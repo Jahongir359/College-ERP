@@ -188,6 +188,30 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 > ⚠️ **Security Note:** Never use `ALLOWED_HOSTS = ['*']` in production!
 
+#### 4.1️⃣ Configure reCAPTCHA
+
+This project now reads the reCAPTCHA keys from environment variables:
+
+```bash
+CAPTCHA_SITE_KEY=your-google-recaptcha-site-key
+CAPTCHA_SECRET_KEY=your-google-recaptcha-secret-key
+```
+
+You can start from [`.env.example`](.env.example) and set the values for your environment. The app automatically loads a local [`.env`](.env) file at startup, so you do not need to export variables manually if you create that file in the project root.
+
+Example `.env` file:
+
+```bash
+CAPTCHA_SITE_KEY=your-google-recaptcha-site-key
+CAPTCHA_SECRET_KEY=your-google-recaptcha-secret-key
+```
+
+If you prefer the shell, you can still export them before running the server.
+
+For the Google error `Invalid domain for site key`, make sure the site key in `CAPTCHA_SITE_KEY` was created in Google reCAPTCHA for the exact hostname you are using, such as `localhost`, `127.0.0.1`, `127.0.0.1:8000`, or your deployed domain.
+
+If you are switching between local and production, use a different key pair for each environment and register both hostnames in the Google reCAPTCHA admin console if you want one key to work in both places.
+
 #### 5️⃣ Database Setup
 
 ```bash

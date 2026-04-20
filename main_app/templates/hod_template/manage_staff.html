@@ -19,6 +19,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Full Name</th>
+                                    <th>Login ID</th>
                                     <th>Email</th>
                                     <th>Gender</th>
                                     <th>Course</th>
@@ -31,6 +32,7 @@
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{staff.last_name}}, {{staff.first_name}}</td>
+                                    <td>STA{{ staff.staff.id|stringformat:"04d" }}</td>
                                     <td>{{staff.email}}</td>
                                     <td>{{staff.gender}}</td>
                                     <td>{{staff.staff.course.name}}</td>

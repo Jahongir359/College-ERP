@@ -1,6 +1,7 @@
 import json
 
 from django.contrib import messages
+from django.db import IntegrityError
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, render)
@@ -306,16 +307,28 @@ def fetch_student_result(request):
 #library
 def add_book(request):
     if request.method == "POST":
-        name = request.POST['name']
-        author = request.POST['author']
-        isbn = request.POST['isbn']
-        category = request.POST['category']
+        name = request.POST.get('name', '').strip()
+        author = request.POST.get('author', '').strip()
+        isbn_raw = request.POST.get('isbn', '').strip()
+        category = request.POST.get('category', '').strip()
 
+        try:
+            isbn = int(isbn_raw)
+        except (TypeError, ValueError):
+            messages.error(request, "ISBN must be a valid positive number.")
+            return redirect(reverse("add_book"))
 
-        books = Book.objects.create(name=name, author=author, isbn=isbn, category=category )
-        books.save()
-        alert = True
-        return render(request, "staff_template/add_book.html", {'alert':alert})
+        if isbn <= 0:
+            messages.error(request, "ISBN must be greater than 0.")
+            return redirect(reverse("add_book"))
+
+        try:
+            Book.objects.create(name=name, author=author, isbn=isbn, category=category)
+            messages.success(request, "Book added successfully.")
+        except IntegrityError:
+            messages.error(request, "Could not add book. Please check the ISBN value.")
+
+        return redirect(reverse("add_book"))
     context = {
         'page_title': "Add Book"
     }

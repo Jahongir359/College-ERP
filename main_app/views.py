@@ -1,17 +1,22 @@
 import json
 import requests
+from django.middleware.csrf import get_token
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
 
-from .EmailBackend import EmailBackend
 from .models import Attendance, Session, Subject 
 
 # Create your views here.
 
 
+@never_cache
+@ensure_csrf_cookie
 def login_page(request):
     if request.user.is_authenticated:
         if request.user.user_type == '1':
@@ -20,35 +25,47 @@ def login_page(request):
             return redirect(reverse("staff_home"))
         else:
             return redirect(reverse("student_home"))
-    return render(request, 'main_app/login.html')
+    return render(request, 'main_app/login.html', {
+        'captcha_site_key': settings.CAPTCHA_SITE_KEY,
+        'captcha_enabled': settings.CAPTCHA_ENABLED,
+    })
 
 
+@csrf_exempt
 def doLogin(request, **kwargs):
     if request.method != 'POST':
         return HttpResponse("<h4>Denied</h4>")
     else:
-        #Google recaptcha
-        captcha_token = request.POST.get('g-recaptcha-response')
-        captcha_url = "https://www.google.com/recaptcha/api/siteverify"
-        captcha_key = "6LfTGD4qAAAAALtlli02bIM2MGi_V0cUYrmzGEGd"
-        # captcha_key = "6LfHPwojAAAAAAtIjbi-7_N4fNf7Wp0LUiYlCDw_"  #server
-        data = {
-            'secret': captcha_key,
-            'response': captcha_token
-        }
-        # Make request
-        try:
-            captcha_server = requests.post(url=captcha_url, data=data)
-            response = json.loads(captcha_server.text)
-            if response['success'] == False:
-                messages.error(request, 'Invalid Captcha. Try Again')
+        if settings.CAPTCHA_ENABLED:
+            # Google reCAPTCHA
+            captcha_token = request.POST.get('g-recaptcha-response')
+            if not captcha_token:
+                messages.error(request, 'Please complete the captcha challenge.')
                 return redirect('/')
-        except:
-            messages.error(request, 'Captcha could not be verified. Try Again')
-            return redirect('/')
+
+            captcha_url = "https://www.google.com/recaptcha/api/siteverify"
+            captcha_key = settings.CAPTCHA_SECRET_KEY
+            data = {
+                'secret': captcha_key,
+                'response': captcha_token
+            }
+            # Make request
+            try:
+                captcha_server = requests.post(url=captcha_url, data=data, timeout=8)
+                response = json.loads(captcha_server.text)
+                if response.get('success') is False:
+                    messages.error(request, 'Invalid Captcha. Try Again')
+                    return redirect('/')
+            except Exception:
+                messages.error(request, 'Captcha could not be verified. Try Again')
+                return redirect('/')
         
-        #Authenticate
-        user = EmailBackend.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
+        # Authenticate with either email or generated staff/student ID.
+        user = authenticate(
+            request,
+            username=request.POST.get('email'),
+            password=request.POST.get('password')
+        )
         if user != None:
             login(request, user)
             
@@ -74,10 +91,16 @@ def doLogin(request, **kwargs):
 
 
 
+@never_cache
+@ensure_csrf_cookie
 def logout_user(request):
     if request.user != None:
         logout(request)
-    return redirect("/")
+
+    # Create a fresh CSRF token right after logout so the next login/form POST
+    # always has a matching token-cookie pair.
+    get_token(request)
+    return redirect(reverse("login_page"))
 
 
 @csrf_exempt

@@ -1,6 +1,7 @@
 import json
 import requests
 from django.contrib import messages
+from django.db import IntegrityError, transaction
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponse, HttpResponseRedirect,
@@ -109,7 +110,7 @@ def add_staff(request):
                 user.address = address
                 user.staff.course = course
                 user.save()
-                messages.success(request, "Successfully Added")
+                messages.success(request, f"Successfully Added. Staff Login ID: STA{user.staff.id:04d}")
                 return redirect(reverse('add_staff'))
 
             except Exception as e:
@@ -145,7 +146,7 @@ def add_student(request):
                 user.student.session = session
                 user.student.course = course
                 user.save()
-                messages.success(request, "Successfully Added")
+                messages.success(request, f"Successfully Added. Student Login ID: STU{user.student.id:04d}")
                 return redirect(reverse('add_student'))
             except Exception as e:
                 messages.error(request, "Could Not Add: " + str(e))
@@ -253,15 +254,13 @@ def edit_staff(request, staff_id):
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
             address = form.cleaned_data.get('address')
-            username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
             course = form.cleaned_data.get('course')
             passport = request.FILES.get('profile_pic') or None
             try:
-                user = CustomUser.objects.get(id=staff.admin.id)
-                user.username = username
+                user = staff.admin
                 user.email = email
                 if password != None:
                     user.set_password(password)
@@ -283,10 +282,8 @@ def edit_staff(request, staff_id):
                 messages.error(request, "Could Not Update " + str(e))
         else:
             messages.error(request, "Please fil form properly")
-    else:
-        user = CustomUser.objects.get(id=staff_id)
-        staff = Staff.objects.get(id=user.id)
-        return render(request, "hod_template/edit_staff_template.html", context)
+
+    return render(request, "hod_template/edit_staff_template.html", context)
 
 
 def edit_student(request, student_id):
@@ -302,7 +299,6 @@ def edit_student(request, student_id):
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
             address = form.cleaned_data.get('address')
-            username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
@@ -310,13 +306,12 @@ def edit_student(request, student_id):
             session = form.cleaned_data.get('session')
             passport = request.FILES.get('profile_pic') or None
             try:
-                user = CustomUser.objects.get(id=student.admin.id)
+                user = student.admin
                 if passport != None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
                     user.profile_pic = passport_url
-                user.username = username
                 user.email = email
                 if password != None:
                     user.set_password(password)
@@ -682,44 +677,108 @@ def send_staff_notification(request):
         return HttpResponse("False")
 
 
+def _delete_attendance_for_subjects(subjects_qs):
+    attendance_qs = Attendance.objects.filter(subject__in=subjects_qs)
+    AttendanceReport.objects.filter(attendance__in=attendance_qs).delete()
+    attendance_qs.delete()
+
+
+def _delete_attendance_for_sessions(sessions_qs):
+    attendance_qs = Attendance.objects.filter(session__in=sessions_qs)
+    AttendanceReport.objects.filter(attendance__in=attendance_qs).delete()
+    attendance_qs.delete()
+
+
 def delete_staff(request, staff_id):
-    staff = get_object_or_404(CustomUser, staff__id=staff_id)
-    staff.delete()
-    messages.success(request, "Staff deleted successfully!")
+    try:
+        with transaction.atomic():
+            staff_profile = get_object_or_404(Staff, id=staff_id)
+            subjects_qs = Subject.objects.filter(staff=staff_profile)
+            _delete_attendance_for_subjects(subjects_qs)
+            subjects_qs.delete()
+            staff_profile.admin.delete()
+        messages.success(request, "Staff deleted successfully!")
+    except IntegrityError:
+        messages.error(
+            request,
+            "Cannot delete this staff member because related records exist (for example attendance/subject data)."
+        )
     return redirect(reverse('manage_staff'))
 
 
 def delete_student(request, student_id):
-    student = get_object_or_404(CustomUser, student__id=student_id)
-    student.delete()
-    messages.success(request, "Student deleted successfully!")
+    try:
+        with transaction.atomic():
+            student_profile = get_object_or_404(Student, id=student_id)
+            AttendanceReport.objects.filter(student=student_profile).delete()
+            student_profile.admin.delete()
+        messages.success(request, "Student deleted successfully!")
+    except IntegrityError:
+        messages.error(
+            request,
+            "Cannot delete this student because related records exist (for example attendance history)."
+        )
     return redirect(reverse('manage_student'))
 
 
 def delete_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     try:
-        course.delete()
+        with transaction.atomic():
+            if Student.objects.filter(course=course).exists() or Staff.objects.filter(course=course).exists():
+                messages.error(
+                    request,
+                    "Cannot delete this course while students or staff are still assigned to it."
+                )
+                return redirect(reverse('manage_course'))
+
+            subjects_qs = Subject.objects.filter(course=course)
+            _delete_attendance_for_subjects(subjects_qs)
+            subjects_qs.delete()
+            course.delete()
         messages.success(request, "Course deleted successfully!")
-    except Exception:
+    except IntegrityError:
         messages.error(
-            request, "Sorry, some students are assigned to this course already. Kindly change the affected student course and try again")
+            request,
+            "Cannot delete this course because dependent records exist. Reassign students/subjects and remove related attendance first."
+        )
     return redirect(reverse('manage_course'))
 
 
 def delete_subject(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
-    subject.delete()
-    messages.success(request, "Subject deleted successfully!")
+    try:
+        with transaction.atomic():
+            subject_qs = Subject.objects.filter(id=subject.id)
+            _delete_attendance_for_subjects(subject_qs)
+            subject.delete()
+        messages.success(request, "Subject deleted successfully!")
+    except IntegrityError:
+        messages.error(
+            request,
+            "Cannot delete this subject because attendance records already reference it."
+        )
     return redirect(reverse('manage_subject'))
 
 
 def delete_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)
     try:
-        session.delete()
+        with transaction.atomic():
+            if Student.objects.filter(session=session).exists():
+                messages.error(
+                    request,
+                    "Cannot delete this session while students are still assigned to it."
+                )
+                return redirect(reverse('manage_session'))
+
+            session_qs = Session.objects.filter(id=session.id)
+            _delete_attendance_for_sessions(session_qs)
+            session.delete()
         messages.success(request, "Session deleted successfully!")
-    except Exception:
+    except IntegrityError:
         messages.error(
-            request, "There are students assigned to this session. Please move them to another session.")
+            request,
+            "Cannot delete this session because related students/attendance records exist."
+        )
     return redirect(reverse('manage_session'))

@@ -19,6 +19,26 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def load_env_file(env_path):
+    if not env_path.exists():
+        return
+
+    with env_path.open() as env_file:
+        for raw_line in env_file:
+            line = raw_line.strip()
+            if not line or line.startswith('#') or '=' not in line:
+                continue
+
+            key, value = line.split('=', 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            os.environ[key] = value
+
+
+# Load local environment variables from .env if present.
+load_env_file(BASE_DIR / '.env')
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -30,6 +50,35 @@ DEBUG = True
 
 # ALLOWED_HOSTS = ['smswithdjango.herokuapp.com']
 ALLOWED_HOSTS = ['*']  # Not recommended but useful in dev mode
+
+# Trust local and Codespaces origins for CSRF checks in development.
+CSRF_TRUSTED_ORIGINS = [
+    'localhost',
+    '127.0.0.1',
+    '.app.github.dev',
+]
+
+extra_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+if extra_csrf_origins:
+    for origin in extra_csrf_origins.split(','):
+        clean_origin = origin.strip().replace('https://', '').replace('http://', '').rstrip('/')
+        if clean_origin:
+            CSRF_TRUSTED_ORIGINS.append(clean_origin)
+
+# Respect forwarded HTTPS headers when running behind a reverse proxy.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
+# Keep CSRF tokens in the authenticated session to avoid cookie-domain mismatch
+# issues in proxied development environments (for example, Codespaces).
+CSRF_USE_SESSIONS = False
+
+# Codespaces and similar proxies may submit requests from a different effective
+# site context. Use cross-site compatible cookies over HTTPS.
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 
 # Application definition
@@ -162,11 +211,15 @@ SESSION_SAVE_EVERY_REQUEST = True  # Save session on every request to extend exp
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-
 EMAIL_HOST_USER = os.environ.get('majidgt786@gmail.com') 
 EMAIL_HOST_PASSWORD = os.environ.get('sshswdwuwaokhghd')
 EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = "School Management System <admin@admin.com>"
+
+# reCAPTCHA configuration
+CAPTCHA_SITE_KEY = os.environ.get('CAPTCHA_SITE_KEY', '6LeD38AsAAAAAP5c93GCIqPBI_Tktaz5EzKhW5YT')
+CAPTCHA_SECRET_KEY = os.environ.get('CAPTCHA_SECRET_KEY', '6LeD38AsAAAAAJrBgT6u8DDrcQgsgZlrxK3JJxaC')
+CAPTCHA_ENABLED = os.environ.get('CAPTCHA_ENABLED', 'false' if DEBUG else 'true').lower() == 'true'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

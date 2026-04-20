@@ -44,15 +44,15 @@
             {% endif %}
 
             <!-- Login Form -->
-            <form action="doLogin/" method="post" class="login-form">
+            <form action="{% url 'user_login' %}" method="post" class="login-form">
                 {% csrf_token %}
 
                 <div class="form-group">
                     <label for="email" class="form-label">
-                        <i class="fas fa-envelope"></i> Email Address
+                        <i class="fas fa-user"></i> Email Or Login ID
                     </label>
-                    <input type="email" id="email" name="email" class="form-control"
-                        placeholder="Enter your email address" required>
+                    <input type="text" id="email" name="email" class="form-control"
+                        placeholder="Enter email, STA0001, or STU0001" required>
                 </div>
 
                 <div class="form-group">
@@ -63,10 +63,12 @@
                         placeholder="Enter your password" required>
                 </div>
 
-                <!-- reCAPTCHA -->
+                {% if captcha_enabled %}
+                <!-- reCAPTCHA site key is provided by the view -->
                 <div class="form-group text-center">
-                    <div class="g-recaptcha" data-sitekey="6LfTGD4qAAAAAJLKy1TGJY7uuTh_T1cB5VikRWjF"></div>
+                    <div class="g-recaptcha" data-sitekey="{{ captcha_site_key }}"></div>
                 </div>
+                {% endif %}
 
                 <div class="form-group">
                     <div class="form-check">
