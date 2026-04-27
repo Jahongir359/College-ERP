@@ -1,57 +1,206 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>College ERP - Password Reset</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iceberg Study Center — Password Reset</title>
+  <link rel="shortcut icon" href="{% static 'image/favicon1.ico' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{% static 'image/favicon1.ico' %}">
+    :root {
+      --navy:   #1B3F7A;
+      --cyan:   #06B6D4;
+      --cyan-dk:#0891B2;
+      --bg:     #F0F6FF;
+      --white:  #FFFFFF;
+      --border: #D1DCF0;
+      --text:   #0F172A;
+      --muted:  #64748B;
+    }
 
-    <!-- ERPNext Style CSS -->
-    <link rel="stylesheet" href="{% static 'dist/css/erpnext-style.css' %}">
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(27,63,122,0.10);
+      width: 100%;
+      max-width: 420px;
+      padding: 48px 40px 40px;
+    }
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .logo-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo-text h1 { font-size: 15px; font-weight: 700; color: var(--navy); line-height: 1.2; }
+    .logo-text p  { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 1px; }
+
+    h2 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+    .alert {
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      border: 1px solid;
+    }
+    .alert-danger  { background:#FEF2F2; color:#991B1B; border-color:#FECACA; }
+    .alert-success { background:#F0FDF4; color:#166534; border-color:#BBF7D0; }
+    .alert-warning { background:#FFFBEB; color:#92400E; border-color:#FDE68A; }
+    .alert-info    { background:#EFF6FF; color:#1E40AF; border-color:#BFDBFE; }
+
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #FAFCFF;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(6,182,212,.15); background: var(--white); }
+
+    /* form-group compatibility */
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .form-group input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; color: var(--text); background: #FAFCFF; outline: none; transition: border-color .15s, box-shadow .15s; }
+    .form-group input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(6,182,212,.15); background: var(--white); }
+    .text-danger { color: #991B1B; font-size: 12px; margin-top: 4px; display: block; }
+
+    .btn-primary, button[type="submit"], input[type="submit"] {
+      display: inline-block;
+      width: 100%;
+      padding: 11px;
+      background: linear-gradient(135deg, var(--navy), var(--cyan-dk));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: .2px;
+    }
+    .btn-primary:hover, button[type="submit"]:hover { opacity: .92; color: white; text-decoration: none; }
+    .btn-primary:active, button[type="submit"]:active { transform: scale(.99); }
+
+    .btn-outline {
+      display: inline-block;
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      color: var(--navy);
+      border: 1.5px solid var(--navy);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+    .btn-outline:hover { background: var(--navy); color: white; text-decoration: none; }
+
+    .link { font-size: 13px; color: var(--cyan-dk); text-decoration: none; font-weight: 500; }
+    .link:hover { text-decoration: underline; }
+
+    .text-center { text-align: center; }
+    .mt-3 { margin-top: 16px; }
+    .mt-4 { margin-top: 24px; }
+    .mb-3 { margin-bottom: 16px; }
+    .mb-4 { margin-bottom: 24px; }
+
+    /* icon in success/error state */
+    .state-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .text-success { color: #166534; }
+    .text-warning { color: #92400E; }
+    .text-muted   { color: var(--muted); }
+
+    .card-footer {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* login-box-msg compatibility */
+    .login-box-msg {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 480px) { .card { padding: 36px 24px 28px; } }
+  </style>
 </head>
-
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-logo">
-                <h1 class="login-title">College ERP</h1>
-                <p class="login-subtitle">Education Management System</p>
-            </div>
+  <div class="card">
 
-            {% block content %}{% endblock %}
-
-            <!-- Footer -->
-            <div class="login-footer text-center mt-4">
-                <small class="text-muted">
-                    &copy; 2024 College ERP System. All rights reserved.
-                </small>
-            </div>
-        </div>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="44" height="44" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="lg" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="0.8" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7DD3FC"/>
+              <stop offset="100%" stop-color="#06B6D4"/>
+            </linearGradient>
+          </defs>
+          <polygon points="18,2 34,32 2,32" stroke="url(#lg2)" stroke-width="1.6" fill="none" filter="url(#lg)"/>
+          <polygon points="11,11 20,30 4,30" stroke="url(#lg2)" stroke-width="1.2" fill="none" opacity="0.85" filter="url(#lg)"/>
+          <polyline points="23,17 29,30 18,30" stroke="#7DD3FC" stroke-width="1" fill="none" opacity="0.6"/>
+          <line x1="18" y1="2" x2="11" y2="20" stroke="#06B6D4" stroke-width="1" opacity="0.7"/>
+          <line x1="11" y1="20" x2="23" y2="30" stroke="#06B6D4" stroke-width="1" opacity="0.7"/>
+          <line x1="11" y1="11" x2="29" y2="30" stroke="#7DD3FC" stroke-width="0.9" opacity="0.5"/>
+          <line x1="18" y1="15" x2="11" y2="30" stroke="#7DD3FC" stroke-width="0.8" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>Iceberg Study Center</h1>
+        <p>Student Management System</p>
+      </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Add 'form-control' class to form inputs for consistent styling
-            var formInputs = document.querySelectorAll('form input[type="text"], form input[type="email"], form input[type="password"]');
-            formInputs.forEach(function (input) {
-                input.classList.add('form-control');
-            });
-        });
-    </script>
-</body>
+    {% block content %}{% endblock %}
 
+    <div class="card-footer">
+      &copy; {% now "Y" %} Iceberg Study Center &mdash; Uzbekistan
+    </div>
+
+  </div>
+</body>
 </html>
