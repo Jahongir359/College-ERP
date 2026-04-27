@@ -15,8 +15,8 @@
             <div class="card-body">
 
               {# Non-field errors #}
-              {% if errors.__all__ %}
-              <div class="alert alert-danger">{{ errors.__all__ }}</div>
+              {% if errors.error %}
+              <div class="alert alert-danger">{{ errors.error }}</div>
               {% endif %}
 
               {# Step 1: Select Group #}
