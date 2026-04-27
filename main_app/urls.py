@@ -17,9 +17,15 @@ from django.urls import path
 
 from main_app.EditResultView import EditResultView
 
-from . import hod_views, staff_views, student_views, views
+from . import hod_views, password_recovery, staff_views, student_views, views
 
 urlpatterns = [
+    # Password recovery (custom code-based flow)
+    path("forgot-password/", password_recovery.forgot_password, name='forgot_password'),
+    path("verify-reset-code/", password_recovery.verify_reset_code, name='verify_reset_code'),
+    path("reset-password/", password_recovery.reset_password, name='reset_password'),
+    path("password-reset-success/", password_recovery.password_reset_success, name='password_reset_success'),
+
     path("health/", views.health, name='health'),
     path("", views.login_page, name='login_page'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
