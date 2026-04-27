@@ -981,7 +981,12 @@ def archive_group(request, group_id):
 @admin_only
 def manage_enrollment(request):
     group_id = request.GET.get('group')
-    groups = Group.objects.filter(is_archived=False).select_related('course')
+    groups, schema_fallback = _active_groups_for_enrollment()
+    if schema_fallback:
+        messages.warning(
+            request,
+            "Database schema looks outdated on this server. Showing all groups for now; run migrations to fully restore enrollment filtering."
+        )
     enrollments = Enrollment.objects.select_related(
         'student__admin', 'student__course',
         'group__course', 'group__teacher__admin'
