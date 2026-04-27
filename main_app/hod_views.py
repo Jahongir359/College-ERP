@@ -771,9 +771,16 @@ def delete_course(request, course_id):
     try:
         course.delete()
         messages.success(request, "Course deleted successfully!")
+    except IntegrityError:
+        messages.error(
+            request,
+            "Could not delete course because linked records still exist. Reassign linked students/staff and try again."
+        )
     except Exception:
         messages.error(
-            request, "Sorry, some students are assigned to this course already. Kindly change the affected student course and try again")
+            request,
+            "Could not delete course due to an unexpected error. Please try again."
+        )
     return redirect(reverse('manage_course'))
 
 
