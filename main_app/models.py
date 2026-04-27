@@ -334,3 +334,23 @@ class ResultFile(models.Model):
     def filename(self):
         import os
         return os.path.basename(self.file.name) if self.file else ''
+
+
+class PasswordResetCode(models.Model):
+    """One-time 6-digit code for the custom password-recovery flow."""
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
+                             related_name='password_reset_codes')
+    code_hash = models.CharField(max_length=64)   # SHA-256 hex of the raw digit code
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used = models.BooleanField(default=False)
+    attempts = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'used', 'expires_at']),
+        ]
+
+    def __str__(self):
+        return f"Reset code for {self.user.email} ({'used' if self.used else 'active'})"
