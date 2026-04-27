@@ -180,6 +180,7 @@ elif DEBUG:
     # Development without SMTP: save emails to files so reset links are readable.
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+    EMAIL_FILE_PATH.mkdir(exist_ok=True)  # auto-create directory if missing
 else:
     # Production without SMTP credentials: print to stdout (visible in DO logs).
     # Set EMAIL_HOST_USER + EMAIL_HOST_PASSWORD in the App Platform console
