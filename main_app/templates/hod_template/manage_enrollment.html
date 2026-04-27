@@ -1,20 +1,22 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
 {% block content %}
 <section class="content">
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-12">
         <div class="card">
-          <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h3 class="card-title">{{page_title}}</h3>
-            <div class="d-flex gap-2">
-              <form method="get" class="d-flex gap-2">
-                <select name="group" class="form-control form-control-sm" onchange="this.form.submit()">
+          <div class="card-header d-flex justify-content-between align-items-center flex-wrap" style="gap:8px;">
+            <h3 class="card-title mb-0">{{ page_title }}</h3>
+            <div class="d-flex flex-wrap" style="gap:8px;">
+              <form method="get" class="d-flex" style="gap:6px;">
+                <select name="group" class="form-control form-control-sm" onchange="this.form.submit()" style="min-width:150px;">
                   <option value="">All Groups</option>
                   {% for g in groups %}
-                  <option value="{{ g.id }}" {% if selected_group == g.id|stringformat:"s" %}selected{% endif %}>{{ g.name }}</option>
+                  <option value="{{ g.id }}" {% if selected_group == g.id|stringformat:"s" %}selected{% endif %}>
+                    {{ g.name }}{% if g.course %} &middot; {{ g.course.name }}{% endif %}
+                  </option>
                   {% endfor %}
                 </select>
               </form>
@@ -23,16 +25,20 @@
               </a>
             </div>
           </div>
-          <div class="card-body" style="overflow-x:auto;">
-            <table class="table table-bordered table-hover">
+
+          <!-- Desktop table -->
+          <div class="card-body p-0 d-none d-md-block" style="overflow-x:auto;">
+            <table class="table table-bordered table-hover mb-0">
               <thead class="thead-dark">
                 <tr>
                   <th>#</th>
                   <th>Student</th>
+                  <th>Course</th>
                   <th>Group</th>
-                  <th>Enrolled On</th>
-                  <th>Active</th>
-                  <th>Actions</th>
+                  <th>Teacher</th>
+                  <th>Enrolled</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -40,7 +46,9 @@
                 <tr>
                   <td>{{ forloop.counter }}</td>
                   <td>{{ e.student }}</td>
+                  <td>{{ e.group.course.name|default:"—" }}</td>
                   <td>{{ e.group.name }}</td>
+                  <td>{{ e.group.teacher|default:"—" }}</td>
                   <td>{{ e.enrolled_on }}</td>
                   <td>
                     {% if e.is_active %}
@@ -51,15 +59,47 @@
                   </td>
                   <td>
                     <a href="{% url 'delete_enrollment' e.id %}" class="btn btn-danger btn-sm"
-                       onclick="return confirm('Remove this enrollment?')">Remove</a>
+                       onclick="return confirm('Remove this enrollment?')">
+                      <i class="fas fa-times"></i> Remove
+                    </a>
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="text-center text-muted">No enrollments found.</td></tr>
+                <tr><td colspan="8" class="text-center text-muted py-4">No enrollments found.</td></tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
+
+          <!-- Mobile cards -->
+          <div class="card-body d-md-none">
+            {% for e in enrollments %}
+            <div class="card mb-2 border">
+              <div class="card-body py-2 px-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <strong>{{ e.student }}</strong>
+                    <div class="text-muted small">{{ e.group.name }} &middot; {{ e.group.course.name|default:"—" }}</div>
+                    <div class="text-muted small">Teacher: {{ e.group.teacher|default:"—" }}</div>
+                    <div class="text-muted small">Enrolled: {{ e.enrolled_on }}</div>
+                  </div>
+                  <div class="text-right">
+                    {% if e.is_active %}
+                    <span class="badge badge-success d-block mb-1">Active</span>
+                    {% else %}
+                    <span class="badge badge-secondary d-block mb-1">Inactive</span>
+                    {% endif %}
+                    <a href="{% url 'delete_enrollment' e.id %}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Remove?')">Remove</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <p class="text-muted text-center">No enrollments found.</p>
+            {% endfor %}
+          </div>
+
         </div>
       </div>
     </div>

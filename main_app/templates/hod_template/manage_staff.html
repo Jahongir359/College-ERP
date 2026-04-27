@@ -1,28 +1,27 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
-
+{% block page_title %}{{ page_title }}{% endblock page_title %}
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">{{ page_title }}</h3>
+                        <a href="{% url 'add_staff' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Add Teacher
+                        </a>
                     </div>
-                    <!-- /.card-header -->
-                    <div class="card-body" style="overflow-x: auto; overflow-y: auto; max-height: 600px;">
-                        <table id="example2" class="table table-bordered table-hover" style="min-width: 800px;">
+                    <div class="card-body" style="overflow-x: auto;">
+                        <table class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
                                     <th>Full Name</th>
                                     <th>Email</th>
-                                    <th>Gender</th>
-                                    <th>Program</th>
-                                    <th>Avatar</th>
+                                    <th>Course</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -30,24 +29,28 @@
                                 {% for staff in allStaff %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{staff.last_name}}, {{staff.first_name}}</td>
-                                    <td>{{staff.email}}</td>
-                                    <td>{{staff.gender}}</td>
-                                    <td>{{staff.staff.course.name}}</td>
+                                    <td>{{ staff.last_name }}, {{ staff.first_name }}</td>
+                                    <td>{{ staff.email }}</td>
+                                    <td>{{ staff.staff.course.name|default:"—" }}</td>
                                     <td>
-                                        {% if staff.profile_pic == ""  %}
-                                        No Image
+                                        {% if staff.staff.is_active %}
+                                        <span class="badge badge-success">Active</span>
                                         {% else %}
-                                        <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{staff.profile_pic}}" alt="">
+                                        <span class="badge badge-danger">Inactive</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> - 
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
+                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Delete this teacher?')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
                                     </td>
                                 </tr>
+                                {% empty %}
+                                <tr><td colspan="6" class="text-center text-muted">No teachers registered.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>

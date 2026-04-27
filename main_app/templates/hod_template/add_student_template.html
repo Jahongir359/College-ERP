@@ -1,72 +1,247 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block custom_css %}
-  <style>
-      .invalid{
-        font-style: italic;
-        font-weight: bold;
-        color: red;
-      }
-      .valid{
-        font-style: italic;
-        font-weight: bold;
-        color: green;
-      }
-  </style>
-{% endblock custom_css %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
-
+{% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
-
 <section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="card card-dark">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-user-plus mr-2"></i>{{ page_title }}</h3>
+          </div>
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-body">
 
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text="Add Student"%}
+              {% if messages %}
+              {% for msg in messages %}
+              <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+              {% endfor %}
+              {% endif %}
+
+              {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+              </div>
+              {% endif %}
+
+              <h6 class="text-uppercase text-muted font-weight-bold border-bottom pb-2 mb-3">Personal Information</h6>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    {{ form.first_name.label_tag }}
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>{% endif %}
+                  </div>
                 </div>
-                <!-- /.card -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    {{ form.last_name.label_tag }}
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>{% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    {{ form.gender.label_tag }}
+                    {{ form.gender }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                {{ form.address.label_tag }}
+                {{ form.address }}
+              </div>
+
+              <div class="form-group">
+                {{ form.profile_pic.label_tag }}
+                {{ form.profile_pic }}
+                <small class="form-text text-muted">Optional — PNG, JPG up to 5 MB.</small>
+              </div>
+
+              <h6 class="text-uppercase text-muted font-weight-bold border-bottom pb-2 mb-3 mt-4">Course &amp; Group Assignment</h6>
+
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label><i class="fas fa-graduation-cap mr-1"></i> Course / Subject <span class="text-danger">*</span></label>
+                    {{ form.course }}
+                    {% if form.course.errors %}<div class="text-danger small mt-1">{{ form.course.errors.0 }}</div>{% endif %}
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label><i class="fas fa-chalkboard-teacher mr-1"></i> Teacher <small class="text-muted">(filter)</small></label>
+                    <select id="teacher_filter" class="form-control">
+                      <option value="">— All Teachers —</option>
+                    </select>
+                    <small class="form-text text-muted">Select course first.</small>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label><i class="fas fa-layer-group mr-1"></i> Group <small class="text-muted">(optional)</small></label>
+                    {{ form.group }}
+                    {% if form.group.errors %}<div class="text-danger small mt-1">{{ form.group.errors.0 }}</div>{% endif %}
+                    <small class="form-text text-muted">Select course to load groups.</small>
+                  </div>
+                </div>
+              </div>
 
             </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-success btn-block">
+                <i class="fas fa-user-plus mr-1"></i> Add Student
+              </button>
+              <a href="{% url 'manage_student' %}" class="btn btn-secondary btn-block mt-2">
+                <i class="fas fa-list mr-1"></i> View All Students
+              </a>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </section>
-{% endblock content %}
+{% endblock %}
+
 {% block custom_js %}
 <script>
-    function validateEmail(email) {
-        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
-    }
-    $(document).ready(function(){
-        $("#id_email").keyup(function(){
-            
-            var email = $(this).val()
-            if (validateEmail(email)){
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+}
+$(document).ready(function(){
+    $("#id_email").keyup(function(){
+        var email = $(this).val();
+        if (validateEmail(email)){
             $.ajax({
                 url: "{% url 'check_email_availability' %}",
                 type: 'POST',
-                data:{email:email}
+                data: {email: email, csrfmiddlewaretoken: '{{ csrf_token }}'}
             }).done(function(response){
+                $(".email_error").remove();
                 if (response == "True"){
-                    $(".email_error").remove()
-                    $("<span class='invalid email_error'>Email Address Already Exist</span>").insertAfter("#id_email");
+                    $("<small class='text-danger email_error d-block mt-1'><i class='fas fa-times-circle mr-1'></i>Email already registered</small>").insertAfter("#id_email");
+                } else {
+                    $("<small class='text-success email_error d-block mt-1'><i class='fas fa-check-circle mr-1'></i>Email available</small>").insertAfter("#id_email");
                 }
-                else{
-                    $(".email_error").remove()
-
-                    $("<span class='valid email_error'>Email Address Available</span>").insertAfter("#id_email");
-                }
-            }).fail(function(response){
-                $("<span class='alert alert-warning'>Server Could Not Process This</span>").insertAfter("#id_email");
-            })
+            });
         }
-        })
     });
+});
+
+const courseSelect = document.getElementById('id_course');
+const teacherFilter = document.getElementById('teacher_filter');
+const groupSelect = document.getElementById('id_group');
+
+function populateSelect(select, items, emptyLabel) {
+    select.innerHTML = `<option value="">${emptyLabel}</option>`;
+    items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.textContent = item.name;
+        select.appendChild(opt);
+    });
+}
+
+function loadTeachers(courseId, callback) {
+    teacherFilter.innerHTML = '<option value="">— All Teachers —</option>';
+    groupSelect.innerHTML = '<option value="">— Select a Group —</option>';
+    if (!courseId) return;
+    fetch(`{% url 'get_teachers_for_course' %}?course_id=${courseId}`)
+        .then(r => r.json())
+        .then(data => {
+            data.forEach(t => {
+                teacherFilter.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+            });
+            if (callback) callback();
+        })
+        .catch(() => {});
+    loadGroupsByCourse(courseId);
+}
+
+function loadGroupsByCourse(courseId) {
+    groupSelect.innerHTML = '<option value="">— Select a Group —</option>';
+    if (!courseId) return;
+    fetch(`{% url 'get_groups_for_teacher' %}?course_id=${courseId}`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.length) {
+                groupSelect.innerHTML += '<option disabled>No groups for this course yet</option>';
+                return;
+            }
+            data.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.id;
+                opt.textContent = g.name;
+                groupSelect.appendChild(opt);
+            });
+            // Re-apply pre-selected group after loading
+            const preGroup = groupSelect.dataset.preselect;
+            if (preGroup) groupSelect.value = preGroup;
+        })
+        .catch(() => {});
+}
+
+function loadGroupsByTeacher(teacherId) {
+    const courseId = courseSelect.value;
+    groupSelect.innerHTML = '<option value="">— Select a Group —</option>';
+    if (!teacherId && !courseId) return;
+    const url = teacherId
+        ? `{% url 'get_groups_for_teacher' %}?teacher_id=${teacherId}`
+        : `{% url 'get_groups_for_teacher' %}?course_id=${courseId}`;
+    fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            data.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.id;
+                opt.textContent = g.name;
+                groupSelect.appendChild(opt);
+            });
+            const preGroup = groupSelect.dataset.preselect;
+            if (preGroup) groupSelect.value = preGroup;
+        })
+        .catch(() => {});
+}
+
+courseSelect.addEventListener('change', function() {
+    loadTeachers(this.value);
+});
+
+teacherFilter.addEventListener('change', function() {
+    loadGroupsByTeacher(this.value);
+});
+
+// On page load: if course pre-selected (e.g. after form validation error), reload dropdowns
+document.addEventListener('DOMContentLoaded', function() {
+    const courseVal = courseSelect.value;
+    const preGroupVal = '{{ form.group.value }}';
+    if (preGroupVal && preGroupVal !== 'None') {
+        groupSelect.dataset.preselect = preGroupVal;
+    }
+    if (courseVal) {
+        loadTeachers(courseVal);
+    }
+});
 </script>
-{% endblock custom_js %}
+{% endblock %}
