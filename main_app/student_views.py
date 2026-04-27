@@ -224,7 +224,8 @@ def student_fcmtoken(request):
 @student_only
 def student_view_notification(request):
     student = get_object_or_404(Student, admin=request.user)
-    notifications = NotificationStudent.objects.filter(student=student)
+    notifications = NotificationStudent.objects.filter(student=student).order_by('-created_at')
+    notifications.filter(is_read=False).update(is_read=True)
     context = {
         'notifications': notifications,
         'page_title': "View Notifications"

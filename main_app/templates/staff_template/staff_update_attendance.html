@@ -13,27 +13,38 @@
           </div>
           <div class="card-body">
 
-            {% if not groups %}
-            <div class="alert alert-warning">
-              <i class="fas fa-exclamation-triangle mr-1"></i>
-              No active groups found.
+            <!-- Cascade: Course → Teacher → Group -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label><i class="fas fa-book mr-1"></i> Course / Program</label>
+                  <select id="course_sel" class="form-control">
+                    <option value="">— All Courses —</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label><i class="fas fa-chalkboard-teacher mr-1"></i> Teacher</label>
+                  <select id="teacher_sel" class="form-control" disabled>
+                    <option value="">— Select Course first —</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label><i class="fas fa-layer-group mr-1"></i> Group <span class="text-danger">*</span></label>
+                  <select id="group" class="form-control" disabled>
+                    <option value="">— Select Teacher first —</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            {% else %}
 
-            <!-- Step 1: pick group -->
-            <div class="form-group">
-              <label><i class="fas fa-layer-group mr-1"></i> Group</label>
-              <select id="group" class="form-control">
-                <option value="">— Select group —</option>
-                {% for g in groups %}
-                <option value="{{ g.id }}">
-                  {{ g.name }}{% if g.course %} · {{ g.course.name }}{% endif %}{% if g.branch %} · {{ g.branch.name }}{% endif %}
-                </option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <button type="button" id="fetch_dates_btn" class="btn btn-primary btn-block">
+            <button type="button" id="fetch_dates_btn" class="btn btn-primary btn-block" disabled>
               <i class="fas fa-calendar-alt mr-1"></i> Load Attendance Dates
             </button>
 
@@ -48,7 +59,6 @@
               </button>
             </div>
 
-            {% endif %}
           </div>
         </div>
 
@@ -143,6 +153,78 @@ function markAll(status) {
   document.querySelectorAll('#roster_tbody tr').forEach(r => setStatus(r, status));
 }
 
+// ── Cascade: Course → Teacher ──────────────────────────────────────────
+document.getElementById('course_sel').addEventListener('change', function () {
+  const courseId = this.value;
+  const teacherSel = document.getElementById('teacher_sel');
+  const groupSel = document.getElementById('group');
+  const fetchBtn = document.getElementById('fetch_dates_btn');
+
+  teacherSel.innerHTML = '<option value="">— Loading… —</option>';
+  teacherSel.disabled = true;
+  groupSel.innerHTML = '<option value="">— Select Teacher first —</option>';
+  groupSel.disabled = true;
+  fetchBtn.disabled = true;
+
+  if (!courseId) {
+    teacherSel.innerHTML = '<option value="">— Select Course first —</option>';
+    return;
+  }
+
+  fetch("{% url 'staff_get_teachers_for_course' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ course_id: courseId })
+  })
+  .then(r => r.json())
+  .then(d => {
+    teacherSel.innerHTML = '<option value="">— All Teachers —</option>' +
+      d.teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    teacherSel.disabled = false;
+    loadGroups(null, courseId);
+  })
+  .catch(() => { teacherSel.innerHTML = '<option value="">Error</option>'; });
+});
+
+// ── Cascade: Teacher → Group ───────────────────────────────────────────
+document.getElementById('teacher_sel').addEventListener('change', function () {
+  const teacherId = this.value;
+  const courseId  = document.getElementById('course_sel').value;
+  loadGroups(teacherId || null, teacherId ? null : courseId);
+});
+
+function loadGroups(teacherId, courseId) {
+  const groupSel = document.getElementById('group');
+  const fetchBtn = document.getElementById('fetch_dates_btn');
+  groupSel.innerHTML = '<option value="">— Loading… —</option>';
+  groupSel.disabled = true;
+  fetchBtn.disabled = true;
+
+  const params = {};
+  if (teacherId) params.teacher_id = teacherId;
+  else if (courseId) params.course_id = courseId;
+
+  fetch("{% url 'staff_get_groups_for_teacher' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(params)
+  })
+  .then(r => r.json())
+  .then(d => {
+    groupSel.innerHTML = '<option value="">— Select a group —</option>' +
+      d.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+    groupSel.disabled = false;
+  })
+  .catch(() => { groupSel.innerHTML = '<option value="">Error</option>'; });
+}
+
+document.getElementById('group').addEventListener('change', function () {
+  document.getElementById('fetch_dates_btn').disabled = !this.value;
+  document.getElementById('date_section').style.display = 'none';
+  document.getElementById('roster_card').style.display = 'none';
+});
+
+// ── Load Dates ─────────────────────────────────────────────────────────
 document.getElementById('fetch_dates_btn').addEventListener('click', function () {
   const group = document.getElementById('group').value;
   if (!group) { alert('Please select a group first.'); return; }
@@ -154,7 +236,7 @@ document.getElementById('fetch_dates_btn').addEventListener('click', function ()
   })
   .then(r => r.json())
   .then(data => {
-    const arr = JSON.parse(data);
+    const arr = typeof data === 'string' ? JSON.parse(data) : data;
     if (!arr.length) { alert('No attendance records for this group yet.'); return; }
     const sel = document.getElementById('attendance_date');
     sel.innerHTML = arr.map(a => `<option value="${a.id}">${a.attendance_date}</option>`).join('');
@@ -164,6 +246,7 @@ document.getElementById('fetch_dates_btn').addEventListener('click', function ()
   .catch(() => alert('Error loading dates.'));
 });
 
+// ── Load Students ──────────────────────────────────────────────────────
 document.getElementById('load_students_btn').addEventListener('click', function () {
   const attendance_date_id = document.getElementById('attendance_date').value;
   if (!attendance_date_id) { alert('Please select a date.'); return; }
@@ -178,34 +261,28 @@ document.getElementById('load_students_btn').addEventListener('click', function 
   })
   .then(r => r.json())
   .then(data => {
-    const arr = JSON.parse(data);
+    const arr = typeof data === 'string' ? JSON.parse(data) : data;
     const btn = document.getElementById('load_students_btn');
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-users mr-1"></i> Load Students';
-
     if (!arr.length) { alert('No student data for this date.'); return; }
 
-    const tbody = document.getElementById('roster_tbody');
-    tbody.innerHTML = arr.map(s => {
-      const cls = STATUS_CLASS[s.status] || 'active-absent';
-      return `
-        <tr data-id="${s.id}">
-          <td class="align-middle font-weight-bold">${s.name}</td>
-          <td>
-            <div class="status-btn-group">
-              <button type="button" class="status-btn ${s.status===1?'active-present':''}" data-status="1" onclick="setStatus(this.closest('tr'),1)">Present</button>
-              <button type="button" class="status-btn ${s.status===2?'active-late':''}" data-status="2" onclick="setStatus(this.closest('tr'),2)">Late</button>
-              <button type="button" class="status-btn ${s.status===0?'active-absent':''}" data-status="0" onclick="setStatus(this.closest('tr'),0)">Absent</button>
-            </div>
-            <input type="hidden" class="student-status" value="${s.status}">
-          </td>
-        </tr>`;
-    }).join('');
+    document.getElementById('roster_tbody').innerHTML = arr.map(s => `
+      <tr data-id="${s.id}">
+        <td class="align-middle font-weight-bold">${s.name}</td>
+        <td>
+          <div class="status-btn-group">
+            <button type="button" class="status-btn ${s.status===1?'active-present':''}" data-status="1" onclick="setStatus(this.closest('tr'),1)">Present</button>
+            <button type="button" class="status-btn ${s.status===2?'active-late':''}" data-status="2" onclick="setStatus(this.closest('tr'),2)">Late</button>
+            <button type="button" class="status-btn ${s.status===0?'active-absent':''}" data-status="0" onclick="setStatus(this.closest('tr'),0)">Absent</button>
+          </div>
+          <input type="hidden" class="student-status" value="${s.status}">
+        </td>
+      </tr>`).join('');
 
-    const dateText = document.getElementById('attendance_date').selectedOptions[0].text;
+    const dateText  = document.getElementById('attendance_date').selectedOptions[0].text;
     const groupText = document.getElementById('group').selectedOptions[0].text;
-    document.getElementById('roster_title').textContent =
-      `${groupText} · ${dateText} — ${arr.length} students`;
+    document.getElementById('roster_title').textContent = `${groupText} · ${dateText} — ${arr.length} students`;
     document.getElementById('roster_card').style.display = 'block';
     document.getElementById('save_msg').innerHTML = '';
     updateSummary();
@@ -218,6 +295,7 @@ document.getElementById('load_students_btn').addEventListener('click', function 
   });
 });
 
+// ── Save ───────────────────────────────────────────────────────────────
 document.getElementById('save_btn').addEventListener('click', function () {
   const attendance_id = document.getElementById('attendance_date').value;
   const rows = document.querySelectorAll('#roster_tbody tr');
@@ -242,7 +320,7 @@ document.getElementById('save_btn').addEventListener('click', function () {
   .then(resp => {
     if (resp === 'OK') {
       document.getElementById('save_msg').innerHTML =
-        '<div class="alert alert-success mb-0"><i class="fas fa-check-circle mr-1"></i> Attendance updated! Students have been notified.</div>';
+        '<div class="alert alert-success mb-0"><i class="fas fa-check-circle mr-1"></i> Attendance updated!</div>';
       document.getElementById('save_btn').style.display = 'none';
     } else {
       document.getElementById('save_msg').innerHTML =

@@ -13,27 +13,40 @@
           </div>
           <div class="card-body">
 
-            {% if not groups %}
-            <div class="alert alert-warning">
-              <i class="fas fa-exclamation-triangle mr-1"></i>
-              No active groups found. Please ask the admin to create groups first.
-            </div>
-            {% else %}
-
             <div class="row">
-              <div class="col-md-6">
+              <!-- Course filter -->
+              <div class="col-md-4">
                 <div class="form-group">
-                  <label><i class="fas fa-layer-group mr-1"></i> Group</label>
-                  <select id="group" class="form-control">
-                    <option value="">— Select group —</option>
-                    {% for g in groups %}
-                    <option value="{{ g.id }}">
-                      {{ g.name }}{% if g.course %} · {{ g.course.name }}{% endif %}{% if g.branch %} · {{ g.branch.name }}{% endif %}
-                    </option>
+                  <label><i class="fas fa-book mr-1"></i> Course / Program</label>
+                  <select id="course_sel" class="form-control">
+                    <option value="">— All Courses —</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
                     {% endfor %}
                   </select>
                 </div>
               </div>
+              <!-- Teacher filter -->
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label><i class="fas fa-chalkboard-teacher mr-1"></i> Teacher</label>
+                  <select id="teacher_sel" class="form-control" disabled>
+                    <option value="">— Select Course first —</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Group -->
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label><i class="fas fa-layer-group mr-1"></i> Group <span class="text-danger">*</span></label>
+                  <select id="group" class="form-control" disabled>
+                    <option value="">— Select Teacher first —</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
               <div class="col-md-4">
                 <div class="form-group">
                   <label><i class="fas fa-calendar-day mr-1"></i> Date</label>
@@ -43,14 +56,13 @@
               </div>
               <div class="col-md-2 d-flex align-items-end">
                 <div class="form-group w-100">
-                  <button type="button" id="fetch_btn" class="btn btn-primary btn-block">
+                  <button type="button" id="fetch_btn" class="btn btn-primary btn-block" disabled>
                     <i class="fas fa-users mr-1"></i> Load
                   </button>
                 </div>
               </div>
             </div>
 
-            {% endif %}
           </div><!-- /.card-body -->
         </div>
 
@@ -127,12 +139,10 @@
 <script>
 const CSRF = document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? '';
 const STATUS_CLASS = {0: 'active-absent', 1: 'active-present', 2: 'active-late'};
-const STATUS_LABEL = {0: 'Absent', 1: 'Present', 2: 'Late'};
 
 function updateSummary() {
-  const rows = document.querySelectorAll('#roster_tbody tr');
   let p = 0, l = 0, a = 0;
-  rows.forEach(r => {
+  document.querySelectorAll('#roster_tbody tr').forEach(r => {
     const v = parseInt(r.querySelector('input.student-status').value);
     if (v === 1) p++; else if (v === 2) l++; else a++;
   });
@@ -142,11 +152,8 @@ function updateSummary() {
 }
 
 function setStatus(row, status) {
-  const inp = row.querySelector('input.student-status');
-  inp.value = status;
-  row.querySelectorAll('.status-btn').forEach(b => {
-    b.classList.remove('active-present', 'active-late', 'active-absent');
-  });
+  row.querySelector('input.student-status').value = status;
+  row.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-present','active-late','active-absent'));
   row.querySelector(`.status-btn[data-status="${status}"]`).classList.add(STATUS_CLASS[status]);
   updateSummary();
 }
@@ -155,10 +162,89 @@ function markAll(status) {
   document.querySelectorAll('#roster_tbody tr').forEach(r => setStatus(r, status));
 }
 
+// ── Cascade: Course → Teacher ──────────────────────────────────────────
+document.getElementById('course_sel').addEventListener('change', function () {
+  const courseId = this.value;
+  const teacherSel = document.getElementById('teacher_sel');
+  const groupSel = document.getElementById('group');
+  const fetchBtn = document.getElementById('fetch_btn');
+
+  teacherSel.innerHTML = '<option value="">— Loading… —</option>';
+  teacherSel.disabled = true;
+  groupSel.innerHTML = '<option value="">— Select Teacher first —</option>';
+  groupSel.disabled = true;
+  fetchBtn.disabled = true;
+
+  if (!courseId) {
+    teacherSel.innerHTML = '<option value="">— Select Course first —</option>';
+    return;
+  }
+
+  fetch("{% url 'staff_get_teachers_for_course' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ course_id: courseId })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (!d.teachers.length) {
+      teacherSel.innerHTML = '<option value="">No teachers for this course</option>';
+      return;
+    }
+    teacherSel.innerHTML = '<option value="">— All Teachers —</option>' +
+      d.teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    teacherSel.disabled = false;
+    // Also load all groups for this course
+    loadGroups(null, courseId);
+  })
+  .catch(() => { teacherSel.innerHTML = '<option value="">Error loading teachers</option>'; });
+});
+
+// ── Cascade: Teacher → Group ───────────────────────────────────────────
+document.getElementById('teacher_sel').addEventListener('change', function () {
+  const teacherId = this.value;
+  const courseId  = document.getElementById('course_sel').value;
+  loadGroups(teacherId || null, teacherId ? null : courseId);
+});
+
+function loadGroups(teacherId, courseId) {
+  const groupSel = document.getElementById('group');
+  const fetchBtn = document.getElementById('fetch_btn');
+  groupSel.innerHTML = '<option value="">— Loading… —</option>';
+  groupSel.disabled = true;
+  fetchBtn.disabled = true;
+
+  const params = {};
+  if (teacherId) params.teacher_id = teacherId;
+  else if (courseId) params.course_id = courseId;
+
+  fetch("{% url 'staff_get_groups_for_teacher' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(params)
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (!d.groups.length) {
+      groupSel.innerHTML = '<option value="">No groups found</option>';
+      return;
+    }
+    groupSel.innerHTML = '<option value="">— Select a group —</option>' +
+      d.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+    groupSel.disabled = false;
+  })
+  .catch(() => { groupSel.innerHTML = '<option value="">Error loading groups</option>'; });
+}
+
+document.getElementById('group').addEventListener('change', function () {
+  document.getElementById('fetch_btn').disabled = !this.value;
+});
+
+// ── Load Students ──────────────────────────────────────────────────────
 document.getElementById('fetch_btn').addEventListener('click', function () {
-  const group = document.getElementById('group').value;
+  const group   = document.getElementById('group').value;
   const attDate = document.getElementById('attendance_date').value;
-  if (!group) { alert('Please select a group first.'); return; }
+  if (!group)   { alert('Please select a group first.'); return; }
   if (!attDate) { alert('Please select a date.'); return; }
 
   this.disabled = true;
@@ -171,18 +257,13 @@ document.getElementById('fetch_btn').addEventListener('click', function () {
   })
   .then(r => r.json())
   .then(data => {
-    const arr = JSON.parse(data);
-    const btn = document.getElementById('fetch_btn');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-users mr-1"></i> Load';
+    const arr = typeof data === 'string' ? JSON.parse(data) : data;
+    document.getElementById('fetch_btn').disabled = false;
+    document.getElementById('fetch_btn').innerHTML = '<i class="fas fa-users mr-1"></i> Load';
 
-    if (!arr.length) {
-      alert('No enrolled students in this group.');
-      return;
-    }
+    if (!arr.length) { alert('No enrolled students in this group.'); return; }
 
-    const tbody = document.getElementById('roster_tbody');
-    tbody.innerHTML = arr.map(s => `
+    document.getElementById('roster_tbody').innerHTML = arr.map(s => `
       <tr data-id="${s.id}">
         <td class="align-middle font-weight-bold">${s.name}</td>
         <td>
@@ -196,20 +277,20 @@ document.getElementById('fetch_btn').addEventListener('click', function () {
       </tr>`).join('');
 
     const grpOpt = document.getElementById('group').selectedOptions[0].text;
-    document.getElementById('roster_title').textContent =
-      `${grpOpt} · ${attDate} — ${arr.length} students`;
+    document.getElementById('roster_title').textContent = `${grpOpt} · ${attDate} — ${arr.length} students`;
     document.getElementById('roster_card').style.display = 'block';
+    document.getElementById('save_btn').style.display = '';
     document.getElementById('save_msg').innerHTML = '';
     updateSummary();
   })
   .catch(() => {
-    const btn = document.getElementById('fetch_btn');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-users mr-1"></i> Load';
+    document.getElementById('fetch_btn').disabled = false;
+    document.getElementById('fetch_btn').innerHTML = '<i class="fas fa-users mr-1"></i> Load';
     alert('Error loading students.');
   });
 });
 
+// ── Save ───────────────────────────────────────────────────────────────
 document.getElementById('save_btn').addEventListener('click', function () {
   const group   = document.getElementById('group').value;
   const attDate = document.getElementById('attendance_date').value;

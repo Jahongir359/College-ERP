@@ -81,6 +81,8 @@ urlpatterns = [
          hod_views.edit_student, name='edit_student'),
     path("course/edit/<int:course_id>",
          hod_views.edit_course, name='edit_course'),
+    path("course/toggle-active/<int:course_id>",
+         hod_views.toggle_course_active, name='toggle_course_active'),
     path("subject/edit/<int:subject_id>",
          hod_views.edit_subject, name='edit_subject'),
 
@@ -180,7 +182,11 @@ urlpatterns = [
     # Result Files (Student)
     path("student/result/files/", student_views.student_result_files, name='student_result_files'),
 
-    # AJAX helpers
+    # AJAX helpers (admin)
     path("ajax/teachers-for-course/", hod_views.get_teachers_for_course, name='get_teachers_for_course'),
     path("ajax/groups-for-teacher/", hod_views.get_groups_for_teacher, name='get_groups_for_teacher'),
+
+    # AJAX helpers (staff)
+    path("staff/ajax/teachers-for-course/", staff_views.staff_get_teachers_for_course, name='staff_get_teachers_for_course'),
+    path("staff/ajax/groups-for-teacher/", staff_views.staff_get_groups_for_teacher, name='staff_get_groups_for_teacher'),
 ]

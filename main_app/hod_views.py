@@ -793,6 +793,16 @@ def delete_course(request, course_id):
 
 
 @admin_only
+def toggle_course_active(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    course.is_active = not course.is_active
+    course.save()
+    state = "activated" if course.is_active else "deactivated"
+    messages.success(request, f"Course '{course.name}' has been {state}.")
+    return redirect(reverse('manage_course'))
+
+
+@admin_only
 def delete_subject(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     try:

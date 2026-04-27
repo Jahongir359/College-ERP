@@ -319,6 +319,9 @@
             <a href="{{ staff_view_notification }}" class="nav-link {% if staff_view_notification == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-bell"></i>
                 <span class="nav-text">Notifications</span>
+                {% if unread_notification_count > 0 %}
+                <span class="badge badge-danger badge-pill ml-auto">{{ unread_notification_count }}</span>
+                {% endif %}
             </a>
         </div>
 
@@ -409,6 +412,9 @@
             <a href="{{ student_view_notification }}" class="nav-link {% if student_view_notification == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-bell"></i>
                 <span class="nav-text">Notifications</span>
+                {% if unread_notification_count > 0 %}
+                <span class="badge badge-danger badge-pill ml-auto">{{ unread_notification_count }}</span>
+                {% endif %}
             </a>
         </div>
 

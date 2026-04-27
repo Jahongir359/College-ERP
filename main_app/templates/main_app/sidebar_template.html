@@ -404,7 +404,9 @@
                                     <i class="nav-icon fas fa-bell"></i>
                                     <p>
                                         View Notifications
-
+                                        {% if unread_notification_count > 0 %}
+                                        <span class="right badge badge-danger">{{ unread_notification_count }}</span>
+                                        {% endif %}
                                     </p>
                                 </a>
                             </li>
@@ -518,7 +520,9 @@
                                                 <i class="nav-icon fas fa-bell"></i>
                                                 <p>
                                                     View Notifications
-
+                                                    {% if unread_notification_count > 0 %}
+                                                    <span class="right badge badge-danger">{{ unread_notification_count }}</span>
+                                                    {% endif %}
                                                 </p>
                                             </a>
                                         </li>

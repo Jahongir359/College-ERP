@@ -70,6 +70,7 @@ class Admin(models.Model):
 
 class Course(models.Model):
     name = models.CharField(max_length=120)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -193,6 +194,7 @@ class FeedbackStaff(models.Model):
 class NotificationStaff(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     message = models.TextField()
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -200,6 +202,7 @@ class NotificationStaff(models.Model):
 class NotificationStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     message = models.TextField()
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -47,10 +47,9 @@ def staff_home(request):
 
 @staff_only
 def staff_take_attendance(request):
-    # Show ALL non-archived groups so any teacher can take attendance
-    groups = Group.objects.filter(is_archived=False).select_related('course', 'branch')
+    courses = Course.objects.filter(is_active=True).order_by('name')
     context = {
-        'groups': groups,
+        'courses': courses,
         'today': date.today().isoformat(),
         'page_title': 'Take Attendance',
     }
@@ -111,9 +110,9 @@ def save_attendance(request):
 
 @staff_only
 def staff_update_attendance(request):
-    groups = Group.objects.filter(is_archived=False).select_related('course', 'branch')
+    courses = Course.objects.filter(is_active=True).order_by('name')
     context = {
-        'groups': groups,
+        'courses': courses,
         'page_title': 'Update Attendance',
     }
     return render(request, 'staff_template/staff_update_attendance.html', context)
@@ -270,7 +269,8 @@ def staff_fcmtoken(request):
 @staff_only
 def staff_view_notification(request):
     staff = get_object_or_404(Staff, admin=request.user)
-    notifications = NotificationStaff.objects.filter(staff=staff)
+    notifications = NotificationStaff.objects.filter(staff=staff).order_by('-created_at')
+    notifications.filter(is_read=False).update(is_read=True)
     context = {
         'notifications': notifications,
         'page_title': "View Notifications"
@@ -476,11 +476,11 @@ def staff_result_files(request):
 def upload_result_file(request):
     import os
     staff = get_object_or_404(Staff, admin=request.user)
-    groups = Group.objects.filter(is_archived=False).select_related('course')
+    courses = Course.objects.filter(is_active=True).order_by('name')
 
     if request.method != 'POST':
         return render(request, 'staff_template/upload_result_file.html', {
-            'groups': groups,
+            'courses': courses,
             'page_title': 'Upload Result File',
         })
 
@@ -502,7 +502,7 @@ def upload_result_file(request):
 
     if errors:
         return render(request, 'staff_template/upload_result_file.html', {
-            'groups': groups,
+            'courses': courses,
             'errors': errors,
             'post': request.POST,
             'page_title': 'Upload Result File',
@@ -544,3 +544,35 @@ def delete_result_file(request, file_id):
     result_file.delete()
     messages.success(request, "File deleted.")
     return redirect(reverse('staff_result_files'))
+
+
+@csrf_exempt
+@staff_only
+def staff_get_teachers_for_course(request):
+    """Return active staff members for a given course (for AJAX cascade in staff views)."""
+    course_id = request.POST.get('course_id') or request.GET.get('course_id')
+    if not course_id:
+        return JsonResponse({'teachers': []})
+    staff_qs = Staff.objects.filter(
+        course_id=course_id, is_active=True
+    ).select_related('admin').order_by('admin__first_name')
+    teachers = [
+        {'id': s.id, 'name': f"{s.admin.first_name} {s.admin.last_name}"}
+        for s in staff_qs
+    ]
+    return JsonResponse({'teachers': teachers})
+
+
+@csrf_exempt
+@staff_only
+def staff_get_groups_for_teacher(request):
+    """Return active groups for a given teacher (for AJAX cascade in staff views)."""
+    teacher_id = request.POST.get('teacher_id') or request.GET.get('teacher_id')
+    course_id = request.POST.get('course_id') or request.GET.get('course_id')
+    qs = Group.objects.filter(is_archived=False)
+    if teacher_id:
+        qs = qs.filter(teacher_id=teacher_id)
+    elif course_id:
+        qs = qs.filter(course_id=course_id)
+    groups = [{'id': g.id, 'name': g.name} for g in qs.order_by('name')]
+    return JsonResponse({'groups': groups})
