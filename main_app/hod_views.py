@@ -680,6 +680,9 @@ def send_student_notification(request):
     message = request.POST.get('message')
     student = get_object_or_404(Student, admin_id=id)
     try:
+        notification = NotificationStudent(student=student, message=message)
+        notification.save()
+
         fcm_server_key = os.environ.get('FCM_SERVER_KEY', '')
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
@@ -695,9 +698,10 @@ def send_student_notification(request):
             'Authorization': 'key=' + fcm_server_key,
             'Content-Type': 'application/json',
         }
-        requests.post(url, data=json.dumps(body), headers=headers)
-        notification = NotificationStudent(student=student, message=message)
-        notification.save()
+        try:
+            requests.post(url, data=json.dumps(body), headers=headers, timeout=10)
+        except requests.RequestException:
+            logger.exception("Failed to send student notification push for student_id=%s", id)
         return HttpResponse("True")
     except Exception as e:
         return HttpResponse("False")
@@ -710,6 +714,9 @@ def send_staff_notification(request):
     message = request.POST.get('message')
     staff = get_object_or_404(Staff, admin_id=id)
     try:
+        notification = NotificationStaff(staff=staff, message=message)
+        notification.save()
+
         fcm_server_key = os.environ.get('FCM_SERVER_KEY', '')
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
@@ -725,9 +732,10 @@ def send_staff_notification(request):
             'Authorization': 'key=' + fcm_server_key,
             'Content-Type': 'application/json',
         }
-        requests.post(url, data=json.dumps(body), headers=headers)
-        notification = NotificationStaff(staff=staff, message=message)
-        notification.save()
+        try:
+            requests.post(url, data=json.dumps(body), headers=headers, timeout=10)
+        except requests.RequestException:
+            logger.exception("Failed to send staff notification push for staff_id=%s", id)
         return HttpResponse("True")
     except Exception as e:
         return HttpResponse("False")
