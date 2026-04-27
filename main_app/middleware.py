@@ -47,6 +47,13 @@ class LoginCheckMiddleWare(MiddlewareMixin):
                 or request.path.startswith('/accounts/')
                 or request.path.startswith('/admin/')
                 or request.path == '/health/'
+                # Custom code-based password recovery flow — checked by both
+                # module name (function-based views) and URL path (fallback).
+                or modulename == 'main_app.password_recovery'
+                or request.path.startswith('/forgot-password')
+                or request.path.startswith('/verify-reset-code')
+                or request.path.startswith('/reset-password')
+                or request.path.startswith('/password-reset-success')
             ):
                 pass
             else:
