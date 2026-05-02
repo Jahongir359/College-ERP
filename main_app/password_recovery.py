@@ -27,6 +27,7 @@ import secrets
 from datetime import timedelta
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -86,7 +87,8 @@ def forgot_password(request):
     exists.  This prevents enumeration.
     """
     if request.method != 'POST':
-        return render(request, 'registration/forgot_password.html')
+        email = request.GET.get('email', '').strip().lower()
+        return render(request, 'registration/forgot_password.html', {'email': email})
 
     email = request.POST.get('email', '').strip().lower()
     if not email:
@@ -120,12 +122,17 @@ def forgot_password(request):
 
             try:
                 _send_code_email(user.email, code)
-                # In development the code is visible in the console/file backend.
-                # This line is intentionally left for server-side debugging only.
-                logger.debug("[PRC] Plaintext code for %s: %s", email, code)
             except Exception as exc:
                 logger.error("[PRC] Email send failed for %s: %s", email, exc, exc_info=True)
                 obj.delete()   # Don't count a failed send against the rate limit.
+            else:
+                # Always log the code so it's findable in server/DO logs.
+                logger.warning("[PRC] Verification code for %s: %s", email, code)
+                # In DEBUG mode, stash the code in the session so the verify
+                # page can display it directly — removes the need for real SMTP
+                # during development and testing.
+                if settings.DEBUG:
+                    request.session['_prc_dev_code'] = code
 
     except CustomUser.DoesNotExist:
         logger.info("[PRC] Email not registered: %s", email)
@@ -148,7 +155,10 @@ def verify_reset_code(request):
     """
     if request.method == 'GET':
         email = request.GET.get('email', '').strip().lower()
-        return render(request, 'registration/verify_reset_code.html', {'email': email})
+        ctx = {'email': email}
+        if settings.DEBUG:
+            ctx['dev_code'] = request.session.pop('_prc_dev_code', None)
+        return render(request, 'registration/verify_reset_code.html', ctx)
 
     # ── POST ──────────────────────────────────────────────────────────────────
     email = request.POST.get('email', '').strip().lower()
@@ -172,7 +182,13 @@ def verify_reset_code(request):
 
     # Find the latest code for this user (regardless of expiry/used status,
     # so we can return the most relevant error message).
-    obj = PasswordResetCode.objects.filter(user=user).order_by('-created_at').first()
+    try:
+        obj = PasswordResetCode.objects.filter(user=user).order_by('-created_at').first()
+    except Exception as exc:
+        logger.error("[PRC] DB error fetching code for user id=%s: %s", user.id, exc, exc_info=True)
+        ctx['error'] = 'A server error occurred. Please try again or request a new code.'
+        ctx['show_resend'] = True
+        return render(request, 'registration/verify_reset_code.html', ctx)
 
     if obj is None:
         logger.info("[PRC] No code exists for user id=%s", user.id)
