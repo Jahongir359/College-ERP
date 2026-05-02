@@ -6,11 +6,19 @@
   Check your inbox for a 6-digit code. It expires in 10&nbsp;minutes.
 </p>
 
+{% if dev_code %}
+<div class="alert alert-warning" style="font-size:15px; text-align:center;">
+  <strong>DEV MODE</strong> — No SMTP configured.<br>
+  Your verification code is:
+  <span style="font-family:monospace; font-size:22px; letter-spacing:0.3em; font-weight:700; display:block; margin-top:6px;">{{ dev_code }}</span>
+</div>
+{% else %}
 <div class="alert alert-info" style="margin-bottom:20px;">
   <i class="fas fa-info-circle" style="margin-right:6px;"></i>
   If this email is registered, a verification code has been sent.
   Please check your inbox and spam folder.
 </div>
+{% endif %}
 
 {% if error %}
 <div class="alert {% if show_resend %}alert-warning{% else %}alert-danger{% endif %}">
@@ -21,7 +29,8 @@
 {% if show_resend %}
 {# Code is expired / used / locked — show resend option, no code form #}
 <div class="text-center" style="margin-top:8px;">
-  <a href="{% url 'forgot_password' %}" class="btn-primary" style="display:inline-block; width:auto; padding:10px 24px;">
+  <a href="{% url 'forgot_password' %}{% if email %}?email={{ email|urlencode }}{% endif %}"
+     class="btn-primary" style="display:inline-block; width:auto; padding:10px 24px;">
     <i class="fas fa-redo" style="margin-right:6px;"></i> Request a new code
   </a>
 </div>
@@ -67,7 +76,8 @@
 </form>
 
 <div class="text-center" style="margin-top:16px;">
-  <a href="{% url 'forgot_password' %}" class="link">Didn't receive a code? Send a new one</a>
+  <a href="{% url 'forgot_password' %}{% if email %}?email={{ email|urlencode }}{% endif %}"
+     class="link">Didn't receive a code? Send a new one</a>
 </div>
 <div class="text-center" style="margin-top:8px;">
   <a href="{% url 'login_page' %}" class="link">← Back to sign in</a>
