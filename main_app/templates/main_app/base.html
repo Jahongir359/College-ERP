@@ -39,9 +39,7 @@
                 <i class="fas fa-bars"></i>
             </button>
             <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}" class="navbar-brand" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;">
-                <span style="font-weight:800;font-size:18px;letter-spacing:0.12em;line-height:1;">
-                    <span style="color:#06B6D4;">ICE</span><span style="color:#1B3F7A;">BERG</span>
-                </span>
+                <img src="{% static 'dist/img/iceberg-wordmark.png' %}" alt="ICEBERG" style="height:30px;width:auto;display:block;">
             </a>
         </div>
         
