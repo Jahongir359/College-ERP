@@ -8,7 +8,6 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
                               redirect, render)
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
 
 from .decorators import student_only
 from .forms import *
@@ -79,7 +78,6 @@ def student_home(request):
 
 
 @student_only
-@csrf_exempt
 def student_view_attendance(request):
     student = get_object_or_404(Student, admin=request.user)
     enrolled_group_ids = Enrollment.objects.filter(
@@ -209,7 +207,6 @@ def student_view_profile(request):
     return render(request, "student_template/student_view_profile.html", context)
 
 
-@csrf_exempt
 def student_fcmtoken(request):
     token = request.POST.get('token')
     student_user = get_object_or_404(CustomUser, id=request.user.id)

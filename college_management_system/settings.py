@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'axes',                                 # brute-force lockout
     'main_app.apps.MainAppConfig',
 ]
 
@@ -59,6 +60,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'main_app.middleware.LoginCheckMiddleWare',
+    # Axes must come AFTER AuthenticationMiddleware so request.user is set.
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'college_management_system.urls'
@@ -148,7 +151,28 @@ else:
 # ---------------------------------------------------------------------------
 
 AUTH_USER_MODEL = 'main_app.CustomUser'
-AUTHENTICATION_BACKENDS = ['main_app.EmailBackend.EmailBackend']
+
+# AxesStandaloneBackend must come FIRST so it can short-circuit
+# authenticate() with AxesSignal-raised lockouts before the real
+# email/password check runs.
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'main_app.EmailBackend.EmailBackend',
+]
+
+# ── Login brute-force protection (django-axes) ────────────────────────────────
+# 5 failed attempts on the (username, IP) pair triggers a 15-minute lockout.
+# AxesStandaloneBackend lets us scope by username (so one attacker's IP storm
+# does not lock out the real user — both signals together gate the lockout).
+from datetime import timedelta as _td
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = _td(minutes=15)               # axes 5.13 requires timedelta, not float
+AXES_LOCK_OUT_AT_FAILURE = True
+AXES_RESET_ON_SUCCESS = True
+AXES_ONLY_USER_FAILURES = False
+AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']
+AXES_USERNAME_FORM_FIELD = 'email'                # doLogin posts ?email=
+AXES_LOCKOUT_TEMPLATE = None                      # use the JSON 403 default
 
 # ---------------------------------------------------------------------------
 # Sessions (Remember Me support)

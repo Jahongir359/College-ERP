@@ -10,7 +10,6 @@ from django.shortcuts import (HttpResponse, HttpResponseRedirect,
                               get_object_or_404, redirect, render)
 from django.templatetags.static import static
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
 
 from .decorators import admin_only
@@ -469,7 +468,6 @@ def edit_session(request, session_id):
         return render(request, "hod_template/edit_session_template.html", context)
 
 
-@csrf_exempt
 @admin_only
 def check_email_availability(request):
     email = request.POST.get("email")
@@ -482,7 +480,6 @@ def check_email_availability(request):
         return HttpResponse(False)
 
 
-@csrf_exempt
 @admin_only
 def student_feedback_message(request):
     if request.method != 'POST':
@@ -504,7 +501,6 @@ def student_feedback_message(request):
             return HttpResponse(False)
 
 
-@csrf_exempt
 @admin_only
 def staff_feedback_message(request):
     if request.method != 'POST':
@@ -526,7 +522,6 @@ def staff_feedback_message(request):
             return HttpResponse(False)
 
 
-@csrf_exempt
 @admin_only
 def view_staff_leave(request):
     if request.method != 'POST':
@@ -552,7 +547,6 @@ def view_staff_leave(request):
             return HttpResponse(False)
 
 
-@csrf_exempt
 @admin_only
 def view_student_leave(request):
     if request.method != 'POST':
@@ -588,7 +582,6 @@ def admin_view_attendance(request):
     return render(request, "hod_template/admin_view_attendance.html", context)
 
 
-@csrf_exempt
 @admin_only
 def get_admin_attendance(request):
     attendance_date_id = request.POST.get('attendance_date_id')
@@ -673,7 +666,6 @@ def admin_notify_student(request):
     return render(request, "hod_template/student_notification.html", context)
 
 
-@csrf_exempt
 @admin_only
 def send_student_notification(request):
     id = request.POST.get('id')
@@ -707,7 +699,6 @@ def send_student_notification(request):
         return HttpResponse("False")
 
 
-@csrf_exempt
 @admin_only
 def send_staff_notification(request):
     id = request.POST.get('id')
@@ -828,7 +819,6 @@ def delete_session(request, session_id):
     return redirect(reverse('manage_session'))
 
 
-@csrf_exempt
 @admin_only
 def get_teachers_for_course(request):
     course_id = request.GET.get('course_id') or request.POST.get('course_id')
@@ -842,7 +832,6 @@ def get_teachers_for_course(request):
         return JsonResponse([], safe=False)
 
 
-@csrf_exempt
 @admin_only
 def get_groups_for_teacher(request):
     teacher_id = request.GET.get('teacher_id') or request.POST.get('teacher_id')
@@ -1082,7 +1071,6 @@ def add_enrollment(request):
     })
 
 
-@csrf_exempt
 @admin_only
 def get_group_info(request):
     group_id = request.POST.get('group_id')

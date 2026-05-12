@@ -3,8 +3,18 @@ from django.contrib.auth.models import UserManager
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 from datetime import datetime,timedelta
+
+
+_LOAN_PERIOD_DAYS = 14
+_OVERDUE_FINE_PER_DAY = 5  # ₹
+
+
+def _default_loan_due_date():
+    return timezone.now().date() + timedelta(days=_LOAN_PERIOD_DAYS)
 
 
 
@@ -139,6 +149,10 @@ class Attendance(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        # Audit #13: prevent the same group/subject/date being marked twice.
+        unique_together = ('group', 'subject', 'date')
+
     def __str__(self):
         group_name = self.group.name if self.group else "—"
         return f"{group_name} · {self.date}"
@@ -159,7 +173,7 @@ class AttendanceReport(models.Model):
 
 class LeaveReportStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date = models.CharField(max_length=60)
+    date = models.DateField(null=True, blank=True)   # was CharField (audit #12)
     message = models.TextField()
     status = models.SmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -168,7 +182,7 @@ class LeaveReportStudent(models.Model):
 
 class LeaveReportStaff(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
-    date = models.CharField(max_length=60)
+    date = models.DateField(null=True, blank=True)   # was CharField (audit #12)
     message = models.TextField()
     status = models.SmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -222,19 +236,16 @@ class StudentResult(models.Model):
 
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
+    """Create the matching role-profile row on first save of a CustomUser.
+
+    Previously this app had TWO post_save receivers (this one and a
+    `save_user_profile` twin without the `created` guard) both calling
+    get_or_create. The twin fired on every password change / profile
+    edit, so every save round-tripped the DB once for the role table
+    even though no new row was ever created. Audit fix #4.
+    """
     if not created:
         return
-    user_type = str(instance.user_type)
-    if user_type == '1':
-        Admin.objects.get_or_create(admin=instance)
-    elif user_type == '2':
-        Staff.objects.get_or_create(admin=instance)
-    elif user_type == '3':
-        Student.objects.get_or_create(admin=instance)
-
-
-@receiver(post_save, sender=CustomUser)
-def save_user_profile(sender, instance, **kwargs):
     user_type = str(instance.user_type)
     if user_type == '1':
         Admin.objects.get_or_create(admin=instance)
@@ -354,3 +365,55 @@ class PasswordResetCode(models.Model):
 
     def __str__(self):
         return f"Reset code for {self.user.email} ({'used' if self.used else 'active'})"
+
+
+class Loan(models.Model):
+    """A book lending transaction.
+
+    Replaces the legacy IssuedBook table which stored student_id as a
+    CharField (no referential integrity) and joined to Book via ISBN.
+    Both ends are now real ForeignKeys; a partial unique constraint
+    prevents the same book from being on loan to the same student twice
+    simultaneously (returned_at IS NULL = active loan).
+    """
+    student = models.ForeignKey(Student, on_delete=models.PROTECT,
+                                related_name='loans')
+    book = models.ForeignKey(Book, on_delete=models.PROTECT,
+                             related_name='loans')
+    issued_on = models.DateField(default=timezone.localdate)
+    due_on = models.DateField(default=_default_loan_due_date)
+    returned_on = models.DateField(null=True, blank=True)
+    fine_paid = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-issued_on']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['student', 'book'],
+                condition=Q(returned_on__isnull=True),
+                name='one_active_loan_per_student_book',
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.book.name} → {self.student} ({'open' if self.returned_on is None else 'returned'})"
+
+    @property
+    def is_active(self):
+        return self.returned_on is None
+
+    @property
+    def is_overdue(self):
+        if not self.is_active:
+            return False
+        return timezone.localdate() > self.due_on
+
+    @property
+    def days_overdue(self):
+        if not self.is_active or not self.is_overdue:
+            return 0
+        return (timezone.localdate() - self.due_on).days
+
+    @property
+    def fine_amount(self):
+        return self.days_overdue * _OVERDUE_FINE_PER_DAY

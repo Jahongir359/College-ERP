@@ -1,17 +1,22 @@
 import json
+import logging
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
+from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, render)
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .decorators import staff_only
 from .forms import *
 from .models import *
 from . import forms, models
 from datetime import date
+
+logger = logging.getLogger(__name__)
 
 
 @staff_only
@@ -56,7 +61,7 @@ def staff_take_attendance(request):
     return render(request, 'staff_template/staff_take_attendance.html', context)
 
 
-@csrf_exempt
+@staff_only
 def get_students(request):
     group_id = request.POST.get('group')
     try:
@@ -83,27 +88,64 @@ _STATUS_LABELS = {
 }
 
 
-@csrf_exempt
+@staff_only
+@require_POST
 def save_attendance(request):
-    student_data = request.POST.get('student_ids')
-    att_date = request.POST.get('date')
-    group_id = request.POST.get('group')
-    students = json.loads(student_data)
+    """Save attendance for a group on a date in one atomic write.
+
+    Replaces the previous loop-per-student pattern (1 + N + N inserts) with
+    a single transaction containing bulk_create calls (≤ 4 round-trips).
+    Re-submitting the same group+date is idempotent: existing reports for
+    that attendance row are wiped before bulk insertion, so partial saves
+    cannot leave stale rows behind.
+    """
     try:
-        group = get_object_or_404(Group, id=group_id)
-        attendance = Attendance.objects.create(group=group, date=att_date)
-        for student_dict in students:
-            student = get_object_or_404(Student, id=student_dict['id'])
-            status = int(student_dict.get('status', AttendanceReport.ABSENT))
-            AttendanceReport.objects.create(student=student, attendance=attendance, status=status)
-            NotificationStudent.objects.create(
-                student=student,
-                message=(
-                    f"Attendance for {group.name} on {att_date} has been marked: "
-                    f"{_STATUS_LABELS.get(status, 'Unknown')}."
-                ),
+        rows = json.loads(request.POST.get('student_ids') or '[]')
+    except json.JSONDecodeError:
+        return HttpResponse("Invalid student data", status=400)
+
+    group_id = request.POST.get('group')
+    att_date = request.POST.get('date')
+    if not group_id or not att_date or not rows:
+        return HttpResponse("Missing group/date/students", status=400)
+
+    group = get_object_or_404(Group, id=group_id)
+    student_ids = {int(r['id']) for r in rows if 'id' in r}
+    if not student_ids:
+        return HttpResponse("No student IDs supplied", status=400)
+
+    try:
+        with transaction.atomic():
+            attendance, _ = Attendance.objects.get_or_create(
+                group=group, date=att_date,
             )
+            # Idempotent: wipe any prior reports for this row before inserting.
+            AttendanceReport.objects.filter(attendance=attendance).delete()
+
+            AttendanceReport.objects.bulk_create([
+                AttendanceReport(
+                    attendance=attendance,
+                    student_id=int(r['id']),
+                    status=int(r.get('status', AttendanceReport.ABSENT)),
+                ) for r in rows
+            ], batch_size=200)
+
+            # Only notify absent/late students — "present" is the default
+            # and doesn't need to spam every inbox.
+            notable = [r for r in rows
+                       if int(r.get('status', 0)) != AttendanceReport.PRESENT]
+            if notable:
+                NotificationStudent.objects.bulk_create([
+                    NotificationStudent(
+                        student_id=int(r['id']),
+                        message=(
+                            f"Attendance for {group.name} on {att_date}: "
+                            f"{_STATUS_LABELS.get(int(r.get('status', 0)), 'Unknown')}."
+                        ),
+                    ) for r in notable
+                ], batch_size=200)
     except Exception:
+        logger.exception("save_attendance failed for group=%s date=%s", group_id, att_date)
         return HttpResponse("ERROR", status=400)
     return HttpResponse("OK")
 
@@ -118,7 +160,7 @@ def staff_update_attendance(request):
     return render(request, 'staff_template/staff_update_attendance.html', context)
 
 
-@csrf_exempt
+@staff_only
 def get_student_attendance(request):
     attendance_date_id = request.POST.get('attendance_date_id')
     try:
@@ -139,27 +181,62 @@ def get_student_attendance(request):
         return JsonResponse({'error': 'Unable to fetch student attendance.'}, status=400)
 
 
-@csrf_exempt
+@staff_only
+@require_POST
 def update_attendance(request):
-    student_data = request.POST.get('student_ids')
-    attendance_id = request.POST.get('date')
-    students = json.loads(student_data)
+    """Bulk-update existing attendance reports.
+
+    Loads all relevant reports in a single query, applies the new
+    statuses in-memory, then writes them back with bulk_update.
+    """
     try:
-        attendance = get_object_or_404(Attendance, id=attendance_id)
-        for student_dict in students:
-            student = get_object_or_404(Student, id=student_dict['id'])   # student PK
-            report = get_object_or_404(AttendanceReport, student=student, attendance=attendance)
-            status = int(student_dict.get('status', AttendanceReport.ABSENT))
-            report.status = status
-            report.save()
-            NotificationStudent.objects.create(
-                student=student,
-                message=(
-                    f"Attendance for {attendance.group.name} on {attendance.date} "
-                    f"updated to {_STATUS_LABELS.get(status, 'Unknown')}."
-                ),
+        rows = json.loads(request.POST.get('student_ids') or '[]')
+    except json.JSONDecodeError:
+        return HttpResponse("Invalid student data", status=400)
+
+    attendance_id = request.POST.get('date')
+    if not attendance_id or not rows:
+        return HttpResponse("Missing attendance/students", status=400)
+
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+    status_by_student = {
+        int(r['id']): int(r.get('status', AttendanceReport.ABSENT))
+        for r in rows if 'id' in r
+    }
+    if not status_by_student:
+        return HttpResponse("No student IDs supplied", status=400)
+
+    try:
+        with transaction.atomic():
+            reports = list(
+                AttendanceReport.objects
+                .filter(attendance=attendance, student_id__in=status_by_student)
             )
+            changed = []
+            for report in reports:
+                new_status = status_by_student[report.student_id]
+                if report.status != new_status:
+                    report.status = new_status
+                    changed.append(report)
+            if changed:
+                AttendanceReport.objects.bulk_update(changed, ['status'], batch_size=200)
+
+            # Notify only the students whose status actually changed (and
+            # only when the new status is not "Present").
+            notable = [r for r in changed if r.status != AttendanceReport.PRESENT]
+            if notable:
+                NotificationStudent.objects.bulk_create([
+                    NotificationStudent(
+                        student_id=r.student_id,
+                        message=(
+                            f"Attendance for {attendance.group.name} on "
+                            f"{attendance.date} updated to "
+                            f"{_STATUS_LABELS.get(r.status, 'Unknown')}."
+                        ),
+                    ) for r in notable
+                ], batch_size=200)
     except Exception:
+        logger.exception("update_attendance failed for attendance=%s", attendance_id)
         return HttpResponse("ERROR", status=400)
     return HttpResponse("OK")
 
@@ -254,7 +331,6 @@ def staff_view_profile(request):
     return render(request, "staff_template/staff_view_profile.html", context)
 
 
-@csrf_exempt
 def staff_fcmtoken(request):
     token = request.POST.get('token')
     try:
@@ -308,7 +384,6 @@ def staff_add_result(request):
     return render(request, "staff_template/staff_add_result.html", context)
 
 
-@csrf_exempt
 def fetch_student_result(request):
     try:
         group_id = request.POST.get('group')
@@ -341,34 +416,63 @@ def add_book(request):
     }
     return render(request, "staff_template/add_book.html",context)
 
-#issue book
+# ── Lending (issue / return) ───────────────────────────────────────────────────
 
 
 @staff_only
 def issue_book(request):
-    form = forms.IssueBookForm()
+    """Create a new Loan from the IssueBookForm.
+
+    Validation lives in the form (uniqueness against active loans);
+    the view never reads raw request.POST anymore.
+    """
     if request.method == "POST":
         form = forms.IssueBookForm(request.POST)
         if form.is_valid():
-            obj = models.IssuedBook()
-            obj.student_id = request.POST['name2']
-            obj.isbn = request.POST['isbn2']
-            obj.save()
-            alert = True
-            return render(request, "staff_template/issue_book.html", {'obj':obj, 'alert':alert})
-    return render(request, "staff_template/issue_book.html", {'form':form})
+            loan = Loan.objects.create(
+                student=form.cleaned_data['student'],
+                book=form.cleaned_data['book'],
+            )
+            messages.success(
+                request,
+                f"Issued '{loan.book.name}' to {loan.student}. Due {loan.due_on}.",
+            )
+            return redirect('issue_book')
+    else:
+        form = forms.IssueBookForm()
+    return render(request, "staff_template/issue_book.html",
+                  {'form': form, 'page_title': 'Issue Book'})
+
 
 @staff_only
 def view_issued_book(request):
-    issuedBooks = IssuedBook.objects.all()
-    details = []
-    for issued in issuedBooks:
-        days = (date.today() - issued.issued_date).days
-        fine = max(0, (days - 14) * 5)
-        book = models.Book.objects.filter(isbn=issued.isbn).first()
-        if book:
-            details.append((book.name, book.isbn, issued.issued_date, issued.expiry_date, fine))
-    return render(request, "staff_template/view_issued_book.html", {'issuedBooks': issuedBooks, 'details': details})
+    """Single-query list of all loans with student + book joined.
+
+    Eliminates the previous N+1 (one Book lookup per issued row).
+    Fine is computed by the model's property — single source of truth.
+    """
+    loans = (
+        Loan.objects
+        .select_related('student__admin', 'book')
+        .order_by('returned_on', '-issued_on')   # active first, newest first
+    )
+    return render(request, "staff_template/view_issued_book.html",
+                  {'loans': loans, 'page_title': 'Issued Books'})
+
+
+@staff_only
+@require_POST
+def return_book(request, loan_id):
+    """Mark a loan as returned. Fine is computed automatically at display time."""
+    loan = get_object_or_404(Loan, id=loan_id, returned_on__isnull=True)
+    loan.returned_on = timezone.localdate()
+    loan.save(update_fields=['returned_on'])
+    messages.success(
+        request,
+        f"Returned '{loan.book.name}' from {loan.student}." +
+        (f" Fine due: ₹{loan.fine_amount}." if loan.days_overdue > 0 else "")
+    )
+    return redirect('view_issued_book')
 
 # ── Assignments ───────────────────────────────────────────────────────────────
 
@@ -546,7 +650,6 @@ def delete_result_file(request, file_id):
     return redirect(reverse('staff_result_files'))
 
 
-@csrf_exempt
 @staff_only
 def staff_get_teachers_for_course(request):
     """Return active staff members for a given course (for AJAX cascade in staff views)."""
@@ -563,7 +666,6 @@ def staff_get_teachers_for_course(request):
     return JsonResponse({'teachers': teachers})
 
 
-@csrf_exempt
 @staff_only
 def staff_get_groups_for_teacher(request):
     """Return active groups for a given teacher (for AJAX cascade in staff views)."""

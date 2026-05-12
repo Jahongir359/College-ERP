@@ -5,11 +5,11 @@ import os
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import PasswordResetView
+from django.core.exceptions import PermissionDenied
 from django.db import DatabaseError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.urls import reverse_lazy
-from django.views.decorators.csrf import csrf_exempt
 
 from .EmailBackend import EmailBackend
 from .apps import create_recovery_admin_access
@@ -72,6 +72,15 @@ def doLogin(request, **kwargs):
 
     try:
         user = authenticate(request, username=email, password=password)
+    except PermissionDenied:
+        # django-axes raises this once AXES_FAILURE_LIMIT is hit.
+        logger.warning("Login locked out by axes for email=%s", email)
+        messages.error(
+            request,
+            "Too many failed login attempts. "
+            "Please wait 15 minutes before trying again."
+        )
+        return redirect("/")
     except Exception:
         logger.exception("authenticate() raised for email=%s — DB may be missing migrations", email)
         messages.error(request, "Login is temporarily unavailable. Please try again in a moment.")
@@ -183,8 +192,9 @@ class SafePasswordResetView(PasswordResetView):
 # Shared AJAX / utility views
 # ---------------------------------------------------------------------------
 
-@csrf_exempt
 def get_attendance(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required.'}, status=401)
     group_id = request.POST.get('group')
     try:
         from .models import Group
@@ -211,32 +221,55 @@ def health(request):
     return JsonResponse({'status': 'ok' if db_ok else 'db_unavailable', 'db': db_ok}, status=status)
 
 
+_FIREBASE_CONFIG_KEYS = (
+    'FIREBASE_API_KEY',
+    'FIREBASE_AUTH_DOMAIN',
+    'FIREBASE_DATABASE_URL',
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_STORAGE_BUCKET',
+    'FIREBASE_MESSAGING_SENDER_ID',
+    'FIREBASE_APP_ID',
+    'FIREBASE_MEASUREMENT_ID',
+)
+
+
 def showFirebaseJS(request):
-    data = """
-importScripts('https://www.gstatic.com/firebasejs/7.22.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/7.22.1/firebase-messaging.js');
+    """Serve the FCM service-worker script with env-driven config.
 
-firebase.initializeApp({
-    apiKey: "AIzaSyBarDWWHTfTMSrtc5Lj3Cdw5dEvjAkFwtM",
-    authDomain: "sms-with-django.firebaseapp.com",
-    databaseURL: "https://sms-with-django.firebaseio.com",
-    projectId: "sms-with-django",
-    storageBucket: "sms-with-django.appspot.com",
-    messagingSenderId: "945324593139",
-    appId: "1:945324593139:web:03fa99a8854bbd38420c86",
-    measurementId: "G-2F2RXTL9GT"
-});
-
-const messaging = firebase.messaging();
-messaging.setBackgroundMessageHandler(function (payload) {
-    const notification = JSON.parse(payload);
-    const notificationOption = {
-        body: notification.body,
-        icon: notification.icon
-    };
-    return self.registration.showNotification(
-        payload.notification.title, notificationOption
-    );
-});
+    Audit item #6: previously hardcoded the Firebase web config in the
+    response body, which forced a code push for key rotation. Web FCM
+    keys are intended to be public, but project/sender IDs and bucket
+    names belong in deployment config, not git.
     """
+    cfg = {k: os.environ.get(k, '') for k in _FIREBASE_CONFIG_KEYS}
+    # If no Firebase env is configured, emit a no-op SW so the page does
+    # not 404 and the browser does not register a broken worker.
+    if not cfg['FIREBASE_API_KEY']:
+        return HttpResponse(
+            "/* Firebase not configured. Set FIREBASE_* env vars to enable FCM. */\n",
+            content_type='application/javascript',
+        )
+
+    data = (
+        "importScripts('https://www.gstatic.com/firebasejs/7.22.1/firebase-app.js');\n"
+        "importScripts('https://www.gstatic.com/firebasejs/7.22.1/firebase-messaging.js');\n\n"
+        "firebase.initializeApp(" + json.dumps({
+            'apiKey':            cfg['FIREBASE_API_KEY'],
+            'authDomain':        cfg['FIREBASE_AUTH_DOMAIN'],
+            'databaseURL':       cfg['FIREBASE_DATABASE_URL'],
+            'projectId':         cfg['FIREBASE_PROJECT_ID'],
+            'storageBucket':     cfg['FIREBASE_STORAGE_BUCKET'],
+            'messagingSenderId': cfg['FIREBASE_MESSAGING_SENDER_ID'],
+            'appId':             cfg['FIREBASE_APP_ID'],
+            'measurementId':     cfg['FIREBASE_MEASUREMENT_ID'],
+        }) + ");\n\n"
+        "const messaging = firebase.messaging();\n"
+        "messaging.setBackgroundMessageHandler(function (payload) {\n"
+        "    const notification = JSON.parse(payload);\n"
+        "    const notificationOption = { body: notification.body, icon: notification.icon };\n"
+        "    return self.registration.showNotification(\n"
+        "        payload.notification.title, notificationOption\n"
+        "    );\n"
+        "});\n"
+    )
     return HttpResponse(data, content_type='application/javascript')

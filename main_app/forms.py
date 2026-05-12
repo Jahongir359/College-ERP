@@ -281,8 +281,35 @@ class SubmissionForm(FormSettings):
 
 
 class IssueBookForm(forms.Form):
-    isbn2 = forms.ModelChoiceField(queryset=models.Book.objects.all(), empty_label="Book Name [ISBN]", to_field_name="isbn", label="Book (Name and ISBN)")
-    name2 = forms.ModelChoiceField(queryset=models.Student.objects.all(), empty_label="Name", label="Student Details")
+    """Form for creating a new Loan (book lending).
 
-    isbn2.widget.attrs.update({'class': 'form-control'})
-    name2.widget.attrs.update({'class': 'form-control'})
+    Field names match the new Loan model (book, student) rather than the
+    legacy isbn2/name2 — the view reads cleaned_data, no more bypassing
+    the form via request.POST.
+    """
+    book = forms.ModelChoiceField(
+        queryset=models.Book.objects.all(),
+        empty_label="Select book…",
+        label="Book",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+    student = forms.ModelChoiceField(
+        queryset=models.Student.objects.all(),
+        empty_label="Select student…",
+        label="Student",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        book = cleaned.get('book')
+        student = cleaned.get('student')
+        if book and student:
+            existing = models.Loan.objects.filter(
+                book=book, student=student, returned_on__isnull=True,
+            ).exists()
+            if existing:
+                raise forms.ValidationError(
+                    "This student already has an active loan for this book."
+                )
+        return cleaned
