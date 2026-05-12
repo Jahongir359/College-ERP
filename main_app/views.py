@@ -5,6 +5,7 @@ import os
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import PasswordResetView
+from django.core.exceptions import PermissionDenied
 from django.db import DatabaseError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -71,6 +72,15 @@ def doLogin(request, **kwargs):
 
     try:
         user = authenticate(request, username=email, password=password)
+    except PermissionDenied:
+        # django-axes raises this once AXES_FAILURE_LIMIT is hit.
+        logger.warning("Login locked out by axes for email=%s", email)
+        messages.error(
+            request,
+            "Too many failed login attempts. "
+            "Please wait 15 minutes before trying again."
+        )
+        return redirect("/")
     except Exception:
         logger.exception("authenticate() raised for email=%s — DB may be missing migrations", email)
         messages.error(request, "Login is temporarily unavailable. Please try again in a moment.")
