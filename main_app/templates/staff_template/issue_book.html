@@ -6,28 +6,33 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                {% if alert %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Book issued successfully.
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                {% endif %}
                 <div class="card card-dark">
                     <div class="card-header">
                         <h3 class="card-title">Issue Book to Student</h3>
                     </div>
                     <div class="card-body">
-                        <form method="POST">
+                        <form method="POST" novalidate>
                             {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+                            </div>
+                            {% endif %}
+
                             <div class="form-group">
-                                <label>Select Book</label>
-                                {{ form.isbn2 }}
+                                <label for="{{ form.book.id_for_label }}">Select Book</label>
+                                {{ form.book }}
+                                {% if form.book.errors %}
+                                <small class="text-danger">{{ form.book.errors|join:", " }}</small>
+                                {% endif %}
                             </div>
                             <div class="form-group">
-                                <label>Select Student</label>
-                                {{ form.name2 }}
+                                <label for="{{ form.student.id_for_label }}">Select Student</label>
+                                {{ form.student }}
+                                {% if form.student.errors %}
+                                <small class="text-danger">{{ form.student.errors|join:", " }}</small>
+                                {% endif %}
                             </div>
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary btn-block">Issue Book</button>

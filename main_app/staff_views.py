@@ -7,6 +7,7 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, render)
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .decorators import staff_only
@@ -415,34 +416,63 @@ def add_book(request):
     }
     return render(request, "staff_template/add_book.html",context)
 
-#issue book
+# ── Lending (issue / return) ───────────────────────────────────────────────────
 
 
 @staff_only
 def issue_book(request):
-    form = forms.IssueBookForm()
+    """Create a new Loan from the IssueBookForm.
+
+    Validation lives in the form (uniqueness against active loans);
+    the view never reads raw request.POST anymore.
+    """
     if request.method == "POST":
         form = forms.IssueBookForm(request.POST)
         if form.is_valid():
-            obj = models.IssuedBook()
-            obj.student_id = request.POST['name2']
-            obj.isbn = request.POST['isbn2']
-            obj.save()
-            alert = True
-            return render(request, "staff_template/issue_book.html", {'obj':obj, 'alert':alert})
-    return render(request, "staff_template/issue_book.html", {'form':form})
+            loan = Loan.objects.create(
+                student=form.cleaned_data['student'],
+                book=form.cleaned_data['book'],
+            )
+            messages.success(
+                request,
+                f"Issued '{loan.book.name}' to {loan.student}. Due {loan.due_on}.",
+            )
+            return redirect('issue_book')
+    else:
+        form = forms.IssueBookForm()
+    return render(request, "staff_template/issue_book.html",
+                  {'form': form, 'page_title': 'Issue Book'})
+
 
 @staff_only
 def view_issued_book(request):
-    issuedBooks = IssuedBook.objects.all()
-    details = []
-    for issued in issuedBooks:
-        days = (date.today() - issued.issued_date).days
-        fine = max(0, (days - 14) * 5)
-        book = models.Book.objects.filter(isbn=issued.isbn).first()
-        if book:
-            details.append((book.name, book.isbn, issued.issued_date, issued.expiry_date, fine))
-    return render(request, "staff_template/view_issued_book.html", {'issuedBooks': issuedBooks, 'details': details})
+    """Single-query list of all loans with student + book joined.
+
+    Eliminates the previous N+1 (one Book lookup per issued row).
+    Fine is computed by the model's property — single source of truth.
+    """
+    loans = (
+        Loan.objects
+        .select_related('student__admin', 'book')
+        .order_by('returned_on', '-issued_on')   # active first, newest first
+    )
+    return render(request, "staff_template/view_issued_book.html",
+                  {'loans': loans, 'page_title': 'Issued Books'})
+
+
+@staff_only
+@require_POST
+def return_book(request, loan_id):
+    """Mark a loan as returned. Fine is computed automatically at display time."""
+    loan = get_object_or_404(Loan, id=loan_id, returned_on__isnull=True)
+    loan.returned_on = timezone.localdate()
+    loan.save(update_fields=['returned_on'])
+    messages.success(
+        request,
+        f"Returned '{loan.book.name}' from {loan.student}." +
+        (f" Fine due: ₹{loan.fine_amount}." if loan.days_overdue > 0 else "")
+    )
+    return redirect('view_issued_book')
 
 # ── Assignments ───────────────────────────────────────────────────────────────
 

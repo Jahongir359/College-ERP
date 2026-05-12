@@ -126,6 +126,7 @@ urlpatterns = [
      path("staff/addbook/", staff_views.add_book, name="add_book"),
     path("staff/issue_book/", staff_views.issue_book, name="issue_book"),
     path("staff/view_issued_book/", staff_views.view_issued_book, name="view_issued_book"),
+    path("staff/return_book/<int:loan_id>/", staff_views.return_book, name="return_book"),
 
 
 
