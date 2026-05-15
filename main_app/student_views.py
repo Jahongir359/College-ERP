@@ -238,7 +238,7 @@ def student_view_result(request):
     ).values_list('group_id', flat=True)
     results = StudentResult.objects.filter(
         student=student, group_id__in=enrolled_group_ids
-    ).select_related('group', 'subject')
+    ).select_related('group')
     context = {
         'results': results,
         'page_title': "View Results",
