@@ -89,7 +89,9 @@ class LoginPageTests(TestCase):
 
     @override_settings(**_BASE_OVERRIDES)
     def test_no_role_confusion_admin_cannot_reach_student_home(self):
-        self.client.login(username='admin@example.com', password='AdminPass123!')
+        # force_login bypasses auth backends (avoids axes request requirement).
+        # We only need to test role-based routing here, not authentication.
+        self.client.force_login(self.admin)
         response = self.client.get(reverse('student_home'))
         # Admin should be redirected away from student pages.
         self.assertNotEqual(response.status_code, 200)
