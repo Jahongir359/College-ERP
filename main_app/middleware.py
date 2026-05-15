@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.urls import reverse
 from django.shortcuts import redirect
+from django.db.utils import OperationalError, ProgrammingError
 
 
 class LoginCheckMiddleWare(MiddlewareMixin):
@@ -12,14 +13,26 @@ class LoginCheckMiddleWare(MiddlewareMixin):
             return None
 
         modulename = view_func.__module__
-        user = request.user
-        user_type = str(getattr(user, 'user_type', ''))
 
         auth_allowed_paths = {
             reverse('login_page'),
             reverse('user_login'),
             reverse('user_logout'),
         }
+
+        try:
+            user = request.user
+            user_type = str(getattr(user, 'user_type', ''))
+        except (OperationalError, ProgrammingError):
+            # DB tables not yet initialised (first deploy, pre-migrate).
+            # Let auth and admin pages through so the site can bootstrap.
+            if (
+                request.path in auth_allowed_paths
+                or modulename.startswith('django.contrib.auth')
+                or request.path.startswith('/admin/')
+            ):
+                return None
+            return redirect(reverse('login_page'))
 
         if user.is_authenticated:
             if user_type == '1':  # HOD / Admin
@@ -36,8 +49,6 @@ class LoginCheckMiddleWare(MiddlewareMixin):
 
             else:
                 # Unknown/corrupt user_type: log out and redirect to login.
-                # This prevents a user with a broken account from reaching
-                # any page while appearing authenticated.
                 if request.path not in auth_allowed_paths:
                     logout(request)
                     return redirect(reverse('login_page'))
@@ -46,16 +57,12 @@ class LoginCheckMiddleWare(MiddlewareMixin):
             if (
                 request.path in auth_allowed_paths
                 or modulename.startswith('django.contrib.auth')
-                # /accounts/* covers both Django's built-in auth views AND our
-                # SafePasswordResetView override (which lives in main_app.views
-                # but is mounted under accounts/).
                 or request.path.startswith('/accounts/')
                 or request.path.startswith('/admin/')
                 or request.path == '/health/'
                 # FCM service worker — browsers fetch this before login.
                 or request.path == '/firebase-messaging-sw.js'
-                # Custom code-based password recovery flow — checked by both
-                # module name (function-based views) and URL path (fallback).
+                # Custom code-based password recovery flow.
                 or modulename == 'main_app.password_recovery'
                 or request.path.startswith('/forgot-password')
                 or request.path.startswith('/verify-reset-code')
