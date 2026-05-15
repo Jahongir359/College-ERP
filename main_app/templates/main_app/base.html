@@ -26,7 +26,7 @@
             </button>
             <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}"
                class="navbar-brand" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;">
-                <img src="{% static 'dist/img/iceberg-wordmark.png' %}" alt="ICEBERG" style="height:28px;width:auto;">
+                <span style="font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.5px;color:var(--navy);text-decoration:none;">ICEBERG</span>
             </a>
         </div>
 
@@ -63,11 +63,11 @@
             {% else %}
                 {% url 'student_view_profile' as profile_url %}
             {% endif %}
-            <a href="{{ profile_url }}" class="navbar-avatar" title="My profile">
+            <a href="{{ profile_url }}" class="navbar-user-avatar" title="My profile">
                 {% if user.profile_pic %}
-                    <img src="{{ user.profile_pic.url }}" alt="{{ user.first_name }}">
+                    <img src="{{ user.profile_pic }}" alt="{{ user.first_name }}">
                 {% else %}
-                    <span>{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                 {% endif %}
             </a>
 

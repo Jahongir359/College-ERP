@@ -4,11 +4,11 @@
 <div class="sidebar-header">
     <div class="sidebar-user">
         {% if request.user.profile_pic %}
-        <img src="{{ request.user.profile_pic }}" alt="User Avatar" class="sidebar-user-avatar" id="sidebar-avatar" onerror="showDefaultAvatar()">
+        <img src="{{ request.user.profile_pic }}" alt="User Avatar" class="sidebar-user-avatar" id="sidebar-avatar" onerror="this.style.display='none';document.getElementById('sidebar-initials').style.display='flex';">
+        <div id="sidebar-initials" class="sidebar-user-avatar" style="display:none;background:linear-gradient(135deg,var(--navy-mid),var(--cyan-dk));color:#fff;font-size:13px;font-weight:700;align-items:center;justify-content:center;">{{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}</div>
         {% else %}
-        <img src="{% static 'admin/img/icon-unknown.svg' %}" alt="User Avatar" class="sidebar-user-avatar" id="sidebar-avatar" onerror="showDefaultAvatar()">
+        <div class="sidebar-user-avatar" style="background:linear-gradient(135deg,var(--navy-mid),var(--cyan-dk));color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}</div>
         {% endif %}
-        <i class="fas fa-user-circle sidebar-default-avatar" id="default-avatar" style="display: none;"></i>
         <div class="sidebar-user-info">
             <h6>{{ user.get_full_name|default:user.username }}</h6>
             <small>

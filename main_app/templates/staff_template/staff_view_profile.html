@@ -81,7 +81,7 @@
   <div class="profile-hero">
     <div class="profile-avatar">
       {% if user.profile_pic %}
-        <img src="{{ user.profile_pic.url }}" alt="{{ user.first_name }}">
+        <img src="{{ user.profile_pic }}" alt="{{ user.first_name }}">
       {% else %}
         {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
       {% endif %}
