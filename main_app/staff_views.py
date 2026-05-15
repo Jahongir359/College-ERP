@@ -135,14 +135,17 @@ def save_attendance(request):
             notable = [r for r in rows
                        if int(r.get('status', 0)) != AttendanceReport.PRESENT]
             if notable:
-                NotificationStudent.objects.bulk_create([
-                    NotificationStudent(
-                        student_id=int(r['id']),
+                notable_ids = [int(r['id']) for r in notable]
+                admin_id_map = dict(Student.objects.filter(id__in=notable_ids).values_list('id', 'admin_id'))
+                Notification.objects.bulk_create([
+                    Notification(
+                        recipient_id=admin_id_map[int(r['id'])],
+                        category=Notification.ATTENDANCE,
                         message=(
                             f"Attendance for {group.name} on {att_date}: "
                             f"{_STATUS_LABELS.get(int(r.get('status', 0)), 'Unknown')}."
                         ),
-                    ) for r in notable
+                    ) for r in notable if int(r['id']) in admin_id_map
                 ], batch_size=200)
     except Exception:
         logger.exception("save_attendance failed for group=%s date=%s", group_id, att_date)
@@ -225,15 +228,18 @@ def update_attendance(request):
             # only when the new status is not "Present").
             notable = [r for r in changed if r.status != AttendanceReport.PRESENT]
             if notable:
-                NotificationStudent.objects.bulk_create([
-                    NotificationStudent(
-                        student_id=r.student_id,
+                notable_student_ids = [r.student_id for r in notable]
+                admin_id_map = dict(Student.objects.filter(id__in=notable_student_ids).values_list('id', 'admin_id'))
+                Notification.objects.bulk_create([
+                    Notification(
+                        recipient_id=admin_id_map[r.student_id],
+                        category=Notification.ATTENDANCE,
                         message=(
                             f"Attendance for {attendance.group.name} on "
                             f"{attendance.date} updated to "
                             f"{_STATUS_LABELS.get(r.status, 'Unknown')}."
                         ),
-                    ) for r in notable
+                    ) for r in notable if r.student_id in admin_id_map
                 ], batch_size=200)
     except Exception:
         logger.exception("update_attendance failed for attendance=%s", attendance_id)
@@ -345,8 +351,7 @@ def staff_fcmtoken(request):
 
 @staff_only
 def staff_view_notification(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    notifications = NotificationStaff.objects.filter(staff=staff).order_by('-created_at')
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
     notifications.filter(is_read=False).update(is_read=True)
     context = {
         'notifications': notifications,
@@ -358,7 +363,6 @@ def staff_view_notification(request):
 @staff_only
 def staff_add_result(request):
     staff = get_object_or_404(Staff, admin=request.user)
-    # Only allow the teacher to add results for groups they teach.
     groups = Group.objects.filter(teacher=staff, is_archived=False).select_related('course')
     context = {
         'page_title': 'Result Upload',
@@ -370,22 +374,29 @@ def staff_add_result(request):
             group_id = request.POST.get('group')
             test = float(request.POST.get('test') or 0)
             exam = float(request.POST.get('exam') or 0)
-            # Ownership: group must belong to this teacher.
+            comment = (request.POST.get('comment') or '').strip()
             group = get_object_or_404(Group, id=group_id, teacher=staff)
             student = get_object_or_404(Student, id=student_id)
-            # Integrity: student must be enrolled in this group.
             if not Enrollment.objects.filter(student=student, group=group, is_active=True).exists():
                 messages.warning(request, "That student is not enrolled in the selected group.")
             else:
                 result, created = StudentResult.objects.get_or_create(
                     student=student, group=group,
-                    defaults={'test': test, 'exam': exam},
+                    defaults={'test': test, 'exam': exam, 'comment': comment},
                 )
                 if not created:
                     result.test = test
                     result.exam = exam
+                    result.comment = comment
                     result.save()
-                messages.success(request, "Scores " + ("Saved" if created else "Updated"))
+                action = "Saved" if created else "Updated"
+                messages.success(request, f"Scores {action}")
+                note = f" — {comment}" if comment else ""
+                Notification.objects.create(
+                    recipient=student.admin,
+                    category=Notification.RESULT,
+                    message=f"Your result for {group.name}: Test={test}, Exam={exam}{note}.",
+                )
         except ValueError:
             messages.warning(request, "Test and exam scores must be numbers.")
         except Exception as e:
@@ -400,7 +411,7 @@ def fetch_student_result(request):
         student = get_object_or_404(Student, id=student_id)
         group = get_object_or_404(Group, id=group_id)
         result = StudentResult.objects.get(student=student, group=group)
-        return HttpResponse(json.dumps({'exam': result.exam, 'test': result.test}))
+        return HttpResponse(json.dumps({'exam': result.exam, 'test': result.test, 'comment': result.comment}))
     except StudentResult.DoesNotExist:
         return HttpResponse('False')
     except Exception:
@@ -632,16 +643,21 @@ def upload_result_file(request):
     )
 
     if student:
-        NotificationStudent.objects.create(
-            student=student,
+        Notification.objects.create(
+            recipient=student.admin,
+            category=Notification.RESULT,
             message=f"A result file '{title}' has been uploaded for you in {group.name}.",
         )
     else:
-        for e in Enrollment.objects.filter(group=group, is_active=True).select_related('student'):
-            NotificationStudent.objects.create(
-                student=e.student,
+        enrollments = Enrollment.objects.filter(group=group, is_active=True).select_related('student__admin')
+        Notification.objects.bulk_create([
+            Notification(
+                recipient=e.student.admin,
+                category=Notification.RESULT,
                 message=f"A result file '{title}' has been uploaded for {group.name}.",
             )
+            for e in enrollments
+        ], batch_size=200)
 
     messages.success(request, f"File '{title}' uploaded successfully.")
     return redirect(reverse('staff_result_files'))

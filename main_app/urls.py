@@ -23,6 +23,7 @@ urlpatterns = [
     # Password recovery (custom code-based flow)
     path("forgot-password/", password_recovery.forgot_password, name='forgot_password'),
     path("verify-reset-code/", password_recovery.verify_reset_code, name='verify_reset_code'),
+    path("resend-code/", password_recovery.resend_code, name='resend_code'),
     path("reset-password/", password_recovery.reset_password, name='reset_password'),
     path("password-reset-success/", password_recovery.password_reset_success, name='password_reset_success'),
 

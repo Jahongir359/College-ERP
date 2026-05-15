@@ -29,10 +29,13 @@
 {% if show_resend %}
 {# Code is expired / used / locked — show resend option, no code form #}
 <div class="text-center" style="margin-top:8px;">
-  <a href="{% url 'forgot_password' %}{% if email %}?email={{ email|urlencode }}{% endif %}"
-     class="btn-primary" style="display:inline-block; width:auto; padding:10px 24px;">
-    <i class="fas fa-redo" style="margin-right:6px;"></i> Request a new code
-  </a>
+  <form method="post" action="{% url 'resend_code' %}">
+    {% csrf_token %}
+    <input type="hidden" name="email" value="{{ email }}">
+    <button type="submit" class="btn-primary" style="width:auto; padding:10px 24px;">
+      <i class="fas fa-redo" style="margin-right:6px;"></i> Request a new code
+    </button>
+  </form>
 </div>
 <div class="text-center" style="margin-top:16px;">
   <a href="{% url 'login_page' %}" class="link">← Back to sign in</a>
@@ -76,8 +79,13 @@
 </form>
 
 <div class="text-center" style="margin-top:16px;">
-  <a href="{% url 'forgot_password' %}{% if email %}?email={{ email|urlencode }}{% endif %}"
-     class="link">Didn't receive a code? Send a new one</a>
+  <form method="post" action="{% url 'resend_code' %}" style="display:inline;">
+    {% csrf_token %}
+    <input type="hidden" name="email" value="{{ email }}">
+    <button type="submit" class="link" style="background:none; border:none; padding:0; cursor:pointer; font-size:13px; color:var(--cyan-dk); font-weight:500; font-family:inherit;">
+      Didn't receive a code? Send a new one
+    </button>
+  </form>
 </div>
 <div class="text-center" style="margin-top:8px;">
   <a href="{% url 'login_page' %}" class="link">← Back to sign in</a>

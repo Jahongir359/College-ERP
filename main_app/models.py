@@ -103,9 +103,19 @@ class Book(models.Model):
 
 
 class Student(models.Model):
+    STATUS_ACTIVE = 'active'
+    STATUS_INACTIVE = 'inactive'
+    STATUS_SUSPENDED = 'suspended'
+    STATUS_CHOICES = [
+        (STATUS_ACTIVE, 'Active'),
+        (STATUS_INACTIVE, 'Inactive'),
+        (STATUS_SUSPENDED, 'Suspended'),
+    ]
+
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
-    session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
+    phone = models.CharField(max_length=20, blank=True, default='')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
@@ -113,10 +123,13 @@ class Student(models.Model):
 class Staff(models.Model):
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20, blank=True, default='')
+    specialization = models.CharField(max_length=200, blank=True, default='',
+                                      help_text="e.g. IELTS, Mathematics, Business English")
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.admin.first_name + " " +  self.admin.last_name
+        return self.admin.first_name + " " + self.admin.last_name
 
 
 class Subject(models.Model):
@@ -138,19 +151,15 @@ class Subject(models.Model):
 
 class Attendance(models.Model):
     group = models.ForeignKey('Group', on_delete=models.CASCADE, null=True, blank=True)
-    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True)
-    subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        # Audit #13: prevent the same group/subject/date being marked twice.
-        unique_together = ('group', 'subject', 'date')
+        unique_together = ('group', 'date')
 
     def __str__(self):
-        group_name = self.group.name if self.group else "—"
-        return f"{group_name} · {self.date}"
+        return f"{self.group.name} · {self.date}"
 
 
 class AttendanceReport(models.Model):
@@ -216,28 +225,43 @@ class FeedbackStaff(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class NotificationStaff(models.Model):
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+class Notification(models.Model):
+    ATTENDANCE = 'attendance'
+    RESULT = 'result'
+    ANNOUNCEMENT = 'announcement'
+    HOMEWORK = 'homework'
+    GENERAL = 'general'
+    CATEGORY_CHOICES = [
+        (ATTENDANCE, 'Attendance'),
+        (RESULT, 'Result'),
+        (ANNOUNCEMENT, 'Announcement'),
+        (HOMEWORK, 'Homework'),
+        (GENERAL, 'General'),
+    ]
+
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
+                                  related_name='notifications')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default=GENERAL)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['recipient', 'is_read']),
+        ]
 
-class NotificationStudent(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    message = models.TextField()
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f"[{self.category}] → {self.recipient.email}: {self.message[:50]}"
 
 
 class StudentResult(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     group = models.ForeignKey('Group', on_delete=models.CASCADE, null=True, blank=True)
-    subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
     test = models.FloatField(default=0)
     exam = models.FloatField(default=0)
+    comment = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -284,7 +308,9 @@ class Group(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True, blank=True)
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, blank=True)
-    schedule = models.CharField(max_length=200, blank=True, default="",
+    room = models.CharField(max_length=50, blank=True, default='',
+                            help_text="Classroom or room number, e.g. Room 3A")
+    schedule = models.CharField(max_length=200, blank=True, default='',
                                 help_text="e.g. Mon/Wed 10:00–12:00")
     capacity = models.PositiveIntegerField(default=20)
     is_archived = models.BooleanField(default=False)

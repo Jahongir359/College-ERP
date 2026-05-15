@@ -60,6 +60,12 @@
                   </div>
                 </div>
 
+                <div class="form-group mt-3">
+                  <label><i class="fas fa-comment-alt mr-1"></i> Teacher Comment <small class="text-muted">(optional)</small></label>
+                  <textarea name="comment" id="comment_field" class="form-control" rows="2"
+                            placeholder="Feedback or notes for the student..."></textarea>
+                </div>
+
                 <div id="existing_scores" class="alert alert-info" style="display:none;"></div>
 
               </div>
@@ -122,10 +128,12 @@ function loadExistingScores() {
       box.style.display = 'none';
       document.getElementById('test_score').value = '';
       document.getElementById('exam_score').value = '';
+      document.getElementById('comment_field').value = '';
     } else {
       const data = JSON.parse(resp);
       document.getElementById('test_score').value = data.test;
       document.getElementById('exam_score').value = data.exam;
+      document.getElementById('comment_field').value = data.comment || '';
       box.textContent = `Existing scores loaded — Test: ${data.test}, Exam: ${data.exam}. Edit and save to update.`;
       box.style.display = 'block';
     }

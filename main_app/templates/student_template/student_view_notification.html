@@ -28,13 +28,19 @@
                   <tr>
                       <th>#</th>
                       <th>Date</th>
+                      <th>Type</th>
                       <th>Message</th>
                   </tr>
-                  {% for notification in  notifications %}
-                    <tr>
-                        <td>{{forloop.counter}}</td>
-                        <td>{{notification.created_at}}</td>
-                        <td>{{notification.message}}</td>
+                  {% for notification in notifications %}
+                    <tr {% if not notification.is_read %}class="table-active"{% endif %}>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ notification.created_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                          <span class="badge badge-{% if notification.category == 'attendance' %}warning{% elif notification.category == 'result' %}success{% elif notification.category == 'homework' %}info{% else %}secondary{% endif %}">
+                            {{ notification.get_category_display }}
+                          </span>
+                        </td>
+                        <td>{{ notification.message }}</td>
                     </tr>
                   {% endfor %}
               </table>

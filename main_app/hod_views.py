@@ -120,6 +120,8 @@ def add_staff(request):
                 user.save()
                 staff_obj = Staff.objects.get(admin=user)
                 staff_obj.course = course
+                staff_obj.phone = form.cleaned_data.get('phone', '')
+                staff_obj.specialization = form.cleaned_data.get('specialization', '')
                 staff_obj.is_active = form.cleaned_data.get('is_active', True)
                 staff_obj.save()
                 messages.success(request, "Successfully Added")
@@ -163,12 +165,14 @@ def add_student(request):
                 user.save()
                 student = user.student
                 student.course = course
-                student.session = None
+                student.phone = student_form.cleaned_data.get('phone', '')
+                student.status = student_form.cleaned_data.get('status', Student.STATUS_ACTIVE)
                 student.save()
                 if group:
                     Enrollment.objects.get_or_create(student=student, group=group, defaults={'is_active': True})
-                    NotificationStudent.objects.create(
-                        student=student,
+                    Notification.objects.create(
+                        recipient=user,
+                        category=Notification.GENERAL,
                         message=f"Welcome! You have been enrolled in {group.name}.",
                     )
                     messages.success(request, f"Student added and enrolled in '{group.name}'.")
@@ -309,6 +313,8 @@ def edit_staff(request, staff_id):
                 user.gender = gender
                 user.address = address
                 staff.course = course
+                staff.phone = form.cleaned_data.get('phone', '')
+                staff.specialization = form.cleaned_data.get('specialization', '')
                 staff.is_active = is_active
                 user.save()
                 staff.save()
@@ -672,7 +678,7 @@ def send_student_notification(request):
     message = request.POST.get('message')
     student = get_object_or_404(Student, admin_id=id)
     try:
-        notification = NotificationStudent(student=student, message=message)
+        notification = Notification(recipient=student.admin, category=Notification.ANNOUNCEMENT, message=message)
         notification.save()
 
         fcm_server_key = os.environ.get('FCM_SERVER_KEY', '')
@@ -705,7 +711,7 @@ def send_staff_notification(request):
     message = request.POST.get('message')
     staff = get_object_or_404(Staff, admin_id=id)
     try:
-        notification = NotificationStaff(staff=staff, message=message)
+        notification = Notification(recipient=staff.admin, category=Notification.ANNOUNCEMENT, message=message)
         notification.save()
 
         fcm_server_key = os.environ.get('FCM_SERVER_KEY', '')
@@ -1043,8 +1049,9 @@ def add_enrollment(request):
                     defaults={'is_active': is_active}
                 )
                 if created:
-                    NotificationStudent.objects.create(
-                        student=student,
+                    Notification.objects.create(
+                        recipient=student.admin,
+                        category=Notification.GENERAL,
                         message=f"You have been enrolled in {group.name}" + (f" ({group.course.name})" if group.course else "") + ".",
                     )
                     messages.success(request, f"{student} enrolled in {group.name}.")

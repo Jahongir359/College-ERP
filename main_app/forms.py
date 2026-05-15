@@ -78,11 +78,22 @@ class AddStudentForm(CustomUserForm):
         label="Assign to Group",
         required=False,
     )
+    phone = forms.CharField(
+        max_length=20, required=False, label="Phone Number",
+        widget=forms.TextInput(attrs={'placeholder': '+998 90 123 45 67'}),
+    )
+    status = forms.ChoiceField(
+        choices=Student.STATUS_CHOICES,
+        initial=Student.STATUS_ACTIVE,
+        label="Status",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['course'].widget.attrs['class'] = 'form-control'
         self.fields['group'].widget.attrs['class'] = 'form-control'
+        self.fields['phone'].widget.attrs['class'] = 'form-control'
+        self.fields['status'].widget.attrs['class'] = 'form-control'
         if self.data.get('group'):
             self.fields['group'].queryset = Group.objects.filter(is_archived=False)
 
@@ -96,7 +107,7 @@ class AddStudentForm(CustomUserForm):
 
     class Meta(CustomUserForm.Meta):
         model = Student
-        fields = CustomUserForm.Meta.fields + ['course', 'group']
+        fields = CustomUserForm.Meta.fields + ['course', 'group', 'phone', 'status']
 
 
 class AdminForm(CustomUserForm):
@@ -119,7 +130,7 @@ class StaffForm(CustomUserForm):
 
     class Meta(CustomUserForm.Meta):
         model = Staff
-        fields = CustomUserForm.Meta.fields + ['course', 'is_active']
+        fields = CustomUserForm.Meta.fields + ['course', 'phone', 'specialization', 'is_active']
 
 
 class CourseForm(FormSettings):
@@ -213,7 +224,7 @@ class StaffEditForm(CustomUserForm):
 
     class Meta(CustomUserForm.Meta):
         model = Staff
-        fields = CustomUserForm.Meta.fields + ['course', 'is_active']
+        fields = CustomUserForm.Meta.fields + ['course', 'phone', 'specialization', 'is_active']
 
 
 class EditResultForm(FormSettings):
@@ -241,11 +252,12 @@ class BranchForm(FormSettings):
 class GroupForm(FormSettings):
     class Meta:
         model = Group
-        fields = ['name', 'course', 'teacher', 'branch', 'schedule', 'capacity']
+        fields = ['name', 'course', 'teacher', 'branch', 'room', 'schedule', 'capacity']
         labels = {
             'course': 'Program',
             'teacher': 'Teacher',
             'branch': 'Branch / Location',
+            'room': 'Room / Classroom',
             'schedule': 'Schedule',
             'capacity': 'Capacity (max students)',
         }

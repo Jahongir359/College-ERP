@@ -303,3 +303,46 @@ def reset_password(request):
 def password_reset_success(request):
     """Kept for backwards-compatibility; login page now shows the success message."""
     return render(request, 'registration/password_reset_success.html')
+
+
+def resend_code(request):
+    """
+    POST-only: re-generate and send a verification code without the forgot_password form step.
+    Used by the inline "Send a new one" POST form on the verify page.
+    """
+    if request.method != 'POST':
+        return redirect('forgot_password')
+    email = request.POST.get('email', '').strip().lower()
+    if not email:
+        return redirect('forgot_password')
+
+    logger.info("[PRC] Resend requested for: %s", email)
+    try:
+        user = CustomUser.objects.get(email__iexact=email)
+        one_hour_ago = timezone.now() - timedelta(hours=1)
+        recent = PasswordResetCode.objects.filter(user=user, created_at__gte=one_hour_ago).count()
+        if recent >= _MAX_CODES_PER_HOUR:
+            logger.warning("[PRC] Resend rate-limited for user id=%s", user.id)
+        else:
+            code = f"{secrets.randbelow(1_000_000):06d}"
+            expires_at = timezone.now() + timedelta(minutes=_EXPIRY_MINUTES)
+            obj = PasswordResetCode.objects.create(
+                user=user, code_hash=_hash_code(code), expires_at=expires_at,
+            )
+            try:
+                _send_code_email(user.email, code)
+            except Exception as exc:
+                logger.error("[PRC] Resend email failed for %s: %s", email, exc, exc_info=True)
+                obj.delete()
+            else:
+                logger.warning("[PRC] Resend code for %s: %s", email, code)
+                if settings.DEBUG:
+                    request.session['_prc_dev_code'] = code
+    except CustomUser.DoesNotExist:
+        logger.info("[PRC] Resend: email not found: %s", email)
+    except Exception as exc:
+        logger.error("[PRC] Resend unexpected error for %s: %s", email, exc, exc_info=True)
+
+    from urllib.parse import urlencode
+    qs = urlencode({'email': email})
+    return redirect(f'/verify-reset-code/?{qs}')
