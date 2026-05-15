@@ -130,6 +130,17 @@ def student_apply_leave(request):
                 obj = form.save(commit=False)
                 obj.student = student
                 obj.save()
+                admin_users = CustomUser.objects.filter(user_type='1')
+                Notification.objects.bulk_create([
+                    Notification(
+                        recipient=admin,
+                        category=Notification.GENERAL,
+                        message=(
+                            f"Leave request from student {request.user.get_full_name()}: "
+                            f"{obj.message[:120]}"
+                        ),
+                    ) for admin in admin_users
+                ])
                 messages.success(
                     request, "Application for leave has been submitted for review")
                 return redirect(reverse('student_apply_leave'))
