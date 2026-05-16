@@ -28,7 +28,8 @@ urlpatterns = [
     path("password-reset-success/", password_recovery.password_reset_success, name='password_reset_success'),
 
     path("health/", views.health, name='health'),
-    path("", views.login_page, name='login_page'),
+    path("", views.entry_page, name='entry_page'),
+    path("login/", views.login_page, name='login_page'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
     path("firebase-messaging-sw.js", views.showFirebaseJS, name='showFirebaseJS'),
     path("doLogin/", views.doLogin, name='user_login'),

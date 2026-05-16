@@ -51,6 +51,20 @@ def _redirect_authenticated_user(user):
     return None  # Unknown type — fall through to show login page
 
 
+def entry_page(request):
+    """Root URL — branded entry splash + welcome question page.
+
+    Authenticated users bypass this and go straight to their dashboard.
+    The template itself uses localStorage to skip the 2-second animation
+    on repeat visits (first visit flag 'iceberg_entry_seen').
+    """
+    if request.user.is_authenticated:
+        destination = _redirect_authenticated_user(request.user)
+        if destination:
+            return destination
+    return render(request, 'main_app/entry.html')
+
+
 def login_page(request):
     if request.user.is_authenticated:
         destination = _redirect_authenticated_user(request.user)
@@ -72,7 +86,7 @@ def doLogin(request, **kwargs):
 
     if not identifier or not password:
         messages.error(request, "Please enter both your ID/email and password.")
-        return redirect("/")
+        return redirect(reverse("login_page"))
 
     try:
         user = authenticate(request, username=identifier, password=password)
@@ -84,11 +98,11 @@ def doLogin(request, **kwargs):
             "Too many failed login attempts. "
             "Please wait 15 minutes before trying again."
         )
-        return redirect("/")
+        return redirect(reverse("login_page"))
     except Exception:
         logger.exception("authenticate() raised for identifier=%s — DB may be missing migrations", identifier)
         messages.error(request, "Login is temporarily unavailable. Please try again in a moment.")
-        return redirect("/")
+        return redirect(reverse("login_page"))
 
     # Recovery fallback: only fires for the designated recovery account.
     recovery_email = os.environ.get(
@@ -105,7 +119,7 @@ def doLogin(request, **kwargs):
 
     if user is None:
         messages.error(request, "Invalid ID/email or password.")
-        return redirect("/")
+        return redirect(reverse("login_page"))
 
     try:
         login(request, user)
@@ -115,14 +129,14 @@ def doLogin(request, **kwargs):
             request,
             "Login is temporarily unavailable. Please try again in a moment."
         )
-        return redirect("/")
+        return redirect(reverse("login_page"))
     except Exception:
         logger.exception("Unexpected login failure for identifier=%s", identifier)
         messages.error(
             request,
             "Login failed due to a server issue. Please try again shortly."
         )
-        return redirect("/")
+        return redirect(reverse("login_page"))
 
     # Ensure the role profile row exists (heals accounts created before signals).
     user_type = str(user.user_type)
@@ -160,12 +174,12 @@ def logout_user(request):
     if request.method != 'POST':
         # Ignore accidental GET hits on the logout URL — redirect to home.
         if request.user.is_authenticated:
-            return _redirect_authenticated_user(request.user) or redirect("/")
-        return redirect("/")
+            return _redirect_authenticated_user(request.user) or redirect(reverse("login_page"))
+        return redirect(reverse("login_page"))
 
     if request.user is not None:
         logout(request)
-    return redirect("/")
+    return redirect(reverse("login_page"))
 
 
 # ---------------------------------------------------------------------------
