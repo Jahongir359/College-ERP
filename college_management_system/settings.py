@@ -144,6 +144,47 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# ---------------------------------------------------------------------------
+# Media file storage — DigitalOcean Spaces (S3-compatible)
+#
+# Set these env vars in the DigitalOcean App Platform dashboard:
+#   SPACES_KEY        — Spaces access key ID
+#   SPACES_SECRET     — Spaces secret access key
+#   SPACES_BUCKET     — bucket name, e.g. "iceberg-media"
+#   SPACES_REGION     — region slug, e.g. "nyc3" or "fra1"
+#   SPACES_ENDPOINT   — (optional) custom endpoint, defaults to
+#                       https://{SPACES_REGION}.digitaloceanspaces.com
+#
+# When these vars are present, all profile pictures are stored on Spaces
+# and survive every redeploy. Without them the app falls back to the local
+# media/ directory (useful for local development).
+# ---------------------------------------------------------------------------
+_spaces_key    = os.environ.get('SPACES_KEY', '')
+_spaces_secret = os.environ.get('SPACES_SECRET', '')
+_spaces_bucket = os.environ.get('SPACES_BUCKET', '')
+_spaces_region = os.environ.get('SPACES_REGION', 'nyc3')
+_spaces_endpoint = os.environ.get(
+    'SPACES_ENDPOINT',
+    f'https://{_spaces_region}.digitaloceanspaces.com',
+)
+
+if _spaces_key and _spaces_secret and _spaces_bucket:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_ACCESS_KEY_ID       = _spaces_key
+    AWS_SECRET_ACCESS_KEY   = _spaces_secret
+    AWS_STORAGE_BUCKET_NAME = _spaces_bucket
+    AWS_S3_ENDPOINT_URL     = _spaces_endpoint
+    AWS_S3_REGION_NAME      = _spaces_region
+    AWS_DEFAULT_ACL         = 'public-read'
+    AWS_S3_FILE_OVERWRITE   = False
+    AWS_QUERYSTRING_AUTH    = False
+    # Serve files directly from the CDN subdomain
+    AWS_S3_CUSTOM_DOMAIN    = os.environ.get(
+        'SPACES_CDN_DOMAIN',
+        f'{_spaces_bucket}.{_spaces_region}.digitaloceanspaces.com',
+    )
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
 if DEBUG or 'test' in sys.argv:
     # Plain storage: no hashing, works without running collectstatic.
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
