@@ -43,30 +43,10 @@
       overflow-x: hidden;
     }
 
-    /* ── Mountain hero ────────────────────────────────────── */
-    .hero {
-      position: relative;
-      width: 100%;
-      height: 220px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .hero svg {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
     /* ── Brand block ──────────────────────────────────────── */
     .brand-block {
       text-align: center;
-      margin-top: -10px;
-      padding: 0 24px 4px;
-      position: relative;
-      z-index: 2;
+      padding: 40px 24px 4px;
     }
     .brand-name {
       font-family: 'Playfair Display', 'Inter', serif;
@@ -252,8 +232,7 @@
 
     @media (min-width: 760px) {
       body { background: linear-gradient(180deg, #DDEAFB 0%, #ECF3FC 50%, #FAFCFF 100%); }
-      .hero { height: 260px; }
-      .brand-block { margin-top: -14px; }
+      .brand-block { padding-top: 56px; }
       .brand-name { font-size: 36px; letter-spacing: 5px; }
       .welcome { font-size: 36px; }
       .form-wrap { padding: 28px 22px 56px; }
@@ -268,47 +247,6 @@
   </style>
 </head>
 <body>
-
-  <!-- ── Iceberg / Mountain Hero ──────────────────────────────── -->
-  <div class="hero" aria-hidden="true">
-    <svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#CEDDF4"/>
-          <stop offset="60%"  stop-color="#E6EFFA"/>
-          <stop offset="100%" stop-color="#F4F8FE"/>
-        </linearGradient>
-        <linearGradient id="mFar" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#C9DBF1"/>
-          <stop offset="100%" stop-color="#A7BFDC"/>
-        </linearGradient>
-        <linearGradient id="mMid" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#B0C8E5"/>
-          <stop offset="100%" stop-color="#88A5C6"/>
-        </linearGradient>
-        <linearGradient id="mNear" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#90B0D2"/>
-          <stop offset="100%" stop-color="#608AB4"/>
-        </linearGradient>
-      </defs>
-
-      <rect width="1440" height="320" fill="url(#skyGrad)"/>
-
-      <path d="M0,260 L120,180 L260,220 L420,140 L580,210 L760,150 L920,200 L1080,140 L1240,200 L1380,170 L1440,210 L1440,320 L0,320 Z"
-            fill="url(#mFar)" opacity="0.85"/>
-
-      <path d="M0,300 L160,200 L300,260 L480,170 L600,250 L760,180 L900,260 L1080,200 L1260,260 L1440,220 L1440,320 L0,320 Z"
-            fill="url(#mMid)"/>
-
-      <path d="M460,178 L480,170 L500,178 L490,184 L478,180 Z" fill="#F4F9FF" opacity="0.85"/>
-      <path d="M740,188 L760,180 L780,188 L770,194 L758,190 Z" fill="#F4F9FF" opacity="0.85"/>
-
-      <path d="M0,320 L80,260 L220,300 L360,240 L520,290 L700,250 L860,300 L1020,260 L1200,300 L1340,270 L1440,300 L1440,320 Z"
-            fill="url(#mNear)"/>
-
-      <rect x="0" y="200" width="1440" height="2" fill="#fff" opacity=".35"/>
-    </svg>
-  </div>
 
   <!-- ── Brand ──────────────────────────────────────────────── -->
   <div class="brand-block">
@@ -346,14 +284,13 @@
         {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
         <div class="field">
-          <label class="field-label" for="id_identifier">Email (admin) or Student / Teacher ID</label>
+          <label class="field-label" for="id_identifier">Student / Teacher ID</label>
           <div class="input-wrap">
             <svg class="ico-l" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path d="M2 5.9L10 9.9 18 5.9A2 2 0 0016 4H4a2 2 0 00-2 1.9z"/>
-              <path d="M18 8.1l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.1z"/>
+              <path fill-rule="evenodd" d="M10 2a4 4 0 100 8 4 4 0 000-8zM6 12a6 6 0 00-6 6 2 2 0 002 2h16a2 2 0 002-2 6 6 0 00-6-6H6z" clip-rule="evenodd"/>
             </svg>
             <input type="text" id="id_identifier" name="identifier"
-                   placeholder="e.g. STU-0001 or admin@example.com" autocomplete="username" required autofocus>
+                   placeholder="Enter your student ID" autocomplete="username" required autofocus>
           </div>
         </div>
 
