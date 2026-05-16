@@ -18,11 +18,25 @@
   --c-warning: #F59E0B;
   --c-danger: #EF4444;
   background: var(--c-bg);
+  color: var(--c-text);
   margin: -24px;
   padding: 18px 16px 32px;
   min-height: 100%;
   font-family: 'Inter', sans-serif;
 }
+/* Dark mode overrides for results page */
+.dark-mode .stu-page {
+  --c-text: #E2E8F0;
+  --c-muted: #94A3B8;
+  --c-border: #1C2E4A;
+  --c-surface: #0E1D34;
+  --c-bg: #08121F;
+}
+.dark-mode .res-card-head { background: #132440 !important; }
+.dark-mode .res-bar { background: #1C2E4A !important; }
+.dark-mode .chart-card,
+.dark-mode .vocab-stage-tile,
+.dark-mode .res-empty { background: #0E1D34 !important; box-shadow: none !important; }
 @media (min-width: 640px) { .stu-page { padding: 24px 28px 40px; } }
 
 /* Hero */

@@ -94,7 +94,8 @@ body {
   text-decoration: none !important;
   gap: 0 !important;
 }
-.navbar-brand span {
+.navbar-brand span,
+.navbar-logo-text {
   font-family: 'Inter', sans-serif !important;
   font-size: 17px !important;
   font-weight: 800 !important;
@@ -1186,6 +1187,9 @@ textarea.form-control { height: auto; min-height: 90px; }
   background: var(--surface) !important;
   border-bottom-color: var(--border) !important;
 }
+/* Logo — always white in dark mode (overrides inline color:var(--navy)) */
+.dark-mode .navbar-brand,
+.dark-mode .navbar-logo-text { color: #93C5FD !important; }
 .dark-mode .navbar-brand { color: #93C5FD !important; }
 .dark-mode .navbar-toggle { color: var(--text-muted) !important; }
 .dark-mode .navbar-toggle:hover { background: var(--surface-2) !important; }

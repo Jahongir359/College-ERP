@@ -370,19 +370,9 @@ def student_view_result(request):
     chart_exam   = [int(r.exam) for r in results]
     chart_total  = [r.total for r in results]
 
-    # Vocab progress breakdown (for English students)
-    vocab_stage_counts = [0, 0, 0, 0]  # new, learning, review, mastered
+    # Vocab progress breakdown (legacy VocabularyProgress removed; counts zeroed)
+    vocab_stage_counts = [0, 0, 0, 0]
     is_english = student.is_english_student
-    if is_english:
-        from django.db.models import Count
-        stage_qs = (
-            VocabularyProgress.objects
-            .filter(student=student)
-            .values('stage')
-            .annotate(cnt=Count('id'))
-        )
-        for row in stage_qs:
-            vocab_stage_counts[row['stage']] = row['cnt']
 
     context = {
         'results': results,
