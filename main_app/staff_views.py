@@ -46,6 +46,7 @@ def staff_home(request):
         'total_subject': total_groups,
         'subject_list': group_label_list,
         'attendance_list': attendance_list,
+        'groups': groups,
     }
     return render(request, "staff_template/erpnext_staff_home.html", context)
 

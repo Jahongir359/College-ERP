@@ -17,9 +17,18 @@
     <link rel="stylesheet" href="{% static 'dist/css/iceberg.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block custom_css %}{% endblock custom_css %}
+    <script>
+    /* Apply theme before paint to prevent flash */
+    (function(){
+      var t='{{ student_theme|default:"system" }}';
+      if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}
+      else if(t==='bright'){document.documentElement.setAttribute('data-theme','bright');}
+      else{if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}
+    })();
+    </script>
 </head>
 
-<body>
+<body id="stu-body">
     <!-- ── Top Navbar ──────────────────────────────────────────────────────── -->
     <nav class="erpnext-navbar">
         <div class="navbar-left">
@@ -221,6 +230,10 @@
         }
     }
     document.addEventListener('DOMContentLoaded', function () {
+        /* Sync data-theme → .dark-mode class for legacy CSS rules */
+        const th = document.documentElement.getAttribute('data-theme');
+        if (th === 'dark') document.body.classList.add('dark-mode');
+
         const state = localStorage.getItem('sidebarState');
         if (isMobile()) { closeSidebar(); }
         else { if (state === 'closed') document.body.classList.add('sidebar-collapsed'); }

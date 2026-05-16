@@ -154,12 +154,26 @@
   <!-- Hero greeting -->
   <div class="stu-hero">
     <img src="{% static 'dist/img/logo.png' %}" alt="" class="stu-hero-img" aria-hidden="true">
-    <div class="stu-greeting">Good morning, {{ user.first_name|default:user.username }} 👋</div>
-    <div class="stu-greeting-sub">Let's make today great!</div>
+    <div class="stu-greeting" id="stu-greeting-text">Good morning, {{ user.first_name|default:user.username }} 👋</div>
+    <div class="stu-greeting-sub" id="stu-greeting-sub">Let's make today great!</div>
     {% if is_english and student_level %}
     <div class="level-badge"><i class="fas fa-layer-group"></i> {{ student_level }}</div>
     {% endif %}
   </div>
+
+  {% if recent_notifications %}
+  <!-- Notifications banner -->
+  <div style="margin:0 4px; display:flex; flex-direction:column; gap:8px;">
+    {% for notif in recent_notifications %}
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:#EFF6FF;border:1.5px solid rgba(30,64,175,.15);border-radius:14px;position:relative;">
+      <i class="fas fa-bell" style="color:#1B3F7A;font-size:15px;flex-shrink:0;margin-top:1px;"></i>
+      <span style="font-size:13px;color:#1E3A8A;font-weight:600;flex:1;line-height:1.4;">{{ notif.message }}</span>
+      <span style="font-size:11px;color:#64748B;white-space:nowrap;margin-top:1px;">{{ notif.created_at|date:"M j" }}</span>
+    </div>
+    {% endfor %}
+    <a href="{% url 'student_view_notification' %}" style="font-size:12px;font-weight:700;color:#1B3F7A;text-decoration:none;text-align:right;padding-right:4px;">View all notifications →</a>
+  </div>
+  {% endif %}
 
   <!-- Navy progress card -->
   <div class="stu-progress-card">
@@ -220,6 +234,32 @@
       {% endif %}
     </div>
   </div>
+
+  {% if subject_rows %}
+  <!-- My Groups -->
+  <div class="stu-section-hd"><h3>My Groups</h3></div>
+  <div style="margin:0 16px; display:flex; flex-direction:column; gap:8px;">
+    {% for row in subject_rows %}
+    <div style="background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(15,23,42,.06);display:flex;align-items:center;gap:14px;">
+      <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#0C1F45,#1B3F7A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0;">{{ row.name|first|upper }}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ row.name }}</div>
+        <div style="font-size:12px;color:#94A3B8;margin-top:2px;">
+          {% if row.start_date %}
+            <i class="fas fa-calendar-alt" style="color:#06B6D4;margin-right:3px;"></i>Starts {{ row.start_date|date:"M j, Y" }}
+          {% else %}
+            <i class="fas fa-calendar-alt" style="color:#CBD5E1;margin-right:3px;"></i>Starting date not set yet
+          {% endif %}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:18px;font-weight:900;color:{% if row.pct >= 75 %}#10B981{% elif row.pct >= 50 %}#F59E0B{% else %}#EF4444{% endif %};">{{ row.pct }}%</div>
+        <div style="font-size:10px;color:#94A3B8;">Attendance</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   <!-- Today's Tasks -->
   <div class="stu-section-hd">
@@ -329,3 +369,67 @@
 </div>
 {% endwith %}
 {% endblock content %}
+
+{% block custom_js %}
+<script>
+// ── Time-based greeting ──────────────────────────────────────────────────────
+(function () {
+  var h = new Date().getHours();
+  var greeting, sub;
+  if (h >= 5 && h < 12) {
+    greeting = 'Good morning'; sub = "Let's make today great! ☀️";
+  } else if (h >= 12 && h < 17) {
+    greeting = 'Good afternoon'; sub = "Keep up the great work! 💪";
+  } else if (h >= 17 && h < 21) {
+    greeting = 'Good evening'; sub = "Time to review what you learned today! 🌆";
+  } else {
+    greeting = 'Good night'; sub = "Rest well and come back stronger! 🌙";
+  }
+  var el = document.getElementById('stu-greeting-text');
+  var sub_el = document.getElementById('stu-greeting-sub');
+  if (el) {
+    var parts = el.textContent.split(',');
+    if (parts.length > 1) el.textContent = greeting + ',' + parts.slice(1).join(',');
+  }
+  if (sub_el) sub_el.textContent = sub;
+})();
+
+// ── Theme application ────────────────────────────────────────────────────────
+(function () {
+  var savedTheme = '{{ student_theme|default:"system" }}';
+
+  function applyTheme(theme) {
+    var root = document.documentElement;
+    root.removeAttribute('data-theme');
+    if (theme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+      document.body.classList.add('dark-mode');
+      document.body.classList.remove('bright-mode');
+    } else if (theme === 'bright') {
+      root.setAttribute('data-theme', 'bright');
+      document.body.classList.add('bright-mode');
+      document.body.classList.remove('dark-mode');
+    } else {
+      // System default
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        root.setAttribute('data-theme', 'dark');
+        document.body.classList.add('dark-mode');
+        document.body.classList.remove('bright-mode');
+      } else {
+        document.body.classList.remove('dark-mode', 'bright-mode');
+      }
+    }
+  }
+
+  applyTheme(savedTheme);
+
+  // Listen for system theme changes (when "system" is selected)
+  if (savedTheme === 'system') {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      applyTheme('system');
+    });
+  }
+})();
+</script>
+{% endblock custom_js %}

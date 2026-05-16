@@ -122,10 +122,20 @@ class Student(models.Model):
 
     LEVEL_CHOICES = [(i, f'Level {i}') for i in range(1, 7)]
 
+    THEME_DARK = 'dark'
+    THEME_BRIGHT = 'bright'
+    THEME_SYSTEM = 'system'
+    THEME_CHOICES = [
+        (THEME_DARK, 'Dark'),
+        (THEME_BRIGHT, 'Bright'),
+        (THEME_SYSTEM, 'System Default'),
+    ]
+
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
     phone = models.CharField(max_length=20, blank=True, default='')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
+    theme = models.CharField(max_length=10, choices=THEME_CHOICES, default=THEME_SYSTEM)
     level = models.PositiveSmallIntegerField(
         choices=LEVEL_CHOICES, null=True, blank=True,
         help_text="English proficiency level (1–6). Only applies to English-program students.",
@@ -339,6 +349,8 @@ class Group(models.Model):
     schedule = models.CharField(max_length=200, blank=True, default='',
                                 help_text="e.g. Mon/Wed 10:00–12:00")
     capacity = models.PositiveIntegerField(default=20)
+    start_date = models.DateField(null=True, blank=True,
+                                  help_text="The date when this group starts classes")
     is_archived = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

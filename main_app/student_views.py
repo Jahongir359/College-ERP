@@ -62,6 +62,7 @@ def student_home(request):
             'absent': absent_count,
             'total': total_cls,
             'pct': pct,
+            'start_date': group.start_date,
         })
 
     # Level & English program detection
@@ -83,6 +84,11 @@ def student_home(request):
         ).order_by('?')[:5]
         todays_vocab = list(vocab_qs)
 
+    # Recent unread notifications (show up to 3 on dashboard)
+    recent_notifications = Notification.objects.filter(
+        recipient=request.user, is_read=False
+    ).order_by('-created_at')[:3]
+
     context = {
         'total_attendance': total_attendance,
         'percent_present': percent_present,
@@ -97,6 +103,8 @@ def student_home(request):
         'is_english': is_english,
         'student_level': student_level,
         'todays_vocab': todays_vocab,
+        'recent_notifications': recent_notifications,
+        'student_theme': student.theme,
         'page_title': 'My Dashboard',
     }
     return render(request, 'student_template/erpnext_student_home.html', context)
@@ -324,6 +332,19 @@ def student_view_profile(request):
             messages.error(request, "Error Occured While Updating Profile " + str(e))
 
     return render(request, "student_template/student_view_profile.html", context)
+
+
+@student_only
+def student_save_theme(request):
+    if request.method == 'POST':
+        theme = request.POST.get('theme', 'system')
+        if theme not in ('dark', 'bright', 'system'):
+            theme = 'system'
+        student = get_object_or_404(Student, admin=request.user)
+        student.theme = theme
+        student.save(update_fields=['theme'])
+        return JsonResponse({'status': 'ok', 'theme': theme})
+    return JsonResponse({'status': 'error'}, status=400)
 
 
 @student_only

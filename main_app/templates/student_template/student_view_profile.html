@@ -101,6 +101,36 @@
     </div>
   </div>
 
+  <!-- Theme Selector -->
+  <div class="pcard">
+    <div class="pcard-header">
+      <i class="fas fa-palette"></i> Appearance
+    </div>
+    <div class="pcard-body">
+      <div style="font-size:12px;color:var(--ice-muted);margin-bottom:14px;">Choose how ICEBERG looks for you. Your preference is saved and applied on every login.</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;" id="theme-selector">
+        {% with current_theme=request.user.student.theme|default:"system" %}
+        <button type="button" class="theme-btn {% if current_theme == 'bright' %}active{% endif %}" data-theme="bright"
+          style="padding:14px 10px;border-radius:12px;border:2px solid {% if current_theme == 'bright' %}#1B3F7A{% else %}var(--ice-border){% endif %};background:{% if current_theme == 'bright' %}#EFF6FF{% else %}var(--ice-surface){% endif %};cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s;">
+          <div style="width:36px;height:36px;border-radius:9px;background:#fff;border:2px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:18px;">☀️</div>
+          <span style="font-size:12px;font-weight:700;color:var(--ice-text);">Bright</span>
+        </button>
+        <button type="button" class="theme-btn {% if current_theme == 'dark' %}active{% endif %}" data-theme="dark"
+          style="padding:14px 10px;border-radius:12px;border:2px solid {% if current_theme == 'dark' %}#1B3F7A{% else %}var(--ice-border){% endif %};background:{% if current_theme == 'dark' %}#EFF6FF{% else %}var(--ice-surface){% endif %};cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s;">
+          <div style="width:36px;height:36px;border-radius:9px;background:#1E293B;border:2px solid #334155;display:flex;align-items:center;justify-content:center;font-size:18px;">🌙</div>
+          <span style="font-size:12px;font-weight:700;color:var(--ice-text);">Dark</span>
+        </button>
+        <button type="button" class="theme-btn {% if current_theme == 'system' %}active{% endif %}" data-theme="system"
+          style="padding:14px 10px;border-radius:12px;border:2px solid {% if current_theme == 'system' %}#1B3F7A{% else %}var(--ice-border){% endif %};background:{% if current_theme == 'system' %}#EFF6FF{% else %}var(--ice-surface){% endif %};cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s;">
+          <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#fff 50%,#1E293B 50%);border:2px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:18px;">⚙️</div>
+          <span style="font-size:12px;font-weight:700;color:var(--ice-text);">System</span>
+        </button>
+        {% endwith %}
+      </div>
+      <div id="theme-msg" style="font-size:12px;color:#10B981;margin-top:10px;display:none;"><i class="fas fa-check-circle me-1"></i>Theme saved!</div>
+    </div>
+  </div>
+
   <!-- Profile Form -->
   <div class="pcard">
     <div class="pcard-header">
@@ -158,6 +188,53 @@
       document.getElementById('pw_notice').style.display = 'block';
     });
   }
+
+  // Theme selector
+  var SAVE_URL = '{% url "student_save_theme" %}';
+  var CSRF = '{{ csrf_token }}';
+
+  function applyTheme(theme) {
+    var root = document.documentElement;
+    root.removeAttribute('data-theme');
+    document.body.classList.remove('dark-mode', 'bright-mode');
+    if (theme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+      document.body.classList.add('dark-mode');
+    } else if (theme === 'bright') {
+      root.setAttribute('data-theme', 'bright');
+      document.body.classList.add('bright-mode');
+    } else {
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        root.setAttribute('data-theme', 'dark');
+        document.body.classList.add('dark-mode');
+      }
+    }
+  }
+
+  document.querySelectorAll('.theme-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var theme = btn.dataset.theme;
+      // Update button styles
+      document.querySelectorAll('.theme-btn').forEach(function (b) {
+        b.style.borderColor = 'var(--ice-border)';
+        b.style.background = 'var(--ice-surface)';
+      });
+      btn.style.borderColor = '#1B3F7A';
+      btn.style.background = '#EFF6FF';
+
+      applyTheme(theme);
+
+      // Save to server
+      fetch(SAVE_URL, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'theme=' + theme,
+      }).then(function () {
+        var msg = document.getElementById('theme-msg');
+        if (msg) { msg.style.display = 'block'; setTimeout(function () { msg.style.display = 'none'; }, 2000); }
+      });
+    });
+  });
 })();
 </script>
 {% endblock %}

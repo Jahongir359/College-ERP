@@ -94,6 +94,7 @@
           <th>Teacher</th>
           <th>Branch</th>
           <th>Schedule</th>
+          <th>Starts</th>
           <th>Cap.</th>
           <th>Status</th>
           <th>Actions</th>
@@ -110,6 +111,13 @@
           <td style="color:var(--ice-muted);">{{ group.teacher|default:"—" }}</td>
           <td style="color:var(--ice-muted);">{{ group.branch|default:"—" }}</td>
           <td style="color:var(--ice-muted); font-size:12px;">{{ group.schedule|default:"—" }}</td>
+          <td style="font-size:12px;">
+            {% if group.start_date %}
+              <span style="color:var(--ice-cyan); font-weight:600;">{{ group.start_date|date:"M j, Y" }}</span>
+            {% else %}
+              <span style="color:var(--ice-muted);">—</span>
+            {% endif %}
+          </td>
           <td style="color:var(--ice-muted);">{{ group.capacity }}</td>
           <td>
             {% if group.is_archived %}
@@ -133,7 +141,7 @@
           </td>
         </tr>
         {% empty %}
-        <tr class="empty-row"><td colspan="9"><i class="fas fa-layer-group" style="font-size:32px; opacity:.2; display:block; margin-bottom:10px;"></i>No groups yet. <a href="{% url 'add_group' %}">Add one</a>.</td></tr>
+        <tr class="empty-row"><td colspan="10"><i class="fas fa-layer-group" style="font-size:32px; opacity:.2; display:block; margin-bottom:10px;"></i>No groups yet. <a href="{% url 'add_group' %}">Add one</a>.</td></tr>
         {% endfor %}
       </tbody>
     </table>

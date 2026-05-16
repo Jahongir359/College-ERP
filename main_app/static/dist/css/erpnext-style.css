@@ -1,5 +1,25 @@
 /* ERPNext Style CSS for College ERP */
 
+/* ── Theme: Dark ─────────────────────────────────────────────────────────── */
+[data-theme="dark"] body,
+[data-theme="dark"] {
+  --light-color: #0f172a;
+  --dark-color: #e2e8f0;
+  --border-color: #1e293b;
+  --text-muted: #64748b;
+}
+[data-theme="dark"] body { background-color: #0f172a; color: #e2e8f0; }
+[data-theme="dark"] .erpnext-main { background-color: #0f172a; }
+[data-theme="dark"] .card,
+[data-theme="dark"] .page-card,
+[data-theme="dark"] .pcard { background-color: #1e293b !important; border-color: #334155 !important; }
+[data-theme="dark"] .erpnext-navbar { background: #0c1a30; border-bottom-color: #1e293b; }
+[data-theme="dark"] body { background-color: #0f172a !important; }
+
+/* ── Theme: Bright ───────────────────────────────────────────────────────── */
+[data-theme="bright"] body { background-color: #f8faff; }
+[data-theme="bright"] .erpnext-navbar { background: #fff; }
+
 :root {
   --primary-color: #5e64ff;
   --secondary-color: #8d99ae;
@@ -127,18 +147,23 @@ body {
 }
 
 /* Sidebar */
+/* ── ICEBERG Sidebar — deep navy design ──────────────────────────────────── */
 .erpnext-sidebar {
   position: fixed;
   top: var(--navbar-height);
   left: 0;
   width: var(--sidebar-width);
   height: calc(100vh - var(--navbar-height));
-  background: #fff;
-  border-right: 1px solid var(--border-color);
+  background: linear-gradient(180deg, #0C1F45 0%, #0F2454 60%, #122870 100%);
+  border-right: none;
   overflow-y: auto;
   z-index: 1020;
   transition: transform 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.12) transparent;
 }
+.erpnext-sidebar::-webkit-scrollbar { width: 4px; }
+.erpnext-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
 
 .sidebar-collapsed .erpnext-sidebar {
   transform: translateX(-100%);
@@ -146,7 +171,7 @@ body {
 
 .sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255,255,255,.08);
 }
 
 .sidebar-user {
@@ -160,159 +185,129 @@ body {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid rgba(6,182,212,.5);
 }
 
 .sidebar-default-avatar {
   width: 40px;
   height: 40px;
   font-size: 40px;
-  color: #6c757d;
+  color: rgba(255,255,255,.7);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: #f8f9fa;
-  border: 2px solid #e9ecef;
+  background: rgba(255,255,255,.1);
+  border: 2px solid rgba(6,182,212,.35);
 }
 
 .sidebar-user-info h6 {
   margin: 0;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
-  color: var(--dark-color);
+  color: #fff;
 }
 
 .sidebar-user-info small {
-  color: var(--text-muted);
+  color: rgba(255,255,255,.55);
   font-size: 12px;
 }
 
-/* Dark mode support for sidebar user info */
-.dark-mode .sidebar-user-info h6 {
-  color: #f7fafc;
-}
-
-.dark-mode .sidebar-user-info small {
-  color: #a0aec0;
-}
-
-/* Dark mode support for entire sidebar */
+/* Dark mode — sidebar is already dark, just ensure compatibility */
 .dark-mode .erpnext-sidebar {
-  background: #2d3748;
-  border-right-color: #4a5568;
+  background: linear-gradient(180deg, #060f22 0%, #0a1835 60%, #0d2050 100%);
 }
 
 .dark-mode .sidebar-header {
-  border-bottom-color: #4a5568;
+  border-bottom-color: rgba(255,255,255,.07);
 }
 
-.dark-mode .nav-section-title {
-  color: #a0aec0;
-}
-
-.dark-mode .nav-link {
-  color: #e2e8f0;
-}
-
-.dark-mode .nav-link:hover {
-  background-color: #374151;
-  color: #66b3ff;
-}
-
-.dark-mode .nav-link.active {
-  background-color: #1a365d;
-  color: #66b3ff;
-  border-left-color: #66b3ff;
-}
-
-.dark-mode .nav-submenu {
-  background-color: #374151;
-}
-
-/* Dark mode support for default avatar */
-.dark-mode .sidebar-default-avatar {
-  color: #a0aec0;
-  background-color: #4a5568;
-  border-color: #718096;
-}
+.dark-mode .sidebar-user-info h6 { color: #f0f4ff; }
+.dark-mode .sidebar-user-info small { color: rgba(255,255,255,.45); }
 
 /* AdminLTE default avatar styling */
 .adminlte-default-avatar {
   width: 40px;
   height: 40px;
   font-size: 35px;
-  color: #6c757d;
+  color: rgba(255,255,255,.7);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: #f8f9fa;
-  border: 2px solid #e9ecef;
+  background: rgba(255,255,255,.1);
+  border: 2px solid rgba(6,182,212,.35);
 }
 
-/* Dark mode support for AdminLTE default avatar */
 .dark-mode .adminlte-default-avatar {
-  color: #a0aec0;
-  background-color: #4a5568;
-  border-color: #718096;
+  color: rgba(255,255,255,.55);
+  background: rgba(255,255,255,.07);
 }
 
 /* Navigation Menu */
 .nav-section {
-  padding: 20px 0;
+  padding: 16px 0;
 }
 
 .nav-section-title {
-  padding: 0 20px 8px;
-  font-size: 11px;
-  font-weight: 600;
+  padding: 0 18px 6px;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-muted);
+  letter-spacing: .08em;
+  color: rgba(6,182,212,.75);
   margin: 0;
 }
 
 .nav-item {
-  margin: 2px 0;
+  margin: 1px 0;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  color: var(--dark-color);
+  padding: 10px 18px;
+  color: rgba(255,255,255,.72);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   border-left: 3px solid transparent;
+  border-radius: 0 8px 8px 0;
+  margin-right: 8px;
 }
 
 .nav-link:hover {
-  background-color: #f5f6fa;
-  color: var(--primary-color);
+  background: rgba(255,255,255,.08);
+  color: #fff;
   text-decoration: none;
 }
 
 .nav-link.active {
-  background-color: #e8f2ff;
-  color: var(--primary-color);
-  border-left-color: var(--primary-color);
-  font-weight: 500;
+  background: rgba(6,182,212,.15);
+  color: #fff;
+  border-left-color: #06B6D4;
+  font-weight: 600;
 }
 
 .nav-icon {
   width: 20px;
   margin-right: 12px;
   text-align: center;
-  font-size: 16px;
+  font-size: 15px;
+  opacity: .85;
 }
+
+.nav-link.active .nav-icon,
+.nav-link:hover .nav-icon { opacity: 1; }
 
 .nav-text {
   flex: 1;
-  font-size: 14px;
+  font-size: 13.5px;
 }
 
 .nav-arrow {
-  font-size: 12px;
+  font-size: 11px;
   transition: transform 0.2s ease;
+  opacity: .55;
 }
 
 .nav-item.open .nav-arrow {
@@ -321,7 +316,7 @@ body {
 
 /* Submenu */
 .nav-submenu {
-  background-color: #f8f9fc;
+  background: rgba(0,0,0,.15);
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease;
@@ -332,8 +327,81 @@ body {
 }
 
 .nav-submenu .nav-link {
-  padding-left: 52px;
+  padding-left: 50px;
   font-size: 13px;
+  color: rgba(255,255,255,.6);
+}
+
+.nav-submenu .nav-link:hover { color: #fff; }
+.nav-submenu .nav-link.active { color: #06B6D4; }
+
+/* Dark mode nav overrides — already handled by navy design */
+.dark-mode .nav-section-title { color: rgba(6,182,212,.65); }
+.dark-mode .nav-link { color: rgba(255,255,255,.65); }
+.dark-mode .nav-link:hover { background: rgba(255,255,255,.07); color: #fff; }
+.dark-mode .nav-link.active { background: rgba(6,182,212,.12); border-left-color: #06B6D4; color: #fff; }
+.dark-mode .nav-submenu { background: rgba(0,0,0,.2); }
+.dark-mode .sidebar-default-avatar { background: rgba(255,255,255,.07); border-color: rgba(6,182,212,.3); }
+
+/* Sidebar footer / logout ─────────────────────────────────────────────────── */
+.sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(6,15,40,.6) 100%);
+}
+
+.sidebar-logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.75);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: left;
+}
+
+.sidebar-logout-btn:hover {
+  background: rgba(239,68,68,.15);
+  border-color: rgba(239,68,68,.35);
+  color: #FCA5A5;
+}
+
+.sidebar-logout-btn i { font-size: 15px; }
+
+/* Notification indicators ───────────────────────────────────────────────── */
+.notif-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #06B6D4;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  margin-left: auto;
+}
+
+.notif-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #06B6D4;
+  margin-left: 4px;
+  flex-shrink: 0;
 }
 
 /* Main Content */
@@ -1050,38 +1118,7 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
-.dark-mode .erpnext-sidebar {
-  background-color: var(--sidebar-bg);
-  border-right: 1px solid var(--border-color);
-}
-
-.dark-mode .nav-link {
-  color: var(--text-color);
-}
-
-.dark-mode .nav-link:hover {
-  color: var(--primary-color);
-  background-color: rgba(94, 100, 255, 0.1);
-}
-
-.dark-mode .nav-link.active {
-  color: var(--primary-color);
-  background-color: rgba(94, 100, 255, 0.15);
-}
-
-.dark-mode .nav-submenu {
-  background-color: var(--border-color);
-}
-
-.dark-mode .nav-submenu .nav-link {
-  color: var(--text-color);
-  background-color: transparent;
-}
-
-.dark-mode .nav-submenu .nav-link:hover {
-  background-color: rgba(94, 100, 255, 0.1);
-  color: var(--primary-color);
-}
+/* dark-mode sidebar overrides handled above in the ICEBERG sidebar block */
 
 .dark-mode .nav-item {
   background-color: transparent;
@@ -1306,9 +1343,7 @@ body {
   color: var(--text-color) !important;
 }
 
-.dark-mode .nav-section-title {
-  color: var(--text-muted);
-}
+/* dark-mode nav-section-title handled in ICEBERG sidebar block */
 
 .dark-mode .user-name {
   color: var(--text-color);

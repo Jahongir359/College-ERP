@@ -958,12 +958,31 @@ def manage_group(request):
     })
 
 
+def _notify_group_start_date(group):
+    """Notify all enrolled active students that a group start date has been set/changed."""
+    from .models import Enrollment, Notification, Student
+    if not group.start_date:
+        return
+    date_str = group.start_date.strftime('%B %d, %Y')
+    enrollments = Enrollment.objects.filter(group=group, is_active=True).select_related('student__admin')
+    notifs = []
+    for e in enrollments:
+        notifs.append(Notification(
+            recipient=e.student.admin,
+            category=Notification.GENERAL,
+            message=f'Your group "{group.name}" will start on {date_str}.',
+        ))
+    if notifs:
+        Notification.objects.bulk_create(notifs)
+
+
 @admin_only
 def add_group(request):
     form = GroupForm(request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            group = form.save()
+            _notify_group_start_date(group)
             messages.success(request, "Group created!")
             return redirect(reverse('manage_group'))
     return render(request, 'hod_template/add_group.html', {
@@ -975,10 +994,13 @@ def add_group(request):
 @admin_only
 def edit_group(request, group_id):
     group = get_object_or_404(Group, id=group_id)
+    old_start_date = group.start_date
     form = GroupForm(request.POST or None, instance=group)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            updated = form.save()
+            if updated.start_date and updated.start_date != old_start_date:
+                _notify_group_start_date(updated)
             messages.success(request, "Group updated!")
             return redirect(reverse('manage_group'))
     return render(request, 'hod_template/add_group.html', {

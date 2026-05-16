@@ -280,7 +280,7 @@ class BranchForm(FormSettings):
 class GroupForm(FormSettings):
     class Meta:
         model = Group
-        fields = ['name', 'course', 'teacher', 'branch', 'room', 'schedule', 'capacity']
+        fields = ['name', 'course', 'teacher', 'branch', 'room', 'schedule', 'capacity', 'start_date']
         labels = {
             'course': 'Program',
             'teacher': 'Teacher',
@@ -288,6 +288,10 @@ class GroupForm(FormSettings):
             'room': 'Room / Classroom',
             'schedule': 'Schedule',
             'capacity': 'Capacity (max students)',
+            'start_date': 'Starting Date',
+        }
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
 

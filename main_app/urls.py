@@ -161,6 +161,8 @@ urlpatterns = [
          name='student_view_profile'),
     path("student/fcmtoken/", student_views.student_fcmtoken,
          name='student_fcmtoken'),
+    path("student/save-theme/", student_views.student_save_theme,
+         name='student_save_theme'),
      # path('student/todo',student_views.todo,name='todo'),
 
      
