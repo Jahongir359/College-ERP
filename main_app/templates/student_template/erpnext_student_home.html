@@ -7,626 +7,582 @@
 
 {% block custom_css %}
 <style>
-/* ── Layout ─────────────────────────────────────────────────── */
-.sd-app { display: grid; gap: 24px; }
+/* ── Page shell ─────────────────────────────────────────────── */
+.stu-page {
+  --c-bg: #F4F7FB;
+  --c-surface: #FFFFFF;
+  --c-text: #0F172A;
+  --c-muted: #64748B;
+  --c-border: #E6ECF5;
+  --c-blue: #2563EB;
+  --c-sky: #3B82F6;
+  --c-blue-bg: #E8F0FE;
+  --c-blue-soft: #DBEAFE;
+  --c-royal: #1F4FD9;
+  --c-navy-a: #0F1F5C;
+  --c-navy-b: #1340A8;
+  --c-success: #10B981;
+  --c-warning: #F59E0B;
+  --c-danger:  #EF4444;
+  background: var(--c-bg);
+  margin: -24px -24px -24px -24px;
+  padding: 18px 16px 32px;
+  min-height: 100%;
+  color: var(--c-text);
+  font-family: 'Inter', sans-serif;
+}
+@media (min-width: 640px) {
+  .stu-page { padding: 24px 28px 40px; margin: -24px; }
+}
 
 /* ── Hero ───────────────────────────────────────────────────── */
-.sd-hero {
+.stu-hero {
   position: relative;
+  padding: 14px 6px 22px;
   overflow: hidden;
-  border-radius: 24px;
-  padding: 36px 32px;
-  color: #fff;
-  background: linear-gradient(135deg, #0C1F45 0%, #1B3F7A 50%, #0f766e 100%);
-  box-shadow: 0 24px 64px rgba(12, 31, 69, .22);
 }
-.sd-hero::before {
-  content: "";
+.stu-hero-bg {
   position: absolute;
-  top: -80px; right: -80px;
-  width: 360px; height: 360px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(6,182,212,.18) 0%, transparent 70%);
+  top: -40px;
+  right: -60px;
+  width: 280px;
+  height: auto;
+  opacity: .45;
   pointer-events: none;
+  transform: rotate(8deg);
+  filter: saturate(.7);
+  z-index: 0;
 }
-.sd-hero::after {
-  content: "";
-  position: absolute;
-  bottom: -60px; left: 20%;
-  width: 280px; height: 280px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(147,197,253,.12) 0%, transparent 70%);
-  pointer-events: none;
+.stu-hero-inner { position: relative; z-index: 1; max-width: 70%; }
+.stu-h1 {
+  font-family: 'Inter', serif;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1.08;
+  letter-spacing: -0.8px;
+  margin: 0 0 6px;
+  color: var(--c-text);
 }
-.sd-hero-inner {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
-  gap: 32px;
+.stu-sub {
+  margin: 0;
+  color: var(--c-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+@media (min-width: 640px) {
+  .stu-h1 { font-size: 38px; }
+  .stu-hero-bg { width: 320px; right: -40px; }
+}
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.stu-card {
+  background: var(--c-surface);
+  border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(15,23,42,.06);
+  padding: 18px;
+  margin-bottom: 18px;
+}
+@media (min-width: 640px) { .stu-card { padding: 22px; } }
+
+.stu-card-head {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
-.sd-kicker {
+.stu-card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--c-text);
+  letter-spacing: -.2px;
+}
+.stu-card-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-blue);
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  margin-bottom: 18px;
-  padding: 6px 14px;
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 999px;
-  background: rgba(255,255,255,.1);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: rgba(241,245,249,.85);
+  gap: 4px;
 }
-.sd-hero h2 {
-  margin: 0 0 14px;
-  font-size: clamp(28px, 4.5vw, 52px);
+.stu-card-link:hover { color: var(--c-royal); text-decoration: none; }
+
+/* ── Stat tiles row ─────────────────────────────────────────── */
+.stu-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.stu-stat {
+  background: var(--c-surface);
+  border-radius: 18px;
+  padding: 14px 12px;
+  box-shadow: 0 6px 24px rgba(15,23,42,.06);
+  text-align: left;
+}
+.stu-stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--c-blue-bg);
+  color: var(--c-royal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.stu-stat-val {
+  display: block;
+  font-size: 22px;
   font-weight: 900;
-  line-height: 1.05;
+  line-height: 1;
+  color: var(--c-text);
   letter-spacing: -.5px;
 }
-.sd-hero p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.7;
-  color: rgba(241,245,249,.75);
-  max-width: 520px;
+.stu-stat-lbl {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--c-muted);
+}
+@media (min-width: 640px) {
+  .stu-stat { padding: 18px; }
+  .stu-stat-val { font-size: 28px; }
+  .stu-stat-lbl { font-size: 11px; }
 }
 
-/* Attendance glass card */
-.sd-meter {
-  padding: 24px;
-  border: 1px solid rgba(255,255,255,.18);
+/* ── Combo card (Next Up + Latest Result) ────────────────────── */
+.stu-combo {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0;
+  padding: 0;
+  background: var(--c-surface);
   border-radius: 20px;
-  background: rgba(255,255,255,.11);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 6px 24px rgba(15,23,42,.06);
+  margin-bottom: 18px;
+  overflow: hidden;
 }
-.sd-meter-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
+.stu-combo-cell {
+  padding: 16px 14px;
+  min-width: 0;
 }
-.sd-meter-lbl {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .08em;
+.stu-combo-div {
+  background: var(--c-border);
+  width: 1px;
+}
+.stu-combo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.stu-combo-icon.navy { background: var(--c-navy-a); }
+.stu-combo-icon.sky  { background: var(--c-sky); }
+.stu-combo-lbl {
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  color: rgba(241,245,249,.65);
+  letter-spacing: .06em;
+  color: var(--c-muted);
   margin-bottom: 4px;
 }
-.sd-meter-note {
-  font-size: 12px;
-  line-height: 1.5;
-  color: rgba(241,245,249,.72);
-  max-width: 160px;
-}
-.sd-meter-pct {
-  font-size: 56px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -2px;
-  white-space: nowrap;
-}
-.sd-track {
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.18);
+.stu-combo-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--c-text);
+  line-height: 1.25;
+  margin-bottom: 6px;
   overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
-.sd-fill {
-  height: 100%;
-  width: {{ percent_present }}%;
-  border-radius: 999px;
-  background: {% if percent_present >= 75 %}#34d399{% elif percent_present >= 50 %}#fbbf24{% else %}#fb7185{% endif %};
-  transition: width .6s ease;
-}
-
-/* ── Metric cards ────────────────────────────────────────────── */
-.sd-metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
-.sd-metric {
-  padding: 22px 20px;
-  border: 1px solid var(--app-border);
-  border-radius: 20px;
-  background: var(--app-surface);
-  box-shadow: 0 8px 24px rgba(15,23,42,.055);
-  transition: transform .16s, box-shadow .16s;
-}
-.sd-metric:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(15,23,42,.09);
-}
-.sd-metric-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  color: #fff;
-  font-size: 17px;
-  margin-bottom: 16px;
-}
-.sd-metric strong {
-  display: block;
-  font-size: 34px;
-  font-weight: 900;
-  line-height: 1;
-  color: var(--app-text);
-  letter-spacing: -1px;
-}
-.sd-metric span {
-  display: block;
-  margin-top: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--app-muted);
-}
-
-/* ── Two-column chart section ─────────────────────────────────── */
-.sd-charts {
-  display: grid;
-  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
-  gap: 20px;
-}
-.sd-card {
-  border: 1px solid var(--app-border);
-  border-radius: 20px;
-  background: var(--app-surface);
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(15,23,42,.05);
-}
-.sd-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px 22px;
-  border-bottom: 1px solid var(--app-border);
-  background: linear-gradient(180deg, var(--app-surface) 0%, var(--app-surface-muted) 100%);
-}
-.sd-card-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 900;
-  color: var(--app-text);
-}
-.sd-card-sub {
-  margin: 5px 0 0;
-  font-size: 12px;
-  color: var(--app-muted);
-}
-.sd-card-body { padding: 22px; }
-
-/* Donut */
-.sd-donut-shell {
-  position: relative;
-  width: min(220px, 100%);
-  aspect-ratio: 1;
-  margin: 0 auto 20px;
-}
-.sd-donut-shell canvas { width: 100% !important; height: 100% !important; }
-.sd-donut-center {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  pointer-events: none;
-}
-.sd-donut-center strong {
-  display: block;
-  font-size: 32px;
-  font-weight: 900;
-  line-height: 1;
-  color: var(--app-text);
-}
-.sd-donut-center span {
+.stu-combo-meta {
   font-size: 11px;
-  font-weight: 700;
-  color: var(--app-muted);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-.sd-donut-legend {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-.sd-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12px;
   font-weight: 600;
-  color: var(--app-muted);
-}
-.sd-legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.sd-bar-shell {
-  position: relative;
-  min-height: 280px;
-}
-.sd-bar-shell canvas { min-height: 260px; }
-
-/* ── Table section ───────────────────────────────────────────── */
-.sd-table-card { border: 1px solid var(--app-border); border-radius: 20px; background: var(--app-surface); overflow: hidden; box-shadow: 0 8px 24px rgba(15,23,42,.05); }
-.sd-table { width: 100%; border-collapse: collapse; }
-.sd-table thead th {
-  padding: 13px 18px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--app-muted);
-  background: var(--app-surface-muted);
-  border-bottom: 1px solid var(--app-border);
-}
-.sd-table tbody td {
-  padding: 14px 18px;
-  font-size: 13px;
-  color: var(--app-text);
-  border-bottom: 1px solid var(--app-border);
-  vertical-align: middle;
-}
-.sd-table tbody tr:last-child td { border-bottom: none; }
-.sd-table tbody tr:hover td { background: var(--app-surface-muted); }
-.sd-badge-present {
+  color: var(--c-muted);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 36px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #dcfce7;
-  color: #166534;
-  font-size: 12px;
-  font-weight: 700;
+  gap: 4px;
 }
-.sd-badge-absent {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 36px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #fee2e2;
-  color: #991b1b;
-  font-size: 12px;
-  font-weight: 700;
-}
-.sd-rate-pill {
-  display: inline-flex;
-  justify-content: center;
-  min-width: 58px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 12px;
+.stu-combo-score {
+  font-size: 24px;
   font-weight: 900;
+  color: var(--c-royal);
+  letter-spacing: -.5px;
+  line-height: 1;
+  margin-top: 4px;
 }
-.sd-rate-good { background: #dcfce7; color: #166534; }
-.sd-rate-warn { background: #fef3c7; color: #92400e; }
-.sd-rate-bad  { background: #fee2e2; color: #991b1b; }
+.stu-combo-dash {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--c-border);
+  line-height: 1;
+}
+@media (min-width: 640px) {
+  .stu-combo-cell { padding: 20px; }
+  .stu-combo-title { font-size: 15px; }
+  .stu-combo-score { font-size: 28px; }
+}
 
-/* ── Quick actions ───────────────────────────────────────────── */
-.sd-actions {
+/* ── Task list ──────────────────────────────────────────────── */
+.stu-list { display: flex; flex-direction: column; gap: 14px; }
+.stu-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-}
-.sd-action {
-  display: flex;
-  flex-direction: column;
-  min-height: 120px;
-  padding: 20px 18px;
-  border: 1px solid var(--app-border);
-  border-radius: 20px;
-  background: var(--app-surface);
-  color: var(--app-text);
+  grid-template-columns: 36px 1fr auto 10px;
+  gap: 12px;
+  align-items: center;
   text-decoration: none;
-  box-shadow: 0 6px 20px rgba(15,23,42,.05);
-  transition: transform .16s, border-color .16s, box-shadow .16s;
+  color: inherit;
 }
-.sd-action:hover {
-  color: var(--app-text);
-  border-color: #bfdbfe;
-  box-shadow: 0 16px 38px rgba(37,99,235,.12);
-  transform: translateY(-3px);
-  text-decoration: none;
-}
-.sd-action-icon {
+.stu-row:hover { text-decoration: none; color: inherit; }
+.stu-row-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
   color: #fff;
-  font-size: 17px;
-  margin-bottom: 14px;
-  flex-shrink: 0;
-}
-.sd-action strong {
-  display: block;
   font-size: 14px;
   font-weight: 900;
-  color: var(--app-text);
+  flex-shrink: 0;
 }
-.sd-action span {
-  display: block;
-  margin-top: 5px;
+.stu-row-body { min-width: 0; }
+.stu-row-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--c-text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stu-row-sub {
+  font-size: 11px;
+  color: var(--c-muted);
+  margin-top: 3px;
+  font-weight: 600;
+}
+.stu-row-progress {
+  margin-top: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #EEF2F8;
+  overflow: hidden;
+}
+.stu-row-progress-fill {
+  height: 100%;
+  background: var(--c-royal);
+  border-radius: 999px;
+}
+.stu-row-right {
   font-size: 12px;
-  color: var(--app-muted);
-  line-height: 1.4;
+  font-weight: 800;
+  color: var(--c-text);
+  text-align: right;
+  white-space: nowrap;
+}
+.stu-row-chev {
+  color: #94A3B8;
+  font-size: 11px;
 }
 
-/* ── Empty state ─────────────────────────────────────────────── */
-.sd-empty {
-  padding: 40px 20px;
+/* Avatar color palette by index */
+.av-0 { background: #2563EB; }
+.av-1 { background: #10B981; }
+.av-2 { background: #F59E0B; }
+.av-3 { background: #8B5CF6; }
+.av-4 { background: #EC4899; }
+.av-5 { background: #06B6D4; }
+
+/* ── Group list rows ────────────────────────────────────────── */
+.stu-grow {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--c-border);
+}
+.stu-grow:last-child { border-bottom: none; }
+.stu-grow-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.stu-grow-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--c-text);
+}
+.stu-grow-sub {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-muted);
+  margin-top: 2px;
+}
+.stu-pill {
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
   text-align: center;
-  color: var(--app-muted);
+  min-width: 44px;
+}
+.pill-good { background: #D1FAE5; color: #065F46; }
+.pill-warn { background: #FEF3C7; color: #92400E; }
+.pill-bad  { background: #FEE2E2; color: #991B1B; }
+
+/* ── Quick links ────────────────────────────────────────────── */
+.stu-quick {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.stu-quick a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 4px;
+  border-radius: 14px;
+  background: #F8FAFC;
+  text-decoration: none;
+  color: var(--c-text);
+  transition: background .15s, transform .15s;
+}
+.stu-quick a:hover {
+  background: var(--c-blue-bg);
+  transform: translateY(-1px);
+  color: var(--c-text);
+  text-decoration: none;
+}
+.stu-quick-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--c-blue-bg);
+  color: var(--c-royal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+.stu-quick-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+/* ── Empty state ────────────────────────────────────────────── */
+.stu-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--c-muted);
   font-size: 13px;
 }
-.sd-empty i {
+.stu-empty i {
   display: block;
-  font-size: 32px;
-  opacity: .25;
-  margin-bottom: 12px;
+  font-size: 28px;
+  opacity: .3;
+  margin-bottom: 10px;
 }
 
-/* ── Dark mode ───────────────────────────────────────────────── */
-.dark-mode .sd-metric,
-.dark-mode .sd-card,
-.dark-mode .sd-table-card,
-.dark-mode .sd-action {
-  background: var(--app-surface);
-  border-color: var(--app-border);
-}
-.dark-mode .sd-card-head { background: var(--app-surface-muted); }
-.dark-mode .sd-table thead th { background: var(--app-surface-muted); }
+/* Hide AdminLTE page header for cleaner mobile look (kept accessible) */
+.stu-page-shell .page-header { display: none; }
 
-/* ── Responsive ──────────────────────────────────────────────── */
-@media (max-width: 1200px) {
-  .sd-metrics  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .sd-actions  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-@media (max-width: 960px) {
-  .sd-hero-inner { grid-template-columns: 1fr; }
-  .sd-meter-pct  { font-size: 48px; }
-  .sd-charts     { grid-template-columns: 1fr; }
-  .sd-actions    { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 640px) {
-  .sd-hero       { padding: 24px 20px; border-radius: 20px; }
-  .sd-hero h2    { font-size: 28px; }
-  .sd-metrics    { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .sd-actions    { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .sd-meter-pct  { font-size: 40px; }
-}
-@media (max-width: 400px) {
-  .sd-metrics { grid-template-columns: 1fr; }
-  .sd-actions { grid-template-columns: 1fr; }
-}
+/* Dark mode */
+.dark-mode .stu-page { background: #0B1220; color: #E2E8F0; }
+.dark-mode .stu-h1 { color: #F1F5F9; }
+.dark-mode .stu-card,
+.dark-mode .stu-stat,
+.dark-mode .stu-combo { background: #131C30; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+.dark-mode .stu-combo-div { background: #1E293B; }
+.dark-mode .stu-card-title,
+.dark-mode .stu-stat-val,
+.dark-mode .stu-combo-title,
+.dark-mode .stu-row-title,
+.dark-mode .stu-row-right,
+.dark-mode .stu-grow-name { color: #F1F5F9; }
+.dark-mode .stu-row-progress,
+.dark-mode .stu-grow { border-color: #1E293B; }
+.dark-mode .stu-quick a { background: #1A2238; color: #E2E8F0; }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
-<div class="sd-app">
+<div class="stu-page">
 
-  <!-- ── Hero ──────────────────────────────────────────────────── -->
-  <section class="sd-hero">
-    <div class="sd-hero-inner">
-      <div>
-        <div class="sd-kicker">
-          <i class="fas fa-graduation-cap"></i>
-          Student portal
-        </div>
-        <h2>Hi {{ request.user.first_name|default:request.user.username }},<br>your day is ready.</h2>
-        <p>Track attendance, results, assignments, leave requests, notifications, and library resources — all from one clean dashboard.</p>
-      </div>
-      <div class="sd-meter">
-        <div class="sd-meter-top">
-          <div>
-            <div class="sd-meter-lbl">Overall attendance</div>
-            <div class="sd-meter-note">
-              {% if percent_present >= 75 %}
-                Healthy range — keep the rhythm.
-              {% elif percent_present >= 50 %}
-                Close to risk — attend more classes.
-              {% else %}
-                Urgent — talk to your teacher soon.
-              {% endif %}
-            </div>
-          </div>
-          <div class="sd-meter-pct">{{ percent_present }}%</div>
-        </div>
-        <div class="sd-track">
-          <div class="sd-fill"></div>
-        </div>
-      </div>
+  <!-- 1. Hero -->
+  <section class="stu-hero">
+    <img src="{% static 'dist/img/logo.png' %}" alt="" class="stu-hero-bg">
+    <div class="stu-hero-inner">
+      <h1 class="stu-h1">Good morning, {{ request.user.first_name|default:request.user.username }} 👋</h1>
+      <p class="stu-sub">Your progress this week</p>
     </div>
   </section>
 
-  <!-- ── Metric cards ──────────────────────────────────────────── -->
-  <section class="sd-metrics">
-    <div class="sd-metric">
-      <div class="sd-metric-icon" style="background:#2563eb;"><i class="fas fa-calendar-alt"></i></div>
-      <strong>{{ total_attendance }}</strong>
-      <span>Total classes recorded</span>
+  <!-- 2. Stat tiles -->
+  <section class="stu-stats">
+    <div class="stu-stat">
+      <div class="stu-stat-icon"><i class="fas fa-calendar-check"></i></div>
+      <span class="stu-stat-val">{{ percent_present }}%</span>
+      <span class="stu-stat-lbl">This week</span>
     </div>
-    <div class="sd-metric">
-      <div class="sd-metric-icon" style="background:#16a34a;"><i class="fas fa-user-check"></i></div>
-      <strong>{{ percent_present }}%</strong>
-      <span>Present rate</span>
+    <div class="stu-stat">
+      <div class="stu-stat-icon"><i class="fas fa-star"></i></div>
+      <span class="stu-stat-val">{{ total_attendance }}</span>
+      <span class="stu-stat-lbl">Total classes</span>
     </div>
-    <div class="sd-metric">
-      <div class="sd-metric-icon" style="background:#dc2626;"><i class="fas fa-user-times"></i></div>
-      <strong>{{ percent_absent }}%</strong>
-      <span>Absence rate</span>
-    </div>
-    <div class="sd-metric">
-      <div class="sd-metric-icon" style="background:#0f766e;"><i class="fas fa-layer-group"></i></div>
-      <strong>{{ total_subject }}</strong>
-      <span>Enrolled groups</span>
+    <div class="stu-stat">
+      <div class="stu-stat-icon"><i class="fas fa-trophy"></i></div>
+      <span class="stu-stat-val">#{{ total_subject }}</span>
+      <span class="stu-stat-lbl">Active groups</span>
     </div>
   </section>
 
-  <!-- ── Charts row ────────────────────────────────────────────── -->
-  <section class="sd-charts">
-    <!-- Donut chart -->
-    <div class="sd-card">
-      <div class="sd-card-head">
-        <div>
-          <h3 class="sd-card-title">Attendance health</h3>
-          <p class="sd-card-sub">Present vs absent across all sessions.</p>
-        </div>
+  <!-- 3. Combo card: Next Up + Latest Result -->
+  <section class="stu-combo">
+    <div class="stu-combo-cell">
+      <div class="stu-combo-icon navy"><i class="fas fa-book"></i></div>
+      <div class="stu-combo-lbl">Next Up</div>
+      <div class="stu-combo-title">
+        {% if recent_assignments %}{{ recent_assignments.0.title }}{% else %}No upcoming tasks{% endif %}
       </div>
-      <div class="sd-card-body">
-        <div class="sd-donut-shell">
-          <canvas id="sdDonutChart"></canvas>
-          <div class="sd-donut-center">
-            <strong>{{ percent_present }}%</strong>
-            <span>Present</span>
-          </div>
-        </div>
-        <div class="sd-donut-legend">
-          <div class="sd-legend-item">
-            <div class="sd-legend-dot" style="background:#16a34a;"></div>
-            Present ({{ percent_present }}%)
-          </div>
-          <div class="sd-legend-item">
-            <div class="sd-legend-dot" style="background:#dc2626;"></div>
-            Absent ({{ percent_absent }}%)
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bar chart -->
-    <div class="sd-card">
-      <div class="sd-card-head">
-        <div>
-          <h3 class="sd-card-title">Group performance</h3>
-          <p class="sd-card-sub">Attendance distribution per enrolled group.</p>
-        </div>
-      </div>
-      <div class="sd-card-body">
-        {% if total_subject %}
-          <div class="sd-bar-shell">
-            <canvas id="sdBarChart"></canvas>
-          </div>
+      <div class="stu-combo-meta">
+        <i class="far fa-clock"></i>
+        {% if recent_assignments and recent_assignments.0.due_date %}
+          Due {{ recent_assignments.0.due_date|date:"M j" }}
         {% else %}
-          <div class="sd-empty">
-            <i class="fas fa-chart-bar"></i>
-            No active groups yet.
-          </div>
+          —
         {% endif %}
       </div>
     </div>
+
+    <div class="stu-combo-div"></div>
+
+    <div class="stu-combo-cell">
+      <div class="stu-combo-icon sky"><i class="fas fa-file-alt"></i></div>
+      <div class="stu-combo-lbl">Latest Result</div>
+      {% if latest_result %}
+        <div class="stu-combo-title">
+          {% if latest_result.group %}{{ latest_result.group.name }}{% else %}General{% endif %}
+        </div>
+        <div class="stu-combo-score">{{ latest_result.test|add:latest_result.exam }}%</div>
+      {% else %}
+        <div class="stu-combo-title">No results yet</div>
+        <div class="stu-combo-dash">—</div>
+      {% endif %}
+    </div>
   </section>
 
-  <!-- ── Attendance by group table ─────────────────────────────── -->
-  <div class="sd-table-card">
-    <div class="sd-card-head">
-      <div>
-        <h3 class="sd-card-title">Attendance by group</h3>
-        <p class="sd-card-sub">Detailed attendance summary for every enrolled group.</p>
-      </div>
-      <a href="{% url 'student_view_attendance' %}" class="btn btn-primary btn-sm" style="white-space:nowrap;">
-        <i class="fas fa-calendar-check me-1"></i> View attendance
+  <!-- 4. Today's Tasks -->
+  <section class="stu-card">
+    <div class="stu-card-head">
+      <h3 class="stu-card-title">Today's Tasks</h3>
+      <a href="{% url 'student_assignments' %}" class="stu-card-link">
+        View All <i class="fas fa-chevron-right"></i>
       </a>
     </div>
-    <div class="table-responsive">
-      <table class="sd-table">
-        <thead>
-          <tr>
-            <th>Group</th>
-            <th class="text-center">Present</th>
-            <th class="text-center">Absent</th>
-            <th class="text-end">Rate</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in subject_rows %}
-          <tr>
-            <td><strong>{{ row.name }}</strong></td>
-            <td class="text-center"><span class="sd-badge-present">{{ row.present }}</span></td>
-            <td class="text-center"><span class="sd-badge-absent">{{ row.absent }}</span></td>
-            <td class="text-end">
-              <span class="sd-rate-pill {% if row.pct >= 75 %}sd-rate-good{% elif row.pct >= 50 %}sd-rate-warn{% else %}sd-rate-bad{% endif %}">
-                {{ row.pct }}%
-              </span>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="4">
-              <div class="sd-empty">
-                <i class="fas fa-layer-group"></i>
-                No active groups have been assigned yet.
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
 
-  <!-- ── Quick actions ─────────────────────────────────────────── -->
-  <section class="sd-actions">
-    <a href="{% url 'student_view_attendance' %}" class="sd-action">
-      <div class="sd-action-icon" style="background:#2563eb;"><i class="fas fa-calendar-check"></i></div>
-      <strong>Attendance</strong>
-      <span>Check classes by date range.</span>
-    </a>
-    <a href="{% url 'student_view_result' %}" class="sd-action">
-      <div class="sd-action-icon" style="background:#16a34a;"><i class="fas fa-chart-bar"></i></div>
-      <strong>Results</strong>
-      <span>View marks and group scores.</span>
-    </a>
-    <a href="{% url 'student_assignments' %}" class="sd-action">
-      <div class="sd-action-icon" style="background:#d97706;"><i class="fas fa-tasks"></i></div>
-      <strong>Assignments</strong>
-      <span>Submit work and track status.</span>
-    </a>
-    <a href="{% url 'student_result_files' %}" class="sd-action">
-      <div class="sd-action-icon" style="background:#0f766e;"><i class="fas fa-file-alt"></i></div>
-      <strong>Files</strong>
-      <span>Download shared result files.</span>
-    </a>
-    <a href="{% url 'student_apply_leave' %}" class="sd-action">
-      <div class="sd-action-icon" style="background:#7c3aed;"><i class="fas fa-calendar-plus"></i></div>
-      <strong>Leave</strong>
-      <span>Send absence requests.</span>
-    </a>
-    <a href="{% url 'student_view_notification' %}" class="sd-action">
-      <div class="sd-action-icon" style="background:#dc2626;"><i class="fas fa-bell"></i></div>
-      <strong>Alerts</strong>
-      <span>Read school notifications.</span>
-    </a>
-    <a href="{% url 'view_books' %}" class="sd-action">
-      <div class="sd-action-icon" style="background:#0891b2;"><i class="fas fa-book"></i></div>
-      <strong>Library</strong>
-      <span>Browse available books.</span>
-    </a>
-    <a href="{% url 'student_view_profile' %}" class="sd-action">
-      <div class="sd-action-icon" style="background:#334155;"><i class="fas fa-user-circle"></i></div>
-      <strong>Profile</strong>
-      <span>Update personal details.</span>
-    </a>
+    {% if recent_assignments %}
+      <div class="stu-list">
+        {% for a in recent_assignments %}
+        <a href="{% url 'submit_assignment' a.id %}" class="stu-row">
+          <div class="stu-row-avatar av-{{ forloop.counter0|divisibleby:6|yesno:'0,' }}{% widthratio forloop.counter0 1 1 %}"
+               style="background: {% cycle '#2563EB' '#10B981' '#F59E0B' '#8B5CF6' '#EC4899' '#06B6D4' %};">
+            {{ a.title|slice:":1"|upper }}
+          </div>
+          <div class="stu-row-body">
+            <div class="stu-row-title">{{ a.title }}</div>
+            <div class="stu-row-sub">{{ a.group_name }}</div>
+            <div class="stu-row-progress">
+              <div class="stu-row-progress-fill" style="width: {{ a.progress }}%;"></div>
+            </div>
+          </div>
+          <div class="stu-row-right">{{ a.progress }}%</div>
+          <i class="fas fa-chevron-right stu-row-chev"></i>
+        </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="stu-empty">
+        <i class="fas fa-clipboard-list"></i>
+        No tasks for today. Enjoy your day!
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- 5. Attendance by group -->
+  <section class="stu-card">
+    <div class="stu-card-head">
+      <h3 class="stu-card-title">Attendance by group</h3>
+      <a href="{% url 'student_view_attendance' %}" class="stu-card-link">
+        Open full report <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+
+    {% if subject_rows %}
+      <div>
+        {% for row in subject_rows %}
+        <div class="stu-grow">
+          <div class="stu-grow-dot" style="background: {% cycle '#2563EB' '#10B981' '#F59E0B' '#8B5CF6' '#EC4899' '#06B6D4' %};"></div>
+          <div>
+            <div class="stu-grow-name">{{ row.name }}</div>
+            <div class="stu-grow-sub">{{ row.present }} present · {{ row.absent }} absent</div>
+          </div>
+          <div class="stu-pill {% if row.pct >= 75 %}pill-good{% elif row.pct >= 50 %}pill-warn{% else %}pill-bad{% endif %}">
+            {{ row.pct }}%
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="stu-empty">
+        <i class="fas fa-layer-group"></i>
+        No active groups yet.
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- 6. Quick links -->
+  <section class="stu-card">
+    <div class="stu-card-head">
+      <h3 class="stu-card-title">Quick links</h3>
+    </div>
+    <div class="stu-quick">
+      <a href="{% url 'student_view_attendance' %}">
+        <div class="stu-quick-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="stu-quick-lbl">Attendance</div>
+      </a>
+      <a href="{% url 'student_view_result' %}">
+        <div class="stu-quick-icon"><i class="fas fa-chart-bar"></i></div>
+        <div class="stu-quick-lbl">Results</div>
+      </a>
+      <a href="{% url 'view_books' %}">
+        <div class="stu-quick-icon"><i class="fas fa-book"></i></div>
+        <div class="stu-quick-lbl">Library</div>
+      </a>
+      <a href="{% url 'student_assignments' %}">
+        <div class="stu-quick-icon"><i class="fas fa-tasks"></i></div>
+        <div class="stu-quick-lbl">Assignments</div>
+      </a>
+    </div>
   </section>
 
 </div>
@@ -634,99 +590,6 @@
 
 {% block custom_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  if (typeof Chart === 'undefined') return;
-
-  Chart.defaults.font.family = "'Inter', sans-serif";
-
-  const subjects    = {{ data_name|safe }};
-  const dataPresent = {{ data_present|safe }};
-  const dataAbsent  = {{ data_absent|safe }};
-
-  function textColor()  { return document.body.classList.contains('dark-mode') ? '#cbd5e1' : '#334155'; }
-  function gridColor()  { return document.body.classList.contains('dark-mode') ? '#1e293b' : '#e8eef8'; }
-
-  function makeDonut() {
-    const el = document.getElementById('sdDonutChart');
-    if (!el) return;
-    const chart = new Chart(el, {
-      type: 'doughnut',
-      data: {
-        labels: ['Present', 'Absent'],
-        datasets: [{
-          data: [{{ percent_present }}, {{ percent_absent }}],
-          backgroundColor: ['#16a34a', '#dc2626'],
-          borderWidth: 0,
-          hoverOffset: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '76%',
-        plugins: { legend: { display: false }, tooltip: { callbacks: {
-          label: function(ctx) { return ' ' + ctx.label + ': ' + ctx.parsed + '%'; }
-        }}}
-      }
-    });
-    window.chartInstances = window.chartInstances || [];
-    window.chartInstances.push(chart);
-  }
-
-  function makeBars() {
-    const el = document.getElementById('sdBarChart');
-    if (!el) return;
-    const chart = new Chart(el, {
-      type: 'bar',
-      data: {
-        labels: subjects,
-        datasets: [
-          {
-            label: 'Present',
-            data: dataPresent,
-            backgroundColor: '#2563eb',
-            borderRadius: 8,
-            borderSkipped: false
-          },
-          {
-            label: 'Absent',
-            data: dataAbsent,
-            backgroundColor: '#dc2626',
-            borderRadius: 8,
-            borderSkipped: false
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { color: textColor(), usePointStyle: true, padding: 20, font: { weight: '600' } }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { color: textColor(), precision: 0 },
-            grid:  { color: gridColor() }
-          },
-          x: {
-            ticks: { color: textColor() },
-            grid:  { display: false }
-          }
-        }
-      }
-    });
-    window.chartInstances = window.chartInstances || [];
-    window.chartInstances.push(chart);
-  }
-
-  window.registerChartRecreation && window.registerChartRecreation(makeDonut);
-  window.registerChartRecreation && window.registerChartRecreation(makeBars);
-  makeDonut();
-  makeBars();
-});
+/* No interactive JS needed on this page — pure static composition. */
 </script>
 {% endblock custom_js %}

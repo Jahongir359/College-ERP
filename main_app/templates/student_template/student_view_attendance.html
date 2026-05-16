@@ -3,88 +3,318 @@
 
 {% block title %}{{ page_title }} — Iceberg Study Center{% endblock %}
 {% block page_title %}{{ page_title }}{% endblock %}
-{% block breadcrumb %}
-  <li class="breadcrumb-item active">Attendance</li>
-{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">Attendance</li>{% endblock %}
 
 {% block custom_css %}
 <style>
-/* ── Layout ─────────────────────────────────────────────────── */
-.att-wrap { display: grid; gap: 24px; max-width: 1100px; margin: 0 auto; }
-
-/* ── Filter card ─────────────────────────────────────────────── */
-.att-filter {
-  border: 1px solid var(--app-border);
-  border-radius: 20px;
-  background: var(--app-surface);
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(15,23,42,.055);
+/* ── Page shell ─────────────────────────────────────────────── */
+.stu-page {
+  --c-bg: #F4F7FB;
+  --c-surface: #FFFFFF;
+  --c-text: #0F172A;
+  --c-muted: #64748B;
+  --c-border: #E6ECF5;
+  --c-blue: #2563EB;
+  --c-sky: #3B82F6;
+  --c-blue-bg: #E8F0FE;
+  --c-blue-soft: #DBEAFE;
+  --c-royal: #1F4FD9;
+  --c-navy-a: #0F1F5C;
+  --c-navy-b: #1340A8;
+  --c-success: #10B981;
+  --c-warning: #F59E0B;
+  --c-danger:  #EF4444;
+  background: var(--c-bg);
+  margin: -24px;
+  padding: 18px 16px 32px;
+  min-height: 100%;
+  color: var(--c-text);
+  font-family: 'Inter', sans-serif;
 }
-.att-filter-head {
+@media (min-width: 640px) {
+  .stu-page { padding: 24px 28px 40px; }
+}
+
+/* ── Hero ───────────────────────────────────────────────────── */
+.att-hero {
+  position: relative;
+  padding: 14px 6px 22px;
+  overflow: hidden;
+}
+.att-hero-bg {
+  position: absolute;
+  top: -40px;
+  right: -60px;
+  width: 280px;
+  height: auto;
+  opacity: .45;
+  pointer-events: none;
+  transform: rotate(8deg);
+  filter: saturate(.7);
+  z-index: 0;
+}
+.att-hero-inner { position: relative; z-index: 1; max-width: 70%; }
+.att-h1 {
+  font-family: 'Inter', serif;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1.08;
+  letter-spacing: -0.8px;
+  margin: 0 0 6px;
+  color: var(--c-text);
+}
+.att-sub {
+  margin: 0;
+  color: var(--c-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+@media (min-width: 640px) {
+  .att-h1 { font-size: 38px; }
+  .att-hero-bg { width: 320px; right: -40px; }
+}
+
+/* ── Generic card ───────────────────────────────────────────── */
+.att-card {
+  background: var(--c-surface);
+  border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(15,23,42,.06);
+  padding: 18px;
+  margin-bottom: 18px;
+}
+@media (min-width: 640px) { .att-card { padding: 22px; } }
+
+.att-card-head {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--app-border);
-  background: linear-gradient(180deg, var(--app-surface) 0%, var(--app-surface-muted) 100%);
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
-.att-filter-head-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: #eff6ff;
-  color: #2563eb;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-.att-filter-head h2 {
+.att-card-title {
   margin: 0;
   font-size: 16px;
   font-weight: 900;
-  color: var(--app-text);
+  color: var(--c-text);
+  letter-spacing: -.2px;
 }
-.att-filter-head p {
-  margin: 3px 0 0;
+.att-card-link {
   font-size: 12px;
-  color: var(--app-muted);
+  font-weight: 700;
+  color: var(--c-blue);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
-.att-filter-body { padding: 24px; }
+.att-card-link:hover { color: var(--c-royal); text-decoration: none; }
+
+/* ── Navy gradient hero ─────────────────────────────────────── */
+.att-month-card {
+  background: linear-gradient(135deg, #0F1F5C, #1340A8);
+  border-radius: 22px;
+  padding: 20px;
+  color: #fff;
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 18px;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(15,31,92,.25);
+  margin-bottom: 18px;
+}
+.att-ring-wrap {
+  width: 140px;
+  height: 140px;
+  position: relative;
+}
+.att-ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.att-ring-track { fill: none; stroke: rgba(255,255,255,.18); stroke-width: 10; }
+.att-ring-fill  { fill: none; stroke: #60A5FA; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
+.att-ring-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -1px;
+}
+.att-month-body { min-width: 0; }
+.att-month-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: rgba(219,234,254,.85);
+  margin-bottom: 6px;
+}
+.att-month-pct {
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  color: #fff;
+}
+.att-month-msg {
+  font-size: 12px;
+  font-weight: 600;
+  color: #BFDBFE;
+  margin-top: 8px;
+  max-width: 220px;
+}
+.att-month-tile {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+}
+@media (max-width: 560px) {
+  .att-month-card {
+    grid-template-columns: 110px 1fr;
+    grid-template-rows: auto auto;
+    padding: 18px;
+  }
+  .att-ring-wrap { width: 110px; height: 110px; }
+  .att-ring-text { font-size: 20px; }
+  .att-month-pct { font-size: 32px; }
+  .att-month-tile { grid-column: 2; justify-self: end; }
+}
+
+/* ── Calendar ───────────────────────────────────────────────── */
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.cal-month-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--c-text);
+}
+.cal-nav {
+  display: flex;
+  gap: 8px;
+}
+.cal-nav button {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background .15s, color .15s;
+}
+.cal-nav button:hover { background: var(--c-blue-bg); color: var(--c-royal); }
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-dow {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--c-muted);
+  letter-spacing: .06em;
+  padding: 4px 0 8px;
+}
+.cal-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-text);
+  background: transparent;
+}
+.cal-cell.empty { background: transparent; color: transparent; pointer-events: none; }
+.cal-cell.muted { color: #CBD5E1; }
+.cal-cell.today {
+  background: var(--c-blue-bg);
+  color: var(--c-royal);
+}
+.cal-cell .cal-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: transparent;
+}
+.cal-cell.s-present .cal-dot { background: var(--c-success); }
+.cal-cell.s-late    .cal-dot { background: var(--c-warning); }
+.cal-cell.s-absent  .cal-dot { background: var(--c-danger);  }
+.cal-cell.s-none    .cal-dot { background: #CBD5E1; }
+
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--c-border);
+}
+.cal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-muted);
+}
+.cal-legend-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+/* ── Filter card ────────────────────────────────────────────── */
 .att-filter-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  gap: 16px;
-  align-items: end;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .att-filter-grid {
+    grid-template-columns: 1.2fr 1fr 1fr auto;
+    align-items: end;
+  }
 }
 .att-field label {
   display: block;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--app-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
   text-transform: uppercase;
-  letter-spacing: .05em;
-  margin-bottom: 8px;
+  color: var(--c-muted);
+  margin-bottom: 6px;
 }
-.att-field label i { margin-right: 5px; color: var(--app-primary); }
 .att-control {
   width: 100%;
   padding: 11px 14px;
   font-size: 14px;
   font-family: 'Inter', sans-serif;
-  color: var(--app-text);
-  background: var(--app-surface);
-  border: 1.5px solid var(--app-border);
+  color: var(--c-text);
+  background: #F8FAFC;
+  border: 1.5px solid var(--c-border);
   border-radius: 12px;
   outline: none;
-  transition: border-color .18s, box-shadow .18s;
-  appearance: none;
+  transition: border-color .15s, box-shadow .15s;
   -webkit-appearance: none;
+  appearance: none;
 }
 .att-control:focus {
-  border-color: #2563eb;
+  border-color: var(--c-blue);
   box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+  background: #fff;
 }
 select.att-control {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
@@ -93,148 +323,104 @@ select.att-control {
   padding-right: 38px;
 }
 .att-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 24px;
+  width: 100%;
+  padding: 12px 22px;
   border: none;
   border-radius: 12px;
-  background: #2563eb;
+  background: var(--c-blue);
   color: #fff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   white-space: nowrap;
-  transition: background .18s, transform .14s, box-shadow .18s;
-  box-shadow: 0 4px 14px rgba(37,99,235,.3);
+  box-shadow: 0 6px 16px rgba(37,99,235,.28);
+  transition: background .15s, transform .14s, box-shadow .15s;
 }
-.att-btn:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(37,99,235,.35);
-}
-.att-btn:active { transform: translateY(0); }
+.att-btn:hover { background: var(--c-royal); transform: translateY(-1px); }
 .att-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+@media (min-width: 640px) { .att-btn { width: auto; } }
 
-/* No groups notice */
 .att-notice {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding: 18px 20px;
+  gap: 12px;
+  padding: 14px 16px;
   border-radius: 14px;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  color: #92400e;
-  font-size: 14px;
-  font-weight: 500;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+  font-size: 13px;
+  font-weight: 600;
 }
-.att-notice i { font-size: 18px; color: #d97706; flex-shrink: 0; margin-top: 1px; }
+.att-notice i { font-size: 16px; color: #D97706; margin-top: 2px; }
 
-/* ── Summary pills ───────────────────────────────────────────── */
+/* ── Results & pills ────────────────────────────────────────── */
+.att-results { display: none; }
+.att-results.visible { display: block; }
+
 .att-summary {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
+  margin-bottom: 14px;
 }
 .att-pill {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-radius: 14px;
-  font-size: 14px;
-  font-weight: 700;
-  transition: transform .14s;
-}
-.att-pill:hover { transform: translateY(-1px); }
-.att-pill-present { background: #dcfce7; color: #166534; }
-.att-pill-late    { background: #fef3c7; color: #92400e; }
-.att-pill-absent  { background: #fee2e2; color: #991b1b; }
-.att-pill i { font-size: 16px; }
-.att-pill .pill-count { font-size: 20px; font-weight: 900; line-height: 1; }
-.att-pill .pill-lbl   { font-size: 11px; font-weight: 700; opacity: .8; }
-
-/* ── Results area ────────────────────────────────────────────── */
-.att-results-card {
-  border: 1px solid var(--app-border);
-  border-radius: 20px;
-  background: var(--app-surface);
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(15,23,42,.05);
-  display: none;
-}
-.att-results-card.visible { display: block; }
-.att-results-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--app-border);
-  background: linear-gradient(180deg, var(--app-surface) 0%, var(--app-surface-muted) 100%);
-}
-.att-results-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 900;
-  color: var(--app-text);
-}
-.att-results-count {
   font-size: 12px;
-  font-weight: 600;
-  color: var(--app-muted);
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--app-border);
+  font-weight: 700;
 }
-.att-results-body { padding: 22px; }
+.att-pill-present { background: #D1FAE5; color: #065F46; }
+.att-pill-late    { background: #FEF3C7; color: #92400E; }
+.att-pill-absent  { background: #FEE2E2; color: #991B1B; }
+.att-pill .pill-count { font-size: 18px; font-weight: 900; line-height: 1; }
+.att-pill .pill-lbl   { font-size: 10px; font-weight: 800; opacity: .85; }
 
-/* Day tiles grid */
 .att-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
 }
 .att-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 16px 10px;
-  border-radius: 16px;
+  gap: 4px;
+  padding: 14px 8px;
+  border-radius: 14px;
   text-align: center;
-  font-size: 13px;
-  font-weight: 700;
-  transition: transform .14s, box-shadow .14s;
-  cursor: default;
+  font-weight: 800;
 }
-.att-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.1); }
-.att-tile .tile-icon { font-size: 22px; line-height: 1; }
-.att-tile .tile-date { font-size: 13px; font-weight: 800; line-height: 1.2; }
-.att-tile .tile-lbl  { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; opacity: .85; }
+.att-tile .ti-icon { font-size: 18px; }
+.att-tile .ti-date { font-size: 12px; }
+.att-tile .ti-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; opacity: .85; }
+.att-tile-present { background: #D1FAE5; color: #065F46; }
+.att-tile-late    { background: #FEF3C7; color: #92400E; }
+.att-tile-absent  { background: #FEE2E2; color: #991B1B; }
 
-/* Tile color themes */
-.att-tile-present { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; border: 1px solid #6ee7b7; }
-.att-tile-late    { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #78350f; border: 1px solid #fcd34d; }
-.att-tile-absent  { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #7f1d1d; border: 1px solid #fca5a5; }
-
-/* ── States ──────────────────────────────────────────────────── */
 .att-spinner {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 48px 20px;
-  color: var(--app-muted);
-  font-size: 14px;
+  padding: 32px 16px;
+  color: var(--c-muted);
+  font-size: 13px;
   font-weight: 600;
 }
 .att-spinner-ring {
-  width: 28px; height: 28px;
-  border: 3px solid var(--app-border);
-  border-top-color: #2563eb;
+  width: 24px; height: 24px;
+  border: 3px solid var(--c-border);
+  border-top-color: var(--c-blue);
   border-radius: 50%;
   animation: att-spin .7s linear infinite;
 }
@@ -245,140 +431,246 @@ select.att-control {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  color: var(--app-muted);
+  padding: 32px 16px;
+  color: var(--c-muted);
   text-align: center;
 }
-.att-empty-icon {
-  font-size: 48px;
-  opacity: .2;
-  margin-bottom: 16px;
-}
-.att-empty-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--app-text);
-  margin-bottom: 6px;
-}
-.att-empty-sub { font-size: 13px; }
+.att-empty-icon { font-size: 32px; opacity: .25; margin-bottom: 10px; }
+.att-empty-title { font-size: 14px; font-weight: 800; color: var(--c-text); margin-bottom: 4px; }
+.att-empty-sub { font-size: 12px; }
 
 .att-error {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 18px 20px;
+  padding: 14px 16px;
   border-radius: 12px;
-  background: #fee2e2;
-  color: #7f1d1d;
-  font-size: 14px;
+  background: #FEE2E2;
+  color: #7F1D1D;
+  font-size: 13px;
   font-weight: 600;
 }
-.att-error i { font-size: 18px; color: #dc2626; }
+
+/* ── Recent attendance rows ─────────────────────────────────── */
+.rec-list { display: flex; flex-direction: column; gap: 14px; }
+.rec-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto 10px;
+  gap: 12px;
+  align-items: center;
+}
+.rec-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+}
+.rec-icon.present { background: var(--c-success); }
+.rec-icon.late    { background: var(--c-warning); }
+.rec-icon.absent  { background: var(--c-danger); }
+.rec-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--c-text);
+}
+.rec-sub {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-muted);
+  margin-top: 2px;
+}
+.rec-status {
+  font-size: 12px;
+  font-weight: 800;
+  text-align: right;
+}
+.rec-status.present { color: var(--c-success); }
+.rec-status.late    { color: var(--c-warning); }
+.rec-status.absent  { color: var(--c-danger); }
+.rec-chev { color: #94A3B8; font-size: 11px; }
 
 /* Dark mode */
-.dark-mode .att-filter,
-.dark-mode .att-results-card { background: var(--app-surface); border-color: var(--app-border); }
-.dark-mode .att-filter-head,
-.dark-mode .att-results-head { background: var(--app-surface-muted); }
-.dark-mode .att-control { background: var(--app-surface-muted); color: var(--app-text); border-color: var(--app-border); }
-.dark-mode .att-notice { background: rgba(253,230,138,.08); border-color: rgba(253,230,138,.2); color: #fde68a; }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .att-filter-grid { grid-template-columns: 1fr 1fr; }
-  .att-filter-grid .att-btn { grid-column: span 2; justify-content: center; }
-}
-@media (max-width: 480px) {
-  .att-filter-grid { grid-template-columns: 1fr; }
-  .att-filter-grid .att-btn { grid-column: 1; }
-  .att-tiles { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-}
+.dark-mode .stu-page { background: #0B1220; color: #E2E8F0; }
+.dark-mode .att-h1 { color: #F1F5F9; }
+.dark-mode .att-card { background: #131C30; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+.dark-mode .att-control { background: #1A2238; color: #E2E8F0; border-color: #1E293B; }
+.dark-mode .cal-nav button { background: #1A2238; border-color: #1E293B; color: #94A3B8; }
+.dark-mode .cal-cell.today { background: rgba(37,99,235,.2); color: #60A5FA; }
+.dark-mode .cal-legend { border-color: #1E293B; }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
-<div class="att-wrap">
+<div class="stu-page">
 
-  <!-- ── Filter card ───────────────────────────────────────────── -->
-  <div class="att-filter">
-    <div class="att-filter-head">
-      <div class="att-filter-head-icon"><i class="fas fa-calendar-check"></i></div>
-      <div>
-        <h2>View Attendance</h2>
-        <p>Select a group and date range to see your attendance records.</p>
+  <!-- 1. Hero -->
+  <section class="att-hero">
+    <img src="{% static 'dist/img/logo.png' %}" alt="" class="att-hero-bg">
+    <div class="att-hero-inner">
+      <h1 class="att-h1">Attendance</h1>
+      <p class="att-sub">Track your daily attendance and build excellent habits.</p>
+    </div>
+  </section>
+
+  <!-- 2. Navy gradient hero card -->
+  <section class="att-month-card">
+    <div class="att-ring-wrap">
+      <svg viewBox="0 0 120 120">
+        <circle class="att-ring-track" cx="60" cy="60" r="52"></circle>
+        <circle id="att-ring-fill" class="att-ring-fill" cx="60" cy="60" r="52"
+                stroke-dasharray="326.7"
+                stroke-dashoffset="326.7"></circle>
+      </svg>
+      <div class="att-ring-text">{{ month_pct }}%</div>
+    </div>
+    <div class="att-month-body">
+      <div class="att-month-lbl">This Month</div>
+      <div class="att-month-pct">{{ month_pct }}%</div>
+      <div class="att-month-msg">{{ month_message }}</div>
+    </div>
+    <div class="att-month-tile"><i class="fas fa-calendar-alt"></i></div>
+  </section>
+
+  <!-- 3. Calendar -->
+  <section class="att-card">
+    <div class="cal-head">
+      <div class="cal-month-name" id="cal-month-name">—</div>
+      <div class="cal-nav">
+        <button type="button" id="cal-prev" aria-label="Previous month"><i class="fas fa-chevron-left"></i></button>
+        <button type="button" id="cal-next" aria-label="Next month"><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
-    <div class="att-filter-body">
-      {% if not groups %}
-        <div class="att-notice">
-          <i class="fas fa-exclamation-triangle"></i>
-          <span>You are not enrolled in any active groups yet. Please contact your administrator.</span>
-        </div>
-      {% else %}
-        <div class="att-filter-grid">
-          <div class="att-field">
-            <label><i class="fas fa-layer-group"></i>Group</label>
-            <select id="att-group" class="att-control">
-              <option value="">— Select group —</option>
-              {% for g in groups %}
+
+    <div class="cal-grid" id="cal-grid">
+      <div class="cal-dow">MON</div>
+      <div class="cal-dow">TUE</div>
+      <div class="cal-dow">WED</div>
+      <div class="cal-dow">THU</div>
+      <div class="cal-dow">FRI</div>
+      <div class="cal-dow">SAT</div>
+      <div class="cal-dow">SUN</div>
+    </div>
+
+    <div class="cal-legend">
+      <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#10B981;"></span> Present</div>
+      <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#F59E0B;"></span> Late</div>
+      <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#EF4444;"></span> Absent</div>
+      <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#CBD5E1;"></span> No Class</div>
+    </div>
+  </section>
+
+  <!-- 4. Filter card (keeps existing AJAX) -->
+  <section class="att-card" id="filter-section">
+    <div class="att-card-head">
+      <h3 class="att-card-title">Filter by group & date range</h3>
+    </div>
+
+    {% if not groups %}
+      <div class="att-notice">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>You are not enrolled in any active groups yet. Please contact your administrator.</span>
+      </div>
+    {% else %}
+      <div class="att-filter-grid">
+        <div class="att-field">
+          <label>Group</label>
+          <select id="att-group" class="att-control">
+            <option value="">— Select group —</option>
+            {% for g in groups %}
               <option value="{{ g.id }}">{{ g.name }}{% if g.course %} · {{ g.course.name }}{% endif %}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="att-field">
-            <label><i class="fas fa-calendar-alt"></i>From</label>
-            <input type="date" id="att-start" class="att-control">
-          </div>
-          <div class="att-field">
-            <label><i class="fas fa-calendar-alt"></i>To</label>
-            <input type="date" id="att-end" class="att-control">
-          </div>
-          <div>
-            <button id="att-fetch-btn" class="att-btn">
-              <i class="fas fa-search"></i>
-              View Attendance
-            </button>
-          </div>
+            {% endfor %}
+          </select>
         </div>
-      {% endif %}
-    </div>
-  </div>
+        <div class="att-field">
+          <label>From</label>
+          <input type="date" id="att-start" class="att-control">
+        </div>
+        <div class="att-field">
+          <label>To</label>
+          <input type="date" id="att-end" class="att-control">
+        </div>
+        <div>
+          <button id="att-fetch-btn" class="att-btn" type="button">
+            <i class="fas fa-search"></i> View Records
+          </button>
+        </div>
+      </div>
+    {% endif %}
+  </section>
 
-  <!-- ── Summary pills (hidden until data loads) ───────────────── -->
-  <div id="att-summary" class="att-summary" style="display:none;">
-    <div class="att-pill att-pill-present">
-      <i class="fas fa-check-circle"></i>
-      <div>
-        <div class="pill-count" id="cnt-present">0</div>
-        <div class="pill-lbl">Present</div>
-      </div>
+  <!-- 5. Results -->
+  <section class="att-card att-results" id="att-results-card">
+    <div class="att-card-head">
+      <h3 class="att-card-title">Filter Results</h3>
+      <span class="att-card-link" id="att-results-count" style="cursor:default;">0 records</span>
     </div>
-    <div class="att-pill att-pill-late">
-      <i class="fas fa-clock"></i>
-      <div>
-        <div class="pill-count" id="cnt-late">0</div>
-        <div class="pill-lbl">Late</div>
-      </div>
-    </div>
-    <div class="att-pill att-pill-absent">
-      <i class="fas fa-times-circle"></i>
-      <div>
-        <div class="pill-count" id="cnt-absent">0</div>
-        <div class="pill-lbl">Absent</div>
-      </div>
-    </div>
-  </div>
+    <div id="att-output"></div>
+  </section>
 
-  <!-- ── Results card ──────────────────────────────────────────── -->
-  <div id="att-results-card" class="att-results-card">
-    <div class="att-results-head">
-      <h3 class="att-results-title">Attendance Records</h3>
-      <span id="att-results-count" class="att-results-count">0 records</span>
+  <!-- 6. Recent attendance -->
+  <section class="att-card">
+    <div class="att-card-head">
+      <h3 class="att-card-title">Recent Attendance</h3>
+      <a href="#filter-section" class="att-card-link">View All <i class="fas fa-chevron-right"></i></a>
     </div>
-    <div class="att-results-body">
-      <div id="att-output"></div>
-    </div>
-  </div>
+
+    {% if recent_rows %}
+      <div class="rec-list">
+        {% for rec in recent_rows %}
+          {% if rec.status == 1 %}
+            {% with cls="present" lbl="Present" icon="fa-check" %}
+              <div class="rec-row">
+                <div class="rec-icon {{ cls }}"><i class="fas {{ icon }}"></i></div>
+                <div>
+                  <div class="rec-title">{{ rec.date|date:"M j, Y" }}</div>
+                  <div class="rec-sub">{{ rec.group_name }}</div>
+                </div>
+                <div class="rec-status {{ cls }}">{{ lbl }}</div>
+                <i class="fas fa-chevron-right rec-chev"></i>
+              </div>
+            {% endwith %}
+          {% elif rec.status == 2 %}
+            {% with cls="late" lbl="Late" icon="fa-clock" %}
+              <div class="rec-row">
+                <div class="rec-icon {{ cls }}"><i class="fas {{ icon }}"></i></div>
+                <div>
+                  <div class="rec-title">{{ rec.date|date:"M j, Y" }}</div>
+                  <div class="rec-sub">{{ rec.group_name }}</div>
+                </div>
+                <div class="rec-status {{ cls }}">{{ lbl }}</div>
+                <i class="fas fa-chevron-right rec-chev"></i>
+              </div>
+            {% endwith %}
+          {% else %}
+            {% with cls="absent" lbl="Absent" icon="fa-times" %}
+              <div class="rec-row">
+                <div class="rec-icon {{ cls }}"><i class="fas {{ icon }}"></i></div>
+                <div>
+                  <div class="rec-title">{{ rec.date|date:"M j, Y" }}</div>
+                  <div class="rec-sub">{{ rec.group_name }}</div>
+                </div>
+                <div class="rec-status {{ cls }}">{{ lbl }}</div>
+                <i class="fas fa-chevron-right rec-chev"></i>
+              </div>
+            {% endwith %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="att-empty">
+        <div class="att-empty-icon"><i class="fas fa-calendar-times"></i></div>
+        <div class="att-empty-title">No recent attendance</div>
+        <div class="att-empty-sub">Your most recent attendance entries will appear here.</div>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Hidden JSON payload for calendar -->
+  {{ status_by_date|json_script:"status-by-date" }}
 
 </div>
 {% endblock content %}
@@ -388,127 +680,206 @@ select.att-control {
 (function () {
   'use strict';
 
-  const CSRF_TOKEN = (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
-  const ATT_URL    = "{% url 'student_view_attendance' %}";
+  /* ── Animate the ring on the navy card ─────────────────────── */
+  var pct = {{ month_pct|default:0 }};
+  if (pct < 0) pct = 0;
+  if (pct > 100) pct = 100;
+  var circumference = 2 * Math.PI * 52; // r=52
+  var ringFill = document.getElementById('att-ring-fill');
+  if (ringFill) {
+    var offset = circumference - (pct / 100) * circumference;
+    setTimeout(function () {
+      ringFill.style.strokeDashoffset = String(offset);
+    }, 80);
+  }
 
-  const fetchBtn     = document.getElementById('att-fetch-btn');
-  const summaryEl    = document.getElementById('att-summary');
-  const resultsCard  = document.getElementById('att-results-card');
-  const outputEl     = document.getElementById('att-output');
-  const cntPresent   = document.getElementById('cnt-present');
-  const cntLate      = document.getElementById('cnt-late');
-  const cntAbsent    = document.getElementById('cnt-absent');
-  const resultsCount = document.getElementById('att-results-count');
+  /* ── Calendar rendering ───────────────────────────────────── */
+  var rawStatus = {};
+  try {
+    var node = document.getElementById('status-by-date');
+    if (node) {
+      var inner = node.textContent.trim();
+      // first parse (json_script gives us the JSON-encoded string the view supplied)
+      var parsed = JSON.parse(inner);
+      // The view stores the dict as a JSON string, so it may be a string we need to parse again
+      if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { /* leave as string */ }
+      }
+      if (parsed && typeof parsed === 'object') rawStatus = parsed;
+    }
+  } catch (e) {
+    console.warn('Could not parse status_by_date', e);
+  }
 
-  if (!fetchBtn) return; // no groups enrolled
+  var calGrid     = document.getElementById('cal-grid');
+  var calMonthLbl = document.getElementById('cal-month-name');
+  var calPrev     = document.getElementById('cal-prev');
+  var calNext     = document.getElementById('cal-next');
 
-  /* Helper: format ISO date nicely */
+  var today = new Date();
+  var viewYear  = today.getFullYear();
+  var viewMonth = today.getMonth();
+
+  var MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+
+  function pad2(n) { return n < 10 ? '0' + n : String(n); }
+  function isoDate(y, m, d) { return y + '-' + pad2(m + 1) + '-' + pad2(d); }
+
+  function renderCalendar() {
+    if (!calGrid) return;
+
+    // Remove old cells but keep day-of-week headers
+    var existing = calGrid.querySelectorAll('.cal-cell');
+    existing.forEach(function (n) { n.parentNode.removeChild(n); });
+
+    calMonthLbl.textContent = MONTHS[viewMonth] + ' ' + viewYear;
+
+    var firstDay = new Date(viewYear, viewMonth, 1);
+    // JS getDay(): 0=Sun..6=Sat. We use Mon-first columns.
+    var startCol = (firstDay.getDay() + 6) % 7;
+    var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    // Leading empty cells
+    for (var i = 0; i < startCol; i++) {
+      var emp = document.createElement('div');
+      emp.className = 'cal-cell empty';
+      emp.innerHTML = '<div></div><div class="cal-dot"></div>';
+      calGrid.appendChild(emp);
+    }
+
+    for (var d = 1; d <= daysInMonth; d++) {
+      var iso = isoDate(viewYear, viewMonth, d);
+      var st = rawStatus[iso];
+      var cell = document.createElement('div');
+      cell.className = 'cal-cell';
+
+      if (st === 1) cell.classList.add('s-present');
+      else if (st === 2) cell.classList.add('s-late');
+      else if (st === 0) cell.classList.add('s-absent');
+      // else no dot
+
+      // Highlight today
+      if (viewYear === today.getFullYear() && viewMonth === today.getMonth() && d === today.getDate()) {
+        cell.classList.add('today');
+      }
+
+      var num = document.createElement('div');
+      num.textContent = String(d);
+      var dot = document.createElement('div');
+      dot.className = 'cal-dot';
+
+      cell.appendChild(num);
+      cell.appendChild(dot);
+      calGrid.appendChild(cell);
+    }
+
+    // Trailing cells so we always have full weeks (visual balance)
+    var totalUsed = startCol + daysInMonth;
+    var trailing = (7 - (totalUsed % 7)) % 7;
+    for (var t = 0; t < trailing; t++) {
+      var emp2 = document.createElement('div');
+      emp2.className = 'cal-cell empty';
+      emp2.innerHTML = '<div></div><div class="cal-dot"></div>';
+      calGrid.appendChild(emp2);
+    }
+  }
+
+  if (calPrev) calPrev.addEventListener('click', function () {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderCalendar();
+  });
+  if (calNext) calNext.addEventListener('click', function () {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderCalendar();
+  });
+
+  renderCalendar();
+
+  /* ── Filter AJAX (preserves existing endpoint behavior) ───── */
+  var CSRF_TOKEN = (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+  var ATT_URL    = "{% url 'student_view_attendance' %}";
+
+  var fetchBtn     = document.getElementById('att-fetch-btn');
+  var resultsCard  = document.getElementById('att-results-card');
+  var outputEl     = document.getElementById('att-output');
+  var resultsCount = document.getElementById('att-results-count');
+
+  if (!fetchBtn) return; // no groups
+
   function formatDate(iso) {
-    const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    var d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
-  /* Render spinner */
   function showSpinner() {
-    outputEl.innerHTML = `
-      <div class="att-spinner">
-        <div class="att-spinner-ring"></div>
-        Loading attendance records…
-      </div>`;
+    outputEl.innerHTML =
+      '<div class="att-spinner"><div class="att-spinner-ring"></div>Loading attendance records…</div>';
     resultsCard.classList.add('visible');
-    summaryEl.style.display = 'none';
   }
-
-  /* Render empty state */
   function showEmpty() {
-    outputEl.innerHTML = `
-      <div class="att-empty">
-        <div class="att-empty-icon"><i class="fas fa-calendar-times"></i></div>
-        <div class="att-empty-title">No records found</div>
-        <div class="att-empty-sub">No attendance has been recorded for this group in the selected date range.</div>
-      </div>`;
+    outputEl.innerHTML =
+      '<div class="att-empty">' +
+        '<div class="att-empty-icon"><i class="fas fa-calendar-times"></i></div>' +
+        '<div class="att-empty-title">No records found</div>' +
+        '<div class="att-empty-sub">No attendance has been recorded for this group in the selected date range.</div>' +
+      '</div>';
     resultsCard.classList.add('visible');
-    summaryEl.style.display = 'none';
     resultsCount.textContent = '0 records';
   }
-
-  /* Render error */
   function showError(msg) {
-    outputEl.innerHTML = `
-      <div class="att-error">
-        <i class="fas fa-exclamation-circle"></i>
-        <span>${msg || 'An error occurred while loading attendance. Please try again.'}</span>
-      </div>`;
+    outputEl.innerHTML =
+      '<div class="att-error"><i class="fas fa-exclamation-circle"></i><span>' +
+      (msg || 'An error occurred. Please try again.') + '</span></div>';
     resultsCard.classList.add('visible');
-    summaryEl.style.display = 'none';
   }
 
-  /* Render tiles */
-  function renderTiles(arr) {
-    let present = 0, late = 0, absent = 0;
-    let html = '<div class="att-tiles">';
+  function renderResults(arr) {
+    var present = 0, late = 0, absent = 0;
+    var tiles = '';
 
     arr.forEach(function (rec) {
-      const dateStr = formatDate(rec.date);
-      if (rec.status === 1) {
-        present++;
-        html += `
-          <div class="att-tile att-tile-present">
-            <div class="tile-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="tile-date">${dateStr}</div>
-            <div class="tile-lbl">Present</div>
-          </div>`;
-      } else if (rec.status === 2) {
-        late++;
-        html += `
-          <div class="att-tile att-tile-late">
-            <div class="tile-icon"><i class="fas fa-clock"></i></div>
-            <div class="tile-date">${dateStr}</div>
-            <div class="tile-lbl">Late</div>
-          </div>`;
-      } else {
-        absent++;
-        html += `
-          <div class="att-tile att-tile-absent">
-            <div class="tile-icon"><i class="fas fa-times-circle"></i></div>
-            <div class="tile-date">${dateStr}</div>
-            <div class="tile-lbl">Absent</div>
-          </div>`;
-      }
+      var dateStr = formatDate(rec.date);
+      var cls, lbl, icon;
+      if (rec.status === 1) { present++; cls = 'att-tile-present'; lbl = 'Present'; icon = 'fa-check-circle'; }
+      else if (rec.status === 2) { late++; cls = 'att-tile-late'; lbl = 'Late'; icon = 'fa-clock'; }
+      else { absent++; cls = 'att-tile-absent'; lbl = 'Absent'; icon = 'fa-times-circle'; }
+      tiles +=
+        '<div class="att-tile ' + cls + '">' +
+          '<div class="ti-icon"><i class="fas ' + icon + '"></i></div>' +
+          '<div class="ti-date">' + dateStr + '</div>' +
+          '<div class="ti-lbl">' + lbl + '</div>' +
+        '</div>';
     });
 
-    html += '</div>';
+    var html =
+      '<div class="att-summary">' +
+        '<div class="att-pill att-pill-present"><i class="fas fa-check-circle"></i>' +
+          '<div><div class="pill-count">' + present + '</div><div class="pill-lbl">Present</div></div></div>' +
+        '<div class="att-pill att-pill-late"><i class="fas fa-clock"></i>' +
+          '<div><div class="pill-count">' + late + '</div><div class="pill-lbl">Late</div></div></div>' +
+        '<div class="att-pill att-pill-absent"><i class="fas fa-times-circle"></i>' +
+          '<div><div class="pill-count">' + absent + '</div><div class="pill-lbl">Absent</div></div></div>' +
+      '</div>' +
+      '<div class="att-tiles">' + tiles + '</div>';
+
     outputEl.innerHTML = html;
-
-    /* Update summary */
-    cntPresent.textContent = present;
-    cntLate.textContent    = late;
-    cntAbsent.textContent  = absent;
-    summaryEl.style.display = 'flex';
-
-    const total = arr.length;
+    var total = arr.length;
     resultsCount.textContent = total + ' record' + (total !== 1 ? 's' : '');
     resultsCard.classList.add('visible');
   }
 
   fetchBtn.addEventListener('click', function () {
-    const group      = document.getElementById('att-group').value;
-    const start_date = document.getElementById('att-start').value;
-    const end_date   = document.getElementById('att-end').value;
+    var group      = document.getElementById('att-group').value;
+    var start_date = document.getElementById('att-start').value;
+    var end_date   = document.getElementById('att-end').value;
 
-    if (!group) {
-      document.getElementById('att-group').focus();
-      return;
-    }
-    if (!start_date || !end_date) {
-      if (!start_date) document.getElementById('att-start').focus();
-      else              document.getElementById('att-end').focus();
-      return;
-    }
-    if (start_date > end_date) {
-      showError('Start date cannot be after end date.');
-      return;
-    }
+    if (!group) { document.getElementById('att-group').focus(); return; }
+    if (!start_date) { document.getElementById('att-start').focus(); return; }
+    if (!end_date)   { document.getElementById('att-end').focus(); return; }
+    if (start_date > end_date) { showError('Start date cannot be after end date.'); return; }
 
     fetchBtn.disabled = true;
     showSpinner();
@@ -519,19 +890,16 @@ select.att-control {
         'X-CSRFToken': CSRF_TOKEN,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: new URLSearchParams({ group, start_date, end_date })
+      body: new URLSearchParams({ group: group, start_date: start_date, end_date: end_date })
     })
     .then(function (res) {
       if (!res.ok) throw new Error('Server error ' + res.status);
       return res.json();
     })
     .then(function (raw) {
-      const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      if (!Array.isArray(arr) || arr.length === 0) {
-        showEmpty();
-      } else {
-        renderTiles(arr);
-      }
+      var arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!Array.isArray(arr) || arr.length === 0) showEmpty();
+      else renderResults(arr);
     })
     .catch(function (err) {
       console.error(err);
@@ -542,9 +910,8 @@ select.att-control {
     });
   });
 
-  /* Allow pressing Enter in date fields to trigger fetch */
   ['att-start', 'att-end'].forEach(function (id) {
-    const el = document.getElementById(id);
+    var el = document.getElementById(id);
     if (el) el.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') fetchBtn.click();
     });
