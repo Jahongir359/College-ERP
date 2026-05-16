@@ -197,6 +197,8 @@ def add_student(request):
                 student.course = course
                 student.phone = student_form.cleaned_data.get('phone', '')
                 student.status = student_form.cleaned_data.get('status', Student.STATUS_ACTIVE)
+                raw_level = student_form.cleaned_data.get('level', '')
+                student.level = int(raw_level) if raw_level else None
                 student.save()
                 if group:
                     Enrollment.objects.get_or_create(student=student, group=group, defaults={'is_active': True})
@@ -225,12 +227,13 @@ def add_course(request):
     }
     if request.method == 'POST':
         if form.is_valid():
-            name = form.cleaned_data.get('name')
             try:
                 course = Course()
-                course.name = name
+                course.name = form.cleaned_data.get('name')
+                course.is_english = form.cleaned_data.get('is_english', False)
+                course.is_active = form.cleaned_data.get('is_active', True)
                 course.save()
-                messages.success(request, "Successfully Added")
+                messages.success(request, "Program added successfully.")
                 return redirect(reverse('add_course'))
             except Exception:
                 messages.error(request, "Could Not Add")
@@ -389,6 +392,8 @@ def edit_student(request, student_id):
                 student.course = course
                 student.phone = form.cleaned_data.get('phone', '')
                 student.status = form.cleaned_data.get('status', student.status)
+                raw_level = form.cleaned_data.get('level', '')
+                student.level = int(raw_level) if raw_level else None
                 user.save()
                 student.save()
                 messages.success(request, "Successfully Updated")
@@ -411,12 +416,13 @@ def edit_course(request, course_id):
     }
     if request.method == 'POST':
         if form.is_valid():
-            name = form.cleaned_data.get('name')
             try:
                 course = Course.objects.get(id=course_id)
-                course.name = name
+                course.name = form.cleaned_data.get('name')
+                course.is_english = form.cleaned_data.get('is_english', False)
+                course.is_active = form.cleaned_data.get('is_active', course.is_active)
                 course.save()
-                messages.success(request, "Successfully Updated")
+                messages.success(request, "Program updated successfully.")
             except Exception:
                 messages.error(request, "Could Not Update")
         else:

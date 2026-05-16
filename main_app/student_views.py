@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.core.files.storage import default_storage
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
                               redirect, render)
@@ -63,6 +64,22 @@ def student_home(request):
             'pct': pct,
         })
 
+    # Level & English program detection
+    is_english = student.is_english_student
+    student_level = student.level
+
+    # Today's vocabulary (level-filtered, for English students)
+    todays_vocab = []
+    if is_english:
+        from django.utils import timezone
+        enrolled_group_ids = [e.group_id for e in enrollments]
+        vocab_qs = Vocabulary.objects.filter(
+            level__in=([Vocabulary.LEVEL_ALL] + ([student_level] if student_level else []))
+        ).filter(
+            Q(group__isnull=True) | Q(group_id__in=enrolled_group_ids)
+        ).order_by('?')[:5]
+        todays_vocab = list(vocab_qs)
+
     context = {
         'total_attendance': total_attendance,
         'percent_present': percent_present,
@@ -74,6 +91,9 @@ def student_home(request):
         'data_name': group_name,
         'recent_assignments': _recent_assignments(student),
         'latest_result': _latest_result(student),
+        'is_english': is_english,
+        'student_level': student_level,
+        'todays_vocab': todays_vocab,
         'page_title': 'My Dashboard',
     }
     return render(request, 'student_template/erpnext_student_home.html', context)
@@ -329,15 +349,14 @@ def student_view_notification(request):
 @student_only
 def student_view_result(request):
     student = get_object_or_404(Student, admin=request.user)
-    enrolled_group_ids = Enrollment.objects.filter(
+    enrolled_group_ids = list(Enrollment.objects.filter(
         student=student, is_active=True
-    ).values_list('group_id', flat=True)
+    ).values_list('group_id', flat=True))
     results = list(
         StudentResult.objects.filter(
             student=student, group_id__in=enrolled_group_ids
         ).select_related('group')
     )
-    # Annotate each result with an integer total for clean template rendering
     for r in results:
         r.total = int(r.test) + int(r.exam)
 
@@ -345,11 +364,38 @@ def student_view_result(request):
     avg_score = round(sum(r.total for r in results) / subject_count) if subject_count else 0
     pass_count = sum(1 for r in results if r.total >= 45)
 
+    # Chart data — scores per group
+    chart_labels = [r.group.name if r.group else "General" for r in results]
+    chart_test   = [int(r.test) for r in results]
+    chart_exam   = [int(r.exam) for r in results]
+    chart_total  = [r.total for r in results]
+
+    # Vocab progress breakdown (for English students)
+    vocab_stage_counts = [0, 0, 0, 0]  # new, learning, review, mastered
+    is_english = student.is_english_student
+    if is_english:
+        from django.db.models import Count
+        stage_qs = (
+            VocabularyProgress.objects
+            .filter(student=student)
+            .values('stage')
+            .annotate(cnt=Count('id'))
+        )
+        for row in stage_qs:
+            vocab_stage_counts[row['stage']] = row['cnt']
+
     context = {
         'results': results,
         'subject_count': subject_count,
         'avg_score': avg_score,
         'pass_count': pass_count,
+        'is_english': is_english,
+        'student_level': student.level_display,
+        'chart_labels': json.dumps(chart_labels),
+        'chart_test':   json.dumps(chart_test),
+        'chart_exam':   json.dumps(chart_exam),
+        'chart_total':  json.dumps(chart_total),
+        'vocab_stage_counts': json.dumps(vocab_stage_counts),
         'page_title': "View Results",
     }
     return render(request, "student_template/student_view_result.html", context)
@@ -428,9 +474,21 @@ def submit_assignment(request, assignment_id):
 
 # ── Vocabulary ────────────────────────────────────────────────────────────────
 
+def _vocab_queryset_for_student(student, enrolled_group_ids):
+    """Return vocabulary visible to this student filtered by their level and enrolled groups."""
+    level_filter = [Vocabulary.LEVEL_ALL]
+    if student.level:
+        level_filter.append(student.level)
+    return (
+        Vocabulary.objects.filter(level__in=level_filter)
+        .filter(Q(group__isnull=True) | Q(group_id__in=enrolled_group_ids))
+        .select_related('group')
+        .order_by('word')
+    )
+
+
 @student_only
 def vocabulary_home(request):
-    from django.db.models import Q
     from django.utils import timezone as tz
 
     student = get_object_or_404(Student, admin=request.user)
@@ -439,9 +497,7 @@ def vocabulary_home(request):
         .values_list('group_id', flat=True)
     )
 
-    vocab_qs = Vocabulary.objects.filter(
-        Q(group__in=enrolled_group_ids) | Q(group__isnull=True)
-    ).select_related('group').order_by('word')
+    vocab_qs = _vocab_queryset_for_student(student, enrolled_group_ids)
 
     today = tz.localdate()
     progress_map = {}
@@ -468,13 +524,14 @@ def vocabulary_home(request):
         'learning': learning,
         'new_count': new_count,
         'due_today': due_today,
+        'student_level': student.level,
+        'is_english': student.is_english_student,
         'page_title': 'My Vocabulary',
     })
 
 
 @student_only
 def vocabulary_flashcard(request):
-    from django.db.models import Q
     from django.utils import timezone as tz
 
     student = get_object_or_404(Student, admin=request.user)
@@ -483,9 +540,7 @@ def vocabulary_flashcard(request):
         .values_list('group_id', flat=True)
     )
 
-    vocab_qs = Vocabulary.objects.filter(
-        Q(group__in=enrolled_group_ids) | Q(group__isnull=True)
-    ).select_related('group').order_by('word')
+    vocab_qs = _vocab_queryset_for_student(student, enrolled_group_ids)
 
     today = tz.localdate()
     progress_map = {}
@@ -545,17 +600,13 @@ def vocabulary_flashcard(request):
 
 @student_only
 def vocabulary_quiz(request):
-    from django.db.models import Q
-
     student = get_object_or_404(Student, admin=request.user)
     enrolled_group_ids = list(
         Enrollment.objects.filter(student=student, is_active=True)
         .values_list('group_id', flat=True)
     )
 
-    vocab_qs = Vocabulary.objects.filter(
-        Q(group__in=enrolled_group_ids) | Q(group__isnull=True)
-    ).order_by('word')
+    vocab_qs = _vocab_queryset_for_student(student, enrolled_group_ids)
 
     progress_map = {}
     for v in vocab_qs:
@@ -603,17 +654,13 @@ def vocabulary_quiz(request):
 
 @student_only
 def vocabulary_voice(request):
-    from django.db.models import Q
-
     student = get_object_or_404(Student, admin=request.user)
     enrolled_group_ids = list(
         Enrollment.objects.filter(student=student, is_active=True)
         .values_list('group_id', flat=True)
     )
 
-    vocab_qs = Vocabulary.objects.filter(
-        Q(group__in=enrolled_group_ids) | Q(group__isnull=True)
-    ).order_by('word')
+    vocab_qs = _vocab_queryset_for_student(student, enrolled_group_ids)
 
     progress_map = {}
     for v in vocab_qs:

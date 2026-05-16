@@ -36,6 +36,7 @@
 .res-hero-inner { position: relative; z-index: 1; max-width: 70%; }
 .res-h1 { font-weight: 900; font-size: 30px; line-height: 1.08; letter-spacing: -.8px; margin: 0 0 6px; color: var(--c-text); }
 .res-sub { margin: 0; color: var(--c-muted); font-size: 13px; font-weight: 500; }
+.level-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: #E0F2FE; color: #0369A1; font-size: 12px; font-weight: 700; }
 @media (min-width: 640px) { .res-h1 { font-size: 38px; } }
 
 /* Summary banner */
@@ -52,6 +53,22 @@
 }
 .res-stat-num { font-size: 32px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
 .res-stat-lbl { font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: rgba(219,234,254,.85); margin-top: 7px; }
+
+/* Chart card */
+.chart-card {
+  background: var(--c-surface); border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(15,23,42,.06);
+  padding: 20px; margin-bottom: 18px;
+}
+.chart-card-title { font-size: 13px; font-weight: 800; color: var(--c-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 16px; }
+.chart-wrap { position: relative; }
+
+/* Vocab stages row */
+.vocab-stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+.vocab-stage-tile { background: var(--c-surface); border-radius: 14px; box-shadow: 0 4px 16px rgba(15,23,42,.06); padding: 14px 10px; text-align: center; }
+.vocab-stage-icon { font-size: 22px; margin-bottom: 6px; }
+.vocab-stage-num { font-size: 24px; font-weight: 900; color: var(--c-text); line-height: 1; }
+.vocab-stage-lbl { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--c-muted); margin-top: 4px; }
 
 /* Result cards */
 .res-card {
@@ -108,6 +125,9 @@
     <div class="res-hero-inner">
       <h1 class="res-h1">Results</h1>
       <p class="res-sub">Your scores across every group.</p>
+      {% if is_english %}
+      <span class="level-badge"><i class="fas fa-layer-group"></i> {{ student_level }}</span>
+      {% endif %}
     </div>
   </section>
 
@@ -129,6 +149,48 @@
     </div>
   </section>
 
+  <!-- Scores chart -->
+  {% if results|length > 1 %}
+  <div class="chart-card">
+    <div class="chart-card-title">Scores by group</div>
+    <div class="chart-wrap" style="height:220px;">
+      <canvas id="scoresChart"></canvas>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Vocab progress stages (English students only) -->
+  {% if is_english %}
+  <div class="chart-card">
+    <div class="chart-card-title">Vocabulary progress</div>
+    <div class="vocab-stages">
+      <div class="vocab-stage-tile">
+        <div class="vocab-stage-icon">🆕</div>
+        <div class="vocab-stage-num" id="vs-new">—</div>
+        <div class="vocab-stage-lbl">New</div>
+      </div>
+      <div class="vocab-stage-tile">
+        <div class="vocab-stage-icon">📖</div>
+        <div class="vocab-stage-num" id="vs-learning">—</div>
+        <div class="vocab-stage-lbl">Learning</div>
+      </div>
+      <div class="vocab-stage-tile">
+        <div class="vocab-stage-icon">🔁</div>
+        <div class="vocab-stage-num" id="vs-review">—</div>
+        <div class="vocab-stage-lbl">Review</div>
+      </div>
+      <div class="vocab-stage-tile">
+        <div class="vocab-stage-icon">✅</div>
+        <div class="vocab-stage-num" id="vs-mastered">—</div>
+        <div class="vocab-stage-lbl">Mastered</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:200px; max-width:320px; margin:0 auto;">
+      <canvas id="vocabChart"></canvas>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Result cards -->
   {% for r in results %}
   <article class="res-card">
@@ -142,21 +204,18 @@
       </span>
     </div>
     <div class="res-card-body">
-      <!-- Test -->
       <div class="res-score">
         <div class="res-score-lbl">Test</div>
         <div class="res-score-val">{{ r.test|floatformat:0 }}</div>
         <div class="res-bar"><div class="res-bar-fill fill-test" style="width:{% widthratio r.test 40 100 %}%;"></div></div>
         <div class="res-score-sub">out of 40</div>
       </div>
-      <!-- Exam -->
       <div class="res-score">
         <div class="res-score-lbl">Exam</div>
         <div class="res-score-val">{{ r.exam|floatformat:0 }}</div>
         <div class="res-bar"><div class="res-bar-fill fill-exam" style="width:{% widthratio r.exam 60 100 %}%;"></div></div>
         <div class="res-score-sub">out of 60</div>
       </div>
-      <!-- Total -->
       <div class="res-score">
         <div class="res-score-lbl">Total</div>
         <div class="res-score-val" style="color:{% if r.total >= 75 %}#10B981{% elif r.total >= 45 %}#F59E0B{% else %}#EF4444{% endif %};">{{ r.total }}</div>
@@ -180,3 +239,68 @@
 
 </div>
 {% endblock content %}
+
+{% block custom_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  var labels   = {{ chart_labels|safe }};
+  var testData  = {{ chart_test|safe }};
+  var examData  = {{ chart_exam|safe }};
+  var totalData = {{ chart_total|safe }};
+  var stages    = {{ vocab_stage_counts|safe }};
+
+  // Scores bar chart (only rendered if canvas exists)
+  var scoresCtx = document.getElementById('scoresChart');
+  if (scoresCtx && labels.length > 0) {
+    new Chart(scoresCtx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Test (max 40)',  data: testData,  backgroundColor: 'rgba(59,130,246,.75)',  borderRadius: 6 },
+          { label: 'Exam (max 60)',  data: examData,  backgroundColor: 'rgba(31,79,217,.75)',   borderRadius: 6 },
+          { label: 'Total (max 100)', data: totalData, backgroundColor: 'rgba(16,185,129,.75)', borderRadius: 6 },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12, padding: 12 } } },
+        scales: {
+          y: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { size: 11 } } },
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        },
+      },
+    });
+  }
+
+  // Vocab stage tiles
+  var ids = ['vs-new', 'vs-learning', 'vs-review', 'vs-mastered'];
+  ids.forEach(function (id, i) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = stages[i];
+  });
+
+  // Vocab doughnut chart
+  var vocabCtx = document.getElementById('vocabChart');
+  if (vocabCtx) {
+    new Chart(vocabCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['New', 'Learning', 'Review', 'Mastered'],
+        datasets: [{
+          data: stages,
+          backgroundColor: ['#94A3B8', '#F59E0B', '#3B82F6', '#10B981'],
+          borderWidth: 2, borderColor: '#fff',
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12, padding: 10 } } },
+      },
+    });
+  }
+})();
+</script>
+{% endblock custom_js %}

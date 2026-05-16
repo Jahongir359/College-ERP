@@ -92,11 +92,11 @@
         <small class="pf-help">Optional — PNG, JPG up to 5 MB.</small>
       </div>
 
-      <div class="form-section-title" style="margin-top:8px;">Course &amp; Group Assignment</div>
+      <div class="form-section-title" style="margin-top:8px;">Program &amp; Class Assignment</div>
 
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px;">
         <div class="pf-field">
-          <label class="pf-label">Course / Subject <span style="color:var(--ice-danger);">*</span></label>
+          <label class="pf-label">Program <span style="color:var(--ice-danger);">*</span></label>
           {{ form.course }}
           {% if form.course.errors %}<div class="pf-error">{{ form.course.errors.0 }}</div>{% endif %}
         </div>
@@ -105,13 +105,19 @@
           <select id="teacher_filter" class="form-control">
             <option value="">— All Teachers —</option>
           </select>
-          <small class="pf-help">Select course first.</small>
+          <small class="pf-help">Select program first.</small>
         </div>
         <div class="pf-field">
-          <label class="pf-label">Group <span style="font-weight:400; text-transform:none; font-size:11px;">(optional)</span></label>
+          <label class="pf-label">Class Group <span style="font-weight:400; text-transform:none; font-size:11px;">(optional)</span></label>
           {{ form.group }}
           {% if form.group.errors %}<div class="pf-error">{{ form.group.errors.0 }}</div>{% endif %}
-          <small class="pf-help">Select course to load groups.</small>
+          <small class="pf-help">Select program to load groups.</small>
+        </div>
+        <div class="pf-field">
+          <label class="pf-label">{{ form.level.label }}</label>
+          {{ form.level }}
+          {% if form.level.errors %}<div class="pf-error">{{ form.level.errors.0 }}</div>{% endif %}
+          <small class="pf-help">English level 1–6. Leave blank for non-English programs.</small>
         </div>
       </div>
 

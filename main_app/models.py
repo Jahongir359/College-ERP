@@ -90,6 +90,10 @@ class Admin(models.Model):
 class Course(models.Model):
     name = models.CharField(max_length=120)
     is_active = models.BooleanField(default=True)
+    is_english = models.BooleanField(
+        default=False,
+        help_text="Mark as English program to enable level tracking and vocabulary features.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -116,13 +120,27 @@ class Student(models.Model):
         (STATUS_SUSPENDED, 'Suspended'),
     ]
 
+    LEVEL_CHOICES = [(i, f'Level {i}') for i in range(1, 7)]
+
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
     phone = models.CharField(max_length=20, blank=True, default='')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
+    level = models.PositiveSmallIntegerField(
+        choices=LEVEL_CHOICES, null=True, blank=True,
+        help_text="English proficiency level (1–6). Only applies to English-program students.",
+    )
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
+
+    @property
+    def level_display(self):
+        return f"Level {self.level}" if self.level else "—"
+
+    @property
+    def is_english_student(self):
+        return bool(self.course and self.course.is_english)
 
 class Staff(models.Model):
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
@@ -471,6 +489,9 @@ class Loan(models.Model):
 # ── Vocabulary ───────────────────────────────────────────────────────────────
 
 class Vocabulary(models.Model):
+    LEVEL_ALL = 0
+    LEVEL_CHOICES = [(LEVEL_ALL, 'All Levels')] + [(i, f'Level {i}') for i in range(1, 7)]
+
     word = models.CharField(max_length=200)
     definition = models.TextField()
     example_sentence = models.TextField(blank=True, default='')
@@ -478,9 +499,13 @@ class Vocabulary(models.Model):
                                    help_text='Native-language translation (optional)')
     part_of_speech = models.CharField(max_length=50, blank=True, default='',
                                       help_text='e.g. noun, verb, adjective')
+    level = models.PositiveSmallIntegerField(
+        choices=LEVEL_CHOICES, default=LEVEL_ALL,
+        help_text='Target student level. "All Levels" means visible to every English student.',
+    )
     group = models.ForeignKey(
         'Group', on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='vocabulary', help_text='Leave blank to make visible to all students'
+        related_name='vocabulary', help_text='Leave blank to share with all groups at this level',
     )
     added_by = models.ForeignKey(
         CustomUser, on_delete=models.SET_NULL, null=True, related_name='vocabulary_words'

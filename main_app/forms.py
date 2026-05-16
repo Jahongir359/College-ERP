@@ -67,30 +67,37 @@ class StudentForm(CustomUserForm):
         initial=Student.STATUS_ACTIVE,
         label="Status",
     )
+    level = forms.ChoiceField(
+        choices=[('', '— No level assigned —')] + Student.LEVEL_CHOICES,
+        required=False,
+        label="English Level",
+    )
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
         self.fields['status'].widget.attrs['class'] = 'form-control'
+        self.fields['level'].widget.attrs['class'] = 'form-control'
         instance = kwargs.get('instance')
         if instance:
             self.fields['phone'].initial = instance.phone
             self.fields['status'].initial = instance.status
+            self.fields['level'].initial = instance.level if instance.level else ''
 
     class Meta(CustomUserForm.Meta):
         model = Student
-        fields = CustomUserForm.Meta.fields + ['course', 'phone', 'status']
+        fields = CustomUserForm.Meta.fields + ['course', 'phone', 'status', 'level']
 
 
 class AddStudentForm(CustomUserForm):
     course = forms.ModelChoiceField(
         queryset=Course.objects.all(),
-        empty_label="— Select a Course —",
-        label="Course / Subject",
+        empty_label="— Select a Program —",
+        label="Program",
     )
     group = forms.ModelChoiceField(
         queryset=Group.objects.none(),
-        empty_label="— Select a Group (optional) —",
-        label="Assign to Group",
+        empty_label="— Select a Class Group (optional) —",
+        label="Assign to Class Group",
         required=False,
     )
     phone = forms.CharField(
@@ -102,6 +109,11 @@ class AddStudentForm(CustomUserForm):
         initial=Student.STATUS_ACTIVE,
         label="Status",
     )
+    level = forms.ChoiceField(
+        choices=[('', '— No level assigned —')] + Student.LEVEL_CHOICES,
+        required=False,
+        label="English Level",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -109,6 +121,7 @@ class AddStudentForm(CustomUserForm):
         self.fields['group'].widget.attrs['class'] = 'form-control'
         self.fields['phone'].widget.attrs['class'] = 'form-control'
         self.fields['status'].widget.attrs['class'] = 'form-control'
+        self.fields['level'].widget.attrs['class'] = 'form-control'
         if self.data.get('group'):
             self.fields['group'].queryset = Group.objects.filter(is_archived=False)
 
@@ -117,12 +130,12 @@ class AddStudentForm(CustomUserForm):
         course = cleaned_data.get('course')
         group = cleaned_data.get('group')
         if group and course and group.course_id != course.id:
-            self.add_error('group', 'The selected group does not belong to the chosen course.')
+            self.add_error('group', 'The selected class group does not belong to the chosen program.')
         return cleaned_data
 
     class Meta(CustomUserForm.Meta):
         model = Student
-        fields = CustomUserForm.Meta.fields + ['course', 'group', 'phone', 'status']
+        fields = CustomUserForm.Meta.fields + ['course', 'group', 'phone', 'status', 'level']
 
 
 class AdminForm(CustomUserForm):
@@ -153,7 +166,7 @@ class CourseForm(FormSettings):
         super(CourseForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        fields = ['name']
+        fields = ['name', 'is_english', 'is_active']
         model = Course
 
 
@@ -358,13 +371,14 @@ class VocabularyForm(forms.ModelForm):
     class Meta:
         model = models.Vocabulary
         fields = ['word', 'definition', 'example_sentence', 'translation',
-                  'part_of_speech', 'group']
+                  'part_of_speech', 'level', 'group']
         widgets = {
             'word': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Diligent'}),
             'definition': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Clear English definition'}),
             'example_sentence': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'She was diligent in her studies.'}),
             'translation': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional native-language translation'}),
             'part_of_speech': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'noun / verb / adjective…'}),
+            'level': forms.Select(attrs={'class': 'form-control'}),
             'group': forms.Select(attrs={'class': 'form-control'}),
         }
 
@@ -372,7 +386,7 @@ class VocabularyForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['group'].queryset = models.Group.objects.filter(is_archived=False)
         self.fields['group'].required = False
-        self.fields['group'].empty_label = '— All students (no group filter) —'
+        self.fields['group'].empty_label = '— All groups —'
         self.fields['example_sentence'].required = False
         self.fields['translation'].required = False
         self.fields['part_of_speech'].required = False
