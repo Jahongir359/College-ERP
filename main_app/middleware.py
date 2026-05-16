@@ -15,6 +15,7 @@ class LoginCheckMiddleWare(MiddlewareMixin):
         modulename = view_func.__module__
 
         auth_allowed_paths = {
+            reverse('entry_page'),
             reverse('login_page'),
             reverse('user_login'),
             reverse('user_logout'),
