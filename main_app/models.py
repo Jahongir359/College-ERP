@@ -70,6 +70,7 @@ class CustomUser(AbstractUser):
     user_type = models.CharField(default='1', choices=USER_TYPE, max_length=1)
     gender = models.CharField(max_length=1, choices=GENDER, blank=True, default='')
     profile_pic = models.ImageField(blank=True, null=True)
+    avatar = models.CharField(max_length=10, blank=True, default='')
     address = models.TextField(blank=True, default='')
     fcm_token = models.TextField(default="")  # For firebase notifications
     created_at = models.DateTimeField(auto_now_add=True)
@@ -593,91 +594,3 @@ class VocabularyQuizResult(models.Model):
 
     def __str__(self):
         return f"{self.student} — {self.score:.0f}% ({self.taken_at.date()})"
-
-
-# ── Legacy Vocabulary (word bank / spaced repetition) ─────────────────────────
-
-class Vocabulary(models.Model):
-    LEVEL_ALL = 0
-    LEVEL_CHOICES = [(LEVEL_ALL, 'All Levels')] + [(i, f'Level {i}') for i in range(1, 7)]
-
-    word = models.CharField(max_length=200)
-    definition = models.TextField()
-    example_sentence = models.TextField(blank=True, default='')
-    translation = models.CharField(max_length=200, blank=True, default='',
-                                   help_text='Native-language translation (optional)')
-    part_of_speech = models.CharField(max_length=50, blank=True, default='',
-                                      help_text='e.g. noun, verb, adjective')
-    level = models.PositiveSmallIntegerField(
-        choices=LEVEL_CHOICES, default=LEVEL_ALL,
-        help_text='Target student level. "All Levels" means visible to every English student.',
-    )
-    group = models.ForeignKey(
-        'Group', on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='vocabulary', help_text='Leave blank to share with all groups at this level',
-    )
-    added_by = models.ForeignKey(
-        CustomUser, on_delete=models.SET_NULL, null=True, related_name='vocabulary_words'
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-        verbose_name_plural = 'Vocabulary'
-
-    def __str__(self):
-        return self.word
-
-
-class VocabularyProgress(models.Model):
-    STAGE_NEW = 0
-    STAGE_LEARNING = 1
-    STAGE_REVIEW = 2
-    STAGE_MASTERED = 3
-    STAGE_CHOICES = [
-        (STAGE_NEW, 'New'),
-        (STAGE_LEARNING, 'Learning'),
-        (STAGE_REVIEW, 'Review'),
-        (STAGE_MASTERED, 'Mastered'),
-    ]
-    # SM-2-style interval ladder (days)
-    _INTERVALS = [1, 2, 4, 8, 14, 30]
-
-    student = models.ForeignKey(
-        Student, on_delete=models.CASCADE, related_name='vocab_progress'
-    )
-    vocabulary = models.ForeignKey(
-        Vocabulary, on_delete=models.CASCADE, related_name='progress'
-    )
-    stage = models.PositiveSmallIntegerField(choices=STAGE_CHOICES, default=STAGE_NEW)
-    correct_count = models.PositiveIntegerField(default=0)
-    incorrect_count = models.PositiveIntegerField(default=0)
-    interval_days = models.PositiveIntegerField(default=1)
-    next_review_date = models.DateField(default=timezone.localdate)
-    last_seen = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        unique_together = ('student', 'vocabulary')
-
-    def __str__(self):
-        return f"{self.student} — {self.vocabulary.word}"
-
-    def record_answer(self, correct: bool):
-        self.last_seen = timezone.now()
-        if correct:
-            self.correct_count += 1
-            idx = min(self.correct_count, len(self._INTERVALS) - 1)
-            self.interval_days = self._INTERVALS[idx]
-            if self.correct_count >= 5:
-                self.stage = self.STAGE_MASTERED
-            elif self.correct_count >= 2:
-                self.stage = self.STAGE_REVIEW
-            else:
-                self.stage = self.STAGE_LEARNING
-        else:
-            self.incorrect_count += 1
-            self.correct_count = max(0, self.correct_count - 1)
-            self.interval_days = 1
-            self.stage = self.STAGE_LEARNING
-        self.next_review_date = timezone.localdate() + timedelta(days=self.interval_days)
-        self.save()

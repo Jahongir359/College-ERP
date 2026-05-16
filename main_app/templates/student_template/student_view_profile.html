@@ -77,18 +77,31 @@
 {% block content %}
 <div class="profile-wrap">
 
+  <!-- Avatar picker modal -->
+  <div class="avatar-modal-overlay" id="avatar-modal">
+    <div class="avatar-modal">
+      <div class="avatar-modal-header">
+        <h3><i class="fas fa-smile me-2" style="color:var(--ice-cyan);"></i>Choose Your Avatar</h3>
+        <button class="avatar-modal-close" onclick="closeAvatarModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="avatar-grid" id="avatar-grid"></div>
+      <div class="avatar-modal-footer">
+        <button class="avatar-cancel-btn" onclick="closeAvatarModal()">Cancel</button>
+        <button class="avatar-save-btn" onclick="saveAvatar()"><i class="fas fa-check me-1"></i>Save Avatar</button>
+      </div>
+    </div>
+  </div>
+  <div class="avatar-toast" id="avatar-toast"><i class="fas fa-check-circle me-1"></i>Avatar saved!</div>
+
   <!-- Hero -->
   <div class="profile-hero">
-    <div class="profile-avatar">
-      {% if user.profile_pic %}
-        <img src="{{ user.profile_pic.url }}" alt="{{ user.first_name }}">
-      {% else %}
-        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-      {% endif %}
+    <div class="profile-avatar-sticker" id="profile-avatar-display" onclick="openAvatarModal()" title="Click to change avatar">
+      <span id="profile-avatar-inner">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
     </div>
     <div class="profile-hero-info">
       <h2>{{ user.get_full_name|default:user.username }}</h2>
       <p><i class="fas fa-id-badge me-1"></i>{{ user.login_id|default:"—" }}</p>
+      <p style="font-size:11px;opacity:.65;margin-top:4px;"><i class="fas fa-paint-brush me-1"></i>Click avatar to change</p>
     </div>
   </div>
 
@@ -181,6 +194,82 @@
 
 {% block custom_js %}
 <script>
+// ── Avatar system ────────────────────────────────────────────────────────────
+var AVATARS = ["🧑‍🎓","👨‍🎓","👩‍🎓","🧑‍💻","👨‍💻","👩‍💻","🧑‍🏫","👨‍🏫","👩‍🏫","🤓",
+               "😊","😎","💡","📚","🏆","⭐","💪","🎯","🌟","🦉","🌍","✏️","🎨","🔬"];
+var BG = ["#1B3F7A","#0C1F45","#7C3AED","#0891B2","#1F2937","#6D28D9",
+          "#BE185D","#B45309","#C2410C","#15803D","#0284C7","#4338CA",
+          "#A16207","#7C2D12","#B45309","#EA580C","#B91C1C","#991B1B",
+          "#4F46E5","#65A30D","#0D9488","#6B7280","#DB2777","#0891B2"];
+var currentAvatar = '{{ request.user.avatar }}';
+var pendingAvatar = currentAvatar;
+var CSRF = '{{ csrf_token }}';
+
+function buildGrid() {
+  var grid = document.getElementById('avatar-grid');
+  grid.innerHTML = '';
+  AVATARS.forEach(function (emoji, idx) {
+    var div = document.createElement('div');
+    div.className = 'avatar-option' + (currentAvatar == String(idx + 1) ? ' selected' : '');
+    div.style.background = BG[idx];
+    div.textContent = emoji;
+    div.dataset.av = String(idx + 1);
+    div.addEventListener('click', function () {
+      document.querySelectorAll('.avatar-option').forEach(function (o) { o.classList.remove('selected'); });
+      div.classList.add('selected');
+      pendingAvatar = div.dataset.av;
+    });
+    grid.appendChild(div);
+  });
+}
+
+function openAvatarModal() {
+  pendingAvatar = currentAvatar;
+  buildGrid();
+  document.getElementById('avatar-modal').classList.add('open');
+}
+function closeAvatarModal() {
+  document.getElementById('avatar-modal').classList.remove('open');
+}
+
+function applyAvatarToHero(avId) {
+  var inner = document.getElementById('profile-avatar-inner');
+  var wrap = document.getElementById('profile-avatar-display');
+  if (!inner || !wrap) return;
+  var idx = parseInt(avId, 10) - 1;
+  if (idx >= 0 && idx < AVATARS.length) {
+    inner.textContent = AVATARS[idx];
+    inner.style.fontSize = '32px';
+    wrap.style.background = BG[idx];
+  }
+}
+
+function saveAvatar() {
+  fetch('{% url "save_avatar" %}', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'avatar=' + encodeURIComponent(pendingAvatar),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (data.status === 'ok') {
+      currentAvatar = pendingAvatar;
+      applyAvatarToHero(currentAvatar);
+      closeAvatarModal();
+      var t = document.getElementById('avatar-toast');
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 2200);
+    }
+  });
+}
+
+// Apply current avatar on load
+(function () {
+  if (currentAvatar) applyAvatarToHero(currentAvatar);
+  document.getElementById('avatar-modal').addEventListener('click', function (e) {
+    if (e.target === this) closeAvatarModal();
+  });
+})();
+
+// ── Password + Theme ─────────────────────────────────────────────────────────
 (function () {
   var pwField = document.getElementById('id_password');
   if (pwField) {
@@ -191,7 +280,7 @@
 
   // Theme selector
   var SAVE_URL = '{% url "student_save_theme" %}';
-  var CSRF = '{{ csrf_token }}';
+  var CSRF2 = '{{ csrf_token }}';
 
   function applyTheme(theme) {
     var root = document.documentElement;
@@ -227,7 +316,7 @@
       // Save to server
       fetch(SAVE_URL, {
         method: 'POST',
-        headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'X-CSRFToken': CSRF2, 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'theme=' + theme,
       }).then(function () {
         var msg = document.getElementById('theme-msg');

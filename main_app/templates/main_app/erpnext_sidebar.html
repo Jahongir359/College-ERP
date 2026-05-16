@@ -1,31 +1,16 @@
 {% load static %}
 
-<!-- Profile picture lightbox -->
-<div class="avatar-lightbox" id="avatar-lightbox" onclick="closeLightbox()">
-    {% if request.user.profile_pic %}
-    <img src="{{ request.user.profile_pic.url }}" alt="{{ request.user.first_name }}" id="lightbox-img">
-    {% endif %}
-</div>
-
 <!-- Sidebar Header -->
 <div class="sidebar-header">
     <div class="sidebar-user">
-        {% if request.user.profile_pic %}
-        <img src="{{ request.user.profile_pic.url }}" alt="User Avatar"
-             class="sidebar-user-avatar" id="sidebar-avatar"
-             onclick="openLightbox()"
-             title="Click to view photo"
-             onerror="this.style.display='none';document.getElementById('sidebar-initials').style.display='flex';">
-        <div id="sidebar-initials" class="sidebar-user-avatar"
-             style="display:none;background:linear-gradient(135deg,#374151,#1F2937);color:#fff;font-size:16px;font-weight:700;align-items:center;justify-content:center;cursor:default;">
-            {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        {# Avatar sticker system: show chosen avatar sticker, else initials #}
+        <div class="sidebar-user-avatar sidebar-sticker-wrap" id="sidebar-avatar-el">
+            {% if request.user.avatar %}
+            <span class="sidebar-sticker" data-av="{{ request.user.avatar }}"></span>
+            {% else %}
+            <span style="font-size:16px;font-weight:700;color:#fff;">{{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}</span>
+            {% endif %}
         </div>
-        {% else %}
-        <div class="sidebar-user-avatar"
-             style="background:linear-gradient(135deg,#374151,#1F2937);color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:default;">
-            {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-        </div>
-        {% endif %}
         <div class="sidebar-user-info">
             <h6>{{ user.get_full_name|default:user.username }}</h6>
             <small>
@@ -54,7 +39,7 @@
         <div class="nav-item">
             {% url 'admin_view_profile' as admin_view_profile %}
             <a href="{{ admin_view_profile }}" class="nav-link {% if admin_view_profile == request.path %}active{% endif %}">
-                <i class="fas fa-user-circle"></i>
+                <i class="nav-icon fas fa-user-circle"></i>
                 <span class="nav-text">Profile</span>
             </a>
         </div>
@@ -190,7 +175,7 @@
         <div class="nav-item">
             {% url 'manage_vocabulary_days' as manage_vocabulary_days %}
             <a href="{{ manage_vocabulary_days }}" class="nav-link {% if 'vocabulary-day' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-alt"></i>
+                <i class="nav-icon fas fa-language"></i>
                 <span class="nav-text">Vocabulary Days</span>
             </a>
         </div>
@@ -254,7 +239,7 @@
         <div class="nav-item">
             {% url 'staff_view_profile' as staff_view_profile %}
             <a href="{{ staff_view_profile }}" class="nav-link {% if staff_view_profile == request.path %}active{% endif %}">
-                <i class="fas fa-user-circle"></i>
+                <i class="nav-icon fas fa-user-circle"></i>
                 <span class="nav-text">My Profile</span>
             </a>
         </div>
@@ -310,7 +295,7 @@
         <div class="nav-item">
             {% url 'staff_vocabulary_days' as staff_vocabulary_days %}
             <a href="{{ staff_vocabulary_days }}" class="nav-link {% if 'vocabulary-day' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-alt"></i>
+                <i class="nav-icon fas fa-language"></i>
                 <span class="nav-text">Daily Vocabulary</span>
             </a>
         </div>
@@ -387,7 +372,7 @@
         <div class="nav-item">
             {% url 'student_view_profile' as student_view_profile %}
             <a href="{{ student_view_profile }}" class="nav-link {% if student_view_profile == request.path %}active{% endif %}">
-                <i class="fas fa-user-circle"></i>
+                <i class="nav-icon fas fa-user-circle"></i>
                 <span class="nav-text">My Profile</span>
             </a>
         </div>
@@ -431,7 +416,7 @@
         <div class="nav-item">
             {% url 'vocabulary_day_list' as vocabulary_day_list %}
             <a href="{{ vocabulary_day_list }}" class="nav-link {% if 'vocabulary-day' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-alt"></i>
+                <i class="nav-icon fas fa-language"></i>
                 <span class="nav-text">Daily Vocabulary</span>
             </a>
         </div>
@@ -495,15 +480,21 @@
 </div>
 
 <script>
-function openLightbox() {
-    const lb = document.getElementById('avatar-lightbox');
-    if (lb && lb.querySelector('img')) lb.classList.add('open');
-}
-function closeLightbox() {
-    const lb = document.getElementById('avatar-lightbox');
-    if (lb) lb.classList.remove('open');
-}
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeLightbox();
-});
+// Render avatar sticker emojis in the sidebar
+(function () {
+  var AVATARS = ["🧑‍🎓","👨‍🎓","👩‍🎓","🧑‍💻","👨‍💻","👩‍💻","🧑‍🏫","👨‍🏫","👩‍🏫","🤓",
+                 "😊","😎","💡","📚","🏆","⭐","💪","🎯","🌟","🦉","🌍","✏️","🎨","🔬"];
+  var BG = ["#1B3F7A","#0C1F45","#7C3AED","#0891B2","#1F2937","#6D28D9",
+            "#BE185D","#B45309","#C2410C","#15803D","#0284C7","#4338CA",
+            "#A16207","#7C2D12","#B45309","#EA580C","#B91C1C","#991B1B",
+            "#4F46E5","#65A30D","#0D9488","#6B7280","#DB2777","#0891B2"];
+  document.querySelectorAll('.sidebar-sticker').forEach(function (el) {
+    var idx = parseInt(el.dataset.av || '1', 10) - 1;
+    if (idx >= 0 && idx < AVATARS.length) {
+      el.textContent = AVATARS[idx];
+      el.parentElement.style.background = BG[idx];
+      el.style.fontSize = '20px';
+    }
+  });
+})();
 </script>

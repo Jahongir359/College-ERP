@@ -279,6 +279,22 @@
     });
     </script>
 
+    /* ── Button ripple effect ────────────────────────────────────────────── */
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn, .quick-action-btn, .sidebar-logout-btn');
+        if (!btn) return;
+        var r = document.createElement('span');
+        r.className = 'ripple';
+        var rect = btn.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height);
+        r.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' +
+            (e.clientX - rect.left - size / 2) + 'px;top:' +
+            (e.clientY - rect.top - size / 2) + 'px;';
+        btn.appendChild(r);
+        setTimeout(function () { r.remove(); }, 600);
+    });
+    </script>
+
     {% block custom_js %}{% endblock custom_js %}
 </body>
 </html>

@@ -1810,3 +1810,281 @@ body {
 .p-3 { padding: 1rem; }
 .p-4 { padding: 1.5rem; }
 .p-5 { padding: 3rem; }
+
+/* ── Avatar / Sticker System ──────────────────────────────────────────────── */
+.sidebar-sticker-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg,#374151,#1F2937);
+  cursor: default;
+  transition: transform .2s ease;
+}
+.sidebar-sticker {
+  font-size: 20px;
+  line-height: 1;
+  display: block;
+}
+
+/* Avatar picker modal */
+.avatar-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.avatar-modal-overlay.open { display: flex; }
+
+.avatar-modal {
+  background: var(--ice-surface, #fff);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  overflow: hidden;
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.avatar-modal-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--ice-border, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.avatar-modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ice-text, #0f172a);
+}
+.avatar-modal-close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--ice-muted, #64748b);
+  font-size: 18px;
+  padding: 4px;
+  transition: color .15s;
+}
+.avatar-modal-close:hover { color: var(--ice-text, #0f172a); }
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  padding: 20px;
+}
+
+.avatar-option {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.avatar-option:hover {
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+}
+.avatar-option.selected {
+  border-color: #06B6D4;
+  box-shadow: 0 0 0 3px rgba(6,182,212,.25);
+  transform: scale(1.1);
+}
+
+.avatar-modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--ice-border, #e2e8f0);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar-save-btn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #1B3F7A, #0891B2);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s, transform .15s;
+}
+.avatar-save-btn:hover { opacity: .9; transform: translateY(-1px); }
+.avatar-save-btn:active { transform: translateY(0); }
+.avatar-cancel-btn {
+  padding: 11px 18px;
+  border-radius: 10px;
+  border: 1.5px solid var(--ice-border, #e2e8f0);
+  background: transparent;
+  color: var(--ice-muted, #64748b);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.avatar-cancel-btn:hover { border-color: #94a3b8; color: var(--ice-text, #0f172a); }
+
+/* Current avatar display in profile hero */
+.profile-avatar-sticker {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+.profile-avatar-sticker:hover { transform: scale(1.06); }
+
+/* Avatar save toast */
+.avatar-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #10B981;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity .3s, transform .3s;
+  z-index: 9999;
+  white-space: nowrap;
+}
+.avatar-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Button Animations ────────────────────────────────────────────────────── */
+.btn {
+  transition: background-color .15s ease, border-color .15s ease,
+              box-shadow .15s ease, transform .1s ease, opacity .15s ease;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+.btn:active {
+  transform: translateY(0) scale(.98);
+  box-shadow: none;
+}
+
+/* Ripple effect on buttons */
+.btn { position: relative; overflow: hidden; }
+.btn .ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple .5s linear;
+  background: rgba(255,255,255,.3);
+  pointer-events: none;
+}
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* Quick-action grid buttons */
+.quick-action-btn {
+  transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
+}
+.quick-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(27,63,122,.12);
+}
+.quick-action-btn:active {
+  transform: translateY(0);
+}
+
+/* Stat cards */
+.stat-card {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(27,63,122,.13) !important;
+}
+
+/* erpnext-card hover */
+.erpnext-card {
+  transition: box-shadow .2s ease;
+}
+.erpnext-card:hover {
+  box-shadow: 0 6px 24px rgba(27,63,122,.1) !important;
+}
+
+/* Sidebar nav-link hover with slide */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: rgba(6,182,212,.08);
+  transition: width .15s ease;
+  border-radius: 0 8px 8px 0;
+  z-index: -1;
+}
+.nav-link:hover::after { width: 100%; }
+
+/* ── UI Consistency ───────────────────────────────────────────────────────── */
+/* Ensure consistent form control sizing */
+.form-control { line-height: 1.5; }
+
+/* Card headers consistent padding */
+.card-header { padding: 14px 20px; }
+
+/* Badge pill consistency */
+.badge { font-weight: 700; letter-spacing: .02em; }
+
+/* Focus ring consistency */
+*:focus-visible {
+  outline: 2px solid #06B6D4;
+  outline-offset: 2px;
+}
+
+/* Table hover row */
+.table tbody tr {
+  transition: background .1s ease;
+}
+
+/* Action buttons in tables */
+.btn-sm { padding: 5px 11px; font-size: 12px; }
+
+/* Smooth page transitions */
+.erpnext-main { animation: fadeIn .2s ease; }
+@keyframes fadeIn {
+  from { opacity: .85; transform: translateY(4px); }
+  to   { opacity: 1;   transform: translateY(0); }
+}
+
+/* Dark mode avatar modal */
+[data-theme="dark"] .avatar-modal {
+  background: #1e293b;
+  border-color: #334155;
+}
+[data-theme="dark"] .avatar-modal-header { border-bottom-color: #334155; }
+[data-theme="dark"] .avatar-modal-footer { border-top-color: #334155; }
+[data-theme="dark"] .avatar-modal-header h3 { color: #f1f5f9; }
+[data-theme="dark"] .avatar-cancel-btn { color: #94a3b8; border-color: #334155; }
+[data-theme="dark"] .avatar-cancel-btn:hover { color: #e2e8f0; border-color: #64748b; }

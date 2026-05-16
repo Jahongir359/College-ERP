@@ -72,18 +72,6 @@ def student_home(request):
     # Notify student of any newly released vocabulary days
     _check_and_notify_vocab_days(student, [e.group_id for e in enrollments])
 
-    # Today's vocabulary (level-filtered, for English students)
-    todays_vocab = []
-    if is_english:
-        from django.utils import timezone
-        enrolled_group_ids = [e.group_id for e in enrollments]
-        vocab_qs = Vocabulary.objects.filter(
-            level__in=([Vocabulary.LEVEL_ALL] + ([student_level] if student_level else []))
-        ).filter(
-            Q(group__isnull=True) | Q(group_id__in=enrolled_group_ids)
-        ).order_by('?')[:5]
-        todays_vocab = list(vocab_qs)
-
     # Recent unread notifications (show up to 3 on dashboard)
     recent_notifications = Notification.objects.filter(
         recipient=request.user, is_read=False
@@ -102,7 +90,6 @@ def student_home(request):
         'latest_result': _latest_result(student),
         'is_english': is_english,
         'student_level': student_level,
-        'todays_vocab': todays_vocab,
         'recent_notifications': recent_notifications,
         'student_theme': student.theme,
         'page_title': 'My Dashboard',
@@ -528,217 +515,6 @@ def _check_and_notify_vocab_days(student, enrolled_group_ids):
         Notification.objects.bulk_create(notifs)
 
 
-def _vocab_queryset_for_student(student, enrolled_group_ids):
-    """Return vocabulary visible to this student filtered by their level and enrolled groups."""
-    level_filter = [Vocabulary.LEVEL_ALL]
-    if student.level:
-        level_filter.append(student.level)
-    return (
-        Vocabulary.objects.filter(level__in=level_filter)
-        .filter(Q(group__isnull=True) | Q(group_id__in=enrolled_group_ids))
-        .select_related('group')
-        .order_by('word')
-    )
-
-
-@student_only
-def vocabulary_home(request):
-    from django.utils import timezone as tz
-
-    student = get_object_or_404(Student, admin=request.user)
-    enrolled_group_ids = list(
-        Enrollment.objects.filter(student=student, is_active=True)
-        .values_list('group_id', flat=True)
-    )
-
-    vocab_qs = _vocab_queryset_for_student(student, enrolled_group_ids)
-
-    today = tz.localdate()
-    progress_map = {}
-    for v in vocab_qs:
-        prog, _ = VocabularyProgress.objects.get_or_create(
-            student=student, vocabulary=v
-        )
-        progress_map[v.id] = prog
-
-    total = vocab_qs.count()
-    mastered = sum(1 for p in progress_map.values() if p.stage == VocabularyProgress.STAGE_MASTERED)
-    learning = sum(1 for p in progress_map.values() if p.stage in (VocabularyProgress.STAGE_LEARNING, VocabularyProgress.STAGE_REVIEW))
-    new_count = sum(1 for p in progress_map.values() if p.stage == VocabularyProgress.STAGE_NEW)
-    due_today = sum(
-        1 for p in progress_map.values()
-        if p.stage < VocabularyProgress.STAGE_MASTERED and p.next_review_date <= today
-    )
-
-    return render(request, 'student_template/vocabulary_home.html', {
-        'vocabulary_list': vocab_qs,
-        'progress_map': progress_map,
-        'total': total,
-        'mastered': mastered,
-        'learning': learning,
-        'new_count': new_count,
-        'due_today': due_today,
-        'student_level': student.level,
-        'is_english': student.is_english_student,
-        'page_title': 'My Vocabulary',
-    })
-
-
-@student_only
-def vocabulary_flashcard(request):
-    from django.utils import timezone as tz
-
-    student = get_object_or_404(Student, admin=request.user)
-    enrolled_group_ids = list(
-        Enrollment.objects.filter(student=student, is_active=True)
-        .values_list('group_id', flat=True)
-    )
-
-    vocab_qs = _vocab_queryset_for_student(student, enrolled_group_ids)
-
-    today = tz.localdate()
-    progress_map = {}
-    for v in vocab_qs:
-        prog, _ = VocabularyProgress.objects.get_or_create(
-            student=student, vocabulary=v
-        )
-        progress_map[v.id] = prog
-
-    # Due cards: next_review_date <= today and not mastered, ordered by stage ASC
-    due_vocab = [
-        v for v in vocab_qs
-        if progress_map[v.id].stage < VocabularyProgress.STAGE_MASTERED
-        and progress_map[v.id].next_review_date <= today
-    ]
-    due_vocab.sort(key=lambda v: progress_map[v.id].stage)
-
-    if request.method == 'POST':
-        try:
-            if request.content_type and 'application/json' in request.content_type:
-                data = json.loads(request.body)
-            else:
-                data = request.POST
-            vocab_id = int(data.get('vocab_id', 0))
-            correct = str(data.get('correct', 'false')).lower() in ('true', '1', 'yes')
-            vocab = get_object_or_404(Vocabulary, id=vocab_id)
-            prog, _ = VocabularyProgress.objects.get_or_create(student=student, vocabulary=vocab)
-            prog.record_answer(correct)
-            return JsonResponse({
-                'stage': prog.stage,
-                'correct_count': prog.correct_count,
-                'incorrect_count': prog.incorrect_count,
-                'interval_days': prog.interval_days,
-                'next_review_date': prog.next_review_date.isoformat(),
-            })
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-    vocab_json = json.dumps([{
-        'id': v.id,
-        'word': v.word,
-        'definition': v.definition,
-        'example_sentence': v.example_sentence,
-        'translation': v.translation,
-        'part_of_speech': v.part_of_speech,
-        'stage': progress_map[v.id].stage,
-    } for v in due_vocab])
-
-    return render(request, 'student_template/vocabulary_flashcard.html', {
-        'vocabulary_list': due_vocab,
-        'progress_map': progress_map,
-        'due_count': len(due_vocab),
-        'vocab_json': vocab_json,
-        'page_title': 'Flashcard Review',
-    })
-
-
-@student_only
-def vocabulary_quiz(request):
-    student = get_object_or_404(Student, admin=request.user)
-    enrolled_group_ids = list(
-        Enrollment.objects.filter(student=student, is_active=True)
-        .values_list('group_id', flat=True)
-    )
-
-    vocab_qs = _vocab_queryset_for_student(student, enrolled_group_ids)
-
-    progress_map = {}
-    for v in vocab_qs:
-        prog, _ = VocabularyProgress.objects.get_or_create(
-            student=student, vocabulary=v
-        )
-        progress_map[v.id] = prog
-
-    if request.method == 'POST':
-        try:
-            if request.content_type and 'application/json' in request.content_type:
-                data = json.loads(request.body)
-            else:
-                data = request.POST
-            vocab_id = int(data.get('vocab_id', 0))
-            correct = str(data.get('correct', 'false')).lower() in ('true', '1', 'yes')
-            vocab = get_object_or_404(Vocabulary, id=vocab_id)
-            prog, _ = VocabularyProgress.objects.get_or_create(student=student, vocabulary=vocab)
-            prog.record_answer(correct)
-            return JsonResponse({
-                'stage': prog.stage,
-                'correct_count': prog.correct_count,
-                'incorrect_count': prog.incorrect_count,
-                'interval_days': prog.interval_days,
-                'next_review_date': prog.next_review_date.isoformat(),
-            })
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-    vocab_json = json.dumps([{
-        'id': v.id,
-        'word': v.word,
-        'definition': v.definition,
-        'example_sentence': v.example_sentence,
-        'translation': v.translation,
-        'part_of_speech': v.part_of_speech,
-        'stage': progress_map.get(v.id, {}).get('stage', 0) if isinstance(progress_map.get(v.id), dict) else getattr(progress_map.get(v.id), 'stage', 0),
-    } for v in vocab_qs])
-
-    return render(request, 'student_template/vocabulary_quiz.html', {
-        'vocab_json': vocab_json,
-        'page_title': 'Vocabulary Quiz',
-    })
-
-
-@student_only
-def vocabulary_voice(request):
-    student = get_object_or_404(Student, admin=request.user)
-    enrolled_group_ids = list(
-        Enrollment.objects.filter(student=student, is_active=True)
-        .values_list('group_id', flat=True)
-    )
-
-    vocab_qs = _vocab_queryset_for_student(student, enrolled_group_ids)
-
-    progress_map = {}
-    for v in vocab_qs:
-        prog, _ = VocabularyProgress.objects.get_or_create(
-            student=student, vocabulary=v
-        )
-        progress_map[v.id] = prog
-
-    vocab_json = json.dumps([{
-        'id': v.id,
-        'word': v.word,
-        'definition': v.definition,
-        'example_sentence': v.example_sentence,
-        'translation': v.translation,
-        'part_of_speech': v.part_of_speech,
-        'stage': progress_map.get(v.id, {}).get('stage', 0) if isinstance(progress_map.get(v.id), dict) else getattr(progress_map.get(v.id), 'stage', 0),
-    } for v in vocab_qs])
-
-    return render(request, 'student_template/vocabulary_voice.html', {
-        'vocab_json': vocab_json,
-        'page_title': 'Voice Practice',
-    })
-
-
 @student_only
 def vocabulary_day_list(request):
     """Show all released vocabulary days for this student's enrolled groups."""
@@ -943,19 +719,6 @@ def student_progress(request):
     )
     completions_line = [completions_qs.get(d, 0) for d in days_30]
 
-    # ── Cumulative vocab mastered (words where stage=MASTERED, by last_seen) ─
-    mastered_qs = dict(
-        VocabularyProgress.objects.filter(
-            student=student,
-            stage=VocabularyProgress.STAGE_MASTERED,
-            last_seen__isnull=False,
-        )
-        .annotate(d=TruncDate('last_seen'))
-        .values('d').annotate(cnt=Count('id'))
-        .values_list('d', 'cnt')
-    )
-    mastered_line = [mastered_qs.get(d, 0) for d in days_30]
-
     # ── Quiz scores per day (average if multiple) ─────────────────────────────
     quiz_qs = dict(
         VocabularyQuizResult.objects.filter(student=student)
@@ -982,24 +745,19 @@ def student_progress(request):
         release_at__lte=tz.now(),
     ).count()
     total_completed = VocabularyDayCompletion.objects.filter(student=student).count()
-    total_mastered = VocabularyProgress.objects.filter(
-        student=student, stage=VocabularyProgress.STAGE_MASTERED
-    ).count()
     recent_quiz = VocabularyQuizResult.objects.filter(student=student).first()
 
-    has_any_data = any(completions_line) or any(mastered_line) or any(q is not None for q in quiz_line)
+    has_any_data = any(completions_line) or any(q is not None for q in quiz_line)
 
     context = {
         'date_labels': json.dumps(date_labels),
         'completions_line': json.dumps(completions_line),
-        'mastered_line': json.dumps(mastered_line),
         'quiz_line': json.dumps(quiz_line),
         'exam_labels': json.dumps(exam_labels),
         'exam_totals': json.dumps(exam_totals),
         'has_any_data': has_any_data,
         'total_days_available': total_days_available,
         'total_completed': total_completed,
-        'total_mastered': total_mastered,
         'recent_quiz': recent_quiz,
         'results': results,
         'is_english': student.is_english_student,
@@ -1009,28 +767,16 @@ def student_progress(request):
     return render(request, 'student_template/student_progress.html', context)
 
 
-@student_only
-def vocabulary_progress_update(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'POST required'}, status=405)
+from django.contrib.auth.decorators import login_required
 
-    student = get_object_or_404(Student, admin=request.user)
-    try:
-        if request.content_type and 'application/json' in request.content_type:
-            data = json.loads(request.body)
-        else:
-            data = request.POST
-        vocab_id = int(data.get('vocab_id', 0))
-        correct = str(data.get('correct', '0')) in ('1', 'true', 'True', 'yes')
-        vocab = get_object_or_404(Vocabulary, id=vocab_id)
-        prog, _ = VocabularyProgress.objects.get_or_create(student=student, vocabulary=vocab)
-        prog.record_answer(correct)
-        return JsonResponse({
-            'stage': prog.stage,
-            'correct_count': prog.correct_count,
-            'incorrect_count': prog.incorrect_count,
-            'interval_days': prog.interval_days,
-            'next_review_date': prog.next_review_date.isoformat(),
-        })
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
+@login_required
+def save_avatar(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error'}, status=405)
+    avatar = request.POST.get('avatar', '')
+    valid = [str(i) for i in range(1, 25)] + ['']
+    if avatar not in valid:
+        return JsonResponse({'status': 'error', 'message': 'Invalid avatar'}, status=400)
+    request.user.avatar = avatar
+    request.user.save(update_fields=['avatar'])
+    return JsonResponse({'status': 'ok', 'avatar': avatar})
