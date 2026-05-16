@@ -172,7 +172,7 @@
             {% url 'student_view_attendance' as u_att %}
             {% url 'student_view_result' as u_results %}
             {% url 'student_view_notification' as u_notifs %}
-            {% url 'student_view_profile' as u_profile %}
+            {% url 'view_books' as u_library %}
             <a href="{{ u_home }}" class="bottom-nav-item {% if u_home == request.path %}active{% endif %}">
                 <i class="fas fa-home"></i><span>Home</span>
             </a>
@@ -186,8 +186,8 @@
                 <i class="fas fa-bell"></i><span>Alerts</span>
                 {% if unread_notification_count > 0 %}<span class="notif-dot"></span>{% endif %}
             </a>
-            <a href="{{ u_profile }}" class="bottom-nav-item {% if 'profile' in request.path %}active{% endif %}">
-                <i class="fas fa-user"></i><span>Profile</span>
+            <a href="{{ u_library }}" class="bottom-nav-item {% if 'book' in request.path %}active{% endif %}">
+                <i class="fas fa-book"></i><span>Library</span>
             </a>
         {% endif %}
     </nav>
