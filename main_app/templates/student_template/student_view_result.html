@@ -1,295 +1,110 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-
-{% block title %}{{ page_title }} — Iceberg Study Center{% endblock %}
-{% block page_title %}{{ page_title }}{% endblock %}
+{% block title %}Results — Iceberg Study Center{% endblock %}
+{% block page_title %}Results{% endblock %}
 {% block breadcrumb %}<li class="breadcrumb-item active">Results</li>{% endblock %}
 
 {% block custom_css %}
 <style>
-/* ── Page shell ─────────────────────────────────────────────── */
 .stu-page {
-  --c-bg: #F4F7FB;
-  --c-surface: #FFFFFF;
   --c-text: #0F172A;
   --c-muted: #64748B;
   --c-border: #E6ECF5;
-  --c-blue: #2563EB;
-  --c-sky: #3B82F6;
-  --c-blue-bg: #E8F0FE;
-  --c-blue-soft: #DBEAFE;
+  --c-surface: #FFFFFF;
+  --c-bg: #F4F7FB;
   --c-royal: #1F4FD9;
-  --c-navy-a: #0F1F5C;
-  --c-navy-b: #1340A8;
+  --c-sky: #3B82F6;
   --c-success: #10B981;
   --c-warning: #F59E0B;
-  --c-danger:  #EF4444;
+  --c-danger: #EF4444;
   background: var(--c-bg);
   margin: -24px;
   padding: 18px 16px 32px;
   min-height: 100%;
-  color: var(--c-text);
   font-family: 'Inter', sans-serif;
 }
-@media (min-width: 640px) {
-  .stu-page { padding: 24px 28px 40px; }
-}
+@media (min-width: 640px) { .stu-page { padding: 24px 28px 40px; } }
 
-/* ── Hero ───────────────────────────────────────────────────── */
-.res-hero {
-  position: relative;
-  padding: 14px 6px 22px;
-  overflow: hidden;
-}
+/* Hero */
+.res-hero { position: relative; padding: 14px 6px 22px; overflow: hidden; }
 .res-hero-bg {
-  position: absolute;
-  top: -40px;
-  right: -60px;
-  width: 280px;
-  height: auto;
-  opacity: .45;
-  pointer-events: none;
-  transform: rotate(8deg);
-  filter: saturate(.7);
-  z-index: 0;
+  position: absolute; top: -40px; right: -60px;
+  width: 280px; opacity: .4; pointer-events: none;
+  transform: rotate(8deg); filter: saturate(.7);
 }
+@media (min-width: 640px) { .res-hero-bg { width: 320px; right: -40px; } }
 .res-hero-inner { position: relative; z-index: 1; max-width: 70%; }
-.res-h1 {
-  font-family: 'Inter', serif;
-  font-weight: 900;
-  font-size: 30px;
-  line-height: 1.08;
-  letter-spacing: -0.8px;
-  margin: 0 0 6px;
-  color: var(--c-text);
-}
-.res-sub {
-  margin: 0;
-  color: var(--c-muted);
-  font-size: 13px;
-  font-weight: 500;
-}
-@media (min-width: 640px) {
-  .res-h1 { font-size: 38px; }
-  .res-hero-bg { width: 320px; right: -40px; }
-}
+.res-h1 { font-weight: 900; font-size: 30px; line-height: 1.08; letter-spacing: -.8px; margin: 0 0 6px; color: var(--c-text); }
+.res-sub { margin: 0; color: var(--c-muted); font-size: 13px; font-weight: 500; }
+@media (min-width: 640px) { .res-h1 { font-size: 38px; } }
 
-/* ── Summary navy card ──────────────────────────────────────── */
+/* Summary banner */
 .res-summary {
   background: linear-gradient(135deg, #0F1F5C, #1340A8);
-  border-radius: 22px;
-  color: #fff;
-  padding: 22px 20px;
-  box-shadow: 0 10px 30px rgba(15,31,92,.25);
-  margin-bottom: 18px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  align-items: stretch;
+  border-radius: 22px; color: #fff; padding: 22px 20px;
+  box-shadow: 0 10px 30px rgba(15,31,92,.25); margin-bottom: 18px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
 }
-.res-summary-stat {
-  text-align: center;
-  position: relative;
+.res-stat { text-align: center; position: relative; padding: 4px 8px; }
+.res-stat + .res-stat::before {
+  content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+  width: 1px; background: rgba(255,255,255,.2);
 }
-.res-summary-stat + .res-summary-stat::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 8px; bottom: 8px;
-  width: 1px;
-  background: rgba(255,255,255,.18);
-}
-.res-summary-num {
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: -1px;
-  line-height: 1;
-  color: #fff;
-}
-.res-summary-lbl {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: rgba(219,234,254,.85);
-  margin-top: 8px;
-}
-@media (min-width: 640px) {
-  .res-summary { padding: 26px 24px; }
-  .res-summary-num { font-size: 38px; }
-}
+.res-stat-num { font-size: 32px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+.res-stat-lbl { font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: rgba(219,234,254,.85); margin-top: 7px; }
 
-/* ── Result cards ───────────────────────────────────────────── */
+/* Result cards */
 .res-card {
-  background: var(--c-surface);
-  border-radius: 20px;
-  box-shadow: 0 6px 24px rgba(15,23,42,.06);
-  overflow: hidden;
-  margin-bottom: 18px;
-  transition: transform .18s, box-shadow .18s;
+  background: var(--c-surface); border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(15,23,42,.06); overflow: hidden;
+  margin-bottom: 16px; transition: transform .18s, box-shadow .18s;
 }
-.res-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(15,23,42,.1);
-}
+.res-card:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(15,23,42,.1); }
 .res-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--c-border);
-  background: #FAFCFF;
-  gap: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--c-border);
+  background: #FAFCFF; gap: 12px;
 }
-.res-group {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--c-text);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.res-group-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 4px;
-  background: var(--c-blue);
-  flex-shrink: 0;
-}
-.grade-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: .5px;
-  flex-shrink: 0;
-}
+.res-group { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 800; color: var(--c-text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.res-group-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.grade-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 30px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 900; flex-shrink: 0; }
 .grade-A { background: #D1FAE5; color: #065F46; }
 .grade-B { background: #DBEAFE; color: #1E3A8A; }
 .grade-C { background: #FEF3C7; color: #92400E; }
 .grade-D { background: #FFEDD5; color: #7C2D12; }
 .grade-F { background: #FEE2E2; color: #991B1B; }
 
-.res-card-body {
-  padding: 18px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-@media (max-width: 480px) {
-  .res-card-body { grid-template-columns: 1fr; gap: 14px; }
-}
+.res-card-body { padding: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media (max-width: 480px) { .res-card-body { grid-template-columns: 1fr; } }
 
-.res-score {
-  padding: 4px 2px;
-}
-.res-score + .res-score {
-  border-left: 1px solid var(--c-border);
-  padding-left: 14px;
-}
-@media (max-width: 480px) {
-  .res-score + .res-score { border-left: none; border-top: 1px solid var(--c-border); padding-left: 2px; padding-top: 12px; }
-}
-.res-score-lbl {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--c-muted);
-  margin-bottom: 8px;
-}
-.res-score-val {
-  font-size: 28px;
-  font-weight: 900;
-  line-height: 1;
-  color: var(--c-text);
-  letter-spacing: -1px;
-  margin-bottom: 10px;
-}
-.res-bar {
-  height: 6px;
-  background: #EEF2F8;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-.res-bar-fill {
-  height: 100%;
-  background: var(--c-royal);
-  border-radius: 999px;
-  transition: width .5s ease;
-}
-.res-bar-fill.fill-test  { background: var(--c-sky); }
-.res-bar-fill.fill-exam  { background: var(--c-blue); }
-.res-bar-fill.fill-good  { background: var(--c-success); }
-.res-bar-fill.fill-warn  { background: var(--c-warning); }
-.res-bar-fill.fill-bad   { background: var(--c-danger); }
-.res-score-sub {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--c-muted);
-}
+.res-score { padding: 4px 0; }
+.res-score + .res-score { border-left: 1px solid var(--c-border); padding-left: 14px; }
+@media (max-width: 480px) { .res-score + .res-score { border-left: none; border-top: 1px solid var(--c-border); padding-left: 0; padding-top: 12px; } }
+.res-score-lbl { font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--c-muted); margin-bottom: 8px; }
+.res-score-val { font-size: 28px; font-weight: 900; line-height: 1; letter-spacing: -1px; margin-bottom: 10px; }
+.res-bar { height: 6px; background: #EEF2F8; border-radius: 999px; overflow: hidden; margin-bottom: 6px; }
+.res-bar-fill { height: 100%; border-radius: 999px; }
+.fill-test { background: var(--c-sky); }
+.fill-exam { background: var(--c-royal); }
+.fill-good { background: var(--c-success); }
+.fill-warn { background: var(--c-warning); }
+.fill-bad  { background: var(--c-danger); }
+.res-score-sub { font-size: 11px; font-weight: 600; color: var(--c-muted); }
 
-/* ── Empty state ────────────────────────────────────────────── */
-.res-empty {
-  background: var(--c-surface);
-  border-radius: 20px;
-  box-shadow: 0 6px 24px rgba(15,23,42,.06);
-  padding: 56px 24px;
-  text-align: center;
-}
-.res-empty-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
-  background: var(--c-blue-bg);
-  color: var(--c-royal);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  margin-bottom: 16px;
-}
-.res-empty-title {
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--c-text);
-  margin: 0 0 8px;
-}
-.res-empty-sub {
-  font-size: 13px;
-  color: var(--c-muted);
-  max-width: 320px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-/* Dark mode */
-.dark-mode .stu-page { background: #0B1220; color: #E2E8F0; }
-.dark-mode .res-h1 { color: #F1F5F9; }
-.dark-mode .res-card { background: #131C30; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
-.dark-mode .res-card-head { background: #0F1827; border-color: #1E293B; }
-.dark-mode .res-score + .res-score { border-color: #1E293B; }
-.dark-mode .res-group, .dark-mode .res-score-val { color: #F1F5F9; }
-.dark-mode .res-bar { background: #1A2238; }
-.dark-mode .res-empty { background: #131C30; }
+/* Empty state */
+.res-empty { background: var(--c-surface); border-radius: 20px; box-shadow: 0 6px 24px rgba(15,23,42,.06); padding: 56px 24px; text-align: center; }
+.res-empty-icon { width: 64px; height: 64px; border-radius: 20px; background: #E8F0FE; color: var(--c-royal); display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 16px; }
+.res-empty-title { font-size: 16px; font-weight: 900; color: var(--c-text); margin: 0 0 8px; }
+.res-empty-sub { font-size: 13px; color: var(--c-muted); max-width: 320px; margin: 0 auto; line-height: 1.6; }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
 <div class="stu-page">
 
-  <!-- 1. Hero -->
+  <!-- Hero -->
   <section class="res-hero">
-    <img src="{% static 'dist/img/logo.png' %}" alt="" class="res-hero-bg">
+    <img src="{% static 'dist/img/logo.png' %}" alt="" class="res-hero-bg" aria-hidden="true">
     <div class="res-hero-inner">
       <h1 class="res-h1">Results</h1>
       <p class="res-sub">Your scores across every group.</p>
@@ -298,150 +113,70 @@
 
   {% if results %}
 
-  <!-- 2. Summary card (3 stats) -->
-  {% with subjects_count=results|length %}
+  <!-- Summary banner -->
   <section class="res-summary">
-    <div class="res-summary-stat">
-      <div class="res-summary-num">{{ subjects_count }}</div>
-      <div class="res-summary-lbl">Subjects assessed</div>
+    <div class="res-stat">
+      <div class="res-stat-num">{{ subject_count }}</div>
+      <div class="res-stat-lbl">Subjects assessed</div>
     </div>
-
-    {# Compute averages and pass count manually in template #}
-    {% with sum_total=0 pass_count=0 %}
-      {# We loop once to accumulate then display — Django templates do not support mutation,
-         so we use a small inline trick: render all stats inside a with that re-loops. #}
-    {% endwith %}
-
-    {# Average score — sum then divide via widthratio trickery #}
-    {% with avg_calc=results %}
-    <div class="res-summary-stat">
-      <div class="res-summary-num">
-        {# Sum total scores #}
-        {% with total_sum=0 %}
-          {# Use forloop with a comma-joined list approach for simple math #}
-        {% endwith %}
-        {# Manual summation via templatetag fallback: just show latest as approximation
-           but we want true average, so do an inline pythonic loop using regroup is not possible.
-           Use Django's |add filter inside loop accumulator pattern. #}
-        {% if subjects_count > 0 %}
-          {% with running_total=0 %}
-            {% for r in results %}
-              {% with rt=r.test|add:r.exam %}
-                {% if forloop.first %}
-                  {# start #}
-                {% endif %}
-              {% endwith %}
-            {% endfor %}
-            {# Because Django can't mutate variables in a loop, use a helper:
-               compute via widthratio on an aggregated value passed from view if available;
-               here we compute by summing in a JS-free way using forloop.last trick: #}
-          {% endwith %}
-        {% endif %}
-        {# Fallback: compute via a single-pass templated trick using regroup-less approach.
-           We render the sum by abusing an inline list. #}
-        <span id="res-avg-placeholder">—</span>
-      </div>
-      <div class="res-summary-lbl">Average score</div>
+    <div class="res-stat">
+      <div class="res-stat-num">{{ avg_score }}%</div>
+      <div class="res-stat-lbl">Average score</div>
     </div>
-    {% endwith %}
-
-    <div class="res-summary-stat">
-      <div class="res-summary-num">
-        {# Count of results where test+exam >= 45 — done by JS post-render below as a robust fallback. #}
-        <span id="res-pass-placeholder">—</span>
-      </div>
-      <div class="res-summary-lbl">Above pass mark</div>
+    <div class="res-stat">
+      <div class="res-stat-num">{{ pass_count }}</div>
+      <div class="res-stat-lbl">Above pass mark</div>
     </div>
   </section>
-  {% endwith %}
 
-  <!-- 3. Result cards -->
+  <!-- Result cards -->
   {% for r in results %}
-    {% with total=r.test|add:r.exam %}
-    <article class="res-card" data-total="{{ total }}">
-      <div class="res-card-head">
-        <div class="res-group">
-          <span class="res-group-dot" style="background: {% cycle '#2563EB' '#10B981' '#F59E0B' '#8B5CF6' '#EC4899' '#06B6D4' %};"></span>
-          {% if r.group %}{{ r.group.name }}{% else %}General{% endif %}
-        </div>
-        <span class="grade-badge {% if total >= 90 %}grade-A{% elif total >= 75 %}grade-B{% elif total >= 60 %}grade-C{% elif total >= 45 %}grade-D{% else %}grade-F{% endif %}">
-          {% if total >= 90 %}A{% elif total >= 75 %}B{% elif total >= 60 %}C{% elif total >= 45 %}D{% else %}F{% endif %}
-        </span>
+  <article class="res-card">
+    <div class="res-card-head">
+      <div class="res-group">
+        <span class="res-group-dot" style="background:{% cycle '#2563EB' '#10B981' '#F59E0B' '#8B5CF6' '#EC4899' '#06B6D4' %};"></span>
+        {% if r.group %}{{ r.group.name }}{% else %}General{% endif %}
       </div>
-
-      <div class="res-card-body">
-        <!-- Test -->
-        <div class="res-score">
-          <div class="res-score-lbl">Test</div>
-          <div class="res-score-val">{{ r.test }}</div>
-          <div class="res-bar">
-            <div class="res-bar-fill fill-test" style="width: {% widthratio r.test 40 100 %}%;"></div>
-          </div>
-          <div class="res-score-sub">out of 40</div>
-        </div>
-
-        <!-- Exam -->
-        <div class="res-score">
-          <div class="res-score-lbl">Exam</div>
-          <div class="res-score-val">{{ r.exam }}</div>
-          <div class="res-bar">
-            <div class="res-bar-fill fill-exam" style="width: {% widthratio r.exam 60 100 %}%;"></div>
-          </div>
-          <div class="res-score-sub">out of 60</div>
-        </div>
-
-        <!-- Total -->
-        <div class="res-score">
-          <div class="res-score-lbl">Total</div>
-          <div class="res-score-val">{{ total }}</div>
-          <div class="res-bar">
-            <div class="res-bar-fill {% if total >= 75 %}fill-good{% elif total >= 45 %}fill-warn{% else %}fill-bad{% endif %}" style="width: {{ total }}%;"></div>
-          </div>
-          <div class="res-score-sub">out of 100</div>
-        </div>
+      <span class="grade-badge {% if r.total >= 90 %}grade-A{% elif r.total >= 75 %}grade-B{% elif r.total >= 60 %}grade-C{% elif r.total >= 45 %}grade-D{% else %}grade-F{% endif %}">
+        {% if r.total >= 90 %}A{% elif r.total >= 75 %}B{% elif r.total >= 60 %}C{% elif r.total >= 45 %}D{% else %}F{% endif %}
+      </span>
+    </div>
+    <div class="res-card-body">
+      <!-- Test -->
+      <div class="res-score">
+        <div class="res-score-lbl">Test</div>
+        <div class="res-score-val">{{ r.test|floatformat:0 }}</div>
+        <div class="res-bar"><div class="res-bar-fill fill-test" style="width:{% widthratio r.test 40 100 %}%;"></div></div>
+        <div class="res-score-sub">out of 40</div>
       </div>
-    </article>
-    {% endwith %}
+      <!-- Exam -->
+      <div class="res-score">
+        <div class="res-score-lbl">Exam</div>
+        <div class="res-score-val">{{ r.exam|floatformat:0 }}</div>
+        <div class="res-bar"><div class="res-bar-fill fill-exam" style="width:{% widthratio r.exam 60 100 %}%;"></div></div>
+        <div class="res-score-sub">out of 60</div>
+      </div>
+      <!-- Total -->
+      <div class="res-score">
+        <div class="res-score-lbl">Total</div>
+        <div class="res-score-val" style="color:{% if r.total >= 75 %}#10B981{% elif r.total >= 45 %}#F59E0B{% else %}#EF4444{% endif %};">{{ r.total }}</div>
+        <div class="res-bar"><div class="res-bar-fill {% if r.total >= 75 %}fill-good{% elif r.total >= 45 %}fill-warn{% else %}fill-bad{% endif %}" style="width:{{ r.total }}%;"></div></div>
+        <div class="res-score-sub">out of 100</div>
+      </div>
+    </div>
+  </article>
   {% endfor %}
 
   {% else %}
 
-  <!-- 4. Empty state -->
+  <!-- Empty state -->
   <div class="res-empty">
     <div class="res-empty-icon"><i class="fas fa-chart-bar"></i></div>
     <h2 class="res-empty-title">No Results Yet</h2>
-    <p class="res-empty-sub">
-      Your academic results will appear here once your teachers have entered scores.
-      Check back after your assessments.
-    </p>
+    <p class="res-empty-sub">Your academic results will appear here once your teachers have entered scores.</p>
   </div>
 
   {% endif %}
 
 </div>
 {% endblock content %}
-
-{% block custom_js %}
-<script>
-(function () {
-  /* Compute average and pass-mark count from rendered cards.
-     Django templates can't easily mutate accumulators, so we read totals
-     from the data-total attribute on each .res-card and fill in the numbers. */
-  var cards = document.querySelectorAll('.res-card[data-total]');
-  if (!cards.length) return;
-  var sum = 0;
-  var passed = 0;
-  cards.forEach(function (c) {
-    var t = parseInt(c.getAttribute('data-total'), 10) || 0;
-    sum += t;
-    if (t >= 45) passed++;
-  });
-  var avg = Math.round(sum / cards.length);
-
-  var avgEl  = document.getElementById('res-avg-placeholder');
-  var passEl = document.getElementById('res-pass-placeholder');
-  if (avgEl)  avgEl.textContent  = avg;
-  if (passEl) passEl.textContent = passed;
-})();
-</script>
-{% endblock custom_js %}

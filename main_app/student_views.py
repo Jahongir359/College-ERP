@@ -332,11 +332,24 @@ def student_view_result(request):
     enrolled_group_ids = Enrollment.objects.filter(
         student=student, is_active=True
     ).values_list('group_id', flat=True)
-    results = StudentResult.objects.filter(
-        student=student, group_id__in=enrolled_group_ids
-    ).select_related('group')
+    results = list(
+        StudentResult.objects.filter(
+            student=student, group_id__in=enrolled_group_ids
+        ).select_related('group')
+    )
+    # Annotate each result with an integer total for clean template rendering
+    for r in results:
+        r.total = int(r.test) + int(r.exam)
+
+    subject_count = len(results)
+    avg_score = round(sum(r.total for r in results) / subject_count) if subject_count else 0
+    pass_count = sum(1 for r in results if r.total >= 45)
+
     context = {
         'results': results,
+        'subject_count': subject_count,
+        'avg_score': avg_score,
+        'pass_count': pass_count,
         'page_title': "View Results",
     }
     return render(request, "student_template/student_view_result.html", context)
