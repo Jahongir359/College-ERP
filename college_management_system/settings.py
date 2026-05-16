@@ -261,7 +261,7 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
-LOGIN_URL = '/'
+LOGIN_URL = '/login/'
 
 # ---------------------------------------------------------------------------
 # Logging — surface 500 errors in Digital Ocean App Platform logs

@@ -52,11 +52,8 @@ def _redirect_authenticated_user(user):
 
 
 def entry_page(request):
-    """Root URL — branded entry splash + welcome question page.
-
-    Everyone sees the animation. Authenticated users who click YES are
-    routed through login_page which detects auth and redirects onward.
-    """
+    """Root URL — branded entry splash + welcome question page."""
+    request.session['entry_seen'] = True
     return render(request, 'main_app/entry.html')
 
 
@@ -65,6 +62,12 @@ def login_page(request):
         destination = _redirect_authenticated_user(request.user)
         if destination:
             return destination
+    # First-time visitors who land directly on /login/ (e.g. saved bookmark)
+    # get sent through the entry animation first. Skip this when Django's
+    # @login_required is redirecting here with a ?next= destination, so that
+    # the next= parameter isn't lost.
+    if not request.session.get('entry_seen') and not request.GET.get('next'):
+        return redirect(reverse('entry_page'))
     return render(request, 'main_app/login.html')
 
 
