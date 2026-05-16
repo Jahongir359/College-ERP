@@ -1125,3 +1125,52 @@ def delete_enrollment(request, enrollment_id):
     enrollment.delete()
     messages.success(request, "Enrollment removed.")
     return redirect(reverse('manage_enrollment'))
+
+
+# ── Vocabulary (HOD/Admin) ────────────────────────────────────────────────────
+
+@admin_only
+def manage_vocabulary(request):
+    group_filter = request.GET.get('group', '')
+    vocab_qs = Vocabulary.objects.select_related('group', 'added_by').order_by('-created_at')
+    if group_filter:
+        try:
+            vocab_qs = vocab_qs.filter(group_id=int(group_filter))
+        except (ValueError, TypeError):
+            pass
+    all_groups = Group.objects.filter(is_archived=False).order_by('name')
+    return render(request, 'hod_template/manage_vocabulary.html', {
+        'vocabulary_list': vocab_qs,
+        'all_groups': all_groups,
+        'selected_group': group_filter,
+        'page_title': 'Manage Vocabulary',
+    })
+
+
+@admin_only
+def hod_add_vocabulary(request):
+    form = VocabularyForm(request.POST or None)
+    # Admin sees all groups
+    form.fields['group'].queryset = Group.objects.filter(is_archived=False).order_by('name')
+    if request.method == 'POST':
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.added_by = request.user
+            obj.save()
+            messages.success(request, f"Word '{obj.word}' added successfully!")
+            return redirect(reverse('manage_vocabulary'))
+        else:
+            messages.error(request, "Please correct the errors below.")
+    return render(request, 'hod_template/add_vocabulary_template.html', {
+        'form': form,
+        'page_title': 'Add Vocabulary Word',
+    })
+
+
+@admin_only
+def delete_vocabulary_admin(request, vocab_id):
+    vocab = get_object_or_404(Vocabulary, id=vocab_id)
+    word = vocab.word
+    vocab.delete()
+    messages.success(request, f"Word '{word}' deleted.")
+    return redirect(reverse('manage_vocabulary'))

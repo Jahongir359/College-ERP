@@ -352,3 +352,27 @@ class IssueBookForm(forms.Form):
                     "This student already has an active loan for this book."
                 )
         return cleaned
+
+
+class VocabularyForm(forms.ModelForm):
+    class Meta:
+        model = models.Vocabulary
+        fields = ['word', 'definition', 'example_sentence', 'translation',
+                  'part_of_speech', 'group']
+        widgets = {
+            'word': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Diligent'}),
+            'definition': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Clear English definition'}),
+            'example_sentence': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'She was diligent in her studies.'}),
+            'translation': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional native-language translation'}),
+            'part_of_speech': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'noun / verb / adjective…'}),
+            'group': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['group'].queryset = models.Group.objects.filter(is_archived=False)
+        self.fields['group'].required = False
+        self.fields['group'].empty_label = '— All students (no group filter) —'
+        self.fields['example_sentence'].required = False
+        self.fields['translation'].required = False
+        self.fields['part_of_speech'].required = False

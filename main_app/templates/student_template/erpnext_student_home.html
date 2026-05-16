@@ -1,595 +1,271 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-
-{% block title %}Student Dashboard — Iceberg Study Center{% endblock %}
-{% block page_title %}Student Dashboard{% endblock %}
+{% block title %}Dashboard — Iceberg Study Center{% endblock %}
+{% block page_title %}My Dashboard{% endblock %}
 {% block breadcrumb %}<li class="breadcrumb-item active">Dashboard</li>{% endblock %}
 
 {% block custom_css %}
 <style>
-/* ── Page shell ─────────────────────────────────────────────── */
-.stu-page {
-  --c-bg: #F4F7FB;
-  --c-surface: #FFFFFF;
-  --c-text: #0F172A;
-  --c-muted: #64748B;
-  --c-border: #E6ECF5;
-  --c-blue: #2563EB;
-  --c-sky: #3B82F6;
-  --c-blue-bg: #E8F0FE;
-  --c-blue-soft: #DBEAFE;
-  --c-royal: #1F4FD9;
-  --c-navy-a: #0F1F5C;
-  --c-navy-b: #1340A8;
-  --c-success: #10B981;
-  --c-warning: #F59E0B;
-  --c-danger:  #EF4444;
-  background: var(--c-bg);
-  margin: -24px -24px -24px -24px;
-  padding: 18px 16px 32px;
-  min-height: 100%;
-  color: var(--c-text);
-  font-family: 'Inter', sans-serif;
-}
-@media (min-width: 640px) {
-  .stu-page { padding: 24px 28px 40px; margin: -24px; }
-}
+  .stu-page { display: flex; flex-direction: column; gap: 20px; padding-bottom: 24px; }
 
-/* ── Hero ───────────────────────────────────────────────────── */
-.stu-hero {
-  position: relative;
-  padding: 14px 6px 22px;
-  overflow: hidden;
-}
-.stu-hero-bg {
-  position: absolute;
-  top: -40px;
-  right: -60px;
-  width: 280px;
-  height: auto;
-  opacity: .45;
-  pointer-events: none;
-  transform: rotate(8deg);
-  filter: saturate(.7);
-  z-index: 0;
-}
-.stu-hero-inner { position: relative; z-index: 1; max-width: 70%; }
-.stu-h1 {
-  font-family: 'Inter', serif;
-  font-weight: 900;
-  font-size: 30px;
-  line-height: 1.08;
-  letter-spacing: -0.8px;
-  margin: 0 0 6px;
-  color: var(--c-text);
-}
-.stu-sub {
-  margin: 0;
-  color: var(--c-muted);
-  font-size: 13px;
-  font-weight: 500;
-}
-@media (min-width: 640px) {
-  .stu-h1 { font-size: 38px; }
-  .stu-hero-bg { width: 320px; right: -40px; }
-}
+  /* Hero */
+  .stu-hero {
+    position: relative; overflow: hidden;
+    padding: 28px 24px 20px;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(15,23,42,.06);
+  }
+  .stu-hero-img {
+    position: absolute; top: -10px; right: -20px;
+    width: 220px; opacity: .35;
+    pointer-events: none; transform: rotate(8deg);
+  }
+  .stu-greeting { position: relative; z-index: 1; font-size: clamp(22px,5vw,29px); font-weight: 900; color: #0F172A; letter-spacing: -.3px; line-height: 1.2; }
+  .stu-greeting-sub { margin-top: 4px; font-size: 14px; color: #64748B; position: relative; z-index: 1; }
 
-/* ── Cards ──────────────────────────────────────────────────── */
-.stu-card {
-  background: var(--c-surface);
-  border-radius: 20px;
-  box-shadow: 0 6px 24px rgba(15,23,42,.06);
-  padding: 18px;
-  margin-bottom: 18px;
-}
-@media (min-width: 640px) { .stu-card { padding: 22px; } }
+  /* Navy stats card */
+  .stu-progress-card {
+    margin: 0 16px; padding: 20px; border-radius: 22px;
+    background: linear-gradient(135deg, #0F1F5C 0%, #1340A8 100%);
+    color: #fff; box-shadow: 0 12px 32px rgba(15,31,92,.28);
+  }
+  .stu-progress-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .stu-progress-title { font-size: 14px; font-weight: 600; opacity: .82; }
+  .stu-progress-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    background: rgba(255,255,255,.14); font-size: 12px; font-weight: 700;
+  }
+  .stu-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .stu-stat-tile { padding: 4px 8px 8px; text-align: center; border-right: 1px solid rgba(255,255,255,.14); }
+  .stu-stat-tile:last-child { border-right: none; }
+  .stu-stat-icon-wrap {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(255,255,255,.15); margin-bottom: 10px; font-size: 18px;
+  }
+  .stu-stat-label { font-size: 12px; opacity: .75; margin-bottom: 4px; }
+  .stu-stat-value { font-size: 26px; font-weight: 900; line-height: 1; }
+  .stu-stat-desc { font-size: 11px; opacity: .68; margin-top: 3px; }
 
-.stu-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-.stu-card-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--c-text);
-  letter-spacing: -.2px;
-}
-.stu-card-link {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--c-blue);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-.stu-card-link:hover { color: var(--c-royal); text-decoration: none; }
+  /* Combo card */
+  .stu-combo {
+    margin: 0 16px; display: grid; grid-template-columns: 1fr 1fr;
+    background: #fff; border-radius: 20px; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15,23,42,.07);
+  }
+  .stu-combo-half { padding: 18px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .stu-combo-half:first-child { border-right: 1px solid #F1F5F9; }
+  .stu-combo-icon { width: 44px; height: 44px; border-radius: 13px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; margin-bottom: 6px; }
+  .stu-combo-sup { font-size: 11px; color: #94A3B8; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  .stu-combo-title { font-size: 15px; font-weight: 800; color: #0F172A; line-height: 1.25; }
+  .stu-combo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .stu-combo-time { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #64748B; }
+  .stu-combo-room { padding: 3px 9px; border-radius: 999px; background: #E8F0FE; color: #1F4FD9; font-size: 11px; font-weight: 700; }
+  .stu-result-score { font-size: 28px; font-weight: 900; color: #10B981; line-height: 1; }
+  .stu-view-btn {
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
+    padding: 6px 12px; border-radius: 8px; border: 1.5px solid #10B981;
+    color: #10B981; font-size: 12px; font-weight: 700; text-decoration: none; width: fit-content;
+    transition: background .15s, color .15s;
+  }
+  .stu-view-btn:hover { background: #10B981; color: #fff; }
 
-/* ── Stat tiles row ─────────────────────────────────────────── */
-.stu-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 18px;
-}
-.stu-stat {
-  background: var(--c-surface);
-  border-radius: 18px;
-  padding: 14px 12px;
-  box-shadow: 0 6px 24px rgba(15,23,42,.06);
-  text-align: left;
-}
-.stu-stat-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  background: var(--c-blue-bg);
-  color: var(--c-royal);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-.stu-stat-val {
-  display: block;
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1;
-  color: var(--c-text);
-  letter-spacing: -.5px;
-}
-.stu-stat-lbl {
-  display: block;
-  margin-top: 6px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--c-muted);
-}
-@media (min-width: 640px) {
-  .stu-stat { padding: 18px; }
-  .stu-stat-val { font-size: 28px; }
-  .stu-stat-lbl { font-size: 11px; }
-}
+  /* Section header */
+  .stu-section-hd { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .stu-section-hd h3 { font-size: 17px; font-weight: 900; color: #0F172A; margin: 0; }
+  .stu-section-hd a { font-size: 13px; font-weight: 700; color: #1F4FD9; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
 
-/* ── Combo card (Next Up + Latest Result) ────────────────────── */
-.stu-combo {
-  display: grid;
-  grid-template-columns: 1fr 1px 1fr;
-  gap: 0;
-  padding: 0;
-  background: var(--c-surface);
-  border-radius: 20px;
-  box-shadow: 0 6px 24px rgba(15,23,42,.06);
-  margin-bottom: 18px;
-  overflow: hidden;
-}
-.stu-combo-cell {
-  padding: 16px 14px;
-  min-width: 0;
-}
-.stu-combo-div {
-  background: var(--c-border);
-  width: 1px;
-}
-.stu-combo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: #fff;
-  margin-bottom: 10px;
-}
-.stu-combo-icon.navy { background: var(--c-navy-a); }
-.stu-combo-icon.sky  { background: var(--c-sky); }
-.stu-combo-lbl {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--c-muted);
-  margin-bottom: 4px;
-}
-.stu-combo-title {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--c-text);
-  line-height: 1.25;
-  margin-bottom: 6px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-.stu-combo-meta {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--c-muted);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-.stu-combo-score {
-  font-size: 24px;
-  font-weight: 900;
-  color: var(--c-royal);
-  letter-spacing: -.5px;
-  line-height: 1;
-  margin-top: 4px;
-}
-.stu-combo-dash {
-  font-size: 24px;
-  font-weight: 900;
-  color: var(--c-border);
-  line-height: 1;
-}
-@media (min-width: 640px) {
-  .stu-combo-cell { padding: 20px; }
-  .stu-combo-title { font-size: 15px; }
-  .stu-combo-score { font-size: 28px; }
-}
+  /* Tasks */
+  .stu-tasks { margin: 0 16px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 16px rgba(15,23,42,.07); }
+  .stu-task-row { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid #F8FAFC; text-decoration: none; color: inherit; transition: background .12s; }
+  .stu-task-row:last-child { border-bottom: none; }
+  .stu-task-row:hover { background: #F8FAFC; }
+  .stu-task-avatar { width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .stu-task-body { flex: 1; min-width: 0; }
+  .stu-task-title { font-size: 14px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stu-task-sub { font-size: 12px; color: #94A3B8; margin-top: 1px; }
+  .stu-task-right { text-align: right; flex-shrink: 0; }
+  .stu-task-pct { font-size: 14px; font-weight: 800; color: #1F4FD9; }
+  .stu-task-bar-track { width: 80px; height: 5px; border-radius: 999px; background: #E2E8F0; margin-top: 5px; overflow: hidden; }
+  .stu-task-bar-fill { height: 100%; border-radius: 999px; background: #1F4FD9; }
+  .stu-task-chevron { margin-left: 6px; color: #CBD5E1; font-size: 12px; }
+  .stu-empty-tasks { padding: 28px; text-align: center; color: #94A3B8; font-size: 13px; }
+  .stu-empty-tasks i { font-size: 32px; display: block; margin-bottom: 10px; opacity: .3; }
 
-/* ── Task list ──────────────────────────────────────────────── */
-.stu-list { display: flex; flex-direction: column; gap: 14px; }
-.stu-row {
-  display: grid;
-  grid-template-columns: 36px 1fr auto 10px;
-  gap: 12px;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-}
-.stu-row:hover { text-decoration: none; color: inherit; }
-.stu-row-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 900;
-  flex-shrink: 0;
-}
-.stu-row-body { min-width: 0; }
-.stu-row-title {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--c-text);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.stu-row-sub {
-  font-size: 11px;
-  color: var(--c-muted);
-  margin-top: 3px;
-  font-weight: 600;
-}
-.stu-row-progress {
-  margin-top: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: #EEF2F8;
-  overflow: hidden;
-}
-.stu-row-progress-fill {
-  height: 100%;
-  background: var(--c-royal);
-  border-radius: 999px;
-}
-.stu-row-right {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--c-text);
-  text-align: right;
-  white-space: nowrap;
-}
-.stu-row-chev {
-  color: #94A3B8;
-  font-size: 11px;
-}
+  /* Vocabulary modes */
+  .stu-vocab-card { margin: 0 16px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 16px rgba(15,23,42,.07); }
+  .stu-vocab-card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 10px; border-bottom: 1px solid #F1F5F9; }
+  .stu-vocab-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #F1F5F9; }
+  .stu-vocab-mode { padding: 16px 12px; background: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: background .12s; }
+  .stu-vocab-mode:hover { background: #F8FAFC; }
+  .stu-vocab-mode-icon { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
+  .stu-vocab-mode span { font-size: 12px; font-weight: 700; color: #334155; text-align: center; }
+  .stu-vocab-mode small { font-size: 10.5px; color: #94A3B8; text-align: center; line-height: 1.3; }
 
-/* Avatar color palette by index */
-.av-0 { background: #2563EB; }
-.av-1 { background: #10B981; }
-.av-2 { background: #F59E0B; }
-.av-3 { background: #8B5CF6; }
-.av-4 { background: #EC4899; }
-.av-5 { background: #06B6D4; }
+  /* Bottom banner */
+  .stu-banner {
+    margin: 4px 16px 0; padding: 22px 24px; border-radius: 22px;
+    background: linear-gradient(135deg, #0F1F5C 0%, #1340A8 100%);
+    color: #fff; display: flex; align-items: center; gap: 18px;
+    position: relative; overflow: hidden;
+  }
+  .stu-banner::after {
+    content: ''; position: absolute; right: -30px; bottom: -30px;
+    width: 140px; height: 140px; border-radius: 999px;
+    border: 24px solid rgba(255,255,255,.08); pointer-events: none;
+  }
+  .stu-banner-icon { width: 54px; height: 54px; border-radius: 999px; background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; }
+  .stu-banner-text { font-size: 18px; font-weight: 800; line-height: 1.3; position: relative; z-index: 1; }
 
-/* ── Group list rows ────────────────────────────────────────── */
-.stu-grow {
-  display: grid;
-  grid-template-columns: 14px 1fr auto;
-  gap: 12px;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--c-border);
-}
-.stu-grow:last-child { border-bottom: none; }
-.stu-grow-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-.stu-grow-name {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--c-text);
-}
-.stu-grow-sub {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--c-muted);
-  margin-top: 2px;
-}
-.stu-pill {
-  padding: 5px 11px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
-  text-align: center;
-  min-width: 44px;
-}
-.pill-good { background: #D1FAE5; color: #065F46; }
-.pill-warn { background: #FEF3C7; color: #92400E; }
-.pill-bad  { background: #FEE2E2; color: #991B1B; }
-
-/* ── Quick links ────────────────────────────────────────────── */
-.stu-quick {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-.stu-quick a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 4px;
-  border-radius: 14px;
-  background: #F8FAFC;
-  text-decoration: none;
-  color: var(--c-text);
-  transition: background .15s, transform .15s;
-}
-.stu-quick a:hover {
-  background: var(--c-blue-bg);
-  transform: translateY(-1px);
-  color: var(--c-text);
-  text-decoration: none;
-}
-.stu-quick-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: var(--c-blue-bg);
-  color: var(--c-royal);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-}
-.stu-quick-lbl {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--c-text);
-}
-
-/* ── Empty state ────────────────────────────────────────────── */
-.stu-empty {
-  padding: 24px 16px;
-  text-align: center;
-  color: var(--c-muted);
-  font-size: 13px;
-}
-.stu-empty i {
-  display: block;
-  font-size: 28px;
-  opacity: .3;
-  margin-bottom: 10px;
-}
-
-/* Hide AdminLTE page header for cleaner mobile look (kept accessible) */
-.stu-page-shell .page-header { display: none; }
-
-/* Dark mode */
-.dark-mode .stu-page { background: #0B1220; color: #E2E8F0; }
-.dark-mode .stu-h1 { color: #F1F5F9; }
-.dark-mode .stu-card,
-.dark-mode .stu-stat,
-.dark-mode .stu-combo { background: #131C30; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
-.dark-mode .stu-combo-div { background: #1E293B; }
-.dark-mode .stu-card-title,
-.dark-mode .stu-stat-val,
-.dark-mode .stu-combo-title,
-.dark-mode .stu-row-title,
-.dark-mode .stu-row-right,
-.dark-mode .stu-grow-name { color: #F1F5F9; }
-.dark-mode .stu-row-progress,
-.dark-mode .stu-grow { border-color: #1E293B; }
-.dark-mode .stu-quick a { background: #1A2238; color: #E2E8F0; }
+  @media (max-width: 480px) {
+    .stu-combo { grid-template-columns: 1fr; }
+    .stu-combo-half:first-child { border-right: none; border-bottom: 1px solid #F1F5F9; }
+    .stu-task-bar-track { width: 56px; }
+  }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
+{% with user=request.user %}
 <div class="stu-page">
 
-  <!-- 1. Hero -->
-  <section class="stu-hero">
-    <img src="{% static 'dist/img/logo.png' %}" alt="" class="stu-hero-bg">
-    <div class="stu-hero-inner">
-      <h1 class="stu-h1">Good morning, {{ request.user.first_name|default:request.user.username }} 👋</h1>
-      <p class="stu-sub">Your progress this week</p>
-    </div>
-  </section>
+  <!-- Hero greeting -->
+  <div class="stu-hero">
+    <img src="{% static 'dist/img/logo.png' %}" alt="" class="stu-hero-img" aria-hidden="true">
+    <div class="stu-greeting">Good morning, {{ user.first_name|default:user.username }} 👋</div>
+    <div class="stu-greeting-sub">Let's make today great!</div>
+  </div>
 
-  <!-- 2. Stat tiles -->
-  <section class="stu-stats">
-    <div class="stu-stat">
-      <div class="stu-stat-icon"><i class="fas fa-calendar-check"></i></div>
-      <span class="stu-stat-val">{{ percent_present }}%</span>
-      <span class="stu-stat-lbl">This week</span>
+  <!-- Navy progress card -->
+  <div class="stu-progress-card">
+    <div class="stu-progress-header">
+      <span class="stu-progress-title">Your progress this week</span>
+      <span class="stu-progress-badge"><i class="fas fa-calendar-week"></i> This Week</span>
     </div>
-    <div class="stu-stat">
-      <div class="stu-stat-icon"><i class="fas fa-star"></i></div>
-      <span class="stu-stat-val">{{ total_attendance }}</span>
-      <span class="stu-stat-lbl">Total classes</span>
-    </div>
-    <div class="stu-stat">
-      <div class="stu-stat-icon"><i class="fas fa-trophy"></i></div>
-      <span class="stu-stat-val">#{{ total_subject }}</span>
-      <span class="stu-stat-lbl">Active groups</span>
-    </div>
-  </section>
-
-  <!-- 3. Combo card: Next Up + Latest Result -->
-  <section class="stu-combo">
-    <div class="stu-combo-cell">
-      <div class="stu-combo-icon navy"><i class="fas fa-book"></i></div>
-      <div class="stu-combo-lbl">Next Up</div>
-      <div class="stu-combo-title">
-        {% if recent_assignments %}{{ recent_assignments.0.title }}{% else %}No upcoming tasks{% endif %}
+    <div class="stu-stats-row">
+      <div class="stu-stat-tile">
+        <div class="stu-stat-icon-wrap"><i class="fas fa-calendar-check"></i></div>
+        <div class="stu-stat-label">Attendance</div>
+        <div class="stu-stat-value">{{ percent_present }}%</div>
+        <div class="stu-stat-desc">{% if percent_present >= 75 %}Excellent{% elif percent_present >= 50 %}Improving{% else %}Needs focus{% endif %}</div>
       </div>
-      <div class="stu-combo-meta">
-        <i class="far fa-clock"></i>
-        {% if recent_assignments and recent_assignments.0.due_date %}
-          Due {{ recent_assignments.0.due_date|date:"M j" }}
-        {% else %}
-          —
-        {% endif %}
+      <div class="stu-stat-tile">
+        <div class="stu-stat-icon-wrap"><i class="fas fa-star"></i></div>
+        <div class="stu-stat-label">Classes</div>
+        <div class="stu-stat-value">{{ total_attendance }}</div>
+        <div class="stu-stat-desc">Total Recorded</div>
+      </div>
+      <div class="stu-stat-tile">
+        <div class="stu-stat-icon-wrap"><i class="fas fa-trophy"></i></div>
+        <div class="stu-stat-label">Groups</div>
+        <div class="stu-stat-value">#{{ total_subject }}</div>
+        <div class="stu-stat-desc">Active Groups</div>
       </div>
     </div>
+  </div>
 
-    <div class="stu-combo-div"></div>
-
-    <div class="stu-combo-cell">
-      <div class="stu-combo-icon sky"><i class="fas fa-file-alt"></i></div>
-      <div class="stu-combo-lbl">Latest Result</div>
-      {% if latest_result %}
-        <div class="stu-combo-title">
-          {% if latest_result.group %}{{ latest_result.group.name }}{% else %}General{% endif %}
+  <!-- Next Up + Latest Result -->
+  <div class="stu-combo">
+    <div class="stu-combo-half">
+      <div class="stu-combo-icon" style="background:#1340A8;"><i class="fas fa-book-open"></i></div>
+      <div class="stu-combo-sup">Next Up</div>
+      {% if recent_assignments %}
+        <div class="stu-combo-title">{{ recent_assignments.0.title }}</div>
+        <div class="stu-combo-meta">
+          <span class="stu-combo-time"><i class="fas fa-clock"></i> Due {{ recent_assignments.0.due_date|date:"M j" }}</span>
+          <span class="stu-combo-room">{{ recent_assignments.0.group_name }}</span>
         </div>
-        <div class="stu-combo-score">{{ latest_result.test|add:latest_result.exam }}%</div>
       {% else %}
-        <div class="stu-combo-title">No results yet</div>
-        <div class="stu-combo-dash">—</div>
+        <div class="stu-combo-title">No upcoming tasks</div>
+        <div class="stu-combo-meta"><span class="stu-combo-time">All caught up!</span></div>
       {% endif %}
     </div>
-  </section>
-
-  <!-- 4. Today's Tasks -->
-  <section class="stu-card">
-    <div class="stu-card-head">
-      <h3 class="stu-card-title">Today's Tasks</h3>
-      <a href="{% url 'student_assignments' %}" class="stu-card-link">
-        View All <i class="fas fa-chevron-right"></i>
-      </a>
+    <div class="stu-combo-half">
+      <div class="stu-combo-icon" style="background:#0D9488;"><i class="fas fa-file-alt"></i></div>
+      <div class="stu-combo-sup">Latest Result</div>
+      {% if latest_result %}
+        {% with total=latest_result.test|add:latest_result.exam %}
+        <div class="stu-combo-title">{{ latest_result.group.name|default:"General" }}</div>
+        <div class="stu-result-score">{{ total }}%</div>
+        <a href="{% url 'student_view_result' %}" class="stu-view-btn">View Result <i class="fas fa-chevron-right"></i></a>
+        {% endwith %}
+      {% else %}
+        <div class="stu-combo-title">No results yet</div>
+        <div class="stu-combo-meta"><span class="stu-combo-time">Check back soon</span></div>
+      {% endif %}
     </div>
+  </div>
 
+  <!-- Today's Tasks -->
+  <div class="stu-section-hd">
+    <h3>Today's Tasks</h3>
+    <a href="{% url 'student_assignments' %}">View All <i class="fas fa-chevron-right"></i></a>
+  </div>
+  <div class="stu-tasks">
     {% if recent_assignments %}
-      <div class="stu-list">
-        {% for a in recent_assignments %}
-        <a href="{% url 'submit_assignment' a.id %}" class="stu-row">
-          <div class="stu-row-avatar av-{{ forloop.counter0|divisibleby:6|yesno:'0,' }}{% widthratio forloop.counter0 1 1 %}"
-               style="background: {% cycle '#2563EB' '#10B981' '#F59E0B' '#8B5CF6' '#EC4899' '#06B6D4' %};">
-            {{ a.title|slice:":1"|upper }}
-          </div>
-          <div class="stu-row-body">
-            <div class="stu-row-title">{{ a.title }}</div>
-            <div class="stu-row-sub">{{ a.group_name }}</div>
-            <div class="stu-row-progress">
-              <div class="stu-row-progress-fill" style="width: {{ a.progress }}%;"></div>
-            </div>
-          </div>
-          <div class="stu-row-right">{{ a.progress }}%</div>
-          <i class="fas fa-chevron-right stu-row-chev"></i>
-        </a>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="stu-empty">
-        <i class="fas fa-clipboard-list"></i>
-        No tasks for today. Enjoy your day!
-      </div>
-    {% endif %}
-  </section>
-
-  <!-- 5. Attendance by group -->
-  <section class="stu-card">
-    <div class="stu-card-head">
-      <h3 class="stu-card-title">Attendance by group</h3>
-      <a href="{% url 'student_view_attendance' %}" class="stu-card-link">
-        Open full report <i class="fas fa-chevron-right"></i>
-      </a>
-    </div>
-
-    {% if subject_rows %}
-      <div>
-        {% for row in subject_rows %}
-        <div class="stu-grow">
-          <div class="stu-grow-dot" style="background: {% cycle '#2563EB' '#10B981' '#F59E0B' '#8B5CF6' '#EC4899' '#06B6D4' %};"></div>
-          <div>
-            <div class="stu-grow-name">{{ row.name }}</div>
-            <div class="stu-grow-sub">{{ row.present }} present · {{ row.absent }} absent</div>
-          </div>
-          <div class="stu-pill {% if row.pct >= 75 %}pill-good{% elif row.pct >= 50 %}pill-warn{% else %}pill-bad{% endif %}">
-            {{ row.pct }}%
+      {% for a in recent_assignments %}
+      {% with idx=forloop.counter0 %}
+      <a href="{% url 'submit_assignment' a.id %}" class="stu-task-row">
+        <div class="stu-task-avatar" style="background:{% if idx == 0 %}#1F4FD9{% elif idx == 1 %}#0D9488{% elif idx == 2 %}#D97706{% else %}#7C3AED{% endif %};">
+          {{ a.title|first|upper }}
+        </div>
+        <div class="stu-task-body">
+          <div class="stu-task-title">{{ a.title }}</div>
+          <div class="stu-task-sub">{{ a.group_name }} · Due {{ a.due_date|date:"M j" }}</div>
+        </div>
+        <div class="stu-task-right">
+          <div class="stu-task-pct">{% if a.submitted %}100%{% else %}0%{% endif %}</div>
+          <div class="stu-task-bar-track">
+            <div class="stu-task-bar-fill" style="width:{% if a.submitted %}100{% else %}0{% endif %}%;"></div>
           </div>
         </div>
-        {% endfor %}
-      </div>
+        <i class="fas fa-chevron-right stu-task-chevron"></i>
+      </a>
+      {% endwith %}
+      {% endfor %}
     {% else %}
-      <div class="stu-empty">
-        <i class="fas fa-layer-group"></i>
-        No active groups yet.
+      <div class="stu-empty-tasks">
+        <i class="fas fa-check-circle"></i>
+        No pending assignments — you're all caught up!
       </div>
     {% endif %}
-  </section>
+  </div>
 
-  <!-- 6. Quick links -->
-  <section class="stu-card">
-    <div class="stu-card-head">
-      <h3 class="stu-card-title">Quick links</h3>
+  <!-- Vocabulary quick-start -->
+  <div class="stu-section-hd">
+    <h3>Vocabulary Practice</h3>
+    <a href="{% url 'vocabulary_home' %}">All Words <i class="fas fa-chevron-right"></i></a>
+  </div>
+  <div class="stu-vocab-card">
+    <div class="stu-vocab-card-header">
+      <div style="font-size:13px; color:#64748B; font-weight:600;">Choose a study mode to start</div>
     </div>
-    <div class="stu-quick">
-      <a href="{% url 'student_view_attendance' %}">
-        <div class="stu-quick-icon"><i class="fas fa-calendar-check"></i></div>
-        <div class="stu-quick-lbl">Attendance</div>
+    <div class="stu-vocab-modes">
+      <a href="{% url 'vocabulary_flashcard' %}" class="stu-vocab-mode">
+        <div class="stu-vocab-mode-icon" style="background:#1340A8;"><i class="fas fa-layer-group"></i></div>
+        <span>Flashcards</span>
+        <small>Spaced repetition</small>
       </a>
-      <a href="{% url 'student_view_result' %}">
-        <div class="stu-quick-icon"><i class="fas fa-chart-bar"></i></div>
-        <div class="stu-quick-lbl">Results</div>
+      <a href="{% url 'vocabulary_quiz' %}" class="stu-vocab-mode">
+        <div class="stu-vocab-mode-icon" style="background:#0D9488;"><i class="fas fa-question-circle"></i></div>
+        <span>Quiz</span>
+        <small>Test yourself</small>
       </a>
-      <a href="{% url 'view_books' %}">
-        <div class="stu-quick-icon"><i class="fas fa-book"></i></div>
-        <div class="stu-quick-lbl">Library</div>
-      </a>
-      <a href="{% url 'student_assignments' %}">
-        <div class="stu-quick-icon"><i class="fas fa-tasks"></i></div>
-        <div class="stu-quick-lbl">Assignments</div>
+      <a href="{% url 'vocabulary_voice' %}" class="stu-vocab-mode">
+        <div class="stu-vocab-mode-icon" style="background:#D97706;"><i class="fas fa-microphone"></i></div>
+        <span>Voice</span>
+        <small>Pronunciation</small>
       </a>
     </div>
-  </section>
+  </div>
+
+  <!-- Bottom motivational banner -->
+  <div class="stu-banner">
+    <div class="stu-banner-icon"><i class="fas fa-mountain"></i></div>
+    <div class="stu-banner-text">Consistency today,<br>excellence tomorrow.</div>
+  </div>
 
 </div>
+{% endwith %}
 {% endblock content %}
-
-{% block custom_js %}
-<script>
-/* No interactive JS needed on this page — pure static composition. */
-</script>
-{% endblock custom_js %}

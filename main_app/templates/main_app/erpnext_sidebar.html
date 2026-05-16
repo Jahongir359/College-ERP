@@ -297,6 +297,14 @@
             </a>
         </div>
 
+        <div class="nav-item">
+            {% url 'staff_vocabulary' as staff_vocabulary %}
+            <a href="{{ staff_vocabulary }}" class="nav-link {% if 'vocabulary' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-spell-check"></i>
+                <span class="nav-text">Vocabulary</span>
+            </a>
+        </div>
+
         <h6 class="nav-section-title">Attendance</h6>
         
         <div class="nav-item">
@@ -315,8 +323,16 @@
             </a>
         </div>
 
-        <h6 class="nav-section-title">Library & Resources</h6>
-        
+        <h6 class="nav-section-title">Vocabulary & Library</h6>
+
+        <div class="nav-item">
+            {% url 'manage_vocabulary' as manage_vocabulary %}
+            <a href="{{ manage_vocabulary }}" class="nav-link {% if 'vocabulary' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-spell-check"></i>
+                <span class="nav-text">Vocabulary</span>
+            </a>
+        </div>
+
         <div class="nav-item">
             {% url 'add_book' as add_book %}
             <a href="{{ add_book }}" class="nav-link {% if add_book == request.path %}active{% endif %}">
@@ -408,7 +424,15 @@
             </a>
         </div>
 
-        <h6 class="nav-section-title">Library & Resources</h6>
+        <h6 class="nav-section-title">Vocabulary & Resources</h6>
+
+        <div class="nav-item">
+            {% url 'vocabulary_home' as vocabulary_home %}
+            <a href="{{ vocabulary_home }}" class="nav-link {% if 'vocabulary' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-spell-check"></i>
+                <span class="nav-text">Vocabulary</span>
+            </a>
+        </div>
 
         <div class="nav-item">
             {% url 'view_books' as view_books %}

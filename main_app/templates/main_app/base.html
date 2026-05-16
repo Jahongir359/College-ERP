@@ -186,8 +186,9 @@
                 <i class="fas fa-bell"></i><span>Alerts</span>
                 {% if unread_notification_count > 0 %}<span class="notif-dot"></span>{% endif %}
             </a>
-            <a href="{{ u_library }}" class="bottom-nav-item {% if 'book' in request.path %}active{% endif %}">
-                <i class="fas fa-book"></i><span>Library</span>
+            {% url 'vocabulary_home' as u_vocab %}
+            <a href="{{ u_vocab }}" class="bottom-nav-item {% if 'vocabulary' in request.path %}active{% endif %}">
+                <i class="fas fa-spell-check"></i><span>Vocab</span>
             </a>
         {% endif %}
     </nav>

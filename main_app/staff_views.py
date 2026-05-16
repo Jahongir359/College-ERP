@@ -710,3 +710,77 @@ def staff_get_groups_for_teacher(request):
         qs = qs.filter(course_id=course_id)
     groups = [{'id': g.id, 'name': g.name} for g in qs.order_by('name')]
     return JsonResponse({'groups': groups})
+
+
+# ── Vocabulary ────────────────────────────────────────────────────────────────
+
+@staff_only
+def staff_vocabulary(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    group_filter = request.GET.get('group', '')
+    vocab_qs = Vocabulary.objects.filter(added_by=request.user).select_related('group').order_by('-created_at')
+    if group_filter:
+        try:
+            vocab_qs = vocab_qs.filter(group_id=int(group_filter))
+        except (ValueError, TypeError):
+            pass
+    my_groups = Group.objects.filter(teacher=staff, is_archived=False)
+    return render(request, 'staff_template/staff_vocabulary.html', {
+        'vocabulary_list': vocab_qs,
+        'my_groups': my_groups,
+        'selected_group': group_filter,
+        'page_title': 'My Vocabulary Words',
+    })
+
+
+@staff_only
+def add_vocabulary(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    form = VocabularyForm(request.POST or None)
+    # Restrict group choices to groups this staff member teaches
+    form.fields['group'].queryset = Group.objects.filter(teacher=staff, is_archived=False)
+    if request.method == 'POST':
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.added_by = request.user
+            obj.save()
+            messages.success(request, f"Word '{obj.word}' added successfully!")
+            return redirect(reverse('staff_vocabulary'))
+        else:
+            messages.error(request, "Please correct the errors below.")
+    return render(request, 'staff_template/add_vocabulary_template.html', {
+        'form': form,
+        'page_title': 'Add Vocabulary Word',
+    })
+
+
+@staff_only
+def edit_vocabulary(request, vocab_id):
+    staff = get_object_or_404(Staff, admin=request.user)
+    vocab = get_object_or_404(Vocabulary, id=vocab_id)
+    form = VocabularyForm(request.POST or None, instance=vocab)
+    form.fields['group'].queryset = Group.objects.filter(teacher=staff, is_archived=False)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Word '{vocab.word}' updated!")
+            return redirect(reverse('staff_vocabulary'))
+        else:
+            messages.error(request, "Please correct the errors below.")
+    return render(request, 'staff_template/edit_vocabulary_template.html', {
+        'form': form,
+        'vocab': vocab,
+        'page_title': f'Edit — {vocab.word}',
+    })
+
+
+@staff_only
+def delete_vocabulary(request, vocab_id):
+    vocab = get_object_or_404(Vocabulary, id=vocab_id)
+    if vocab.added_by != request.user and request.user.user_type != '1':
+        messages.error(request, "You can only delete words you added.")
+        return redirect(reverse('staff_vocabulary'))
+    word = vocab.word
+    vocab.delete()
+    messages.success(request, f"Word '{word}' deleted.")
+    return redirect(reverse('staff_vocabulary'))

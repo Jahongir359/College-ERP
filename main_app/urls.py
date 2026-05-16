@@ -197,4 +197,22 @@ urlpatterns = [
     # AJAX helpers (staff)
     path("staff/ajax/teachers-for-course/", staff_views.staff_get_teachers_for_course, name='staff_get_teachers_for_course'),
     path("staff/ajax/groups-for-teacher/", staff_views.staff_get_groups_for_teacher, name='staff_get_groups_for_teacher'),
+
+    # Vocabulary (Student)
+    path('student/vocabulary/', student_views.vocabulary_home, name='vocabulary_home'),
+    path('student/vocabulary/flashcard/', student_views.vocabulary_flashcard, name='vocabulary_flashcard'),
+    path('student/vocabulary/quiz/', student_views.vocabulary_quiz, name='vocabulary_quiz'),
+    path('student/vocabulary/voice/', student_views.vocabulary_voice, name='vocabulary_voice'),
+    path('student/vocabulary/progress/', student_views.vocabulary_progress_update, name='vocabulary_progress_update'),
+
+    # Vocabulary (Staff)
+    path('staff/vocabulary/', staff_views.staff_vocabulary, name='staff_vocabulary'),
+    path('staff/vocabulary/add/', staff_views.add_vocabulary, name='add_vocabulary'),
+    path('staff/vocabulary/edit/<int:vocab_id>/', staff_views.edit_vocabulary, name='edit_vocabulary'),
+    path('staff/vocabulary/delete/<int:vocab_id>/', staff_views.delete_vocabulary, name='delete_vocabulary'),
+
+    # Vocabulary (Admin/HOD)
+    path('admin/vocabulary/', hod_views.manage_vocabulary, name='manage_vocabulary'),
+    path('admin/vocabulary/add/', hod_views.hod_add_vocabulary, name='hod_add_vocabulary'),
+    path('admin/vocabulary/delete/<int:vocab_id>/', hod_views.delete_vocabulary_admin, name='delete_vocabulary_admin'),
 ]
