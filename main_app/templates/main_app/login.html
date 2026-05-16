@@ -3,284 +3,417 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Iceberg Study Center — Sign In</title>
   <link rel="shortcut icon" href="{% static 'image/favicon1.ico' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700&display=swap">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy:   #1B3F7A;
-      --cyan:   #06B6D4;
-      --cyan-dk:#0891B2;
-      --bg:     #F0F6FF;
-      --white:  #FFFFFF;
-      --border: #D1DCF0;
-      --text:   #0F172A;
-      --muted:  #64748B;
+      --navy-deep: #0A1B3D;
+      --navy:      #0C1F45;
+      --navy-mid:  #1B3F7A;
+      --cyan:      #06B6D4;
+      --cyan-dk:   #0891B2;
+      --ice-3:     #EEF4FB;
+      --bg:        #F2F7FE;
+      --white:     #FFFFFF;
+      --border:    #D8E3F2;
+      --text:      #0C1F45;
+      --muted:     #64748B;
+      --danger:    #DC2626;
+      --danger-bg: #FEF2F2;
+      --success:   #047857;
+      --success-bg:#F0FDF4;
     }
+
+    html, body { height: 100%; }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #0B1426 0%, #1B3F7A 50%, #0B1426 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #DDEAFB 0%, #ECF3FC 38%, #F4F8FE 70%, #FAFCFF 100%);
+      color: var(--text);
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    /* subtle animated background pattern */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        radial-gradient(ellipse at 20% 30%, rgba(6,182,212,.08) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 70%, rgba(27,63,122,.15) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .card {
+    /* ── Mountain hero ────────────────────────────────────── */
+    .hero {
       position: relative;
-      background: rgba(255,255,255,0.97);
-      border-radius: 20px;
-      box-shadow: 0 8px 48px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.15) inset;
       width: 100%;
-      max-width: 420px;
-      padding: 44px 40px 40px;
-      backdrop-filter: blur(12px);
-    }
-
-    /* ── Brand hero ── */
-    .brand-hero {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-    .brand-logo-wrap {
-      position: relative;
-      display: inline-block;
-      padding: 18px;
-    }
-    .brand-logo-wrap::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center,
-        rgba(6,182,212,.28) 0%,
-        rgba(6,182,212,.10) 38%,
-        transparent 70%);
-      border-radius: 50%;
-      z-index: 0;
-      filter: blur(2px);
-    }
-    .brand-logo {
-      position: relative;
-      z-index: 1;
-      width: 92px;
-      height: 92px;
-      border-radius: 22px;
+      height: 280px;
+      flex-shrink: 0;
       overflow: hidden;
-      box-shadow:
-        0 14px 32px rgba(11,20,38,.32),
-        0 2px 6px rgba(11,20,38,.18),
-        0 0 0 1px rgba(6,182,212,.22);
     }
-    .brand-logo img {
+    .hero svg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
       display: block;
     }
+
+    /* ── Brand block ──────────────────────────────────────── */
+    .brand-block {
+      text-align: center;
+      margin-top: -14px;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .brand-shield {
+      width: 78px;
+      height: 92px;
+      margin: 0 auto 14px;
+      filter: drop-shadow(0 8px 18px rgba(12,31,69,.18));
+    }
     .brand-name {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: .14em;
-      color: var(--navy);
-      line-height: 1;
-      margin-top: 6px;
-    }
-    .brand-name .ice { color: var(--cyan); }
-    .brand-sub {
-      font-size: 10px;
+      font-family: 'Playfair Display', 'Inter', serif;
+      font-size: 30px;
       font-weight: 700;
-      letter-spacing: .32em;
-      color: var(--muted);
+      color: var(--navy);
+      letter-spacing: 4px;
+      line-height: 1;
+    }
+    .brand-sub {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       margin-top: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3.2px;
+      color: var(--navy-mid);
+      text-transform: uppercase;
+    }
+    .brand-sub::before,
+    .brand-sub::after {
+      content: '';
+      width: 18px;
+      height: 1px;
+      background: var(--navy-mid);
+      opacity: .5;
     }
 
-    /* ── Heading ── */
-    .heading { margin-bottom: 24px; }
-    .heading h2 { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .heading p  { font-size: 13px; color: var(--muted); }
+    /* ── Form area ────────────────────────────────────────── */
+    .form-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 28px 22px 40px;
+      width: 100%;
+    }
+    .form-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--white);
+      border: 1px solid rgba(216,227,242,.7);
+      border-radius: 20px;
+      padding: 32px 28px 30px;
+      box-shadow: 0 8px 36px rgba(12,31,69,.10),
+                  0 1px 0 rgba(255,255,255,.6) inset;
+    }
+    .welcome {
+      font-family: 'Playfair Display', 'Inter', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -.5px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .welcome-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
 
-    /* ── Alerts ── */
+    /* Alerts */
     .alert {
       padding: 11px 14px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 13px;
-      margin-bottom: 20px;
-      border: 1px solid;
+      margin-bottom: 16px;
+      border: 1px solid transparent;
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 9px;
+      line-height: 1.45;
     }
-    .alert-danger  { background:#FEF2F2; color:#991B1B; border-color:#FECACA; }
-    .alert-success { background:#F0FDF4; color:#166534; border-color:#BBF7D0; }
-    .alert-warning { background:#FFFBEB; color:#92400E; border-color:#FDE68A; }
-    .alert-info    { background:#EFF6FF; color:#1E40AF; border-color:#BFDBFE; }
+    .alert-danger  { background: var(--danger-bg);  color: var(--danger);  border-color: #FECACA; }
+    .alert-success { background: var(--success-bg); color: var(--success); border-color: #BBF7D0; }
+    .alert-warning { background: #FFFBEB;           color: #92400E;        border-color: #FDE68A; }
+    .alert-info    { background: #EFF6FF;           color: #1E40AF;        border-color: #BFDBFE; }
+    .alert .ico    { flex-shrink: 0; width: 14px; height: 14px; margin-top: 2px; }
 
-    /* ── Fields ── */
-    .field { margin-bottom: 18px; }
-    label  { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-
-    .input-wrap { position: relative; }
-    .input-wrap .icon {
-      position: absolute; left: 13px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted); width: 16px; height: 16px; pointer-events: none;
-    }
-    .input-wrap .toggle-pw {
-      position: absolute; right: 12px; top: 50%;
-      transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      color: var(--muted); padding: 0; line-height: 1;
-    }
-    .input-wrap .toggle-pw:hover { color: var(--navy); }
-
-    input[type="email"], input[type="password"], input[type="text"] {
-      width: 100%;
-      padding: 10px 38px 10px 40px;
-      border: 1.5px solid var(--border);
-      border-radius: 9px;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
+    /* Fields */
+    .field { margin-bottom: 14px; }
+    .field-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
       color: var(--text);
-      background: #FAFCFF;
+      margin-bottom: 7px;
+      letter-spacing: .1px;
+    }
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-wrap .ico-l {
+      position: absolute;
+      left: 14px;
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .input-wrap .ico-r {
+      position: absolute;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      padding: 0;
+    }
+    .input-wrap .ico-r:hover { color: var(--navy); background: var(--ice-3); }
+    .input-wrap input {
+      width: 100%;
+      height: 48px;
+      padding: 0 44px 0 42px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14.5px;
+      color: var(--text);
+      background: #F7FAFE;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
       outline: none;
       transition: border-color .15s, box-shadow .15s, background .15s;
     }
-    input:focus {
-      border-color: var(--cyan);
-      box-shadow: 0 0 0 3px rgba(6,182,212,.18);
+    .input-wrap input::placeholder { color: #94A3B8; }
+    .input-wrap input:focus {
+      border-color: var(--navy-mid);
       background: var(--white);
+      box-shadow: 0 0 0 4px rgba(27,63,122,.10);
     }
-    input::placeholder { color: #A0AABE; }
 
-    /* ── Remember / Forgot row ── */
-    .row-between {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      margin-bottom: 22px;
+    /* Remember-me row */
+    .row-meta { display: flex; align-items: center; margin: 4px 0 22px; font-size: 13px; }
+    .remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      color: var(--muted);
     }
-    .remember { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); cursor: pointer; user-select: none; }
-    .remember input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--navy); cursor: pointer; }
-    .forgot { font-size: 13px; color: var(--cyan-dk); text-decoration: none; font-weight: 500; }
-    .forgot:hover { text-decoration: underline; }
+    .remember input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--navy);
+      cursor: pointer;
+    }
 
-    /* ── Submit button ── */
+    /* Sign-in button */
     .btn-signin {
       width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, var(--navy) 0%, var(--cyan-dk) 100%);
-      color: white;
+      height: 52px;
       border: none;
-      border-radius: 9px;
-      font-size: 14px;
-      font-weight: 700;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #122E66 0%, #0A1B3D 100%);
+      color: #fff;
       font-family: 'Inter', sans-serif;
-      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
       letter-spacing: .3px;
-      transition: opacity .15s, transform .1s, box-shadow .15s;
-      box-shadow: 0 3px 14px rgba(27,63,122,.35);
+      cursor: pointer;
+      transition: transform .12s, box-shadow .15s, opacity .15s;
+      box-shadow: 0 8px 22px rgba(10,27,61,.30),
+                  0 1px 0 rgba(255,255,255,.10) inset;
     }
-    .btn-signin:hover  { opacity: .9; box-shadow: 0 5px 20px rgba(6,182,212,.35); }
-    .btn-signin:active { transform: scale(.985); }
+    .btn-signin:hover  { opacity: .96; box-shadow: 0 10px 26px rgba(10,27,61,.36); }
+    .btn-signin:active { transform: translateY(1px); }
 
-    /* ── Footer ── */
-    .card-footer {
-      margin-top: 28px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
+    /* Footer */
+    .login-footer {
       text-align: center;
-      font-size: 11.5px;
+      font-size: 12px;
       color: var(--muted);
-      letter-spacing: .02em;
+      padding: 14px 20px 24px;
+      letter-spacing: .1px;
     }
 
-    @media (max-width: 480px) { .card { padding: 36px 24px 28px; } }
+    @media (min-width: 760px) {
+      body { background: linear-gradient(180deg, #DDEAFB 0%, #ECF3FC 50%, #FAFCFF 100%); }
+      .hero { height: 320px; }
+      .brand-block { margin-top: -22px; }
+      .brand-shield { width: 92px; height: 108px; }
+      .brand-name { font-size: 36px; letter-spacing: 5px; }
+      .welcome { font-size: 36px; }
+      .form-wrap { padding: 36px 22px 56px; }
+      .form-card { padding: 36px 36px 32px; }
+    }
+
+    @media (max-width: 380px) {
+      .form-card { padding: 26px 20px 24px; }
+      .brand-name { font-size: 26px; letter-spacing: 3px; }
+      .welcome { font-size: 28px; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
 
-    <!-- Brand -->
-    <div class="brand-hero">
-      <div class="brand-name"><span class="ice">ICE</span>BERG</div>
-      <div class="brand-sub">STUDY CENTER</div>
-    </div>
+  <!-- ── Iceberg / Mountain Hero ──────────────────────────────── -->
+  <div class="hero" aria-hidden="true">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#CEDDF4"/>
+          <stop offset="60%"  stop-color="#E6EFFA"/>
+          <stop offset="100%" stop-color="#F4F8FE"/>
+        </linearGradient>
+        <linearGradient id="mFar" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#C9DBF1"/>
+          <stop offset="100%" stop-color="#A7BFDC"/>
+        </linearGradient>
+        <linearGradient id="mMid" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#B0C8E5"/>
+          <stop offset="100%" stop-color="#88A5C6"/>
+        </linearGradient>
+        <linearGradient id="mNear" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#90B0D2"/>
+          <stop offset="100%" stop-color="#608AB4"/>
+        </linearGradient>
+      </defs>
 
-    <!-- Heading -->
-    <div class="heading">
-      <h2>Welcome back</h2>
-      <p>Sign in to your account to continue</p>
-    </div>
+      <rect width="1440" height="320" fill="url(#skyGrad)"/>
 
-    <!-- Flash messages -->
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+      <path d="M0,260 L120,180 L260,220 L420,140 L580,210 L760,150 L920,200 L1080,140 L1240,200 L1380,170 L1440,210 L1440,320 L0,320 Z"
+            fill="url(#mFar)" opacity="0.85"/>
 
-    <!-- Form -->
-    <form method="post" action="{% url 'user_login' %}">
-      {% csrf_token %}
-      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <path d="M0,300 L160,200 L300,260 L480,170 L600,250 L760,180 L900,260 L1080,200 L1260,260 L1440,220 L1440,320 L0,320 Z"
+            fill="url(#mMid)"/>
 
-      <div class="field">
-        <label for="id_email">Email address</label>
-        <div class="input-wrap">
-          <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-          </svg>
-          <input type="email" id="id_email" name="email"
-                 placeholder="you@example.com" autocomplete="email" required autofocus>
-        </div>
-      </div>
+      <path d="M460,178 L480,170 L500,178 L490,184 L478,180 Z" fill="#F4F9FF" opacity="0.85"/>
+      <path d="M740,188 L760,180 L780,188 L770,194 L758,190 Z" fill="#F4F9FF" opacity="0.85"/>
 
-      <div class="field">
-        <label for="id_password">Password</label>
-        <div class="input-wrap">
-          <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-          </svg>
-          <input type="password" id="id_password" name="password"
-                 placeholder="••••••••" autocomplete="current-password" required>
-          <button type="button" class="toggle-pw" onclick="togglePassword()" aria-label="Show/hide password">
-            <svg id="eye-icon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-              <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+      <path d="M0,320 L80,260 L220,300 L360,240 L520,290 L700,250 L860,300 L1020,260 L1200,300 L1340,270 L1440,300 L1440,320 Z"
+            fill="url(#mNear)"/>
+
+      <rect x="0" y="200" width="1440" height="2" fill="#fff" opacity=".35"/>
+    </svg>
+  </div>
+
+  <!-- ── Brand ──────────────────────────────────────────────── -->
+  <div class="brand-block">
+    <svg class="brand-shield" viewBox="0 0 78 92" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#1B3F7A"/>
+          <stop offset="100%" stop-color="#0C1F45"/>
+        </linearGradient>
+        <linearGradient id="iceGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#D9ECFF"/>
+          <stop offset="100%" stop-color="#7FA6CF"/>
+        </linearGradient>
+      </defs>
+      <path d="M39 2 L74 14 L74 44 C74 66 60 82 39 90 C18 82 4 66 4 44 L4 14 Z"
+            fill="#FFFFFF" stroke="url(#shieldGrad)" stroke-width="3"/>
+      <line x1="10" y1="56" x2="68" y2="56" stroke="#1B3F7A" stroke-width="1.2" opacity=".4"/>
+      <polygon points="39,20 30,40 48,40" fill="#1B3F7A"/>
+      <polygon points="39,20 48,40 44,44 39,32" fill="#0C1F45" opacity=".6"/>
+      <polygon points="22,56 56,56 50,74 28,74" fill="url(#iceGrad)" opacity=".75"/>
+      <polygon points="28,74 50,74 44,80 34,80" fill="#7FA6CF" opacity=".55"/>
+    </svg>
+    <div class="brand-name">ICEBERG</div>
+    <div class="brand-sub">Study Center</div>
+  </div>
+
+  <!-- ── Form ───────────────────────────────────────────────── -->
+  <div class="form-wrap">
+    <div class="form-card">
+      <h1 class="welcome">Welcome back</h1>
+      <p class="welcome-sub">Sign in to continue your journey at Iceberg.</p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }}">
+            <svg class="ico" viewBox="0 0 20 20" fill="currentColor">
+              {% if message.tags == 'success' %}
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3l-4 4a1 1 0 01-1.4 0l-2-2a1 1 0 011.4-1.4L9 10.6l3.3-3.3a1 1 0 011.4 1.4z" clip-rule="evenodd"/>
+              {% elif message.tags == 'danger' or message.tags == 'error' %}
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 7a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+              {% elif message.tags == 'warning' %}
+                <path fill-rule="evenodd" d="M8.3 2.6c.8-1.5 2.9-1.5 3.7 0l6.5 12a2 2 0 01-1.8 3H3.7a2 2 0 01-1.9-3l6.5-12zM10 7a1 1 0 011 1v4a1 1 0 11-2 0V8a1 1 0 011-1zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+              {% else %}
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 112 0v4a1 1 0 11-2 0v-4zm1-6a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>
+              {% endif %}
             </svg>
-          </button>
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" action="{% url 'user_login' %}" autocomplete="on" novalidate>
+        {% csrf_token %}
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+        <div class="field">
+          <label class="field-label" for="id_email">Email address</label>
+          <div class="input-wrap">
+            <svg class="ico-l" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M2 5.9L10 9.9 18 5.9A2 2 0 0016 4H4a2 2 0 00-2 1.9z"/>
+              <path d="M18 8.1l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.1z"/>
+            </svg>
+            <input type="email" id="id_email" name="email"
+                   placeholder="you@example.com" autocomplete="email" required autofocus>
+          </div>
         </div>
-      </div>
 
-      <div class="row-between">
-        <label class="remember">
-          <input type="checkbox" name="remember" id="remember"> Remember me
-        </label>
-        <a href="{% url 'forgot_password' %}" class="forgot">Forgot password?</a>
-      </div>
+        <div class="field">
+          <label class="field-label" for="id_password">Password</label>
+          <div class="input-wrap">
+            <svg class="ico-l" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+            </svg>
+            <input type="password" id="id_password" name="password"
+                   placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" class="ico-r" onclick="togglePassword()" aria-label="Show or hide password">
+              <svg id="eye-icon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                <path fill-rule="evenodd" d="M.5 10C1.7 5.9 5.5 3 10 3s8.3 2.9 9.5 7c-1.2 4.1-5 7-9.5 7S1.7 14.1.5 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </div>
+        </div>
 
-      <button type="submit" class="btn-signin">Sign in to Iceberg</button>
-    </form>
+        <div class="row-meta">
+          <label class="remember">
+            <input type="checkbox" name="remember" id="remember">
+            Remember me
+          </label>
+        </div>
 
-    <div class="card-footer">
-      &copy; {% now "Y" %} Iceberg Study Center &mdash; All rights reserved
+        <button type="submit" class="btn-signin">Sign In</button>
+      </form>
     </div>
+  </div>
+
+  <div class="login-footer">
+    &copy; {% now "Y" %} Iceberg Study Center &mdash; All rights reserved
   </div>
 
   <script>
@@ -288,10 +421,13 @@
       const inp = document.getElementById('id_password');
       inp.type = inp.type === 'password' ? 'text' : 'password';
     }
-    // Restore remember-me preference
-    const rem = document.getElementById('remember');
-    if (localStorage.getItem('icebergRemember') === '1') rem.checked = true;
-    rem.addEventListener('change', () => localStorage.setItem('icebergRemember', rem.checked ? '1' : '0'));
+    (function () {
+      const rem = document.getElementById('remember');
+      if (!rem) return;
+      if (localStorage.getItem('icebergRemember') === '1') rem.checked = true;
+      rem.addEventListener('change', () =>
+        localStorage.setItem('icebergRemember', rem.checked ? '1' : '0'));
+    })();
   </script>
 </body>
 </html>

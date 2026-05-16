@@ -179,17 +179,24 @@ body {
   object-fit: cover;
 }
 
-/* ── Premium Sidebar ──────────────────────────────────── */
+/* ── Premium Sidebar (always dark navy) ───────────────── */
 .erpnext-sidebar {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  background: #0C1E45 !important;
+  border-right: none !important;
+  box-shadow: 4px 0 24px rgba(12,30,69,.30) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Nav section grows to fill space so footer sticks to bottom */
+.erpnext-sidebar .nav-section {
+  flex: 1 0 auto;
 }
 
 .sidebar-header {
-  padding: 16px 16px 14px;
-  border-bottom: 1px solid var(--border);
-  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+  background: rgba(0,0,0,.15);
 }
 
 .sidebar-user {
@@ -254,22 +261,22 @@ body {
 }
 
 .nav-section-title {
-  padding: 10px 16px 4px;
+  padding: 14px 18px 6px;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
+  letter-spacing: 1.2px;
+  color: rgba(255,255,255,.42) !important;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 .nav-section-title::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--border);
+  background: rgba(255,255,255,.08) !important;
 }
 
 .nav-item {
@@ -279,9 +286,9 @@ body {
 .nav-link {
   display: flex !important;
   align-items: center !important;
-  padding: 9px 10px !important;
-  border-radius: var(--radius-sm) !important;
-  color: var(--text-muted) !important;
+  padding: 10px 12px !important;
+  border-radius: 8px !important;
+  color: rgba(255,255,255,.74) !important;
   font-size: 13px !important;
   font-weight: 500 !important;
   text-decoration: none !important;
@@ -290,17 +297,18 @@ body {
   gap: 0;
 }
 .nav-link:hover {
-  background: rgba(12,31,69,.05) !important;
-  color: var(--navy) !important;
+  background: rgba(255,255,255,.06) !important;
+  color: #fff !important;
   text-decoration: none !important;
 }
 .nav-link.active {
-  background: rgba(12,31,69,.08) !important;
-  color: var(--navy) !important;
+  background: rgba(255,255,255,.14) !important;
+  color: #fff !important;
   font-weight: 600 !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
 }
 .nav-link.active .nav-icon {
-  color: var(--cyan-dk) !important;
+  color: #67E8F9 !important;
 }
 
 .nav-icon {
@@ -319,7 +327,7 @@ body {
 
 .nav-arrow {
   font-size: 10px !important;
-  color: var(--text-muted);
+  color: rgba(255,255,255,.45) !important;
   transition: transform .2s;
   margin-left: 4px;
 }
@@ -338,12 +346,12 @@ body {
   max-height: 400px;
 }
 .nav-submenu .nav-link {
-  padding-left: 38px !important;
+  padding-left: 42px !important;
   font-size: 12.5px !important;
-  color: var(--text-muted) !important;
+  color: rgba(255,255,255,.6) !important;
 }
-.nav-submenu .nav-link:hover { color: var(--navy) !important; }
-.nav-submenu .nav-link.active { color: var(--navy) !important; font-weight: 600 !important; }
+.nav-submenu .nav-link:hover { color: #fff !important; background: rgba(255,255,255,.05) !important; }
+.nav-submenu .nav-link.active { color: #fff !important; background: rgba(255,255,255,.10) !important; font-weight: 600 !important; }
 
 /* Notification badge on nav item */
 .nav-badge {
@@ -371,32 +379,41 @@ body {
 
 /* Sidebar logout at bottom */
 .sidebar-footer {
-  padding: 12px 8px;
-  border-top: 1px solid var(--border);
-  margin-top: auto;
+  padding: 14px 12px 20px;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+  margin-top: 16px;
+  background: rgba(0,0,0,.12);
 }
+.sidebar-footer form { margin: 0; }
 .sidebar-logout-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   width: 100%;
-  padding: 9px 10px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: rgba(239,68,68,.07);
-  color: var(--danger);
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(239,68,68,.35) !important;
+  background: rgba(239,68,68,.14) !important;
+  color: #FCA5A5 !important;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: .2px;
   cursor: pointer;
-  transition: background .15s;
+  transition: all .18s;
+  font-family: 'Inter', sans-serif;
 }
 .sidebar-logout-btn:hover {
-  background: rgba(239,68,68,.12);
+  background: #EF4444 !important;
+  border-color: #EF4444 !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239,68,68,.32);
 }
 .sidebar-logout-btn i {
-  width: 18px;
+  width: 16px;
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* ── Main Content Area ────────────────────────────────── */
@@ -1100,23 +1117,23 @@ textarea.form-control { height: auto; min-height: 90px; }
 }
 .dark-mode .navbar-user-chip:hover { border-color: var(--border-dk); color: var(--text); }
 
-/* Sidebar dark */
+/* Sidebar stays dark navy in both modes — no overrides for sidebar bg here */
 .dark-mode .erpnext-sidebar {
-  background: var(--surface) !important;
-  border-right-color: var(--border) !important;
+  background: #0A1B3D !important;
+  border-right: none !important;
 }
-.dark-mode .sidebar-header { border-bottom-color: var(--border) !important; }
-.dark-mode .sidebar-footer { border-top-color: var(--border) !important; }
-.dark-mode .nav-section-title { color: var(--text-muted); }
-.dark-mode .nav-section-title::after { background: var(--border); }
-.dark-mode .nav-link { color: var(--text-muted) !important; }
-.dark-mode .nav-link:hover { background: rgba(255,255,255,.05) !important; color: var(--text) !important; }
-.dark-mode .nav-link.active { background: rgba(6,182,212,.12) !important; color: #93C5FD !important; }
-.dark-mode .nav-link.active .nav-icon { color: var(--cyan) !important; }
-.dark-mode .nav-submenu .nav-link { color: var(--text-muted) !important; }
-.dark-mode .nav-submenu .nav-link.active { color: #93C5FD !important; }
-.dark-mode .sidebar-logout-btn { background: rgba(239,68,68,.1); color: #FCA5A5; }
-.dark-mode .sidebar-logout-btn:hover { background: rgba(239,68,68,.18); }
+.dark-mode .sidebar-header { border-bottom: 1px solid rgba(255,255,255,.09) !important; background: rgba(0,0,0,.18) !important; }
+.dark-mode .sidebar-footer { border-top: 1px solid rgba(255,255,255,.08) !important; background: rgba(0,0,0,.18) !important; }
+.dark-mode .nav-section-title { color: rgba(255,255,255,.42) !important; }
+.dark-mode .nav-section-title::after { background: rgba(255,255,255,.08) !important; }
+.dark-mode .nav-link { color: rgba(255,255,255,.74) !important; }
+.dark-mode .nav-link:hover { background: rgba(255,255,255,.06) !important; color: #fff !important; }
+.dark-mode .nav-link.active { background: rgba(255,255,255,.14) !important; color: #fff !important; }
+.dark-mode .nav-link.active .nav-icon { color: #67E8F9 !important; }
+.dark-mode .nav-submenu .nav-link { color: rgba(255,255,255,.6) !important; }
+.dark-mode .nav-submenu .nav-link.active { color: #fff !important; background: rgba(255,255,255,.10) !important; }
+.dark-mode .sidebar-logout-btn { background: rgba(239,68,68,.14) !important; color: #FCA5A5 !important; border-color: rgba(239,68,68,.35) !important; }
+.dark-mode .sidebar-logout-btn:hover { background: #EF4444 !important; color: #fff !important; border-color: #EF4444 !important; }
 
 /* Main content dark */
 .dark-mode .erpnext-main { background: var(--bg); }
@@ -1515,3 +1532,58 @@ textarea.form-control { height: auto; min-height: 90px; }
 .ice-modal-close:hover { background: var(--ice-border); }
 .ice-modal-body { padding: 24px; }
 .ice-modal-footer { padding: 16px 24px; border-top: 1px solid var(--ice-border); display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ── Navbar logout button — clearer danger styling ─────── */
+.logout-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 14px !important;
+  font-size: 13px;
+  font-weight: 600 !important;
+  text-decoration: none;
+  border-radius: 8px !important;
+  transition: all .15s ease !important;
+  border: 1px solid rgba(239,68,68,.35) !important;
+  color: #EF4444 !important;
+  background: rgba(239,68,68,.08) !important;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  line-height: 1;
+  transform: none !important;
+}
+.logout-btn:hover {
+  background: #EF4444 !important;
+  border-color: #EF4444 !important;
+  color: #fff !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 12px rgba(239,68,68,.32) !important;
+  transform: translateY(-1px) !important;
+}
+.logout-btn i { font-size: 13px !important; }
+.logout-text { font-weight: 600; }
+
+/* On mobile, keep the navbar logout icon-only but clearly red */
+@media (max-width: 768px) {
+  .logout-text { display: none !important; }
+  .logout-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0 !important;
+    border-radius: 8px !important;
+  }
+  .logout-btn i { font-size: 14px !important; }
+}
+
+/* Dark-mode navbar logout button — keep red, just tweak surface */
+.dark-mode .logout-btn {
+  background: rgba(239,68,68,.12) !important;
+  color: #FCA5A5 !important;
+  border-color: rgba(239,68,68,.40) !important;
+}
+.dark-mode .logout-btn:hover {
+  background: #EF4444 !important;
+  color: #fff !important;
+  border-color: #EF4444 !important;
+}

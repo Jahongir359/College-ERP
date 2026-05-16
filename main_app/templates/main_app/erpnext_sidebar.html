@@ -436,6 +436,17 @@
     {% endif %}
 </div>
 
+<!-- Sidebar Footer with Logout -->
+<div class="sidebar-footer">
+    <form method="post" action="{% url 'user_logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="sidebar-logout-btn" title="Sign out of Iceberg">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Sign Out</span>
+        </button>
+    </form>
+</div>
+
 <script>
 function showDefaultAvatar() {
     // Hide the broken image
