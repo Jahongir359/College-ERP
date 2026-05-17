@@ -1527,17 +1527,3 @@ def student_progress(request):
     }
     return render(request, 'student_template/student_progress.html', context)
 
-
-from django.contrib.auth.decorators import login_required
-
-@login_required
-def save_avatar(request):
-    if request.method != 'POST':
-        return JsonResponse({'status': 'error'}, status=405)
-    avatar = request.POST.get('avatar', '')
-    valid = [str(i) for i in range(1, 25)] + ['']
-    if avatar not in valid:
-        return JsonResponse({'status': 'error', 'message': 'Invalid avatar'}, status=400)
-    request.user.avatar = avatar
-    request.user.save(update_fields=['avatar'])
-    return JsonResponse({'status': 'ok', 'avatar': avatar})

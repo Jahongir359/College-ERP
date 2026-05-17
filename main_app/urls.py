@@ -222,8 +222,8 @@ urlpatterns = [
     # Progress page (Student)
     path('student/progress/', student_views.student_progress, name='student_progress'),
 
-    # Avatar (all users)
-    path('profile/save-avatar/', student_views.save_avatar, name='save_avatar'),
+    # Avatar (all user types — lives in views.py to bypass role middleware)
+    path('profile/save-avatar/', views.save_avatar, name='save_avatar'),
 
     # Vocabulary Days (Staff)
     path('staff/vocabulary-days/', staff_views.staff_vocabulary_days, name='staff_vocabulary_days'),
