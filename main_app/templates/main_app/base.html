@@ -18,31 +18,123 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'dist/js/trend-chart.js' %}"></script>
     <style>
-/* ── Page Transitions ───────────────────────────────────────────────── */
+/* ── ICEBERG Premium Page Transitions ───────────────────────────────── */
+
+/* Progress bar with glow + shimmer */
 #ice-progress {
   position: fixed; top: 0; left: 0; z-index: 9999;
-  height: 3px; width: 0%;
-  background: linear-gradient(90deg, #06B6D4, #0891B2);
-  box-shadow: 0 0 8px rgba(6,182,212,.5);
-  opacity: 0; pointer-events: none;
-  transition: width .2s ease, opacity .3s ease;
+  height: 3px; width: 0%; pointer-events: none;
+  background: linear-gradient(90deg, #0891B2, #06B6D4, #38BDF8, #06B6D4, #0891B2);
+  background-size: 300% 100%;
+  box-shadow: 0 0 10px rgba(6,182,212,.75), 0 1px 4px rgba(6,182,212,.35);
+  border-radius: 0 3px 3px 0;
+  opacity: 0;
+  transition: width .22s cubic-bezier(.4,0,.2,1), opacity .15s ease;
 }
-#ice-progress.ice-active { opacity: 1; }
+#ice-progress.ice-active {
+  opacity: 1;
+  animation: iceBarPulse 1.5s ease-in-out infinite;
+}
+@keyframes iceBarPulse {
+  0%,100% { background-position: 0% 0; }
+  50%      { background-position: 100% 0; }
+}
 
-@keyframes icePageOut {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(-8px); }
+/* Barely-visible loading overlay — keeps layout from flashing white */
+#ice-overlay {
+  position: fixed; inset: 0; z-index: 9990;
+  background: transparent; pointer-events: none;
+  transition: background .15s ease;
 }
-@keyframes icePageIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.ice-page-out { animation: icePageOut .18s cubic-bezier(.22,1,.36,1) both; }
-.ice-page-in  { animation: icePageIn  .38s cubic-bezier(.22,1,.36,1) both; }
+#ice-overlay.ice-active       { background: rgba(12,31,69,.025); }
+.dark-mode #ice-overlay.ice-active { background: rgba(0,0,0,.06); }
 
+/* Transform-origin for scale animations */
+.ice-exit-up, .ice-exit-left, .ice-exit-right,
+.ice-enter-up, .ice-enter-down, .ice-enter-left, .ice-enter-right {
+  transform-origin: top center;
+}
+
+/* ── Exit keyframes (mobile: no blur) ── */
+@keyframes iceExitUp {
+  from { opacity: 1;    transform: scale(1)     translateY(0);    }
+  to   { opacity: 0.65; transform: scale(0.985) translateY(-4px); }
+}
+@keyframes iceExitLeft {
+  from { opacity: 1;   transform: scale(1)     translateX(0);     }
+  to   { opacity: 0.5; transform: scale(0.988) translateX(-24px); }
+}
+@keyframes iceExitRight {
+  from { opacity: 1;   transform: scale(1)     translateX(0);    }
+  to   { opacity: 0.5; transform: scale(0.988) translateX(24px); }
+}
+
+/* Desktop: enrich exit-up with blur */
+@media (min-width: 769px) {
+  @keyframes iceExitUp {
+    from { opacity: 1;    transform: scale(1)     translateY(0);    filter: blur(0px); }
+    to   { opacity: 0.65; transform: scale(0.985) translateY(-4px); filter: blur(3px); }
+  }
+}
+
+/* ── Enter keyframes ── */
+@keyframes iceEnterUp {
+  from { opacity: 0; transform: scale(0.985) translateY(14px); }
+  to   { opacity: 1; transform: scale(1)     translateY(0);    }
+}
+@keyframes iceEnterDown {
+  from { opacity: 0; transform: scale(0.985) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1)     translateY(0);     }
+}
+@keyframes iceEnterRight {
+  from { opacity: 0; transform: scale(0.988) translateX(28px); }
+  to   { opacity: 1; transform: scale(1)     translateX(0);    }
+}
+@keyframes iceEnterLeft {
+  from { opacity: 0; transform: scale(0.988) translateX(-28px); }
+  to   { opacity: 1; transform: scale(1)     translateX(0);     }
+}
+
+/* ── Animation classes ── */
+.ice-exit-up    { animation: iceExitUp    .26s cubic-bezier(.4,0,.2,1)  both; }
+.ice-exit-left  { animation: iceExitLeft  .22s cubic-bezier(.4,0,.2,1)  both; }
+.ice-exit-right { animation: iceExitRight .22s cubic-bezier(.4,0,.2,1)  both; }
+.ice-enter-up    { animation: iceEnterUp    .44s cubic-bezier(.22,1,.36,1) both; }
+.ice-enter-down  { animation: iceEnterDown  .40s cubic-bezier(.22,1,.36,1) both; }
+.ice-enter-right { animation: iceEnterRight .40s cubic-bezier(.22,1,.36,1) both; }
+.ice-enter-left  { animation: iceEnterLeft  .40s cubic-bezier(.22,1,.36,1) both; }
+
+/* ── Skeleton shimmer (for slow-loading content) ── */
+.ice-skel {
+  border-radius: 14px;
+  background: linear-gradient(90deg,
+    var(--ice-surface2,#F1F5F9) 25%,
+    rgba(255,255,255,.75) 50%,
+    var(--ice-surface2,#F1F5F9) 75%
+  );
+  background-size: 300% 100%;
+  animation: iceSkelShimmer 1.6s ease infinite;
+}
+.dark-mode .ice-skel {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,.04) 25%, rgba(255,255,255,.11) 50%, rgba(255,255,255,.04) 75%
+  );
+  background-size: 300% 100%;
+}
+@keyframes iceSkelShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .ice-page-out, .ice-page-in { animation: none !important; opacity: 1 !important; transform: none !important; }
-  #ice-progress { transition: none; }
+  .ice-exit-up, .ice-exit-left, .ice-exit-right,
+  .ice-enter-up, .ice-enter-down, .ice-enter-left, .ice-enter-right {
+    animation: none !important; opacity: 1 !important;
+    transform: none !important; filter: none !important;
+  }
+  #ice-progress { transition: none; animation: none; }
+  .ice-skel { animation: none; }
 }
     </style>
     {% block custom_css %}{% endblock custom_css %}
@@ -71,6 +163,7 @@
 
 <body id="stu-body">
     <div id="ice-progress"></div>
+    <div id="ice-overlay"></div>
     <!-- ── Top Navbar ──────────────────────────────────────────────────────── -->
     <nav class="erpnext-navbar">
         <div class="navbar-left">
@@ -376,24 +469,36 @@
     </script>
 
     <script>
-/* ── Page Transitions ───────────────────────────────────────────────── */
+/* ── ICEBERG Premium Page Transitions ──────────────────────────────── */
 (function () {
+  'use strict';
+
+  var TRANS_KEY = 'ice_tx'; // sessionStorage: pending enter class for next page
+
   var bar     = document.getElementById('ice-progress');
+  var overlay = document.getElementById('ice-overlay');
   var content = document.getElementById('main-content');
   var barTimer = null;
   var navTimer = null;
 
-  /* ── Progress bar ── */
+  var ALL_EXIT  = ['ice-exit-up',  'ice-exit-left',  'ice-exit-right'];
+  var ALL_ENTER = ['ice-enter-up', 'ice-enter-down', 'ice-enter-left', 'ice-enter-right'];
+  var ALL_ICE   = ALL_EXIT.concat(ALL_ENTER);
+
+  /* ── Progress bar ──────────────────────────────────────────────────── */
   function barStart() {
     if (!bar) return;
     clearInterval(barTimer);
+    bar.style.transition = 'none';
     bar.style.width = '0%';
     bar.classList.add('ice-active');
+    void bar.offsetWidth;          // reflow so reset is instant
+    bar.style.transition = '';
     var w = 0;
     barTimer = setInterval(function () {
-      w += (88 - w) * 0.07;
+      w += (92 - w) * 0.055;
       bar.style.width = w + '%';
-    }, 30);
+    }, 25);
   }
   function barDone() {
     if (!bar) return;
@@ -401,19 +506,54 @@
     bar.style.width = '100%';
     setTimeout(function () {
       bar.classList.remove('ice-active');
-      setTimeout(function () { bar.style.width = '0%'; }, 300);
+      setTimeout(function () { bar.style.width = '0%'; }, 350);
     }, 200);
   }
 
-  /* ── Determine if a link is safe to intercept ── */
-  function isSafe(a) {
+  /* ── Overlay ───────────────────────────────────────────────────────── */
+  function overlayOn()  { if (overlay) overlay.classList.add('ice-active');    }
+  function overlayOff() { if (overlay) overlay.classList.remove('ice-active'); }
+
+  /* ── GPU hint ──────────────────────────────────────────────────────── */
+  function wcOn()  { if (content) content.style.willChange = 'transform, opacity, filter'; }
+  function wcOff() { if (content) content.style.willChange = ''; }
+
+  /* ── Remove all transition classes ────────────────────────────────── */
+  function clearIce() {
+    if (content) ALL_ICE.forEach(function (c) { content.classList.remove(c); });
+  }
+
+  /* ── Bottom-nav direction ──────────────────────────────────────────── */
+  function bnDir(a) {
+    var bnav = document.getElementById('bottom-nav');
+    if (!bnav || !bnav.contains(a)) return null;
+    var items  = Array.from(bnav.querySelectorAll('a.bottom-nav-item'));
+    var curIdx  = items.findIndex(function (el) { return el.classList.contains('active'); });
+    var destIdx = items.indexOf(a);
+    if (curIdx < 0 || destIdx < 0 || curIdx === destIdx) return null;
+    return destIdx > curIdx ? 'right' : 'left';
+  }
+
+  /* ── Pick exit / enter class pair ─────────────────────────────────── */
+  function classify(a) {
+    var dir = bnDir(a);
+    // Bottom-nav: slide horizontally in the direction of the tapped item
+    if (dir === 'right') return { exit: 'ice-exit-left',  enter: 'ice-enter-right' };
+    if (dir === 'left')  return { exit: 'ice-exit-right', enter: 'ice-enter-left'  };
+    // Sidebar / all other internal links: vertical soft slide
+    return { exit: 'ice-exit-up', enter: 'ice-enter-up' };
+  }
+
+  /* ── Safe-to-intercept check ───────────────────────────────────────── */
+  function safe(a) {
     if (!a || !a.href) return false;
     try {
-      var url = new URL(a.href);
-      // External origin
-      if (url.origin !== window.location.origin) return false;
-      // Hash-only scroll on same page
-      if (url.pathname === window.location.pathname && url.hash) return false;
+      var u = new URL(a.href);
+      if (u.origin !== window.location.origin) return false;
+      // Same-page hash anchor — let browser scroll, don't transition
+      if (u.pathname === window.location.pathname && u.hash) return false;
+      // Already on this exact page
+      if (u.href === window.location.href) return false;
     } catch (e) { return false; }
     if (a.target === '_blank') return false;
     var raw = a.getAttribute('href') || '';
@@ -422,56 +562,82 @@
     return true;
   }
 
-  /* ── Intercept link clicks ── */
+  /* ── Click interceptor ─────────────────────────────────────────────── */
   document.addEventListener('click', function (e) {
     if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     var a = e.target.closest('a[href]');
     if (!a) return;
-    // Never intercept links inside forms (POST actions, logout, etc.)
-    if (a.closest('form')) return;
-    if (!isSafe(a)) return;
+    if (a.closest('form')) return; // POST / logout — never intercept
+    if (!safe(a)) return;
 
     e.preventDefault();
     var dest = a.href;
+    var tx   = classify(a);
+
+    // Persist the enter class so the destination page picks it up
+    try { sessionStorage.setItem(TRANS_KEY, tx.enter); } catch (_) {}
+
     barStart();
-    if (content) {
-      content.classList.remove('ice-page-in');
-      void content.offsetWidth; // force reflow to restart animation
-      content.classList.add('ice-page-out');
-    }
+    overlayOn();
+    wcOn();
+    clearIce();
+    if (content) void content.offsetWidth;
+    if (content) content.classList.add(tx.exit);
+
     clearTimeout(navTimer);
-    navTimer = setTimeout(function () { window.location.href = dest; }, 180);
+    navTimer = setTimeout(function () { window.location.href = dest; }, 260);
   });
 
-  /* ── Page-in animation on load ── */
-  function pageIn() {
-    if (!content) return;
-    content.classList.remove('ice-page-out', 'ice-page-in');
-    void content.offsetWidth;
-    content.classList.add('ice-page-in');
+  /* ── Page-in animation ─────────────────────────────────────────────── */
+  function pageIn(isBack) {
+    if (!content) { barDone(); overlayOff(); return; }
+
+    var enClass = 'ice-enter-up'; // default
+    if (isBack) {
+      enClass = 'ice-enter-down'; // back gesture reverses direction
+    } else {
+      try {
+        var stored = sessionStorage.getItem(TRANS_KEY);
+        if (stored) { enClass = stored; sessionStorage.removeItem(TRANS_KEY); }
+      } catch (_) {}
+    }
+
+    clearIce();
+    wcOn();
+    void content.offsetWidth; // force reflow so 'from' keyframe applies immediately
+    content.classList.add(enClass);
     barDone();
+    overlayOff();
+
     content.addEventListener('animationend', function () {
-      content.classList.remove('ice-page-in');
+      content.classList.remove(enClass);
+      wcOff();
     }, { once: true });
   }
 
+  /* ── Init ──────────────────────────────────────────────────────────── */
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', pageIn);
+    document.addEventListener('DOMContentLoaded', function () { pageIn(false); });
   } else {
-    pageIn();
+    pageIn(false);
   }
 
-  /* ── Restore cleanly from bfcache (browser back/forward) ── */
+  /* ── bfcache restore (browser Back / Forward button) ──────────────── */
   window.addEventListener('pageshow', function (e) {
     if (!e.persisted) return;
     clearTimeout(navTimer);
-    barDone();
+    // Strip any lingering exit state left when we navigated away
     if (content) {
-      content.classList.remove('ice-page-out', 'ice-page-in');
-      content.style.opacity = '1';
-      content.style.transform = 'none';
+      clearIce();
+      content.style.opacity  = '';
+      content.style.transform = '';
+      content.style.filter   = '';
     }
+    barDone();
+    overlayOff();
+    pageIn(true); // enter with reverse (down) direction for back feel
   });
+
 })();
     </script>
     {% block custom_js %}{% endblock custom_js %}
