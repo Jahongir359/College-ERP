@@ -21,7 +21,15 @@
     <script>
     /* Apply theme before paint to prevent flash */
     (function(){
-      var t='{{ student_theme|default:"system" }}';
+      var userType='{{ user.user_type|default:"" }}';
+      var t;
+      if(userType==='3'){
+        /* Students: theme is stored in DB and injected by context processor */
+        t='{{ student_theme|default:"system" }}';
+      } else {
+        /* Teachers / Admins: theme lives in localStorage */
+        try { t=localStorage.getItem('ice_ui_theme')||'system'; } catch(e){ t='system'; }
+      }
       function applyDark(){
         document.documentElement.setAttribute('data-theme','dark');
         document.documentElement.classList.add('dark-mode');
@@ -47,6 +55,15 @@
         </div>
 
         <div class="navbar-user">
+            <!-- Theme Toggle (Teacher/Admin only — students use profile settings) -->
+            {% if user.user_type == '1' or user.user_type == '2' %}
+            <button type="button" id="navbar-theme-toggle" class="navbar-notification"
+                    title="Toggle dark/light mode" onclick="iceToggleTheme()"
+                    style="border:none;background:none;cursor:pointer;">
+                <i class="fas fa-moon" id="navbar-theme-icon"></i>
+            </button>
+            {% endif %}
+
             <!-- Notification Bell -->
             {% if user.user_type == '1' %}
                 {% url 'admin_notify_student' as notif_url %}
@@ -263,6 +280,31 @@
     window.addEventListener('resize', function() {
         if (!isMobile()) document.body.classList.remove('sidebar-open');
     });
+
+    /* ── Theme toggle (Teacher / Admin) ─────────────────────────────────── */
+    window.iceToggleTheme = function () {
+        var isDark = document.documentElement.classList.contains('dark-mode');
+        var newTheme = isDark ? 'bright' : 'dark';
+        try { localStorage.setItem('ice_ui_theme', newTheme); } catch(e){}
+        if (newTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark-mode');
+            document.body.classList.add('dark-mode');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            document.documentElement.classList.remove('dark-mode');
+            document.body.classList.remove('dark-mode');
+        }
+        _syncThemeIcon();
+        if (window.recreateAllCharts) window.recreateAllCharts();
+    };
+    function _syncThemeIcon() {
+        var icon = document.getElementById('navbar-theme-icon');
+        if (!icon) return;
+        var isDark = document.documentElement.classList.contains('dark-mode');
+        icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    document.addEventListener('DOMContentLoaded', _syncThemeIcon);
 
     /* ── Auto-dismiss alerts ─────────────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function() {

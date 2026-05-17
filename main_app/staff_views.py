@@ -910,10 +910,17 @@ def _notify_vocab_day(day: VocabularyDay):
 
 
 @staff_only
+def _story_storage_ok():
+    import os
+    return bool(os.environ.get('SPACES_KEY') and os.environ.get('SPACES_BUCKET'))
+
+
 def staff_create_story(request):
     staff = get_object_or_404(Staff, admin=request.user)
     if request.method == 'POST':
         form = DashboardStoryForm(request.POST, request.FILES)
+        # Restrict target_groups to teacher's own groups before validation
+        form.fields['target_groups'].queryset = Group.objects.filter(teacher=staff, is_archived=False)
         if form.is_valid():
             story = form.save(commit=False)
             story.created_by = request.user
@@ -923,9 +930,9 @@ def staff_create_story(request):
             return redirect(reverse('staff_create_story'))
     else:
         form = DashboardStoryForm()
-        # Pre-filter groups to only this teacher's groups
         form.fields['target_groups'].queryset = Group.objects.filter(teacher=staff, is_archived=False)
     return render(request, 'staff_template/staff_story_form.html', {
         'form': form,
         'page_title': 'Post a Story',
+        'storage_ok': _story_storage_ok(),
     })

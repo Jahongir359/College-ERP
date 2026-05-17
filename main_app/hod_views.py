@@ -1204,6 +1204,12 @@ def manage_stories(request):
     })
 
 
+def _story_storage_ok():
+    """True when a persistent remote storage backend is active (e.g. S3/Spaces)."""
+    import os
+    return bool(os.environ.get('SPACES_KEY') and os.environ.get('SPACES_BUCKET'))
+
+
 @admin_only
 def add_story(request):
     if request.method == 'POST':
@@ -1221,6 +1227,7 @@ def add_story(request):
         'form': form,
         'page_title': 'New Story',
         'action': 'Add',
+        'storage_ok': _story_storage_ok(),
     })
 
 
@@ -1240,6 +1247,7 @@ def edit_story(request, story_id):
         'story': story,
         'page_title': 'Edit Story',
         'action': 'Save',
+        'storage_ok': _story_storage_ok(),
     })
 
 

@@ -3,31 +3,354 @@
 {% block page_title %}Post a Story{% endblock %}
 {% block breadcrumb %}<li class="breadcrumb-item active">Post Story</li>{% endblock %}
 
+{% block custom_css %}
+<style>
+.sf { --sf-bg: #F4F6FB; --sf-surf: #fff; --sf-bdr: #E2EAF4; --sf-text: #0C1A36;
+      --sf-muted: #64748B; --sf-cyan: #06B6D4; --sf-navy: #0C1F45; }
+.dark-mode .sf { --sf-bg: #08121F; --sf-surf: #0D1B2F; --sf-bdr: #18304F;
+                 --sf-text: #E2E8F0; --sf-muted: #8CA4BE; }
+
+.sf-card {
+  max-width: 680px; margin: 0 auto;
+  background: var(--sf-surf); border: 1.5px solid var(--sf-bdr);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 4px 24px rgba(12,31,69,.08);
+}
+.sf-head {
+  padding: 16px 22px; border-bottom: 1.5px solid var(--sf-bdr);
+  font-size: 13px; font-weight: 700; color: var(--sf-text);
+  display: flex; align-items: center; gap: 8px;
+}
+.sf-body { padding: 24px 22px; display: flex; flex-direction: column; gap: 0; }
+
+.sf-field { margin-bottom: 18px; }
+.sf-label {
+  display: block; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--sf-muted); margin-bottom: 7px;
+}
+.sf-label .req { color: #EF4444; }
+.sf-hint { font-size: 11px; color: var(--sf-muted); margin-top: 5px; }
+.sf-err  { font-size: 11px; color: #EF4444; margin-top: 4px; }
+
+.sf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 520px) { .sf-row { grid-template-columns: 1fr; } }
+
+.sf-warn {
+  background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3);
+  border-radius: 10px; padding: 10px 14px; margin-bottom: 18px;
+  font-size: 12px; color: #92400E; display: flex; align-items: flex-start; gap: 8px;
+}
+.dark-mode .sf-warn { color: #FCD34D; background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.25); }
+
+/* Toggle */
+.sf-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border: 1.5px solid var(--sf-bdr);
+  border-radius: 12px; background: var(--sf-bg);
+}
+.dark-mode .sf-toggle-row { background: rgba(255,255,255,.03); }
+.sf-toggle-text { font-size: 14px; font-weight: 600; color: var(--sf-text); }
+.sf-toggle-sub  { font-size: 12px; color: var(--sf-muted); margin-top: 2px; }
+.sf-toggle-input { display: none; }
+.sf-toggle-switch {
+  position: relative; width: 46px; height: 26px; cursor: pointer; flex-shrink: 0;
+}
+.sf-toggle-switch span {
+  position: absolute; inset: 0; border-radius: 999px;
+  background: #CBD5E1; transition: background .2s;
+}
+.sf-toggle-switch span::after {
+  content: ''; position: absolute; left: 3px; top: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  transition: transform .2s;
+}
+.sf-toggle-input:checked + .sf-toggle-switch span { background: var(--sf-cyan); }
+.sf-toggle-input:checked + .sf-toggle-switch span::after { transform: translateX(20px); }
+
+/* Group chips */
+.sf-groups-grid { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+.sf-group-chip { display: none; }
+.sf-group-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px;
+  border: 1.5px solid var(--sf-bdr); background: var(--sf-bg);
+  font-size: 13px; font-weight: 600; color: var(--sf-muted);
+  cursor: pointer; user-select: none; transition: all .15s;
+}
+.sf-group-label:hover { border-color: var(--sf-cyan); color: var(--sf-text); }
+.sf-group-chip:checked + .sf-group-label {
+  background: rgba(6,182,212,.12); border-color: var(--sf-cyan); color: var(--sf-cyan);
+}
+.sf-group-label .sf-check { display: none; }
+.sf-group-chip:checked + .sf-group-label .sf-check { display: inline; }
+.dark-mode .sf-group-label { background: rgba(255,255,255,.04); }
+.dark-mode .sf-group-chip:checked + .sf-group-label { background: rgba(6,182,212,.16); }
+
+/* Expiry */
+.sf-expiry-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.sf-expiry-btn {
+  padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--sf-bdr); background: var(--sf-bg);
+  color: var(--sf-muted); cursor: pointer; transition: all .15s;
+}
+.sf-expiry-btn:hover, .sf-expiry-btn.active {
+  border-color: var(--sf-cyan); background: rgba(6,182,212,.1); color: var(--sf-cyan);
+}
+.sf-expiry-custom { margin-top: 10px; }
+
+/* Image preview */
+.sf-img-preview {
+  margin-top: 10px; border-radius: 12px; overflow: hidden;
+  border: 1.5px solid var(--sf-bdr); max-height: 180px; position: relative;
+}
+.sf-img-preview img { width: 100%; height: 180px; object-fit: cover; display: block; }
+.sf-img-preview-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,.5); color: #fff; font-size: 11px;
+  padding: 5px 10px; text-align: center;
+}
+
+/* Colour */
+.sf-color-row { display: flex; align-items: center; gap: 12px; }
+.sf-color-swatch {
+  width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--sf-bdr);
+  cursor: pointer; transition: transform .15s; flex-shrink: 0;
+}
+.sf-color-swatch:hover { transform: scale(1.05); }
+
+/* Actions */
+.sf-submit {
+  width: 100%; padding: 13px; border-radius: 12px;
+  background: linear-gradient(135deg, #0C1F45, #1B3F7A);
+  color: #fff; font-size: 15px; font-weight: 700; border: none; cursor: pointer;
+  margin-top: 6px; transition: opacity .15s;
+}
+.sf-submit:hover { opacity: .9; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width:640px;margin:0 auto;">
-  <div style="background:var(--ice-surface);border:1.5px solid var(--ice-border);border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(12,31,69,.07);">
-    <div style="padding:18px 22px;border-bottom:1.5px solid var(--ice-border);font-size:13px;font-weight:700;color:var(--ice-text);">
-      <i class="fas fa-film me-2" style="color:var(--ice-cyan);"></i>Post a Story to Student Dashboards
+<div class="sf">
+<div class="sf-card">
+  <div class="sf-head">
+    <i class="fas fa-film" style="color:var(--sf-cyan);"></i>
+    Post a Story to Student Dashboards
+  </div>
+  <div class="sf-body">
+
+    {% if messages %}{% for m in messages %}
+    <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}{% endif %}
+
+    {% if not storage_ok %}
+    <div class="sf-warn">
+      <i class="fas fa-exclamation-triangle" style="margin-top:1px;flex-shrink:0;"></i>
+      <span>Images are saved to local disk and will disappear after the next server redeploy. Ask your administrator to configure cloud storage (Spaces/S3).</span>
     </div>
-    <div style="padding:24px 22px;">
-      {% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
-      <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for field in form %}
-        <div style="margin-bottom:18px;">
-          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ice-muted);margin-bottom:7px;">
-            {{ field.label }}{% if field.field.required %} <span style="color:#EF4444;">*</span>{% endif %}
-          </label>
-          {{ field }}
-          {% if field.help_text %}<div style="font-size:11px;color:var(--ice-muted);margin-top:4px;">{{ field.help_text }}</div>{% endif %}
-          {% if field.errors %}<div style="font-size:11px;color:#EF4444;margin-top:4px;">{{ field.errors.0 }}</div>{% endif %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" id="sf-form">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger" style="margin-bottom:16px;">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <!-- Title -->
+      <div class="sf-field">
+        <label class="sf-label">Title <span class="req">*</span></label>
+        {{ form.title }}
+        {% if form.title.errors %}<div class="sf-err">{{ form.title.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Body -->
+      <div class="sf-field">
+        <label class="sf-label">Body text</label>
+        {{ form.body }}
+        {% if form.body.errors %}<div class="sf-err">{{ form.body.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Type + Emoji -->
+      <div class="sf-row sf-field">
+        <div>
+          <label class="sf-label">Story type</label>
+          {{ form.story_type }}
+          {% if form.story_type.errors %}<div class="sf-err">{{ form.story_type.errors.0 }}</div>{% endif %}
         </div>
-        {% endfor %}
-        <button type="submit" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#0C1F45,#1B3F7A);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;">
-          <i class="fas fa-paper-plane me-1"></i> Publish Story
-        </button>
-      </form>
-    </div>
+        <div>
+          <label class="sf-label">Emoji (no image)</label>
+          {{ form.emoji }}
+          {% if form.emoji.errors %}<div class="sf-err">{{ form.emoji.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- Background colour -->
+      <div class="sf-field">
+        <label class="sf-label">Card colour (shown without image)</label>
+        <div class="sf-color-row">
+          <input type="color" id="sf-color-pick" value="{{ form.bg_color.value|default:'#0C1F45' }}"
+                 oninput="document.getElementById('sf-color-text').value=this.value;document.getElementById('sf-color-swatch').style.background=this.value;"
+                 style="width:0;height:0;opacity:0;position:absolute;">
+          <div id="sf-color-swatch" class="sf-color-swatch"
+               style="background:{{ form.bg_color.value|default:'#0C1F45' }};"
+               onclick="document.getElementById('sf-color-pick').click();"
+               title="Pick colour"></div>
+          <input type="text" id="sf-color-text" class="form-control"
+                 value="{{ form.bg_color.value|default:'#0C1F45' }}" maxlength="7"
+                 oninput="var v=this.value;if(/^#[0-9a-fA-F]{6}$/.test(v)){document.getElementById('sf-color-swatch').style.background=v;document.getElementById('sf-color-pick').value=v;}"
+                 style="max-width:120px;" name="_color_text">
+          <input type="hidden" id="sf-bg-color-real" name="bg_color" value="{{ form.bg_color.value|default:'#0C1F45' }}">
+        </div>
+        {% if form.bg_color.errors %}<div class="sf-err">{{ form.bg_color.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Image upload -->
+      <div class="sf-field">
+        <label class="sf-label">Cover image (optional)</label>
+        {{ form.image }}
+        <div class="sf-hint">Recommended: 800×400 px or wider. JPG or PNG.</div>
+        {% if form.image.errors %}<div class="sf-err">{{ form.image.errors.0 }}</div>{% endif %}
+        <div class="sf-img-preview" id="sf-img-new" style="display:none;">
+          <img id="sf-img-new-img" src="" alt="Preview">
+          <div class="sf-img-preview-label">New image selected</div>
+        </div>
+      </div>
+
+      <!-- Target groups -->
+      <div class="sf-field">
+        <label class="sf-label">Target groups <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(leave all unchecked = visible to all your students)</span></label>
+        <div class="sf-groups-grid">
+          {% for choice in form.target_groups %}
+          <input type="checkbox" class="sf-group-chip" name="target_groups"
+                 id="{{ choice.id_for_label }}" value="{{ choice.data.value }}"
+                 {% if choice.data.selected %}checked{% endif %}>
+          <label for="{{ choice.id_for_label }}" class="sf-group-label">
+            <i class="fas fa-check sf-check"></i>
+            {{ choice.choice_label }}
+          </label>
+          {% endfor %}
+          {% if not form.target_groups %}
+          <span style="font-size:13px;color:var(--sf-muted);">No groups assigned to you yet.</span>
+          {% endif %}
+        </div>
+        {% if form.target_groups.errors %}<div class="sf-err">{{ form.target_groups.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Expiry presets -->
+      <div class="sf-field">
+        <label class="sf-label">Expires after</label>
+        <div class="sf-expiry-presets">
+          <button type="button" class="sf-expiry-btn" data-hours="1">1 hour</button>
+          <button type="button" class="sf-expiry-btn" data-hours="24">24 hours</button>
+          <button type="button" class="sf-expiry-btn" data-hours="72">3 days</button>
+          <button type="button" class="sf-expiry-btn" data-hours="168">7 days</button>
+          <button type="button" class="sf-expiry-btn" data-hours="0">Never</button>
+          <button type="button" class="sf-expiry-btn" data-hours="custom" id="sf-expiry-custom-btn">Custom…</button>
+        </div>
+        <div class="sf-expiry-custom" id="sf-expiry-custom-wrap" style="display:none;">
+          {{ form.expires_at }}
+          <div class="sf-hint">Leave blank (Never) to keep the story visible indefinitely.</div>
+        </div>
+        {% if form.expires_at.errors %}<div class="sf-err">{{ form.expires_at.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Is active toggle -->
+      <div class="sf-field">
+        <label class="sf-label">Visibility</label>
+        <div class="sf-toggle-row">
+          <div>
+            <div class="sf-toggle-text">Show on student dashboards</div>
+            <div class="sf-toggle-sub">Disable to draft without deleting</div>
+          </div>
+          <label style="display:flex;align-items:center;cursor:pointer;">
+            <input type="checkbox" class="sf-toggle-input" name="is_active"
+                   id="id_is_active" {% if form.is_active.value %}checked{% endif %}>
+            <span class="sf-toggle-switch"><span></span></span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="sf-submit">
+        <i class="fas fa-paper-plane me-1"></i> Publish Story
+      </button>
+    </form>
+
   </div>
 </div>
+</div>
+
+<script>
+(function () {
+  /* Colour picker */
+  var colorText = document.getElementById('sf-color-text');
+  var colorReal = document.getElementById('sf-bg-color-real');
+  function syncColor() {
+    var v = colorText.value.trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) colorReal.value = v;
+  }
+  colorText.addEventListener('input', syncColor);
+  document.getElementById('sf-form').addEventListener('submit', syncColor);
+
+  /* Image preview */
+  var imgInput = document.querySelector('input[type="file"][name="image"]');
+  if (imgInput) {
+    imgInput.addEventListener('change', function () {
+      var f = this.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('sf-img-new-img').src = e.target.result;
+        document.getElementById('sf-img-new').style.display = '';
+      };
+      reader.readAsDataURL(f);
+    });
+  }
+
+  /* Expiry presets */
+  var expiresInput = document.querySelector('input[name="expires_at"]');
+  var customWrap   = document.getElementById('sf-expiry-custom-wrap');
+  var customBtn    = document.getElementById('sf-expiry-custom-btn');
+  var presetBtns   = document.querySelectorAll('.sf-expiry-btn:not(#sf-expiry-custom-btn)');
+
+  function setActive(btn) {
+    document.querySelectorAll('.sf-expiry-btn').forEach(function (b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+  }
+  (function () {
+    var existingVal = expiresInput ? expiresInput.value : '';
+    if (!existingVal) {
+      document.querySelectorAll('.sf-expiry-btn').forEach(function (b) {
+        if (b.dataset.hours === '0') setActive(b);
+      });
+      customWrap.style.display = 'none';
+    } else {
+      customWrap.style.display = '';
+      setActive(customBtn);
+    }
+  })();
+
+  presetBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var h = parseInt(this.dataset.hours, 10);
+      customWrap.style.display = 'none';
+      setActive(this);
+      if (!expiresInput) return;
+      if (h === 0) { expiresInput.value = ''; return; }
+      var d = new Date(Date.now() + h * 3600 * 1000);
+      var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+      expiresInput.value =
+        d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+        'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    });
+  });
+
+  customBtn.addEventListener('click', function () {
+    customWrap.style.display = '';
+    setActive(customBtn);
+    if (expiresInput && !expiresInput.value) expiresInput.focus();
+  });
+})();
+</script>
 {% endblock %}

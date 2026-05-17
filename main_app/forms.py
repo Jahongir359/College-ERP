@@ -458,15 +458,27 @@ class DashboardStoryForm(FormSettings):
         fields = ['title', 'body', 'image', 'story_type', 'emoji', 'bg_color',
                   'target_groups', 'is_active', 'expires_at']
         widgets = {
-            'title':        forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Story title'}),
-            'body':         forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Short description…'}),
-            'story_type':   forms.Select(attrs={'class': 'form-control'}),
-            'emoji':        forms.TextInput(attrs={'class': 'form-control', 'placeholder': '📢', 'maxlength': 8}),
-            'bg_color':     forms.TextInput(attrs={'class': 'form-control', 'type': 'color'}),
-            'target_groups':forms.CheckboxSelectMultiple(),
-            'is_active':    forms.CheckboxInput(),
-            'expires_at':   forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'title':         forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Story title'}),
+            'body':          forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Short description…'}),
+            'story_type':    forms.Select(attrs={'class': 'form-control'}),
+            'emoji':         forms.TextInput(attrs={'class': 'form-control', 'placeholder': '📢', 'maxlength': 8}),
+            'bg_color':      forms.TextInput(attrs={'class': 'form-control'}),
+            'target_groups': forms.CheckboxSelectMultiple(),
+            'is_active':     forms.CheckboxInput(),
+            'expires_at':    forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Prevent FormSettings from stamping form-control onto checkbox widgets
+        for name in ('target_groups', 'is_active'):
+            if name in self.fields:
+                self.fields[name].widget.attrs.pop('class', None)
+        # Initialise datetime-local input from existing value (converted to local time)
+        if self.instance and self.instance.pk and self.instance.expires_at:
+            from django.utils import timezone as _tz
+            local_dt = _tz.localtime(self.instance.expires_at)
+            self.initial['expires_at'] = local_dt.strftime('%Y-%m-%dT%H:%M')
 
 
 class LeaderboardSettingsForm(FormSettings):
