@@ -123,6 +123,17 @@
 
 {% block content %}
 
+<!-- Weekly submission trend -->
+<div class="trend-card">
+  <div class="trend-card-head">
+    <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Submission Rate</h4>
+    <span class="trend-meta" id="hw-trend-meta">—</span>
+  </div>
+  <div class="trend-card-body" id="hw-trend-body">
+    <canvas id="hwTrendChart"></canvas>
+  </div>
+</div>
+
 <div class="page-toolbar">
   <div class="page-count">
     <i class="fas fa-tasks me-1" style="color:var(--ice-cyan);"></i>
@@ -197,5 +208,32 @@ function filterAssignments(type, btn) {
     }
   });
 }
+
+(function () {
+  var trend = {{ trend_json|safe }};
+  var hasData = (trend.values || []).some(function (v) { return v !== null; });
+  if (hasData && window.IcebergTrend) {
+    IcebergTrend.line({
+      canvas: 'hwTrendChart',
+      labels: trend.labels,
+      series: [{
+        name: 'Submitted',
+        data: trend.values,
+        color: '#8B5CF6',
+      }],
+      suffix: '%',
+      yMax: 100,
+    });
+    var meta = document.getElementById('hw-trend-meta');
+    if (meta) meta.innerHTML = '<i class="fas fa-circle"></i> Avg ' + trend.avg + '%';
+  } else {
+    var body = document.getElementById('hw-trend-body');
+    if (body) body.innerHTML =
+      '<div class="trend-card-empty">' +
+        '<i class="fas fa-chart-line"></i>' +
+        '<p>Your submission rate trend will appear here once homework is assigned.</p>' +
+      '</div>';
+  }
+})();
 </script>
 {% endblock %}

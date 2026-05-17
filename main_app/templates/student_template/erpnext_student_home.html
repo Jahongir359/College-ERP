@@ -605,6 +605,35 @@
   </div>
   {% endif %}
 
+  <!-- ══ OVERALL PERFORMANCE TREND ════════════════════════════ -->
+  <div class="dash-section">
+    <h3 class="dash-section-title"><i class="fas fa-chart-line"></i> Performance Trend</h3>
+    <span class="dash-section-link" style="cursor:default;">Last 8 weeks</span>
+  </div>
+  <div class="trend-card" style="margin: 0 16px 12px;">
+    <div class="trend-card-head">
+      <h4 class="trend-card-title"><i class="fas fa-bolt"></i> Overall Performance</h4>
+      <span class="trend-meta" id="overall-trend-meta">—</span>
+    </div>
+    <div class="trend-card-body" id="overall-trend-body">
+      <canvas id="overallTrendChart"></canvas>
+    </div>
+    <div class="trend-card-foot">
+      <div class="trend-pill">
+        <div class="trend-pill-num" id="ot-att">—</div>
+        <div class="trend-pill-lbl">Attendance</div>
+      </div>
+      <div class="trend-pill">
+        <div class="trend-pill-num" id="ot-hw">—</div>
+        <div class="trend-pill-lbl">Homework</div>
+      </div>
+      <div class="trend-pill">
+        <div class="trend-pill-num" id="ot-qz">—</div>
+        <div class="trend-pill-lbl">Quizzes</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ 3. UPCOMING LESSONS ══════════════════════════════════ -->
   {% if subject_rows %}
   {% with accent_colors="#3B82F6,#10B981,#8B5CF6,#F59E0B,#EF4444,#06B6D4,#EC4899" %}
@@ -823,6 +852,44 @@
       }
     }, 5000);
   }
+
+  /* ── Overall performance trend chart ──────────────────────── */
+  var trend = {{ overall_trend_json|safe }};
+  var hasData = (trend.values || []).some(function (v) { return v !== null; });
+
+  if (hasData && window.IcebergTrend) {
+    IcebergTrend.line({
+      canvas: 'overallTrendChart',
+      labels: trend.labels,
+      series: [{
+        name: 'Performance',
+        data: trend.values,
+        color: '#06B6D4',
+      }],
+      suffix: '%',
+      yMax: 100,
+    });
+    var meta = document.getElementById('overall-trend-meta');
+    if (meta) meta.innerHTML = '<i class="fas fa-circle"></i> Avg ' + trend.avg + '%';
+  } else {
+    var body = document.getElementById('overall-trend-body');
+    if (body) body.innerHTML =
+      '<div class="trend-card-empty">' +
+        '<i class="fas fa-chart-line"></i>' +
+        '<p>Your performance trend will appear here once you have attendance, homework, or quiz data.</p>' +
+      '</div>';
+  }
+
+  /* Pills: latest non-null value */
+  function lastVal(arr) {
+    if (!arr) return null;
+    for (var i = arr.length - 1; i >= 0; i--) if (arr[i] !== null) return arr[i];
+    return null;
+  }
+  var fmt = function (v) { return v === null ? '—' : v + '%'; };
+  document.getElementById('ot-att').textContent = fmt(lastVal(trend.attendance));
+  document.getElementById('ot-hw').textContent  = fmt(lastVal(trend.homework));
+  document.getElementById('ot-qz').textContent  = fmt(lastVal(trend.quizzes));
 })();
 </script>
 {% endblock custom_js %}

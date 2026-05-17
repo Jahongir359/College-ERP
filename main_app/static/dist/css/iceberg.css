@@ -1758,3 +1758,131 @@ textarea.form-control { height: auto; min-height: 90px; }
   color: #fff !important;
   border-color: #EF4444 !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   Trend Chart Card — reusable premium line graph component
+   Used on: dashboard, scores, attendance, assignments, vocabulary
+══════════════════════════════════════════════════════════════════ */
+.trend-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 18px 20px 14px;
+  box-shadow: 0 4px 20px rgba(12, 31, 69, .07);
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.dark-mode .trend-card {
+  background: #0D1B2F;
+  border-color: #18304F;
+  box-shadow: none;
+}
+.trend-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 220px; height: 120px;
+  background: radial-gradient(ellipse at top right, rgba(6, 182, 212, .07), transparent 65%);
+  pointer-events: none;
+}
+.trend-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  position: relative;
+}
+.trend-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.trend-card-title i {
+  font-size: 13px;
+  color: #06B6D4;
+}
+.dark-mode .trend-card-title { color: #E2E8F0; }
+.trend-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(6, 182, 212, .12);
+  color: #0891B2;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.dark-mode .trend-meta { background: rgba(6, 182, 212, .18); color: #67E8F9; }
+.trend-meta i { font-size: 9px; }
+.trend-meta.up   { background: rgba(16,185,129,.14); color: #047857; }
+.trend-meta.down { background: rgba(239,68,68,.14);  color: #B91C1C; }
+.dark-mode .trend-meta.up   { background: rgba(16,185,129,.18); color: #6EE7B7; }
+.dark-mode .trend-meta.down { background: rgba(239,68,68,.16);  color: #FCA5A5; }
+
+.trend-card-body {
+  height: 200px;
+  position: relative;
+}
+.trend-card-empty {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted, #94A3B8);
+}
+.trend-card-empty i {
+  font-size: 30px;
+  opacity: .25;
+  margin-bottom: 10px;
+}
+.trend-card-empty p {
+  font-size: 12.5px;
+  margin: 0;
+  max-width: 240px;
+}
+
+/* Footer row beneath chart (avg / best / latest pills) */
+.trend-card-foot {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  margin-top: 6px;
+  border-top: 1px dashed var(--border);
+  position: relative;
+  flex-wrap: wrap;
+}
+.dark-mode .trend-card-foot { border-top-color: #18304F; }
+.trend-pill {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  padding: 6px 4px;
+}
+.trend-pill-num {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -.3px;
+}
+.dark-mode .trend-pill-num { color: #E2E8F0; }
+.trend-pill-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-muted, #94A3B8);
+  margin-top: 3px;
+}

@@ -343,6 +343,18 @@
 
   {% if results %}
 
+  <!-- ── Performance Trend ────────────────────────────────────── -->
+  <div class="rp-section-lbl">Score Trend</div>
+  <div class="trend-card" style="margin: 0 0 18px;">
+    <div class="trend-card-head">
+      <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Total Score by Result</h4>
+      <span class="trend-meta" id="scores-trend-meta">—</span>
+    </div>
+    <div class="trend-card-body" id="scores-trend-body">
+      <canvas id="scoresTrendChart"></canvas>
+    </div>
+  </div>
+
   <!-- ── Chart (multi-group only) ──────────────────────────────────────── -->
   {% if results|length > 1 %}
   <div class="rp-section-lbl">Score Overview</div>
@@ -556,6 +568,31 @@
   });
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+  /* ── Score trend line chart ───────────────────────────────────────────── */
+  var trend = {{ trend_json|safe }};
+  if (trend.labels && trend.labels.length && window.IcebergTrend) {
+    IcebergTrend.line({
+      canvas: 'scoresTrendChart',
+      labels: trend.labels,
+      series: [
+        { name: 'Total', data: trend.totals, color: '#06B6D4' },
+        { name: 'Test',  data: trend.tests,  color: '#F59E0B' },
+        { name: 'Exam',  data: trend.exams,  color: '#10B981' },
+      ],
+      suffix: '',
+      yMax: 100,
+    });
+    var meta = document.getElementById('scores-trend-meta');
+    if (meta) meta.innerHTML = '<i class="fas fa-circle"></i> Avg ' + trend.avg + '/100';
+  } else {
+    var body = document.getElementById('scores-trend-body');
+    if (body) body.innerHTML =
+      '<div class="trend-card-empty">' +
+        '<i class="fas fa-chart-line"></i>' +
+        '<p>Your score trend will appear here once you have graded results.</p>' +
+      '</div>';
+  }
 })();
 </script>
 {% endblock custom_js %}

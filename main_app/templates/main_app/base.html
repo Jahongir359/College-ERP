@@ -16,6 +16,7 @@
     <!-- iceberg.css loads LAST so its premium UI patches take precedence -->
     <link rel="stylesheet" href="{% static 'dist/css/iceberg.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'dist/js/trend-chart.js' %}"></script>
     {% block custom_css %}{% endblock custom_css %}
     <script>
     /* Apply theme before paint to prevent flash */

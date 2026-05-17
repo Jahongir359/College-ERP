@@ -122,6 +122,7 @@ def student_home(request):
             'bg':    s.bg_color,
             'img':   s.image.url if s.image else '',
         } for s in visible_stories]),
+        'overall_trend_json': json.dumps(_overall_performance_trend(student, weeks=8)),
         'page_title': 'My Dashboard',
     }
     return render(request, 'student_template/erpnext_student_home.html', context)
@@ -161,6 +162,154 @@ def _latest_result(student):
         .order_by('-id')
         .first()
     )
+
+
+# ── Time-series helpers for trend charts ────────────────────────────────────
+
+def _scores_trend(student):
+    """Chronological list of result totals for the scores line chart."""
+    results = (
+        StudentResult.objects.filter(student=student)
+        .select_related('group')
+        .order_by('created_at')
+    )
+    labels, totals, tests, exams = [], [], [], []
+    for r in results:
+        labels.append(r.group.name if r.group else 'General')
+        tests.append(int(r.test))
+        exams.append(int(r.exam))
+        totals.append(int(r.test) + int(r.exam))
+    return {
+        'labels': labels,
+        'totals': totals,
+        'tests':  tests,
+        'exams':  exams,
+        'avg':    round(sum(totals) / len(totals)) if totals else 0,
+    }
+
+
+def _attendance_weekly_trend(student, weeks=8):
+    """Weekly attendance % for the last `weeks` weeks (None for empty weeks)."""
+    from datetime import timedelta
+    today = datetime.now().date()
+    labels, values = [], []
+    for i in range(weeks - 1, -1, -1):
+        week_end = today - timedelta(days=i * 7)
+        week_start = week_end - timedelta(days=6)
+        reports = AttendanceReport.objects.filter(
+            student=student,
+            attendance__date__gte=week_start,
+            attendance__date__lte=week_end,
+        )
+        total = reports.count()
+        if total == 0:
+            value = None
+        else:
+            present = reports.filter(
+                status__in=[AttendanceReport.PRESENT, AttendanceReport.LATE]
+            ).count()
+            value = round((present / total) * 100)
+        labels.append(week_start.strftime('%b %d'))
+        values.append(value)
+    seen = [v for v in values if v is not None]
+    return {
+        'labels': labels,
+        'values': values,
+        'avg':    round(sum(seen) / len(seen)) if seen else 0,
+    }
+
+
+def _homework_weekly_trend(student, weeks=8):
+    """Weekly homework submission rate (% submitted by due_date) for last N weeks."""
+    from datetime import timedelta
+    today = datetime.now().date()
+    enrolled_group_ids = list(
+        Enrollment.objects.filter(student=student, is_active=True)
+        .values_list('group_id', flat=True)
+    )
+    labels, values = [], []
+    for i in range(weeks - 1, -1, -1):
+        week_end = today - timedelta(days=i * 7)
+        week_start = week_end - timedelta(days=6)
+        due_assignments = Assignment.objects.filter(
+            group_id__in=enrolled_group_ids,
+            due_date__gte=week_start,
+            due_date__lte=week_end,
+        )
+        total_due = due_assignments.count()
+        if total_due == 0:
+            value = None
+        else:
+            submitted = Submission.objects.filter(
+                student=student,
+                assignment__in=due_assignments,
+            ).count()
+            value = round((submitted / total_due) * 100)
+        labels.append(week_start.strftime('%b %d'))
+        values.append(value)
+    seen = [v for v in values if v is not None]
+    return {
+        'labels': labels,
+        'values': values,
+        'avg':    round(sum(seen) / len(seen)) if seen else 0,
+    }
+
+
+def _vocab_quiz_trend(student):
+    """Chronological list of quiz scores."""
+    quizzes = (
+        VocabularyQuizResult.objects.filter(student=student)
+        .order_by('taken_at')
+    )
+    labels = [q.taken_at.strftime('%b %d') for q in quizzes]
+    values = [round(q.score) for q in quizzes]
+    return {
+        'labels': labels,
+        'values': values,
+        'avg':    round(sum(values) / len(values)) if values else 0,
+    }
+
+
+def _overall_performance_trend(student, weeks=8):
+    """
+    Combined performance: weekly mean of (attendance %, homework %, quiz avg).
+    Each week's value is the mean of whichever metrics had data that week,
+    so a student missing one metric isn't penalised.
+    """
+    from datetime import timedelta
+    today = datetime.now().date()
+
+    attendance = _attendance_weekly_trend(student, weeks)['values']
+    homework   = _homework_weekly_trend(student, weeks)['values']
+    quiz_vals  = []
+    labels = []
+    for i in range(weeks - 1, -1, -1):
+        week_end = today - timedelta(days=i * 7)
+        week_start = week_end - timedelta(days=6)
+        labels.append(week_start.strftime('%b %d'))
+        qs = VocabularyQuizResult.objects.filter(
+            student=student,
+            taken_at__date__gte=week_start,
+            taken_at__date__lte=week_end,
+        )
+        if qs.exists():
+            quiz_vals.append(round(sum(q.score for q in qs) / qs.count()))
+        else:
+            quiz_vals.append(None)
+
+    combined = []
+    for i in range(weeks):
+        avail = [v for v in (attendance[i], homework[i], quiz_vals[i]) if v is not None]
+        combined.append(round(sum(avail) / len(avail)) if avail else None)
+    seen = [v for v in combined if v is not None]
+    return {
+        'labels':      labels,
+        'values':      combined,
+        'attendance':  attendance,
+        'homework':    homework,
+        'quizzes':     quiz_vals,
+        'avg':         round(sum(seen) / len(seen)) if seen else 0,
+    }
 
 
 @student_only
@@ -225,6 +374,7 @@ def student_view_attendance(request):
             'month_message': month_message,
             'recent_rows': recent_rows,
             'status_by_date': json.dumps(status_by_date),
+            'trend_json': json.dumps(_attendance_weekly_trend(student, weeks=12)),
         }
         return render(request, 'student_template/student_view_attendance.html', context)
 
@@ -416,6 +566,7 @@ def student_view_result(request):
         'chart_exam':   json.dumps(chart_exam),
         'chart_total':  json.dumps(chart_total),
         'vocab_stage_counts': json.dumps(vocab_stage_counts),
+        'trend_json': json.dumps(_scores_trend(student)),
         'page_title': "View Results",
     }
     return render(request, "student_template/student_view_result.html", context)
@@ -464,6 +615,7 @@ def student_assignments(request):
     return render(request, 'student_template/student_assignments.html', {
         'assignments': assignments,
         'submitted_ids': submitted_ids,
+        'trend_json': json.dumps(_homework_weekly_trend(student, weeks=12)),
         'page_title': 'Assignments',
     })
 
@@ -553,6 +705,7 @@ def vocabulary_day_list(request):
         })
     return render(request, 'student_template/vocabulary_day_list.html', {
         'day_rows': day_rows,
+        'trend_json': json.dumps(_vocab_quiz_trend(student)),
         'page_title': 'Daily Vocabulary',
     })
 

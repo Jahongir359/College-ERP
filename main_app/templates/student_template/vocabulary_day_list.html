@@ -79,6 +79,17 @@
     <p>Your teacher's vocabulary sets — study each day's words, then test yourself.</p>
   </div>
 
+  <!-- Quiz score trend -->
+  <div class="trend-card">
+    <div class="trend-card-head">
+      <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Quiz Score Trend</h4>
+      <span class="trend-meta" id="vocab-trend-meta">—</span>
+    </div>
+    <div class="trend-card-body" id="vocab-trend-body">
+      <canvas id="vocabTrendChart"></canvas>
+    </div>
+  </div>
+
   {% if day_rows %}
   <div class="day-grid">
     {% for row in day_rows %}
@@ -120,4 +131,34 @@
   {% endif %}
 
 </div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+(function () {
+  var trend = {{ trend_json|safe }};
+  if (trend.labels && trend.labels.length && window.IcebergTrend) {
+    IcebergTrend.line({
+      canvas: 'vocabTrendChart',
+      labels: trend.labels,
+      series: [{
+        name: 'Quiz Score',
+        data: trend.values,
+        color: '#10B981',
+      }],
+      suffix: '%',
+      yMax: 100,
+    });
+    var meta = document.getElementById('vocab-trend-meta');
+    if (meta) meta.innerHTML = '<i class="fas fa-circle"></i> Avg ' + trend.avg + '%';
+  } else {
+    var body = document.getElementById('vocab-trend-body');
+    if (body) body.innerHTML =
+      '<div class="trend-card-empty">' +
+        '<i class="fas fa-chart-line"></i>' +
+        '<p>Take a vocabulary quiz to see your score trend here.</p>' +
+      '</div>';
+  }
+})();
+</script>
 {% endblock %}

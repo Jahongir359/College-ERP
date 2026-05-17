@@ -552,6 +552,17 @@ select.att-control {
     <div class="att-month-tile"><i class="fas fa-calendar-alt"></i></div>
   </section>
 
+  <!-- 2.5 — Weekly attendance trend -->
+  <div class="trend-card">
+    <div class="trend-card-head">
+      <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Weekly Attendance</h4>
+      <span class="trend-meta" id="att-trend-meta">—</span>
+    </div>
+    <div class="trend-card-body" id="att-trend-body">
+      <canvas id="attTrendChart"></canvas>
+    </div>
+  </div>
+
   <!-- 3. Calendar -->
   <section class="att-card">
     <div class="cal-head">
@@ -933,6 +944,32 @@ select.att-control {
       if (e.key === 'Enter') fetchBtn.click();
     });
   });
+
+  /* ── Weekly attendance trend chart ─────────────────────────────── */
+  var trend = {{ trend_json|safe }};
+  var hasData = (trend.values || []).some(function (v) { return v !== null; });
+  if (hasData && window.IcebergTrend) {
+    IcebergTrend.line({
+      canvas: 'attTrendChart',
+      labels: trend.labels,
+      series: [{
+        name: 'Attendance',
+        data: trend.values,
+        color: '#3B82F6',
+      }],
+      suffix: '%',
+      yMax: 100,
+    });
+    var meta = document.getElementById('att-trend-meta');
+    if (meta) meta.innerHTML = '<i class="fas fa-circle"></i> Avg ' + trend.avg + '%';
+  } else {
+    var body = document.getElementById('att-trend-body');
+    if (body) body.innerHTML =
+      '<div class="trend-card-empty">' +
+        '<i class="fas fa-chart-line"></i>' +
+        '<p>Your weekly attendance trend will appear here once classes start.</p>' +
+      '</div>';
+  }
 })();
 </script>
 {% endblock custom_js %}
