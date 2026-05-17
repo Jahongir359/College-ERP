@@ -435,6 +435,17 @@ def student_view_attendance(request):
         else:
             month_message = 'Needs your attention'
 
+        # All-time totals and current streak
+        att_total_present = sum(1 for s in status_by_date.values() if s == AttendanceReport.PRESENT)
+        att_total_late = sum(1 for s in status_by_date.values() if s == AttendanceReport.LATE)
+        att_total_absent = sum(1 for s in status_by_date.values() if s == AttendanceReport.ABSENT)
+        att_streak = 0
+        for iso in sorted(status_by_date.keys(), reverse=True):
+            if status_by_date[iso] in (AttendanceReport.PRESENT, AttendanceReport.LATE):
+                att_streak += 1
+            else:
+                break
+
         context = {
             'groups': groups,
             'page_title': 'Attendance',
@@ -447,6 +458,10 @@ def student_view_attendance(request):
             'recent_rows': recent_rows,
             'status_by_date': json.dumps(status_by_date),
             'trend_json': json.dumps(_attendance_weekly_trend(student, weeks=12)),
+            'att_total_present': att_total_present,
+            'att_total_late': att_total_late,
+            'att_total_absent': att_total_absent,
+            'att_streak': att_streak,
         }
         return render(request, 'student_template/student_view_attendance.html', context)
 
@@ -1278,10 +1293,19 @@ def vocabulary_day_list(request):
             'word_count': d.words.count(),
             'completed': d.id in completed_ids,
         })
+    total_days = len(day_rows)
+    total_completed_count = sum(1 for r in day_rows if r['completed'])
+    completion_pct = round(total_completed_count / total_days * 100) if total_days else 0
+    total_words = sum(r['word_count'] for r in day_rows)
+
     return render(request, 'student_template/vocabulary_day_list.html', {
         'day_rows': day_rows,
         'trend_json': json.dumps(_vocab_quiz_trend(student)),
         'page_title': 'Daily Vocabulary',
+        'total_days': total_days,
+        'total_completed_count': total_completed_count,
+        'completion_pct': completion_pct,
+        'total_words': total_words,
     })
 
 

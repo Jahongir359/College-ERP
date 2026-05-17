@@ -1,559 +1,380 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-
-{% block title %}{{ page_title }} — Iceberg Study Center{% endblock %}
-{% block page_title %}{{ page_title }}{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">Attendance</li>{% endblock %}
+{% block title %}Attendance — Iceberg Study Center{% endblock %}
+{% block page_title %}{% endblock %}
+{% block breadcrumb %}{% endblock %}
 
 {% block custom_css %}
 <style>
-/* ══ LAYOUT TAKEOVER — full-bleed page ═══════════════════════════ */
-.erpnext-main  { padding: 0 !important; }
-.content-area  { overflow: visible !important; }
+/* ══ LAYOUT ══════════════════════════════════════════════════════ */
+.page-header  { display: none !important; }
+.erpnext-main { padding: 0 !important; }
+.content-area { overflow: visible !important; }
 
-/* ── Page shell ─────────────────────────────────────────────── */
-.stu-page {
-  --c-bg: #F4F7FB;
-  --c-surface: #FFFFFF;
-  --c-text: #0F172A;
-  --c-muted: #64748B;
-  --c-border: #E6ECF5;
-  --c-blue: #2563EB;
-  --c-sky: #3B82F6;
-  --c-blue-bg: #E8F0FE;
-  --c-blue-soft: #DBEAFE;
-  --c-royal: #1F4FD9;
-  --c-navy-a: #0F1F5C;
-  --c-navy-b: #1340A8;
-  --c-success: #10B981;
-  --c-warning: #F59E0B;
-  --c-danger:  #EF4444;
-  background: var(--c-bg);
-  padding: 18px 16px 48px;
-  min-height: 100svh;
-  color: var(--c-text);
-  font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
+/* ══ TOKENS ══════════════════════════════════════════════════════ */
+.att {
+  --navy: #0C1F45; --navy-mid: #1B3F7A; --cyan: #06B6D4;
+  --bg: #EEF3FB; --surf: #ffffff; --bdr: #E2EAF4;
+  --txt: #0C1A36; --sub: #475569; --muted: #94A3B8;
+  --green: #10B981; --amber: #F59E0B; --red: #EF4444;
+  --r-sm: 14px; --r-md: 22px; --r-lg: 32px;
+  background: var(--bg); min-height: 100svh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  overflow-x: hidden; color: var(--txt);
 }
-@media (min-width: 640px) {
-  .stu-page { padding: 24px 28px 48px; }
-}
-@media (max-width: 768px) {
-  .stu-page { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+.dark-mode .att {
+  --bg: #070F1C; --surf: #0D1B2F; --bdr: #18304F;
+  --txt: #E2E8F0; --sub: #94AFC8; --muted: #5C7A9A;
 }
 
-/* ── Hero ───────────────────────────────────────────────────── */
+/* ══ HERO ════════════════════════════════════════════════════════ */
 .att-hero {
-  position: relative;
-  padding: 14px 6px 22px;
-  overflow: hidden;
+  background: linear-gradient(160deg, #06102A 0%, #0D2657 52%, #0E3E94 100%);
+  padding: 28px 20px 30px; position: relative; overflow: hidden;
 }
-.att-hero-bg {
-  position: absolute;
-  top: -40px;
-  right: -60px;
-  width: 280px;
-  height: auto;
-  opacity: .45;
+.att-hero::before {
+  content: ''; position: absolute; right: -60px; top: -60px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,.22) 0%, transparent 60%);
   pointer-events: none;
-  transform: rotate(8deg);
-  filter: saturate(.7);
-  z-index: 0;
 }
-.att-hero-inner { position: relative; z-index: 1; max-width: 70%; }
-.att-h1 {
-  font-family: 'Inter', serif;
-  font-weight: 900;
-  font-size: 30px;
-  line-height: 1.08;
-  letter-spacing: -0.8px;
-  margin: 0 0 6px;
-  color: var(--c-text);
+.att-hero::after {
+  content: ''; position: absolute; left: -40px; bottom: -80px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,.15) 0%, transparent 65%);
+  pointer-events: none;
 }
-.att-sub {
-  margin: 0;
-  color: var(--c-muted);
-  font-size: 13px;
-  font-weight: 500;
+.att-hero-inner { position: relative; z-index: 1; }
+.att-hero-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 14px; margin-bottom: 22px;
+  animation: attUp .4s ease both;
 }
-@media (min-width: 640px) {
-  .att-h1 { font-size: 38px; }
-  .att-hero-bg { width: 320px; right: -40px; }
+.att-hero-label {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: rgba(255,255,255,.45); margin-bottom: 6px;
+}
+.att-hero-title {
+  font-size: 30px; font-weight: 900; color: #fff;
+  letter-spacing: -.8px; line-height: 1.05; margin: 0 0 5px;
+}
+.att-hero-sub { font-size: 13px; color: rgba(255,255,255,.6); margin: 0; }
+
+/* Ring on hero right */
+.att-ring-wrap { width: 96px; height: 96px; position: relative; flex-shrink: 0; }
+.att-ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.att-ring-track { fill: none; stroke: rgba(255,255,255,.15); stroke-width: 9; }
+.att-ring-fill  { fill: none; stroke: #06B6D4; stroke-width: 9; stroke-linecap: round;
+  transition: stroke-dashoffset .9s cubic-bezier(.4,0,.2,1); }
+.att-ring-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.att-ring-pct { font-size: 22px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -.5px; }
+.att-ring-lbl { font-size: 9px; font-weight: 700; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+
+/* Hero stat row */
+.att-hero-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px;
+  animation: attUp .4s ease .08s both;
+}
+.att-hstat {
+  background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px; padding: 12px 8px; text-align: center;
+}
+.att-hstat-num { font-size: 21px; font-weight: 900; color: #fff; line-height: 1; }
+.att-hstat-lbl { font-size: 9.5px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: rgba(255,255,255,.45); margin-top: 3px; }
+
+/* AI insight strip */
+.att-insight {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: rgba(6,182,212,.1); border: 1px solid rgba(6,182,212,.22);
+  border-radius: 16px; padding: 13px 16px; margin: 14px 16px 0;
+  animation: attUp .4s ease .14s both;
+}
+.att-insight-icon {
+  width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0;
+  background: rgba(6,182,212,.2); color: #06B6D4; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.dark-mode .att-insight { background: rgba(6,182,212,.07); border-color: rgba(6,182,212,.18); }
+.att-insight-head { font-size: 9.5px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .08em; color: rgba(6,182,212,.65); margin-bottom: 3px; }
+.att-insight-txt { font-size: 12.5px; font-weight: 600; color: #06B6D4; line-height: 1.5; }
+
+/* All-time stats row */
+.att-alltime {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  margin: 14px 16px 0;
+  animation: attUp .4s ease .18s both;
+}
+.att-alltime-tile {
+  background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: 16px; padding: 14px 10px; text-align: center;
+  box-shadow: 0 2px 10px rgba(12,31,69,.05);
+}
+.att-alltime-num { font-size: 24px; font-weight: 900; color: var(--txt); line-height: 1; }
+.att-alltime-lbl { font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--muted); margin-top: 3px; }
+.att-alltime-tile.streak .att-alltime-num { color: #F59E0B; }
+.att-alltime-tile.present .att-alltime-num { color: var(--green); }
+.att-alltime-tile.late    .att-alltime-num { color: var(--amber); }
+.att-alltime-tile.absent  .att-alltime-num { color: var(--red); }
+
+/* ══ SECTION LABEL ═══════════════════════════════════════════════ */
+.att-lbl {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); padding: 20px 20px 8px; display: block;
 }
 
-/* ── Generic card ───────────────────────────────────────────── */
+/* ══ CARD ════════════════════════════════════════════════════════ */
 .att-card {
-  background: var(--c-surface);
-  border-radius: 20px;
-  box-shadow: 0 6px 24px rgba(15,23,42,.06);
-  padding: 18px;
-  margin-bottom: 18px;
+  background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: var(--r-md); box-shadow: 0 4px 20px rgba(12,31,69,.07);
+  padding: 18px; margin: 0 16px 14px;
 }
-@media (min-width: 640px) { .att-card { padding: 22px; } }
-
+.dark-mode .att-card { box-shadow: 0 4px 24px rgba(0,0,0,.28); }
 .att-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
 }
 .att-card-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--c-text);
-  letter-spacing: -.2px;
+  font-size: 15px; font-weight: 800; color: var(--txt);
+  display: flex; align-items: center; gap: 8px; margin: 0; letter-spacing: -.2px;
 }
-.att-card-link {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--c-blue);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-.att-card-link:hover { color: var(--c-royal); text-decoration: none; }
+.att-card-title i { font-size: 13px; color: var(--cyan); }
 
-/* ── Navy gradient hero ─────────────────────────────────────── */
-.att-month-card {
-  background: linear-gradient(135deg, #0F1F5C, #1340A8);
-  border-radius: 22px;
-  padding: 20px;
-  color: #fff;
-  display: grid;
-  grid-template-columns: 140px 1fr auto;
-  gap: 18px;
-  align-items: center;
-  box-shadow: 0 10px 30px rgba(15,31,92,.25);
-  margin-bottom: 18px;
-}
-.att-ring-wrap {
-  width: 140px;
-  height: 140px;
-  position: relative;
-}
-.att-ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.att-ring-track { fill: none; stroke: rgba(255,255,255,.18); stroke-width: 10; }
-.att-ring-fill  { fill: none; stroke: #60A5FA; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
-.att-ring-text {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -1px;
-}
-.att-month-body { min-width: 0; }
-.att-month-lbl {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: rgba(219,234,254,.85);
-  margin-bottom: 6px;
-}
-.att-month-pct {
-  font-size: 40px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -1.5px;
-  color: #fff;
-}
-.att-month-msg {
-  font-size: 12px;
-  font-weight: 600;
-  color: #BFDBFE;
-  margin-top: 8px;
-  max-width: 220px;
-}
-.att-month-tile {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.12);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 18px;
-}
-@media (max-width: 560px) {
-  .att-month-card {
-    grid-template-columns: 110px 1fr;
-    grid-template-rows: auto auto;
-    padding: 18px;
-  }
-  .att-ring-wrap { width: 110px; height: 110px; }
-  .att-ring-text { font-size: 20px; }
-  .att-month-pct { font-size: 32px; }
-  .att-month-tile { grid-column: 2; justify-self: end; }
-}
-
-/* ── Calendar ───────────────────────────────────────────────── */
-.cal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-.cal-month-name {
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--c-text);
-}
-.cal-nav {
-  display: flex;
-  gap: 8px;
-}
+/* ══ CALENDAR ════════════════════════════════════════════════════ */
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cal-month-name { font-size: 15px; font-weight: 900; color: var(--txt); }
+.cal-nav { display: flex; gap: 7px; }
 .cal-nav button {
-  width: 32px; height: 32px;
-  border-radius: 10px;
-  border: 1px solid var(--c-border);
-  background: var(--c-surface);
-  color: var(--c-muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 12px;
-  transition: background .15s, color .15s;
+  width: 32px; height: 32px; border-radius: 10px;
+  border: 1.5px solid var(--bdr); background: var(--surf);
+  color: var(--muted); display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 12px; transition: all .15s;
 }
-.cal-nav button:hover { background: var(--c-blue-bg); color: var(--c-royal); }
-
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-}
-.cal-dow {
-  text-align: center;
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--c-muted);
-  letter-spacing: .06em;
-  padding: 4px 0 8px;
-}
+.cal-nav button:hover { background: rgba(6,182,212,.1); border-color: rgba(6,182,212,.3); color: var(--cyan); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-dow { text-align: center; font-size: 9.5px; font-weight: 800; color: var(--muted); letter-spacing: .05em; padding: 4px 0 8px; }
 .cal-cell {
-  position: relative;
-  aspect-ratio: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--c-text);
-  background: transparent;
+  aspect-ratio: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--txt);
 }
-.cal-cell.empty { background: transparent; color: transparent; pointer-events: none; }
-.cal-cell.muted { color: #CBD5E1; }
-.cal-cell.today {
-  background: var(--c-blue-bg);
-  color: var(--c-royal);
-}
-.cal-cell .cal-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: transparent;
-}
-.cal-cell.s-present .cal-dot { background: var(--c-success); }
-.cal-cell.s-late    .cal-dot { background: var(--c-warning); }
-.cal-cell.s-absent  .cal-dot { background: var(--c-danger);  }
+.cal-cell.empty { pointer-events: none; color: transparent; }
+.cal-cell.today { background: rgba(6,182,212,.12); color: var(--cyan); }
+.cal-cell .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
+.cal-cell.s-present .cal-dot { background: var(--green); }
+.cal-cell.s-late    .cal-dot { background: var(--amber); }
+.cal-cell.s-absent  .cal-dot { background: var(--red);   }
 .cal-cell.s-none    .cal-dot { background: #CBD5E1; }
-
 .cal-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--c-border);
+  display: flex; flex-wrap: wrap; gap: 12px;
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--bdr);
 }
-.cal-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--c-muted);
-}
-.cal-legend-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-}
+.cal-legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--muted); }
+.cal-legend-dot { width: 7px; height: 7px; border-radius: 50%; }
 
-/* ── Filter card ────────────────────────────────────────────── */
-.att-filter-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-@media (min-width: 640px) {
-  .att-filter-grid {
-    grid-template-columns: 1.2fr 1fr 1fr auto;
-    align-items: end;
-  }
-}
+/* ══ FILTER ══════════════════════════════════════════════════════ */
+.att-filter-grid { display: grid; grid-template-columns: 1fr; gap: 11px; }
+@media (min-width: 640px) { .att-filter-grid { grid-template-columns: 1.2fr 1fr 1fr auto; align-items: end; } }
 .att-field label {
-  display: block;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--c-muted);
-  margin-bottom: 6px;
+  display: block; font-size: 10px; font-weight: 800; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
 }
 .att-control {
-  width: 100%;
-  padding: 11px 14px;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-  color: var(--c-text);
-  background: #F8FAFC;
-  border: 1.5px solid var(--c-border);
-  border-radius: 12px;
-  outline: none;
-  transition: border-color .15s, box-shadow .15s;
-  -webkit-appearance: none;
-  appearance: none;
+  width: 100%; padding: 11px 14px; font-size: 14px; font-family: 'Inter', sans-serif;
+  color: var(--txt); background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: var(--r-sm); outline: none; transition: border-color .15s, box-shadow .15s;
+  -webkit-appearance: none; appearance: none;
 }
-.att-control:focus {
-  border-color: var(--c-blue);
-  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
-  background: #fff;
-}
+.att-control:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(6,182,212,.12); }
 select.att-control {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 38px;
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px;
 }
+.dark-mode .att-control { background: #111F35; border-color: #18304F; color: var(--txt); }
 .att-btn {
-  width: 100%;
-  padding: 12px 22px;
-  border: none;
-  border-radius: 12px;
-  background: var(--c-blue);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  white-space: nowrap;
-  box-shadow: 0 6px 16px rgba(37,99,235,.28);
-  transition: background .15s, transform .14s, box-shadow .15s;
+  width: 100%; padding: 12px 22px; border: none; border-radius: var(--r-sm);
+  background: linear-gradient(135deg, #1B3F7A, #0C1F45); color: #fff;
+  font-size: 14px; font-weight: 800; font-family: 'Inter', sans-serif;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; box-shadow: 0 6px 20px rgba(12,31,69,.25); transition: all .15s;
 }
-.att-btn:hover { background: var(--c-royal); transform: translateY(-1px); }
+.att-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(12,31,69,.35); }
+.att-btn:active { transform: scale(.97); }
 .att-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 @media (min-width: 640px) { .att-btn { width: auto; } }
-
 .att-notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #FFFBEB;
-  border: 1px solid #FDE68A;
-  color: #92400E;
-  font-size: 13px;
-  font-weight: 600;
+  display: flex; align-items: flex-start; gap: 11px; padding: 13px 15px;
+  border-radius: 12px; background: #FFFBEB; border: 1px solid #FDE68A;
+  color: #92400E; font-size: 13px; font-weight: 600;
 }
-.att-notice i { font-size: 16px; color: #D97706; margin-top: 2px; }
+.att-notice i { color: #D97706; margin-top: 2px; }
+.dark-mode .att-notice { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.2); color: #FCD34D; }
 
-/* ── Results & pills ────────────────────────────────────────── */
+/* ══ RESULTS ═════════════════════════════════════════════════════ */
 .att-results { display: none; }
 .att-results.visible { display: block; }
-
-.att-summary {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
+.att-summary { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 14px; }
 .att-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border-radius: 14px;
-  font-size: 12px;
-  font-weight: 700;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 10px 15px; border-radius: var(--r-sm); font-size: 12px; font-weight: 700;
 }
 .att-pill-present { background: #D1FAE5; color: #065F46; }
 .att-pill-late    { background: #FEF3C7; color: #92400E; }
 .att-pill-absent  { background: #FEE2E2; color: #991B1B; }
+.dark-mode .att-pill-present { background: rgba(16,185,129,.15); color: #6EE7B7; }
+.dark-mode .att-pill-late    { background: rgba(245,158,11,.15); color: #FCD34D; }
+.dark-mode .att-pill-absent  { background: rgba(239,68,68,.15); color: #FCA5A5; }
 .att-pill .pill-count { font-size: 18px; font-weight: 900; line-height: 1; }
 .att-pill .pill-lbl   { font-size: 10px; font-weight: 800; opacity: .85; }
-
-.att-tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 10px;
-}
+.att-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 9px; }
 .att-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 14px 8px;
-  border-radius: 14px;
-  text-align: center;
-  font-weight: 800;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 12px 8px; border-radius: 12px; text-align: center; font-weight: 800;
 }
-.att-tile .ti-icon { font-size: 18px; }
-.att-tile .ti-date { font-size: 12px; }
-.att-tile .ti-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; opacity: .85; }
+.att-tile .ti-icon { font-size: 17px; }
+.att-tile .ti-date { font-size: 11px; }
+.att-tile .ti-lbl  { font-size: 9px; text-transform: uppercase; letter-spacing: .06em; opacity: .85; }
 .att-tile-present { background: #D1FAE5; color: #065F46; }
 .att-tile-late    { background: #FEF3C7; color: #92400E; }
 .att-tile-absent  { background: #FEE2E2; color: #991B1B; }
+.dark-mode .att-tile-present { background: rgba(16,185,129,.15); color: #6EE7B7; }
+.dark-mode .att-tile-late    { background: rgba(245,158,11,.15); color: #FCD34D; }
+.dark-mode .att-tile-absent  { background: rgba(239,68,68,.15); color: #FCA5A5; }
 
-.att-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 32px 16px;
-  color: var(--c-muted);
-  font-size: 13px;
-  font-weight: 600;
-}
-.att-spinner-ring {
-  width: 24px; height: 24px;
-  border: 3px solid var(--c-border);
-  border-top-color: var(--c-blue);
-  border-radius: 50%;
-  animation: att-spin .7s linear infinite;
-}
-@keyframes att-spin { to { transform: rotate(360deg); } }
-
-.att-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 16px;
-  color: var(--c-muted);
-  text-align: center;
-}
-.att-empty-icon { font-size: 32px; opacity: .25; margin-bottom: 10px; }
-.att-empty-title { font-size: 14px; font-weight: 800; color: var(--c-text); margin-bottom: 4px; }
-.att-empty-sub { font-size: 12px; }
-
-.att-error {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: #FEE2E2;
-  color: #7F1D1D;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-/* ── Recent attendance rows ─────────────────────────────────── */
-.rec-list { display: flex; flex-direction: column; gap: 14px; }
+/* ══ RECENT ROWS ══════════════════════════════════════════════════ */
+.rec-list { display: flex; flex-direction: column; gap: 9px; }
 .rec-row {
-  display: grid;
-  grid-template-columns: 36px 1fr auto 10px;
-  gap: 12px;
-  align-items: center;
+  display: flex; align-items: center; gap: 13px;
+  padding: 11px 14px; border-radius: 14px;
+  background: var(--surf); border: 1.5px solid var(--bdr); transition: border-color .15s;
 }
+.rec-row:hover { border-color: rgba(6,182,212,.3); }
 .rec-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 14px;
+  width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px;
 }
-.rec-icon.present { background: var(--c-success); }
-.rec-icon.late    { background: var(--c-warning); }
-.rec-icon.absent  { background: var(--c-danger); }
-.rec-title {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--c-text);
-}
-.rec-sub {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--c-muted);
-  margin-top: 2px;
-}
-.rec-status {
-  font-size: 12px;
-  font-weight: 800;
-  text-align: right;
-}
-.rec-status.present { color: var(--c-success); }
-.rec-status.late    { color: var(--c-warning); }
-.rec-status.absent  { color: var(--c-danger); }
-.rec-chev { color: #94A3B8; font-size: 11px; }
+.rec-icon.present { background: linear-gradient(135deg, #10B981, #047857); }
+.rec-icon.late    { background: linear-gradient(135deg, #F59E0B, #B45309); }
+.rec-icon.absent  { background: linear-gradient(135deg, #EF4444, #B91C1C); }
+.rec-body { flex: 1; min-width: 0; }
+.rec-title { font-size: 13px; font-weight: 800; color: var(--txt); }
+.rec-sub   { font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 1px; }
+.rec-badge { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; flex-shrink: 0; }
+.rec-badge.present { background: #D1FAE5; color: #065F46; }
+.rec-badge.late    { background: #FEF3C7; color: #92400E; }
+.rec-badge.absent  { background: #FEE2E2; color: #991B1B; }
+.dark-mode .rec-badge.present { background: rgba(16,185,129,.15); color: #6EE7B7; }
+.dark-mode .rec-badge.late    { background: rgba(245,158,11,.15); color: #FCD34D; }
+.dark-mode .rec-badge.absent  { background: rgba(239,68,68,.15); color: #FCA5A5; }
 
-/* Dark mode */
-.dark-mode .stu-page {
-  --c-bg: #070F1C;
-  --c-surface: #0D1B2F;
-  --c-border: #18304F;
-  --c-text: #E2E8F0;
-  --c-muted: #8CA4BE;
-  --c-blue-soft: #0D1B2F;
-  --c-blue-bg: #111F35;
-  background: var(--c-bg);
-  color: var(--c-text);
+/* ══ STATES ══════════════════════════════════════════════════════ */
+.att-spinner { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 32px; color: var(--muted); font-size: 13px; font-weight: 600; }
+.att-spinner-ring { width: 22px; height: 22px; border: 3px solid var(--bdr); border-top-color: var(--cyan); border-radius: 50%; animation: att-spin .7s linear infinite; }
+@keyframes att-spin { to { transform: rotate(360deg); } }
+.att-empty { padding: 36px 20px; text-align: center; color: var(--muted); }
+.att-empty-icon { font-size: 30px; opacity: .2; margin-bottom: 10px; }
+.att-empty-title { font-size: 14px; font-weight: 800; color: var(--txt); margin-bottom: 4px; }
+.att-empty-sub { font-size: 12px; }
+.att-error { display: flex; align-items: center; gap: 12px; padding: 13px 15px; border-radius: 12px; background: rgba(239,68,68,.1); color: var(--red); font-size: 13px; font-weight: 600; }
+
+/* ══ ANIMATIONS ══════════════════════════════════════════════════ */
+@keyframes attUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.dark-mode .att-h1 { color: #F1F5F9; }
-.dark-mode .att-card { background: #131C30; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
-.dark-mode .att-control { background: #1A2238; color: #E2E8F0; border-color: #1E293B; }
-.dark-mode .cal-nav button { background: #1A2238; border-color: #1E293B; color: #94A3B8; }
-.dark-mode .cal-cell.today { background: rgba(37,99,235,.2); color: #60A5FA; }
-.dark-mode .cal-legend { border-color: #1E293B; }
+.att-anim   { animation: attUp .4s cubic-bezier(.4,0,.2,1) both; }
+.att-anim-2 { animation-delay: .08s; }
+.att-anim-3 { animation-delay: .14s; }
+.att-anim-4 { animation-delay: .20s; }
+.att-anim-5 { animation-delay: .26s; }
+.att-anim-6 { animation-delay: .32s; }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
-<div class="stu-page">
+<div class="att">
 
-  <!-- 1. Hero -->
-  <section class="att-hero">
-    <img src="{% static 'dist/img/logo.png' %}" alt="" class="att-hero-bg">
+  <!-- ══ HERO ══════════════════════════════════════════════════════ -->
+  <div class="att-hero">
     <div class="att-hero-inner">
-      <h1 class="att-h1">Attendance</h1>
-      <p class="att-sub">Track your daily attendance and build excellent habits.</p>
+      <div class="att-hero-top">
+        <div>
+          <div class="att-hero-label">Monthly Report</div>
+          <h1 class="att-hero-title">Attendance</h1>
+          <p class="att-hero-sub">{{ month_message }} · {{ month_total }} class{{ month_total|pluralize }} this month</p>
+        </div>
+        <div class="att-ring-wrap">
+          <svg viewBox="0 0 96 96">
+            <circle class="att-ring-track" cx="48" cy="48" r="40"/>
+            <circle id="att-ring-fill" class="att-ring-fill" cx="48" cy="48" r="40"
+                    stroke-dasharray="251.3" stroke-dashoffset="251.3"/>
+          </svg>
+          <div class="att-ring-inner">
+            <span class="att-ring-pct">{{ month_pct }}%</span>
+            <span class="att-ring-lbl">This month</span>
+          </div>
+        </div>
+      </div>
+      <div class="att-hero-stats">
+        <div class="att-hstat">
+          <div class="att-hstat-num">{{ month_present }}</div>
+          <div class="att-hstat-lbl">Present</div>
+        </div>
+        <div class="att-hstat">
+          <div class="att-hstat-num">{{ month_late }}</div>
+          <div class="att-hstat-lbl">Late</div>
+        </div>
+        <div class="att-hstat">
+          <div class="att-hstat-num">{{ month_absent }}</div>
+          <div class="att-hstat-lbl">Absent</div>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
 
-  <!-- 2. Navy gradient hero card -->
-  <section class="att-month-card">
-    <div class="att-ring-wrap">
-      <svg viewBox="0 0 120 120">
-        <circle class="att-ring-track" cx="60" cy="60" r="52"></circle>
-        <circle id="att-ring-fill" class="att-ring-fill" cx="60" cy="60" r="52"
-                stroke-dasharray="326.7"
-                stroke-dashoffset="326.7"></circle>
-      </svg>
-      <div class="att-ring-text">{{ month_pct }}%</div>
+  <!-- All-time stats -->
+  <div class="att-alltime att-anim att-anim-2">
+    <div class="att-alltime-tile streak">
+      <div class="att-alltime-num">🔥 {{ att_streak }}</div>
+      <div class="att-alltime-lbl">Streak</div>
     </div>
-    <div class="att-month-body">
-      <div class="att-month-lbl">This Month</div>
-      <div class="att-month-pct">{{ month_pct }}%</div>
-      <div class="att-month-msg">{{ month_message }}</div>
+    <div class="att-alltime-tile present">
+      <div class="att-alltime-num">{{ att_total_present }}</div>
+      <div class="att-alltime-lbl">All-time Present</div>
     </div>
-    <div class="att-month-tile"><i class="fas fa-calendar-alt"></i></div>
-  </section>
+    <div class="att-alltime-tile late">
+      <div class="att-alltime-num">{{ att_total_late }}</div>
+      <div class="att-alltime-lbl">Late</div>
+    </div>
+    <div class="att-alltime-tile absent">
+      <div class="att-alltime-num">{{ att_total_absent }}</div>
+      <div class="att-alltime-lbl">Absent</div>
+    </div>
+  </div>
 
-  <!-- 2.5 — Weekly attendance trend -->
-  <div class="trend-card">
+  <!-- AI Insight -->
+  <div class="att-insight att-anim att-anim-3">
+    <div class="att-insight-icon"><i class="fas fa-lightbulb"></i></div>
+    <div>
+      <div class="att-insight-head">Iceberg AI · Attendance Insight</div>
+      <div class="att-insight-txt">
+        {% if month_pct >= 90 %}Outstanding! Your {{ month_pct }}% attendance this month puts you in the top tier. Consistent presence leads to much better exam results.
+        {% elif month_pct >= 75 %}Good progress — {{ month_pct }}% this month. You're on track! Attending every session will help close the remaining gap.
+        {% elif month_pct >= 50 %}Your {{ month_pct }}% rate this month needs attention. Try to attend at least 80% of classes to protect your academic performance.
+        {% else %}You've missed many classes this month. Talk to your teacher soon — catching up early is much easier than before exams.{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Trend Chart -->
+  <span class="att-lbl att-anim att-anim-3" style="animation-delay:.18s;">Weekly Trend</span>
+  <div class="trend-card att-anim att-anim-4" style="margin: 0 16px 14px;">
     <div class="trend-card-head">
       <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Weekly Attendance</h4>
       <span class="trend-meta" id="att-trend-meta">—</span>
@@ -563,40 +384,31 @@ select.att-control {
     </div>
   </div>
 
-  <!-- 3. Calendar -->
-  <section class="att-card">
+  <!-- Calendar -->
+  <span class="att-lbl att-anim att-anim-4" style="animation-delay:.22s;">Attendance Calendar</span>
+  <div class="att-card att-anim att-anim-5">
     <div class="cal-head">
-      <div class="cal-month-name" id="cal-month-name">—</div>
+      <div class="att-card-title"><i class="fas fa-calendar-alt"></i> <span id="cal-month-name">—</span></div>
       <div class="cal-nav">
-        <button type="button" id="cal-prev" aria-label="Previous month"><i class="fas fa-chevron-left"></i></button>
-        <button type="button" id="cal-next" aria-label="Next month"><i class="fas fa-chevron-right"></i></button>
+        <button type="button" id="cal-prev" aria-label="Prev"><i class="fas fa-chevron-left"></i></button>
+        <button type="button" id="cal-next" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
-
     <div class="cal-grid" id="cal-grid">
-      <div class="cal-dow">MON</div>
-      <div class="cal-dow">TUE</div>
-      <div class="cal-dow">WED</div>
-      <div class="cal-dow">THU</div>
-      <div class="cal-dow">FRI</div>
-      <div class="cal-dow">SAT</div>
-      <div class="cal-dow">SUN</div>
+      <div class="cal-dow">MON</div><div class="cal-dow">TUE</div><div class="cal-dow">WED</div>
+      <div class="cal-dow">THU</div><div class="cal-dow">FRI</div><div class="cal-dow">SAT</div><div class="cal-dow">SUN</div>
     </div>
-
     <div class="cal-legend">
       <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#10B981;"></span> Present</div>
       <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#F59E0B;"></span> Late</div>
       <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#EF4444;"></span> Absent</div>
       <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#CBD5E1;"></span> No Class</div>
     </div>
-  </section>
+  </div>
 
-  <!-- 4. Filter card (keeps existing AJAX) -->
-  <section class="att-card" id="filter-section">
-    <div class="att-card-head">
-      <h3 class="att-card-title">Filter by group & date range</h3>
-    </div>
-
+  <!-- Filter -->
+  <span class="att-lbl att-anim att-anim-5" style="animation-delay:.3s;">Filter Records</span>
+  <div class="att-card att-anim att-anim-6" id="filter-section">
     {% if not groups %}
       <div class="att-notice">
         <i class="fas fa-exclamation-triangle"></i>
@@ -608,9 +420,7 @@ select.att-control {
           <label>Group</label>
           <select id="att-group" class="att-control">
             <option value="">— Select group —</option>
-            {% for g in groups %}
-              <option value="{{ g.id }}">{{ g.name }}{% if g.course %} · {{ g.course.name }}{% endif %}</option>
-            {% endfor %}
+            {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}{% if g.course %} · {{ g.course.name }}{% endif %}</option>{% endfor %}
           </select>
         </div>
         <div class="att-field">
@@ -628,78 +438,52 @@ select.att-control {
         </div>
       </div>
     {% endif %}
-  </section>
+  </div>
 
-  <!-- 5. Results -->
-  <section class="att-card att-results" id="att-results-card">
+  <!-- Filter Results -->
+  <div class="att-card att-results" id="att-results-card" style="margin-top:0;">
     <div class="att-card-head">
-      <h3 class="att-card-title">Filter Results</h3>
-      <span class="att-card-link" id="att-results-count" style="cursor:default;">0 records</span>
+      <h3 class="att-card-title"><i class="fas fa-filter"></i> Filter Results</h3>
+      <span style="font-size:12px;font-weight:600;color:var(--muted);" id="att-results-count">0 records</span>
     </div>
     <div id="att-output"></div>
-  </section>
+  </div>
 
-  <!-- 6. Recent attendance -->
-  <section class="att-card">
+  <!-- Recent Attendance -->
+  {% if recent_rows %}
+  <span class="att-lbl att-anim att-anim-6" style="animation-delay:.36s;">Recent Records</span>
+  <div class="att-card att-anim att-anim-6" style="animation-delay:.36s;">
     <div class="att-card-head">
-      <h3 class="att-card-title">Recent Attendance</h3>
-      <a href="#filter-section" class="att-card-link">View All <i class="fas fa-chevron-right"></i></a>
+      <h3 class="att-card-title"><i class="fas fa-history"></i> Recent Attendance</h3>
+      <a href="#filter-section" style="font-size:12px;font-weight:700;color:var(--cyan);text-decoration:none;">Filter <i class="fas fa-arrow-down" style="font-size:10px;"></i></a>
     </div>
+    <div class="rec-list">
+      {% for rec in recent_rows %}
+        {% if rec.status == 1 %}
+          <div class="rec-row">
+            <div class="rec-icon present"><i class="fas fa-check"></i></div>
+            <div class="rec-body"><div class="rec-title">{{ rec.date|date:"M j, Y" }}</div><div class="rec-sub">{{ rec.group_name }}</div></div>
+            <span class="rec-badge present">Present</span>
+          </div>
+        {% elif rec.status == 2 %}
+          <div class="rec-row">
+            <div class="rec-icon late"><i class="fas fa-clock"></i></div>
+            <div class="rec-body"><div class="rec-title">{{ rec.date|date:"M j, Y" }}</div><div class="rec-sub">{{ rec.group_name }}</div></div>
+            <span class="rec-badge late">Late</span>
+          </div>
+        {% else %}
+          <div class="rec-row">
+            <div class="rec-icon absent"><i class="fas fa-times"></i></div>
+            <div class="rec-body"><div class="rec-title">{{ rec.date|date:"M j, Y" }}</div><div class="rec-sub">{{ rec.group_name }}</div></div>
+            <span class="rec-badge absent">Absent</span>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 
-    {% if recent_rows %}
-      <div class="rec-list">
-        {% for rec in recent_rows %}
-          {% if rec.status == 1 %}
-            {% with cls="present" lbl="Present" icon="fa-check" %}
-              <div class="rec-row">
-                <div class="rec-icon {{ cls }}"><i class="fas {{ icon }}"></i></div>
-                <div>
-                  <div class="rec-title">{{ rec.date|date:"M j, Y" }}</div>
-                  <div class="rec-sub">{{ rec.group_name }}</div>
-                </div>
-                <div class="rec-status {{ cls }}">{{ lbl }}</div>
-                <i class="fas fa-chevron-right rec-chev"></i>
-              </div>
-            {% endwith %}
-          {% elif rec.status == 2 %}
-            {% with cls="late" lbl="Late" icon="fa-clock" %}
-              <div class="rec-row">
-                <div class="rec-icon {{ cls }}"><i class="fas {{ icon }}"></i></div>
-                <div>
-                  <div class="rec-title">{{ rec.date|date:"M j, Y" }}</div>
-                  <div class="rec-sub">{{ rec.group_name }}</div>
-                </div>
-                <div class="rec-status {{ cls }}">{{ lbl }}</div>
-                <i class="fas fa-chevron-right rec-chev"></i>
-              </div>
-            {% endwith %}
-          {% else %}
-            {% with cls="absent" lbl="Absent" icon="fa-times" %}
-              <div class="rec-row">
-                <div class="rec-icon {{ cls }}"><i class="fas {{ icon }}"></i></div>
-                <div>
-                  <div class="rec-title">{{ rec.date|date:"M j, Y" }}</div>
-                  <div class="rec-sub">{{ rec.group_name }}</div>
-                </div>
-                <div class="rec-status {{ cls }}">{{ lbl }}</div>
-                <i class="fas fa-chevron-right rec-chev"></i>
-              </div>
-            {% endwith %}
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="att-empty">
-        <div class="att-empty-icon"><i class="fas fa-calendar-times"></i></div>
-        <div class="att-empty-title">No recent attendance</div>
-        <div class="att-empty-sub">Your most recent attendance entries will appear here.</div>
-      </div>
-    {% endif %}
-  </section>
-
-  <!-- Hidden JSON payload for calendar -->
   {{ status_by_date|json_script:"status-by-date" }}
-
 </div>
 {% endblock content %}
 
@@ -708,267 +492,119 @@ select.att-control {
 (function () {
   'use strict';
 
-  /* ── Animate the ring on the navy card ─────────────────────── */
+  /* Ring */
   var pct = {{ month_pct|default:0 }};
-  if (pct < 0) pct = 0;
-  if (pct > 100) pct = 100;
-  var circumference = 2 * Math.PI * 52; // r=52
-  var ringFill = document.getElementById('att-ring-fill');
-  if (ringFill) {
-    var offset = circumference - (pct / 100) * circumference;
-    setTimeout(function () {
-      ringFill.style.strokeDashoffset = String(offset);
-    }, 80);
-  }
+  if (pct < 0) pct = 0; if (pct > 100) pct = 100;
+  var circ = 2 * Math.PI * 40;
+  var rf = document.getElementById('att-ring-fill');
+  if (rf) setTimeout(function(){ rf.style.strokeDashoffset = String(circ - (pct/100)*circ); }, 120);
 
-  /* ── Calendar rendering ───────────────────────────────────── */
+  /* Calendar */
   var rawStatus = {};
   try {
     var node = document.getElementById('status-by-date');
     if (node) {
-      var inner = node.textContent.trim();
-      // first parse (json_script gives us the JSON-encoded string the view supplied)
-      var parsed = JSON.parse(inner);
-      // The view stores the dict as a JSON string, so it may be a string we need to parse again
-      if (typeof parsed === 'string') {
-        try { parsed = JSON.parse(parsed); } catch (e) { /* leave as string */ }
-      }
+      var parsed = JSON.parse(node.textContent.trim());
+      if (typeof parsed === 'string') try { parsed = JSON.parse(parsed); } catch(e){}
       if (parsed && typeof parsed === 'object') rawStatus = parsed;
     }
-  } catch (e) {
-    console.warn('Could not parse status_by_date', e);
-  }
+  } catch(e) { console.warn('status_by_date parse error', e); }
 
-  var calGrid     = document.getElementById('cal-grid');
-  var calMonthLbl = document.getElementById('cal-month-name');
-  var calPrev     = document.getElementById('cal-prev');
-  var calNext     = document.getElementById('cal-next');
+  var calGrid = document.getElementById('cal-grid');
+  var calLbl  = document.getElementById('cal-month-name');
+  var today   = new Date();
+  var viewY   = today.getFullYear();
+  var viewM   = today.getMonth();
+  var MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function pad2(n){ return n<10?'0'+n:String(n); }
+  function iso(y,m,d){ return y+'-'+pad2(m+1)+'-'+pad2(d); }
 
-  var today = new Date();
-  var viewYear  = today.getFullYear();
-  var viewMonth = today.getMonth();
-
-  var MONTHS = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
-
-  function pad2(n) { return n < 10 ? '0' + n : String(n); }
-  function isoDate(y, m, d) { return y + '-' + pad2(m + 1) + '-' + pad2(d); }
-
-  function renderCalendar() {
+  function renderCal() {
     if (!calGrid) return;
-
-    // Remove old cells but keep day-of-week headers
-    var existing = calGrid.querySelectorAll('.cal-cell');
-    existing.forEach(function (n) { n.parentNode.removeChild(n); });
-
-    calMonthLbl.textContent = MONTHS[viewMonth] + ' ' + viewYear;
-
-    var firstDay = new Date(viewYear, viewMonth, 1);
-    // JS getDay(): 0=Sun..6=Sat. We use Mon-first columns.
-    var startCol = (firstDay.getDay() + 6) % 7;
-    var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-
-    // Leading empty cells
-    for (var i = 0; i < startCol; i++) {
-      var emp = document.createElement('div');
-      emp.className = 'cal-cell empty';
-      emp.innerHTML = '<div></div><div class="cal-dot"></div>';
-      calGrid.appendChild(emp);
+    calGrid.querySelectorAll('.cal-cell').forEach(function(n){ n.remove(); });
+    calLbl.textContent = MONTHS[viewM] + ' ' + viewY;
+    var first = new Date(viewY, viewM, 1);
+    var sc = (first.getDay()+6)%7;
+    var dim = new Date(viewY, viewM+1, 0).getDate();
+    for (var i=0; i<sc; i++) {
+      var e=document.createElement('div'); e.className='cal-cell empty';
+      e.innerHTML='<div></div><div class="cal-dot"></div>'; calGrid.appendChild(e);
     }
-
-    for (var d = 1; d <= daysInMonth; d++) {
-      var iso = isoDate(viewYear, viewMonth, d);
-      var st = rawStatus[iso];
-      var cell = document.createElement('div');
-      cell.className = 'cal-cell';
-
-      if (st === 1) cell.classList.add('s-present');
-      else if (st === 2) cell.classList.add('s-late');
-      else if (st === 0) cell.classList.add('s-absent');
-      // else no dot
-
-      // Highlight today
-      if (viewYear === today.getFullYear() && viewMonth === today.getMonth() && d === today.getDate()) {
-        cell.classList.add('today');
-      }
-
-      var num = document.createElement('div');
-      num.textContent = String(d);
-      var dot = document.createElement('div');
-      dot.className = 'cal-dot';
-
-      cell.appendChild(num);
-      cell.appendChild(dot);
-      calGrid.appendChild(cell);
+    for (var d=1; d<=dim; d++) {
+      var s=rawStatus[iso(viewY,viewM,d)];
+      var cell=document.createElement('div'); cell.className='cal-cell';
+      if(s===1) cell.classList.add('s-present');
+      else if(s===2) cell.classList.add('s-late');
+      else if(s===0) cell.classList.add('s-absent');
+      if(viewY===today.getFullYear()&&viewM===today.getMonth()&&d===today.getDate()) cell.classList.add('today');
+      var num=document.createElement('div'); num.textContent=String(d);
+      var dot=document.createElement('div'); dot.className='cal-dot';
+      cell.appendChild(num); cell.appendChild(dot); calGrid.appendChild(cell);
     }
-
-    // Trailing cells so we always have full weeks (visual balance)
-    var totalUsed = startCol + daysInMonth;
-    var trailing = (7 - (totalUsed % 7)) % 7;
-    for (var t = 0; t < trailing; t++) {
-      var emp2 = document.createElement('div');
-      emp2.className = 'cal-cell empty';
-      emp2.innerHTML = '<div></div><div class="cal-dot"></div>';
-      calGrid.appendChild(emp2);
-    }
+    var trail=(7-((sc+dim)%7))%7;
+    for(var t=0;t<trail;t++){var e2=document.createElement('div');e2.className='cal-cell empty';e2.innerHTML='<div></div><div class="cal-dot"></div>';calGrid.appendChild(e2);}
   }
+  var cp=document.getElementById('cal-prev'), cn=document.getElementById('cal-next');
+  if(cp) cp.addEventListener('click',function(){viewM--;if(viewM<0){viewM=11;viewY--;}renderCal();});
+  if(cn) cn.addEventListener('click',function(){viewM++;if(viewM>11){viewM=0;viewY++;}renderCal();});
+  renderCal();
 
-  if (calPrev) calPrev.addEventListener('click', function () {
-    viewMonth--;
-    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
-    renderCalendar();
-  });
-  if (calNext) calNext.addEventListener('click', function () {
-    viewMonth++;
-    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-    renderCalendar();
-  });
+  /* Filter AJAX */
+  var CSRF=''; try{CSRF=(document.cookie.match(/csrftoken=([^;]+)/)||[])[1]||'';}catch(e){}
+  var ATT_URL="{% url 'student_view_attendance' %}";
+  var fetchBtn=document.getElementById('att-fetch-btn');
+  var resCard=document.getElementById('att-results-card');
+  var out=document.getElementById('att-output');
+  var cnt=document.getElementById('att-results-count');
+  if (!fetchBtn) return;
 
-  renderCalendar();
-
-  /* ── Filter AJAX (preserves existing endpoint behavior) ───── */
-  var CSRF_TOKEN = (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
-  var ATT_URL    = "{% url 'student_view_attendance' %}";
-
-  var fetchBtn     = document.getElementById('att-fetch-btn');
-  var resultsCard  = document.getElementById('att-results-card');
-  var outputEl     = document.getElementById('att-output');
-  var resultsCount = document.getElementById('att-results-count');
-
-  if (!fetchBtn) return; // no groups
-
-  function formatDate(iso) {
-    var d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  }
-
-  function showSpinner() {
-    outputEl.innerHTML =
-      '<div class="att-spinner"><div class="att-spinner-ring"></div>Loading attendance records…</div>';
-    resultsCard.classList.add('visible');
-  }
-  function showEmpty() {
-    outputEl.innerHTML =
-      '<div class="att-empty">' +
-        '<div class="att-empty-icon"><i class="fas fa-calendar-times"></i></div>' +
-        '<div class="att-empty-title">No records found</div>' +
-        '<div class="att-empty-sub">No attendance has been recorded for this group in the selected date range.</div>' +
-      '</div>';
-    resultsCard.classList.add('visible');
-    resultsCount.textContent = '0 records';
-  }
-  function showError(msg) {
-    outputEl.innerHTML =
-      '<div class="att-error"><i class="fas fa-exclamation-circle"></i><span>' +
-      (msg || 'An error occurred. Please try again.') + '</span></div>';
-    resultsCard.classList.add('visible');
-  }
-
-  function renderResults(arr) {
-    var present = 0, late = 0, absent = 0;
-    var tiles = '';
-
-    arr.forEach(function (rec) {
-      var dateStr = formatDate(rec.date);
-      var cls, lbl, icon;
-      if (rec.status === 1) { present++; cls = 'att-tile-present'; lbl = 'Present'; icon = 'fa-check-circle'; }
-      else if (rec.status === 2) { late++; cls = 'att-tile-late'; lbl = 'Late'; icon = 'fa-clock'; }
-      else { absent++; cls = 'att-tile-absent'; lbl = 'Absent'; icon = 'fa-times-circle'; }
-      tiles +=
-        '<div class="att-tile ' + cls + '">' +
-          '<div class="ti-icon"><i class="fas ' + icon + '"></i></div>' +
-          '<div class="ti-date">' + dateStr + '</div>' +
-          '<div class="ti-lbl">' + lbl + '</div>' +
-        '</div>';
+  function fmtDate(iso){ return new Date(iso+'T00:00:00').toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'}); }
+  function showSpinner(){ out.innerHTML='<div class="att-spinner"><div class="att-spinner-ring"></div>Loading…</div>'; resCard.classList.add('visible'); }
+  function showEmpty(){ out.innerHTML='<div class="att-empty"><div class="att-empty-icon"><i class="fas fa-calendar-times"></i></div><div class="att-empty-title">No records found</div><div class="att-empty-sub">No attendance recorded in this period.</div></div>'; resCard.classList.add('visible'); cnt.textContent='0 records'; }
+  function showError(m){ out.innerHTML='<div class="att-error"><i class="fas fa-exclamation-circle"></i><span>'+(m||'An error occurred.')+'</span></div>'; resCard.classList.add('visible'); }
+  function renderRes(arr){
+    var p=0,l=0,a=0,tiles='';
+    arr.forEach(function(r){
+      var d=fmtDate(r.date),cls,lbl,icon;
+      if(r.status===1){p++;cls='att-tile-present';lbl='Present';icon='fa-check-circle';}
+      else if(r.status===2){l++;cls='att-tile-late';lbl='Late';icon='fa-clock';}
+      else{a++;cls='att-tile-absent';lbl='Absent';icon='fa-times-circle';}
+      tiles+='<div class="att-tile '+cls+'"><div class="ti-icon"><i class="fas '+icon+'"></i></div><div class="ti-date">'+d+'</div><div class="ti-lbl">'+lbl+'</div></div>';
     });
-
-    var html =
-      '<div class="att-summary">' +
-        '<div class="att-pill att-pill-present"><i class="fas fa-check-circle"></i>' +
-          '<div><div class="pill-count">' + present + '</div><div class="pill-lbl">Present</div></div></div>' +
-        '<div class="att-pill att-pill-late"><i class="fas fa-clock"></i>' +
-          '<div><div class="pill-count">' + late + '</div><div class="pill-lbl">Late</div></div></div>' +
-        '<div class="att-pill att-pill-absent"><i class="fas fa-times-circle"></i>' +
-          '<div><div class="pill-count">' + absent + '</div><div class="pill-lbl">Absent</div></div></div>' +
-      '</div>' +
-      '<div class="att-tiles">' + tiles + '</div>';
-
-    outputEl.innerHTML = html;
-    var total = arr.length;
-    resultsCount.textContent = total + ' record' + (total !== 1 ? 's' : '');
-    resultsCard.classList.add('visible');
+    out.innerHTML='<div class="att-summary"><div class="att-pill att-pill-present"><i class="fas fa-check-circle"></i><div><div class="pill-count">'+p+'</div><div class="pill-lbl">Present</div></div></div><div class="att-pill att-pill-late"><i class="fas fa-clock"></i><div><div class="pill-count">'+l+'</div><div class="pill-lbl">Late</div></div></div><div class="att-pill att-pill-absent"><i class="fas fa-times-circle"></i><div><div class="pill-count">'+a+'</div><div class="pill-lbl">Absent</div></div></div></div><div class="att-tiles">'+tiles+'</div>';
+    cnt.textContent=arr.length+' record'+(arr.length!==1?'s':''); resCard.classList.add('visible');
   }
 
-  fetchBtn.addEventListener('click', function () {
-    var group      = document.getElementById('att-group').value;
-    var start_date = document.getElementById('att-start').value;
-    var end_date   = document.getElementById('att-end').value;
-
-    if (!group) { document.getElementById('att-group').focus(); return; }
-    if (!start_date) { document.getElementById('att-start').focus(); return; }
-    if (!end_date)   { document.getElementById('att-end').focus(); return; }
-    if (start_date > end_date) { showError('Start date cannot be after end date.'); return; }
-
-    fetchBtn.disabled = true;
-    showSpinner();
-
-    fetch(ATT_URL, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': CSRF_TOKEN,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({ group: group, start_date: start_date, end_date: end_date })
-    })
-    .then(function (res) {
-      if (!res.ok) throw new Error('Server error ' + res.status);
-      return res.json();
-    })
-    .then(function (raw) {
-      var arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      if (!Array.isArray(arr) || arr.length === 0) showEmpty();
-      else renderResults(arr);
-    })
-    .catch(function (err) {
-      console.error(err);
-      showError();
-    })
-    .finally(function () {
-      fetchBtn.disabled = false;
-    });
+  fetchBtn.addEventListener('click',function(){
+    var g=document.getElementById('att-group').value;
+    var s=document.getElementById('att-start').value;
+    var e=document.getElementById('att-end').value;
+    if(!g){document.getElementById('att-group').focus();return;}
+    if(!s){document.getElementById('att-start').focus();return;}
+    if(!e){document.getElementById('att-end').focus();return;}
+    if(s>e){showError('Start date cannot be after end date.');return;}
+    fetchBtn.disabled=true; showSpinner();
+    fetch(ATT_URL,{method:'POST',headers:{'X-CSRFToken':CSRF,'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({group:g,start_date:s,end_date:e})})
+      .then(function(r){if(!r.ok)throw new Error('Server '+r.status);return r.json();})
+      .then(function(raw){var arr=typeof raw==='string'?JSON.parse(raw):raw;if(!Array.isArray(arr)||!arr.length)showEmpty();else renderRes(arr);})
+      .catch(function(err){console.error(err);showError();})
+      .finally(function(){fetchBtn.disabled=false;});
+  });
+  ['att-start','att-end'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.addEventListener('keydown',function(e){if(e.key==='Enter')fetchBtn.click();});
   });
 
-  ['att-start', 'att-end'].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (el) el.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') fetchBtn.click();
-    });
-  });
-
-  /* ── Weekly attendance trend chart ─────────────────────────────── */
+  /* Trend chart */
   var trend = {{ trend_json|safe }};
-  var hasData = (trend.values || []).some(function (v) { return v !== null; });
+  var hasData = (trend.values||[]).some(function(v){return v!==null;});
   if (hasData && window.IcebergTrend) {
-    IcebergTrend.line({
-      canvas: 'attTrendChart',
-      labels: trend.labels,
-      series: [{
-        name: 'Attendance',
-        data: trend.values,
-        color: '#3B82F6',
-      }],
-      suffix: '%',
-      yMax: 100,
-    });
-    var meta = document.getElementById('att-trend-meta');
-    if (meta) meta.innerHTML = '<i class="fas fa-circle"></i> Avg ' + trend.avg + '%';
+    IcebergTrend.line({canvas:'attTrendChart',labels:trend.labels,series:[{name:'Attendance',data:trend.values,color:'#06B6D4'}],suffix:'%',yMax:100});
+    var meta=document.getElementById('att-trend-meta');
+    if(meta) meta.innerHTML='<i class="fas fa-circle"></i> Avg '+trend.avg+'%';
   } else {
-    var body = document.getElementById('att-trend-body');
-    if (body) body.innerHTML =
-      '<div class="trend-card-empty">' +
-        '<i class="fas fa-chart-line"></i>' +
-        '<p>Your weekly attendance trend will appear here once classes start.</p>' +
-      '</div>';
+    var body=document.getElementById('att-trend-body');
+    if(body) body.innerHTML='<div class="trend-card-empty"><i class="fas fa-chart-line"></i><p>Your weekly attendance trend will appear here once classes start.</p></div>';
   }
 })();
 </script>

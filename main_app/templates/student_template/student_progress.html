@@ -1,172 +1,355 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block title %}My Progress — Iceberg{% endblock %}
-{% block page_title %}My Progress{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">My Progress</li>{% endblock %}
+{% block title %}My Progress — Iceberg Study Center{% endblock %}
+{% block page_title %}{% endblock %}
+{% block breadcrumb %}{% endblock %}
 
 {% block custom_css %}
 <style>
-.pg-page { display:flex; flex-direction:column; gap:20px; }
+/* ══ LAYOUT ══════════════════════════════════════════════════════ */
+.page-header  { display: none !important; }
+.erpnext-main { padding: 0 !important; }
+.content-area { overflow: visible !important; }
 
-.pg-hero {
-  padding:20px 22px; border-radius:18px;
-  background:linear-gradient(135deg,#0C1F45,#1B3F7A); color:#fff;
-  box-shadow:0 10px 28px rgba(12,31,69,.22);
+/* ══ TOKENS ══════════════════════════════════════════════════════ */
+.pg {
+  --navy: #0C1F45; --navy-mid: #1B3F7A; --cyan: #06B6D4;
+  --bg: #EEF3FB; --surf: #ffffff; --bdr: #E2EAF4;
+  --txt: #0C1A36; --sub: #475569; --muted: #94A3B8;
+  --green: #10B981; --amber: #F59E0B; --red: #EF4444; --purple: #8B5CF6;
+  --r-sm: 14px; --r-md: 22px; --r-lg: 32px;
+  background: var(--bg); min-height: 100svh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  overflow-x: hidden; color: var(--txt);
 }
-.pg-hero h2 { font-size:20px; font-weight:900; margin:0 0 4px; }
-.pg-hero p  { font-size:13px; color:rgba(255,255,255,.72); margin:0; }
+.dark-mode .pg {
+  --bg: #070F1C; --surf: #0D1B2F; --bdr: #18304F;
+  --txt: #E2E8F0; --sub: #94AFC8; --muted: #5C7A9A;
+}
 
-/* Stat cards */
-.stat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-@media(min-width:600px){ .stat-grid { grid-template-columns:repeat(4,1fr); } }
-.stat-card { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:0 3px 12px rgba(12,31,69,.07); text-align:center; }
-.stat-num  { font-size:30px; font-weight:900; color:#0C1F45; }
-.stat-lbl  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#64748B; margin-top:4px; }
-.stat-sub  { font-size:11px; color:#94A3B8; margin-top:2px; }
+/* ══ HERO ════════════════════════════════════════════════════════ */
+.pg-hero {
+  background: linear-gradient(160deg, #06102A 0%, #0D2657 52%, #0E3E94 100%);
+  padding: 28px 20px 30px; position: relative; overflow: hidden;
+}
+.pg-hero::before {
+  content: ''; position: absolute; right: -60px; top: -60px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,.22) 0%, transparent 60%);
+  pointer-events: none;
+}
+.pg-hero::after {
+  content: ''; position: absolute; left: -40px; bottom: -80px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,.15) 0%, transparent 65%);
+  pointer-events: none;
+}
+.pg-hero-inner { position: relative; z-index: 1; }
+.pg-hero-top { margin-bottom: 22px; animation: pgUp .4s ease both; }
+.pg-hero-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.45); margin-bottom: 6px; }
+.pg-hero-title { font-size: 30px; font-weight: 900; color: #fff; letter-spacing: -.8px; line-height: 1.05; margin: 0 0 5px; }
+.pg-hero-sub   { font-size: 13px; color: rgba(255,255,255,.6); margin: 0; }
+{% if is_english %}
+.pg-level-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: 999px; margin-top: 8px;
+  background: rgba(6,182,212,.18); border: 1px solid rgba(6,182,212,.35);
+  color: #67E8F9; font-size: 12px; font-weight: 700;
+}
+{% endif %}
 
-/* Chart cards */
-.chart-card { background:#fff; border-radius:16px; box-shadow:0 3px 12px rgba(12,31,69,.07); overflow:hidden; }
-.chart-head { padding:14px 18px 0; display:flex; align-items:center; justify-content:space-between; }
-.chart-head h3 { font-size:14px; font-weight:800; color:#0F172A; margin:0; }
-.chart-head span { font-size:11px; color:#94A3B8; }
-.chart-body { padding:12px 14px 16px; }
+/* Hero stats */
+.pg-hero-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px;
+  animation: pgUp .4s ease .08s both;
+}
+@media (max-width: 360px) { .pg-hero-stats { grid-template-columns: repeat(2, 1fr); } }
+.pg-hstat {
+  background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px; padding: 11px 6px; text-align: center;
+}
+.pg-hstat-num { font-size: 20px; font-weight: 900; color: #fff; line-height: 1; }
+.pg-hstat-lbl { font-size: 8.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-top: 3px; }
 
-/* Empty state */
-.empty-pg { background:#fff; border-radius:16px; box-shadow:0 3px 12px rgba(12,31,69,.07); padding:56px 24px; text-align:center; }
-.empty-pg i { font-size:42px; color:#CBD5E1; margin-bottom:16px; display:block; }
-.empty-pg h3 { font-size:16px; font-weight:700; color:#0F172A; margin-bottom:8px; }
-.empty-pg p { font-size:13px; color:#64748B; margin:0; }
+/* ══ SECTION LABEL ═══════════════════════════════════════════════ */
+.pg-lbl {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); padding: 20px 20px 8px; display: block;
+}
 
-/* Exam table */
-.exam-table { width:100%; border-collapse:collapse; }
-.exam-table th { padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#64748B; background:#F8FAFC; border-bottom:1px solid #E8EDF5; text-align:left; }
-.exam-table td { padding:12px 14px; font-size:13px; border-bottom:1px solid #F8FAFC; }
-.exam-table tr:last-child td { border-bottom:none; }
-.score-bar-wrap { display:flex; align-items:center; gap:10px; }
-.score-bar { flex:1; height:7px; background:#E8EDF5; border-radius:999px; overflow:hidden; }
-.score-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#06B6D4,#1B3F7A); }
-/* Dark mode */
-.dark-mode .pg-hero { background: linear-gradient(135deg, #06102A, #0D2657); box-shadow: 0 10px 28px rgba(0,0,0,.4); }
-.dark-mode .stat-card { background: #0D1B2F; box-shadow: none; }
-.dark-mode .stat-num { color: #E2E8F0; }
-.dark-mode .stat-lbl { color: #8CA4BE; }
-.dark-mode .stat-sub { color: #4A6080; }
-.dark-mode .chart-card { background: #0D1B2F; box-shadow: none; }
-.dark-mode .chart-head h3 { color: #E2E8F0; }
-.dark-mode .chart-head span { color: #4A6080; }
-.dark-mode .empty-pg { background: #0D1B2F; box-shadow: none; }
-.dark-mode .empty-pg h3 { color: #E2E8F0; }
-.dark-mode .empty-pg p { color: #8CA4BE; }
-.dark-mode .exam-table th { background: #111F35; color: #8CA4BE; border-bottom-color: #18304F; }
-.dark-mode .exam-table td { color: #CBD5E1; border-bottom-color: #111F35; }
-.dark-mode .score-bar { background: #18304F; }
+/* ══ INSIGHT ═════════════════════════════════════════════════════ */
+.pg-insight {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.22);
+  border-radius: 16px; padding: 13px 16px; margin: 14px 16px 0;
+  animation: pgUp .4s ease .14s both;
+}
+.pg-insight-icon {
+  width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0;
+  background: rgba(139,92,246,.2); color: #8B5CF6; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.dark-mode .pg-insight { background: rgba(139,92,246,.07); border-color: rgba(139,92,246,.18); }
+.pg-insight-head { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: rgba(139,92,246,.65); margin-bottom: 3px; }
+.pg-insight-txt  { font-size: 12.5px; font-weight: 600; color: #8B5CF6; line-height: 1.5; }
+
+/* ══ STAT GRID ════════════════════════════════════════════════════ */
+.pg-stat-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px;
+  padding: 0 16px; margin-bottom: 14px;
+}
+@media (min-width: 600px) { .pg-stat-grid { grid-template-columns: repeat(4, 1fr); } }
+.pg-stat-tile {
+  background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: var(--r-md); padding: 18px 16px;
+  box-shadow: 0 4px 20px rgba(12,31,69,.07); text-align: center;
+}
+.dark-mode .pg-stat-tile { box-shadow: 0 4px 20px rgba(0,0,0,.28); }
+.pg-stat-icon {
+  width: 40px; height: 40px; border-radius: 13px; margin: 0 auto 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
+.pg-stat-num { font-size: 28px; font-weight: 900; color: var(--txt); line-height: 1; letter-spacing: -.5px; }
+.pg-stat-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 3px; }
+.pg-stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ══ CHART CARD ══════════════════════════════════════════════════ */
+.pg-chart-card {
+  background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: var(--r-md); margin: 0 16px 14px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(12,31,69,.07);
+}
+.dark-mode .pg-chart-card { box-shadow: 0 4px 20px rgba(0,0,0,.28); }
+.pg-chart-head {
+  padding: 16px 18px 0; display: flex; align-items: center; justify-content: space-between;
+}
+.pg-chart-title { font-size: 15px; font-weight: 800; color: var(--txt); margin: 0; display: flex; align-items: center; gap: 8px; }
+.pg-chart-title i { font-size: 13px; }
+.pg-chart-meta  { font-size: 11px; color: var(--muted); font-weight: 600; }
+.pg-chart-body  { padding: 12px 14px 16px; }
+
+/* ══ EXAM TABLE ══════════════════════════════════════════════════ */
+.pg-exam-card {
+  background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: var(--r-md); margin: 0 16px 14px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(12,31,69,.07);
+}
+.dark-mode .pg-exam-card { box-shadow: 0 4px 20px rgba(0,0,0,.28); }
+.pg-exam-head { padding: 16px 18px 14px; display: flex; align-items: center; gap: 8px; }
+.pg-exam-title { font-size: 15px; font-weight: 800; color: var(--txt); margin: 0; }
+.pg-exam-title i { font-size: 13px; color: var(--navy-mid); }
+.dark-mode .pg-exam-title i { color: var(--cyan); }
+.pg-table { width: 100%; border-collapse: collapse; }
+.pg-table th {
+  padding: 10px 16px; font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--muted); background: rgba(12,31,69,.03);
+  border-bottom: 1px solid var(--bdr); text-align: left;
+}
+.dark-mode .pg-table th { background: rgba(255,255,255,.02); }
+.pg-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--bdr); }
+.pg-table tr:last-child td { border-bottom: none; }
+.pg-table td:first-child { font-weight: 800; color: var(--txt); }
+.pg-score-bar-wrap { display: flex; align-items: center; gap: 10px; }
+.pg-score-bar { flex: 1; height: 7px; background: var(--bdr); border-radius: 999px; overflow: hidden; }
+.pg-score-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #06B6D4, #1B3F7A); }
+
+/* ══ EMPTY STATE ══════════════════════════════════════════════════ */
+.pg-empty {
+  background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: var(--r-md); margin: 0 16px;
+  padding: 64px 24px; text-align: center;
+  box-shadow: 0 4px 20px rgba(12,31,69,.06);
+}
+.pg-empty-icon {
+  width: 80px; height: 80px; border-radius: 24px; margin: 0 auto 20px;
+  background: linear-gradient(135deg, rgba(139,92,246,.12), rgba(27,63,122,.12));
+  color: var(--purple); font-size: 32px;
+  display: flex; align-items: center; justify-content: center;
+}
+.pg-empty-title { font-size: 17px; font-weight: 900; color: var(--txt); margin: 0 0 8px; }
+.pg-empty-sub   { font-size: 13px; color: var(--muted); line-height: 1.65; max-width: 280px; margin: 0 auto 20px; }
+.pg-empty-cta {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 22px; border-radius: var(--r-sm);
+  background: linear-gradient(135deg, #1B3F7A, #0C1F45); color: #fff;
+  text-decoration: none; font-size: 13px; font-weight: 800;
+  box-shadow: 0 6px 20px rgba(12,31,69,.25); transition: transform .15s;
+}
+.pg-empty-cta:hover { transform: translateY(-1px); color: #fff; text-decoration: none; }
+
+/* ══ ANIMATIONS ══════════════════════════════════════════════════ */
+@keyframes pgUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pg-anim   { animation: pgUp .4s cubic-bezier(.4,0,.2,1) both; }
+.pg-anim-2 { animation-delay: .08s; }
+.pg-anim-3 { animation-delay: .14s; }
+.pg-anim-4 { animation-delay: .20s; }
+.pg-anim-5 { animation-delay: .26s; }
 </style>
-{% endblock %}
+{% endblock custom_css %}
 
 {% block content %}
-<div class="pg-page">
+<div class="pg">
 
+  <!-- ══ HERO ══════════════════════════════════════════════════════ -->
   <div class="pg-hero">
-    <h2><i class="fas fa-chart-line me-2"></i>My Progress</h2>
-    <p>Track your vocabulary completion, mastery, and quiz performance over the last 30 days.</p>
+    <div class="pg-hero-inner">
+      <div class="pg-hero-top">
+        <div class="pg-hero-label">Learning Analytics</div>
+        <h1 class="pg-hero-title">My Progress</h1>
+        <p class="pg-hero-sub">Vocabulary completion, quiz performance & exam results</p>
+        {% if is_english %}<span class="pg-level-chip"><i class="fas fa-layer-group"></i> {{ student_level }}</span>{% endif %}
+      </div>
+      <div class="pg-hero-stats">
+        <div class="pg-hstat">
+          <div class="pg-hstat-num">{{ total_days_available }}</div>
+          <div class="pg-hstat-lbl">Days Available</div>
+        </div>
+        <div class="pg-hstat">
+          <div class="pg-hstat-num">{{ total_completed }}</div>
+          <div class="pg-hstat-lbl">Completed</div>
+        </div>
+        <div class="pg-hstat">
+          <div class="pg-hstat-num">{% if recent_quiz %}{{ recent_quiz.score|floatformat:0 }}%{% else %}—{% endif %}</div>
+          <div class="pg-hstat-lbl">Last Quiz</div>
+        </div>
+        <div class="pg-hstat">
+          <div class="pg-hstat-num">{% if results %}{{ results|length }}{% else %}0{% endif %}</div>
+          <div class="pg-hstat-lbl">Groups</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Summary stats -->
-  <div class="stat-grid">
-    <div class="stat-card">
-      <div class="stat-num" style="color:#1B3F7A;">{{ total_days_available }}</div>
-      <div class="stat-lbl">Days Available</div>
-      <div class="stat-sub">vocabulary sets</div>
+  <!-- AI Insight -->
+  <div class="pg-insight pg-anim pg-anim-2">
+    <div class="pg-insight-icon"><i class="fas fa-lightbulb"></i></div>
+    <div>
+      <div class="pg-insight-head">Iceberg AI · Progress Insight</div>
+      <div class="pg-insight-txt">
+        {% if not has_any_data %}Complete vocabulary days and take quizzes to unlock your learning analytics dashboard.
+        {% elif total_completed >= total_days_available and total_days_available > 0 %}Amazing — you've completed all {{ total_days_available }} available vocabulary days! Your consistency is exceptional.
+        {% elif total_completed > 0 %}You've completed {{ total_completed }} of {{ total_days_available }} vocabulary days.{% if recent_quiz %} Your last quiz score was {{ recent_quiz.score|floatformat:0 }}% — keep practicing to improve.{% else %} Take a quiz after each study session to reinforce your learning.{% endif %}
+        {% else %}You haven't completed any vocabulary days yet. Start with Day 1 — even 10 minutes a day builds strong vocabulary over time.{% endif %}
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" style="color:#10B981;">{{ total_completed }}</div>
-      <div class="stat-lbl">Days Completed</div>
-      <div class="stat-sub">all time</div>
+  </div>
+
+  <!-- Stat Tiles -->
+  <span class="pg-lbl pg-anim pg-anim-3">Summary</span>
+  <div class="pg-stat-grid pg-anim pg-anim-3">
+    <div class="pg-stat-tile">
+      <div class="pg-stat-icon" style="background:rgba(27,63,122,.1); color:#1B3F7A;">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <div class="pg-stat-num" style="color:var(--navy-mid);">{{ total_days_available }}</div>
+      <div class="pg-stat-lbl">Days Available</div>
+      <div class="pg-stat-sub">vocabulary sets</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" style="color:#06B6D4;">{{ total_mastered }}</div>
-      <div class="stat-lbl">Words Mastered</div>
-      <div class="stat-sub">from flashcards</div>
+    <div class="pg-stat-tile">
+      <div class="pg-stat-icon" style="background:rgba(16,185,129,.1); color:#10B981;">
+        <i class="fas fa-check-double"></i>
+      </div>
+      <div class="pg-stat-num" style="color:var(--green);">{{ total_completed }}</div>
+      <div class="pg-stat-lbl">Days Completed</div>
+      <div class="pg-stat-sub">all time</div>
     </div>
-    <div class="stat-card">
+    <div class="pg-stat-tile">
+      <div class="pg-stat-icon" style="background:rgba(245,158,11,.1); color:#F59E0B;">
+        <i class="fas fa-question-circle"></i>
+      </div>
       {% if recent_quiz %}
-      <div class="stat-num" style="color:{% if recent_quiz.score >= 80 %}#10B981{% elif recent_quiz.score >= 60 %}#F59E0B{% else %}#EF4444{% endif %};">{{ recent_quiz.score|floatformat:0 }}%</div>
-      <div class="stat-lbl">Latest Quiz</div>
-      <div class="stat-sub">{{ recent_quiz.taken_at|date:"M j" }}</div>
+      <div class="pg-stat-num" style="color:{% if recent_quiz.score >= 80 %}var(--green){% elif recent_quiz.score >= 60 %}var(--amber){% else %}var(--red){% endif %};">{{ recent_quiz.score|floatformat:0 }}%</div>
+      <div class="pg-stat-lbl">Latest Quiz</div>
+      <div class="pg-stat-sub">{{ recent_quiz.taken_at|date:"M j" }}</div>
       {% else %}
-      <div class="stat-num" style="color:#CBD5E1;">—</div>
-      <div class="stat-lbl">Latest Quiz</div>
-      <div class="stat-sub">no quiz yet</div>
+      <div class="pg-stat-num" style="color:var(--muted);">—</div>
+      <div class="pg-stat-lbl">Latest Quiz</div>
+      <div class="pg-stat-sub">no quiz yet</div>
       {% endif %}
+    </div>
+    <div class="pg-stat-tile">
+      <div class="pg-stat-icon" style="background:rgba(139,92,246,.1); color:#8B5CF6;">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="pg-stat-num" style="color:var(--purple);">{% if results %}{{ results|length }}{% else %}0{% endif %}</div>
+      <div class="pg-stat-lbl">Exam Groups</div>
+      <div class="pg-stat-sub">graded results</div>
     </div>
   </div>
 
   {% if has_any_data %}
 
-  <!-- 30-day activity chart -->
-  <div class="chart-card">
-    <div class="chart-head">
-      <h3><i class="fas fa-calendar-alt me-2" style="color:#06B6D4;"></i>30-Day Activity</h3>
-      <span>Days completed & words mastered</span>
+  <!-- 30-Day Activity -->
+  <span class="pg-lbl pg-anim pg-anim-4">30-Day Activity</span>
+  <div class="pg-chart-card pg-anim pg-anim-4">
+    <div class="pg-chart-head">
+      <h3 class="pg-chart-title"><i class="fas fa-calendar-alt" style="color:var(--cyan);"></i> Daily Activity</h3>
+      <span class="pg-chart-meta">Days completed &amp; words</span>
     </div>
-    <div class="chart-body">
+    <div class="pg-chart-body">
       <canvas id="activityChart" height="110"></canvas>
     </div>
   </div>
 
-  <!-- Quiz scores chart -->
-  <div class="chart-card">
-    <div class="chart-head">
-      <h3><i class="fas fa-question-circle me-2" style="color:#F59E0B;"></i>Quiz Scores (30 days)</h3>
-      <span>Average score per day</span>
+  <!-- Quiz Scores -->
+  <span class="pg-lbl pg-anim pg-anim-4" style="animation-delay:.22s;">Quiz Performance</span>
+  <div class="pg-chart-card pg-anim pg-anim-5">
+    <div class="pg-chart-head">
+      <h3 class="pg-chart-title"><i class="fas fa-question-circle" style="color:var(--amber);"></i> Quiz Scores</h3>
+      <span class="pg-chart-meta">30-day avg per day</span>
     </div>
-    <div class="chart-body">
+    <div class="pg-chart-body">
       <canvas id="quizChart" height="100"></canvas>
     </div>
   </div>
 
   {% else %}
-  <div class="empty-pg">
-    <i class="fas fa-chart-line"></i>
-    <h3>No activity yet</h3>
-    <p>Complete vocabulary days and take quizzes to see your progress here.</p>
-    <a href="{% url 'vocabulary_day_list' %}" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 20px;background:linear-gradient(135deg,#0C1F45,#1B3F7A);color:#fff;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700;">
+  <div class="pg-empty pg-anim pg-anim-3" style="margin-top:4px;">
+    <div class="pg-empty-icon"><i class="fas fa-chart-line"></i></div>
+    <h3 class="pg-empty-title">No activity yet</h3>
+    <p class="pg-empty-sub">Complete vocabulary days and take quizzes to see your progress charts.</p>
+    <a href="{% url 'vocabulary_day_list' %}" class="pg-empty-cta">
       <i class="fas fa-book-open"></i> Start Studying
     </a>
   </div>
   {% endif %}
 
-  <!-- Exam scores table -->
+  <!-- Exam Scores Table -->
   {% if results %}
-  <div class="chart-card">
-    <div class="chart-head">
-      <h3><i class="fas fa-graduation-cap me-2" style="color:#1B3F7A;"></i>Exam Scores by Group</h3>
-      <span>Test + Exam totals</span>
+  <span class="pg-lbl pg-anim pg-anim-5" style="animation-delay:.28s;">Exam Results</span>
+  <div class="pg-exam-card pg-anim pg-anim-5" style="animation-delay:.28s;">
+    <div class="pg-exam-head">
+      <h3 class="pg-exam-title"><i class="fas fa-graduation-cap"></i> Scores by Group</h3>
     </div>
-    <div style="overflow-x:auto;padding:4px 0 8px;">
-      <table class="exam-table">
+    <div style="overflow-x:auto;">
+      <table class="pg-table">
         <thead>
           <tr>
             <th>Group</th>
             <th>Test</th>
             <th>Exam</th>
             <th>Total</th>
-            <th style="min-width:120px;">Bar</th>
+            <th style="min-width:120px;">Score Bar</th>
           </tr>
         </thead>
         <tbody>
           {% for r in results %}
           <tr>
-            <td style="font-weight:700;color:#0F172A;">{{ r.group.name|default:"General" }}</td>
-            <td>{{ r.test|floatformat:0 }}</td>
-            <td>{{ r.exam|floatformat:0 }}</td>
-            <td style="font-weight:700;">{{ r.total }}</td>
+            <td>{{ r.group.name|default:"General" }}</td>
+            <td style="color:var(--sub);">{{ r.test|floatformat:0 }}<span style="font-size:10px;color:var(--muted);">/40</span></td>
+            <td style="color:var(--sub);">{{ r.exam|floatformat:0 }}<span style="font-size:10px;color:var(--muted);">/60</span></td>
+            <td style="font-weight:900;color:{% if r.total >= 75 %}var(--green){% elif r.total >= 45 %}var(--amber){% else %}var(--red){% endif %};">{{ r.total }}</td>
             <td>
-              <div class="score-bar-wrap">
-                <div class="score-bar">
-                  <div class="score-bar-fill" style="width:{% widthratio r.total 200 100 %}%;"></div>
+              <div class="pg-score-bar-wrap">
+                <div class="pg-score-bar">
+                  <div class="pg-score-bar-fill" style="width:{{ r.total }}%;"></div>
                 </div>
-                <span style="font-size:11px;color:#64748B;white-space:nowrap;">{{ r.total }}/200</span>
+                <span style="font-size:11px;color:var(--muted);white-space:nowrap;">{{ r.total }}/100</span>
               </div>
             </td>
           </tr>
@@ -178,112 +361,81 @@
   {% endif %}
 
 </div>
-{% endblock %}
+{% endblock content %}
 
 {% block custom_js %}
 {% if has_any_data %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-var labels = {{ date_labels|safe }};
-var completions = {{ completions_line|safe }};
-var mastered   = {{ mastered_line|safe }};
-var quizScores = {{ quiz_line|safe }};
+(function () {
+  var isDark = document.documentElement.classList.contains('dark-mode') || document.body.classList.contains('dark-mode');
+  var gridColor = isDark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.04)';
+  var tickColor = isDark ? '#8CA4BE' : '#64748B';
 
-// Activity chart
-new Chart(document.getElementById('activityChart'), {
-  type: 'line',
-  data: {
-    labels: labels,
-    datasets: [
-      {
-        label: 'Days Completed',
-        data: completions,
-        borderColor: '#1B3F7A',
-        backgroundColor: 'rgba(27,63,122,.08)',
-        fill: true,
-        tension: .35,
-        pointRadius: 3,
-        pointHoverRadius: 6,
-        borderWidth: 2,
-      },
-      {
-        label: 'Words Mastered',
-        data: mastered,
-        borderColor: '#06B6D4',
-        backgroundColor: 'rgba(6,182,212,.06)',
-        fill: true,
-        tension: .35,
-        pointRadius: 3,
-        pointHoverRadius: 6,
-        borderWidth: 2,
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { position: 'top', labels: { font: { size: 11, weight: '600' }, usePointStyle: true, pointStyleWidth: 8 } },
-      tooltip: { backgroundColor: '#0F172A', titleFont: { size: 11 }, bodyFont: { size: 12 } },
+  var labels = {{ date_labels|safe }};
+  var completions = {{ completions_line|safe }};
+  var quizScores  = {{ quiz_line|safe }};
+
+  /* 30-day activity chart */
+  new Chart(document.getElementById('activityChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Days Completed',
+          data: completions,
+          borderColor: '#1B3F7A', backgroundColor: 'rgba(27,63,122,.08)',
+          fill: true, tension: .38, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2.5,
+        },
+      ],
     },
-    scales: {
-      x: {
-        ticks: { font: { size: 10 }, maxTicksLimit: 10, maxRotation: 0 },
-        grid: { color: 'rgba(0,0,0,.04)' },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      animation: { duration: 800, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { position:'top', labels:{ font:{size:11,weight:'600'}, usePointStyle:true, pointStyleWidth:8, color:tickColor } },
+        tooltip: { backgroundColor: isDark?'#0D1B2F':'#0F172A', cornerRadius:10, padding:10, titleFont:{size:11}, bodyFont:{size:12} },
       },
-      y: {
-        beginAtZero: true,
-        ticks: { font: { size: 10 }, stepSize: 1 },
-        grid: { color: 'rgba(0,0,0,.04)' },
-      }
-    }
-  }
-});
-
-// Quiz score chart
-new Chart(document.getElementById('quizChart'), {
-  type: 'line',
-  data: {
-    labels: labels,
-    datasets: [{
-      label: 'Quiz Score (%)',
-      data: quizScores,
-      borderColor: '#F59E0B',
-      backgroundColor: 'rgba(245,158,11,.08)',
-      fill: true,
-      tension: .35,
-      pointRadius: function(ctx) { return ctx.raw !== null ? 4 : 0; },
-      pointHoverRadius: 7,
-      borderWidth: 2,
-      spanGaps: false,
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#0F172A',
-        callbacks: {
-          label: function(ctx) {
-            return ctx.raw !== null ? 'Score: ' + ctx.raw + '%' : 'No quiz';
-          }
-        }
+      scales: {
+        x: { ticks:{font:{size:10},maxTicksLimit:8,maxRotation:0,color:tickColor}, grid:{color:gridColor} },
+        y: { beginAtZero:true, ticks:{font:{size:10},stepSize:1,color:tickColor}, grid:{color:gridColor} },
       },
     },
-    scales: {
-      x: {
-        ticks: { font: { size: 10 }, maxTicksLimit: 10, maxRotation: 0 },
-        grid: { color: 'rgba(0,0,0,.04)' },
+  });
+
+  /* Quiz score chart */
+  new Chart(document.getElementById('quizChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Quiz Score (%)',
+        data: quizScores,
+        borderColor: '#F59E0B', backgroundColor: 'rgba(245,158,11,.08)',
+        fill: true, tension: .38, spanGaps: false,
+        pointRadius: function(ctx){ return ctx.raw !== null ? 4 : 0; },
+        pointHoverRadius: 7, borderWidth: 2.5,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      animation: { duration: 800, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: isDark?'#0D1B2F':'#0F172A', cornerRadius:10, padding:10,
+          callbacks: { label: function(ctx){ return ctx.raw !== null ? 'Score: '+ctx.raw+'%' : 'No quiz'; } },
+        },
       },
-      y: {
-        min: 0, max: 100,
-        ticks: { font: { size: 10 }, callback: function(v) { return v + '%'; } },
-        grid: { color: 'rgba(0,0,0,.04)' },
-      }
-    }
-  }
-});
+      scales: {
+        x: { ticks:{font:{size:10},maxTicksLimit:8,maxRotation:0,color:tickColor}, grid:{color:gridColor} },
+        y: { min:0, max:100, ticks:{font:{size:10},callback:function(v){return v+'%';},color:tickColor}, grid:{color:gridColor} },
+      },
+    },
+  });
+})();
 </script>
 {% endif %}
-{% endblock %}
+{% endblock custom_js %}

@@ -1,88 +1,270 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 {% block title %}Daily Vocabulary — Iceberg Study Center{% endblock %}
-{% block page_title %}Daily Vocabulary{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">Daily Vocabulary</li>{% endblock %}
+{% block page_title %}{% endblock %}
+{% block breadcrumb %}{% endblock %}
 
 {% block custom_css %}
 <style>
-.vdl-page { display:flex; flex-direction:column; gap:18px; }
+/* ══ LAYOUT ══════════════════════════════════════════════════════ */
+.page-header  { display: none !important; }
+.erpnext-main { padding: 0 !important; }
+.content-area { overflow: visible !important; }
+
+/* ══ TOKENS ══════════════════════════════════════════════════════ */
+.vdl {
+  --navy: #0C1F45; --navy-mid: #1B3F7A; --cyan: #06B6D4;
+  --bg: #EEF3FB; --surf: #ffffff; --bdr: #E2EAF4;
+  --txt: #0C1A36; --sub: #475569; --muted: #94A3B8;
+  --green: #10B981; --amber: #F59E0B; --purple: #8B5CF6;
+  --r-sm: 14px; --r-md: 22px; --r-lg: 32px;
+  background: var(--bg); min-height: 100svh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  overflow-x: hidden; color: var(--txt);
+}
+.dark-mode .vdl {
+  --bg: #070F1C; --surf: #0D1B2F; --bdr: #18304F;
+  --txt: #E2E8F0; --sub: #94AFC8; --muted: #5C7A9A;
+}
+
+/* ══ HERO ════════════════════════════════════════════════════════ */
 .vdl-hero {
-  padding:22px 24px 18px; border-radius:18px;
-  background:linear-gradient(135deg,#0C1F45,#1B3F7A); color:#fff;
-  box-shadow:0 10px 28px rgba(12,31,69,.22);
+  background: linear-gradient(160deg, #06102A 0%, #0D2657 52%, #0E3E94 100%);
+  padding: 28px 20px 30px; position: relative; overflow: hidden;
 }
-.vdl-hero h2 { font-size:22px; font-weight:900; margin:0 0 5px; }
-.vdl-hero p  { font-size:13px; color:rgba(255,255,255,.72); margin:0; }
-
-.day-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
-@media (max-width: 480px) { .day-grid { grid-template-columns: 1fr; } }
-.day-card {
-  background:#fff; border-radius:16px; overflow:hidden;
-  box-shadow:0 4px 14px rgba(12,31,69,.07);
-  border:1.5px solid #E8EDF5; transition:transform .15s,box-shadow .15s;
-  display:flex; flex-direction:column;
+.vdl-hero::before {
+  content: ''; position: absolute; right: -60px; top: -60px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,.22) 0%, transparent 60%);
+  pointer-events: none;
 }
-.day-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(12,31,69,.12); }
-.day-card-top {
-  padding:14px 16px 10px;
-  background:linear-gradient(135deg,#0C1F45,#1B3F7A); color:#fff;
-  display:flex; align-items:center; justify-content:space-between;
+.vdl-hero::after {
+  content: ''; position: absolute; left: -40px; bottom: -80px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,.15) 0%, transparent 65%);
+  pointer-events: none;
 }
-.day-num-big { font-size:26px; font-weight:900; letter-spacing:-1px; }
-.done-badge { padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700; }
-.done-badge.done { background:rgba(16,185,129,.25); color:#6EE7B7; }
-.done-badge.pending { background:rgba(255,255,255,.15); color:#fff; }
+.vdl-hero-inner { position: relative; z-index: 1; }
+.vdl-hero-top { margin-bottom: 20px; animation: vdlUp .4s ease both; }
+.vdl-hero-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.45); margin-bottom: 6px; }
+.vdl-hero-title { font-size: 30px; font-weight: 900; color: #fff; letter-spacing: -.8px; line-height: 1.05; margin: 0 0 5px; }
+.vdl-hero-sub   { font-size: 13px; color: rgba(255,255,255,.6); margin: 0; }
 
-.day-card-body { padding:14px 16px; flex:1; }
-.day-group-name { font-size:14px; font-weight:800; color:#0F172A; margin-bottom:6px; }
-.day-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
-.meta-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; background:#F1F5F9; color:#64748B; font-size:11px; font-weight:600; }
-.meta-chip i { font-size:10px; }
-
-.day-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:auto; }
-.action-btn {
-  display:flex; flex-direction:column; align-items:center; gap:5px;
-  padding:10px 6px; border-radius:10px; text-decoration:none;
-  font-size:11px; font-weight:700; transition:all .12s; text-align:center;
+/* Hero stats */
+.vdl-hero-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px;
+  animation: vdlUp .4s ease .08s both;
 }
-.action-btn i { font-size:18px; }
-.action-btn.vocab  { background:#EFF6FF; color:#1E40AF; border:1.5px solid rgba(30,64,175,.15); }
-.action-btn.flash  { background:#ECFDF5; color:#065F46; border:1.5px solid rgba(6,95,70,.15); }
-.action-btn.quiz   { background:#FFF7ED; color:#92400E; border:1.5px solid rgba(146,64,14,.15); }
-.action-btn:hover { filter:brightness(.92); transform:translateY(-1px); }
+.vdl-hstat {
+  background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px; padding: 12px 8px; text-align: center;
+}
+.vdl-hstat-num { font-size: 22px; font-weight: 900; color: #fff; line-height: 1; }
+.vdl-hstat-lbl { font-size: 9.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-top: 3px; }
 
-.empty-state { background:#fff; border-radius:16px; box-shadow:0 4px 14px rgba(12,31,69,.07); padding:56px 24px; text-align:center; }
-.empty-icon { font-size:42px; margin-bottom:14px; opacity:.2; }
-.empty-title { font-size:15px; font-weight:700; color:#0F172A; margin-bottom:6px; }
-.empty-sub { font-size:13px; color:#64748B; }
-/* Dark mode */
-.dark-mode .vdl-hero { background: linear-gradient(135deg, #06102A, #0D2657); box-shadow: 0 10px 28px rgba(0,0,0,.4); }
-.dark-mode .day-card { background: #0D1B2F; border-color: #18304F; box-shadow: none; }
-.dark-mode .day-card-top { background: linear-gradient(135deg, #06102A, #0D2657); }
-.dark-mode .day-group-name { color: #E2E8F0; }
-.dark-mode .meta-chip { background: #18304F; color: #8CA4BE; }
-.dark-mode .action-btn.vocab { background: #111F35; color: #93C5FD; border-color: #18304F; }
-.dark-mode .action-btn.flash { background: #111F35; color: #6EE7B7; border-color: #18304F; }
-.dark-mode .action-btn.quiz  { background: #111F35; color: #FCD34D; border-color: #18304F; }
-.dark-mode .empty-state { background: #0D1B2F; border-color: #18304F; box-shadow: none; }
-.dark-mode .empty-title { color: #E2E8F0; }
-.dark-mode .empty-sub { color: #8CA4BE; }
+/* Progress bar in hero */
+.vdl-progress-wrap {
+  margin-top: 16px;
+  animation: vdlUp .4s ease .12s both;
+}
+.vdl-progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.vdl-progress-lbl { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .07em; }
+.vdl-progress-pct { font-size: 13px; font-weight: 900; color: #06B6D4; }
+.vdl-progress-bar { height: 7px; background: rgba(255,255,255,.15); border-radius: 999px; overflow: hidden; }
+.vdl-progress-fill { height: 100%; background: linear-gradient(90deg, #06B6D4, #38BDF8); border-radius: 999px; width: 0%; transition: width 1.1s cubic-bezier(.4,0,.2,1); }
+
+/* ══ INSIGHT ═════════════════════════════════════════════════════ */
+.vdl-insight {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.22);
+  border-radius: 16px; padding: 13px 16px; margin: 14px 16px 0;
+  animation: vdlUp .4s ease .16s both;
+}
+.vdl-insight-icon {
+  width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0;
+  background: rgba(16,185,129,.2); color: #10B981; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.dark-mode .vdl-insight { background: rgba(16,185,129,.07); border-color: rgba(16,185,129,.18); }
+.vdl-insight-head { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: rgba(16,185,129,.65); margin-bottom: 3px; }
+.vdl-insight-txt  { font-size: 12.5px; font-weight: 600; color: #10B981; line-height: 1.5; }
+
+/* ══ SECTION LABEL ═══════════════════════════════════════════════ */
+.vdl-lbl {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); padding: 20px 20px 8px; display: block;
+}
+
+/* ══ TREND CARD WRAPPER ══════════════════════════════════════════ */
+.vdl-trend { margin: 0 16px 14px; }
+
+/* ══ DAY CARDS GRID ══════════════════════════════════════════════ */
+.vdl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px; padding: 0 16px;
+}
+@media (max-width: 400px) { .vdl-grid { grid-template-columns: 1fr; } }
+
+.vdl-card {
+  background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: var(--r-md); overflow: hidden;
+  box-shadow: 0 4px 20px rgba(12,31,69,.07);
+  display: flex; flex-direction: column;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+  animation: vdlUp .4s cubic-bezier(.4,0,.2,1) both;
+}
+.dark-mode .vdl-card { box-shadow: 0 4px 20px rgba(0,0,0,.3); }
+.vdl-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(12,31,69,.14); }
+
+/* Card header */
+.vdl-card-top {
+  padding: 16px 18px 14px;
+  background: linear-gradient(135deg, #06102A, #0D2657);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.vdl-day-circle {
+  width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0;
+  background: rgba(6,182,212,.2); border: 2px solid rgba(6,182,212,.3);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #06B6D4;
+}
+.vdl-day-num { font-size: 22px; font-weight: 900; line-height: 1; letter-spacing: -.5px; }
+.vdl-day-word { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; opacity: .7; }
+.vdl-card-top-right { text-align: right; }
+.vdl-card-title { font-size: 14px; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 6px; }
+.vdl-status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
+}
+.vdl-status-done    { background: rgba(16,185,129,.25); color: #6EE7B7; }
+.vdl-status-pending { background: rgba(255,255,255,.12); color: rgba(255,255,255,.7); }
+
+/* Card body */
+.vdl-card-body { padding: 14px 16px; flex: 1; }
+.vdl-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.vdl-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(6,182,212,.08); border: 1px solid rgba(6,182,212,.15);
+  color: var(--sub); font-size: 11px; font-weight: 600;
+}
+.vdl-chip i { font-size: 10px; color: var(--cyan); }
+.dark-mode .vdl-chip { background: rgba(6,182,212,.07); border-color: rgba(6,182,212,.12); }
+
+/* Action buttons */
+.vdl-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.vdl-action {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  padding: 11px 6px; border-radius: 12px; text-decoration: none;
+  font-size: 11px; font-weight: 700; transition: all .15s; text-align: center;
+  border: 1.5px solid transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+.vdl-action i { font-size: 18px; }
+.vdl-action:active { transform: scale(.93); }
+.vdl-action-study {
+  background: rgba(27,63,122,.08); color: #1B3F7A;
+  border-color: rgba(27,63,122,.15);
+}
+.vdl-action-cards {
+  background: rgba(16,185,129,.08); color: #047857;
+  border-color: rgba(16,185,129,.15);
+}
+.vdl-action-quiz {
+  background: rgba(245,158,11,.08); color: #B45309;
+  border-color: rgba(245,158,11,.15);
+}
+.dark-mode .vdl-action-study { background: rgba(147,197,253,.07); color: #93C5FD; border-color: rgba(147,197,253,.12); }
+.dark-mode .vdl-action-cards { background: rgba(110,231,183,.07); color: #6EE7B7; border-color: rgba(110,231,183,.12); }
+.dark-mode .vdl-action-quiz  { background: rgba(252,211,77,.07);  color: #FCD34D; border-color: rgba(252,211,77,.12);  }
+
+/* ══ EMPTY STATE ══════════════════════════════════════════════════ */
+.vdl-empty {
+  background: var(--surf); border: 1.5px solid var(--bdr);
+  border-radius: var(--r-md); margin: 0 16px;
+  padding: 64px 24px; text-align: center;
+  box-shadow: 0 4px 20px rgba(12,31,69,.06);
+}
+.vdl-empty-icon {
+  width: 80px; height: 80px; border-radius: 24px;
+  background: linear-gradient(135deg, rgba(6,182,212,.12), rgba(27,63,122,.12));
+  color: var(--cyan); font-size: 32px; margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+}
+.vdl-empty-title { font-size: 17px; font-weight: 900; color: var(--txt); margin: 0 0 8px; }
+.vdl-empty-sub   { font-size: 13px; color: var(--muted); line-height: 1.65; max-width: 300px; margin: 0 auto; }
+
+/* ══ ANIMATIONS ══════════════════════════════════════════════════ */
+@keyframes vdlUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 </style>
-{% endblock %}
+{% endblock custom_css %}
 
 {% block content %}
-<div class="vdl-page">
+<div class="vdl">
 
+  <!-- ══ HERO ══════════════════════════════════════════════════════ -->
   <div class="vdl-hero">
-    <h2><i class="fas fa-language me-2"></i>Daily Vocabulary</h2>
-    <p>Your teacher's vocabulary sets — study each day's words, then test yourself.</p>
+    <div class="vdl-hero-inner">
+      <div class="vdl-hero-top">
+        <div class="vdl-hero-label">Learning Journey</div>
+        <h1 class="vdl-hero-title">Daily Vocabulary</h1>
+        <p class="vdl-hero-sub">Study words, flip flashcards, ace the quiz — every day.</p>
+      </div>
+      <div class="vdl-hero-stats">
+        <div class="vdl-hstat">
+          <div class="vdl-hstat-num">{{ total_days }}</div>
+          <div class="vdl-hstat-lbl">Available</div>
+        </div>
+        <div class="vdl-hstat">
+          <div class="vdl-hstat-num">{{ total_completed_count }}</div>
+          <div class="vdl-hstat-lbl">Completed</div>
+        </div>
+        <div class="vdl-hstat">
+          <div class="vdl-hstat-num">{{ total_words }}</div>
+          <div class="vdl-hstat-lbl">Total Words</div>
+        </div>
+      </div>
+      {% if total_days > 0 %}
+      <div class="vdl-progress-wrap">
+        <div class="vdl-progress-row">
+          <span class="vdl-progress-lbl">Completion Progress</span>
+          <span class="vdl-progress-pct">{{ completion_pct }}%</span>
+        </div>
+        <div class="vdl-progress-bar">
+          <div class="vdl-progress-fill" id="vdl-prog-fill" style="width:0%;"></div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
   </div>
 
-  <!-- Quiz score trend -->
-  <div class="trend-card">
+  <!-- AI Insight -->
+  <div class="vdl-insight">
+    <div class="vdl-insight-icon"><i class="fas fa-lightbulb"></i></div>
+    <div>
+      <div class="vdl-insight-head">Iceberg AI · Learning Insight</div>
+      <div class="vdl-insight-txt">
+        {% if total_days == 0 %}Your teacher hasn't published any vocabulary sets yet. Check back after class!
+        {% elif completion_pct >= 90 %}Incredible dedication! You've completed {{ completion_pct }}% of all available vocabulary days. You're mastering the ICEBERG vocabulary system.
+        {% elif completion_pct >= 60 %}Good momentum — {{ completion_pct }}% complete. Take the quiz after each study session to lock in new words faster.
+        {% elif completion_pct >= 30 %}You've completed {{ total_completed_count }} of {{ total_days }} days. Study a little each day — even 10 minutes builds lasting vocabulary.
+        {% else %}Start with Day 1 and work through each set. Daily vocab study dramatically improves your reading, listening, and exam performance.{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Trend -->
+  {% if day_rows %}
+  <span class="vdl-lbl" style="animation:vdlUp .4s ease .18s both;">Quiz Score Trend</span>
+  <div class="trend-card vdl-trend" style="animation:vdlUp .4s ease .22s both;">
     <div class="trend-card-head">
-      <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Quiz Score Trend</h4>
+      <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Quiz Scores</h4>
       <span class="trend-meta" id="vocab-trend-meta">—</span>
     </div>
     <div class="trend-card-body" id="vocab-trend-body">
@@ -90,31 +272,37 @@
     </div>
   </div>
 
-  {% if day_rows %}
-  <div class="day-grid">
+  <!-- Day Cards -->
+  <span class="vdl-lbl" style="animation:vdlUp .4s ease .26s both;">Vocabulary Days</span>
+  <div class="vdl-grid">
     {% for row in day_rows %}
-    <div class="day-card">
-      <div class="day-card-top">
-        <div class="day-num-big">Day {{ row.day.day_number }}</div>
-        <span class="done-badge {% if row.completed %}done{% else %}pending{% endif %}">
-          {% if row.completed %}✓ Done{% else %}Study{% endif %}
-        </span>
-      </div>
-      <div class="day-card-body">
-        <div class="day-group-name">{% if row.day.title %}{{ row.day.title }}{% else %}{{ row.day.group.name }}{% endif %}</div>
-        <div class="day-meta">
-          <span class="meta-chip"><i class="fas fa-users"></i> {{ row.day.group.name }}</span>
-          <span class="meta-chip"><i class="fas fa-book"></i> {{ row.word_count }} words</span>
-          {% if row.day.level %}<span class="meta-chip"><i class="fas fa-layer-group"></i> Level {{ row.day.level }}</span>{% endif %}
+    <div class="vdl-card" style="animation-delay:{{ forloop.counter0|add:'4' }}00ms;">
+      <div class="vdl-card-top">
+        <div class="vdl-day-circle">
+          <span class="vdl-day-num">{{ row.day.day_number }}</span>
+          <span class="vdl-day-word">Day</span>
         </div>
-        <div class="day-actions">
-          <a href="{% url 'vocabulary_day_detail' row.day.id %}" class="action-btn vocab">
+        <div class="vdl-card-top-right">
+          <div class="vdl-card-title">{% if row.day.title %}{{ row.day.title }}{% else %}{{ row.day.group.name }}{% endif %}</div>
+          <span class="vdl-status-badge {% if row.completed %}vdl-status-done{% else %}vdl-status-pending{% endif %}">
+            {% if row.completed %}<i class="fas fa-check-circle"></i> Completed{% else %}<i class="fas fa-book-open"></i> Study{% endif %}
+          </span>
+        </div>
+      </div>
+      <div class="vdl-card-body">
+        <div class="vdl-meta">
+          <span class="vdl-chip"><i class="fas fa-users"></i> {{ row.day.group.name }}</span>
+          <span class="vdl-chip"><i class="fas fa-font"></i> {{ row.word_count }} words</span>
+          {% if row.day.level %}<span class="vdl-chip"><i class="fas fa-layer-group"></i> Level {{ row.day.level }}</span>{% endif %}
+        </div>
+        <div class="vdl-actions">
+          <a href="{% url 'vocabulary_day_detail' row.day.id %}" class="vdl-action vdl-action-study">
             <i class="fas fa-book-open"></i> Study
           </a>
-          <a href="{% url 'vocabulary_day_flashcard' row.day.id %}" class="action-btn flash">
+          <a href="{% url 'vocabulary_day_flashcard' row.day.id %}" class="vdl-action vdl-action-cards">
             <i class="fas fa-layer-group"></i> Cards
           </a>
-          <a href="{% url 'vocabulary_day_quiz' row.day.id %}" class="action-btn quiz">
+          <a href="{% url 'vocabulary_day_quiz' row.day.id %}" class="vdl-action vdl-action-quiz">
             <i class="fas fa-question-circle"></i> Quiz
           </a>
         </div>
@@ -122,43 +310,39 @@
     </div>
     {% endfor %}
   </div>
+
   {% else %}
-  <div class="empty-state">
-    <div class="empty-icon"><i class="fas fa-calendar-plus"></i></div>
-    <div class="empty-title">No vocabulary days available yet</div>
-    <p class="empty-sub">Your teacher will publish vocabulary sets here. Check back after class!</p>
+  <div class="vdl-empty" style="animation:vdlUp .4s ease .18s both;margin-top:16px;">
+    <div class="vdl-empty-icon"><i class="fas fa-calendar-plus"></i></div>
+    <div class="vdl-empty-title">No vocabulary days yet</div>
+    <p class="vdl-empty-sub">Your teacher will publish vocabulary sets here. Check back after class!</p>
   </div>
   {% endif %}
 
 </div>
-{% endblock %}
+{% endblock content %}
 
 {% block custom_js %}
 <script>
 (function () {
+  /* Progress bar */
+  var fill = document.getElementById('vdl-prog-fill');
+  if (fill) setTimeout(function(){ fill.style.width = '{{ completion_pct }}%'; }, 200);
+
+  /* Quiz trend chart */
   var trend = {{ trend_json|safe }};
   if (trend.labels && trend.labels.length && window.IcebergTrend) {
     IcebergTrend.line({
-      canvas: 'vocabTrendChart',
-      labels: trend.labels,
-      series: [{
-        name: 'Quiz Score',
-        data: trend.values,
-        color: '#10B981',
-      }],
-      suffix: '%',
-      yMax: 100,
+      canvas: 'vocabTrendChart', labels: trend.labels,
+      series: [{ name: 'Quiz Score', data: trend.values, color: '#10B981' }],
+      suffix: '%', yMax: 100,
     });
     var meta = document.getElementById('vocab-trend-meta');
     if (meta) meta.innerHTML = '<i class="fas fa-circle"></i> Avg ' + trend.avg + '%';
   } else {
     var body = document.getElementById('vocab-trend-body');
-    if (body) body.innerHTML =
-      '<div class="trend-card-empty">' +
-        '<i class="fas fa-chart-line"></i>' +
-        '<p>Take a vocabulary quiz to see your score trend here.</p>' +
-      '</div>';
+    if (body) body.innerHTML = '<div class="trend-card-empty"><i class="fas fa-chart-line"></i><p>Take a vocabulary quiz to see your score trend here.</p></div>';
   }
 })();
 </script>
-{% endblock %}
+{% endblock custom_js %}
