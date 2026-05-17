@@ -225,6 +225,9 @@ urlpatterns = [
     # Avatar (all user types — lives in views.py to bypass role middleware)
     path('profile/save-avatar/', views.save_avatar, name='save_avatar'),
 
+    # Result file download — in views.py so the role middleware never blocks it
+    path('result/download/<int:file_id>/', views.result_file_download, name='result_file_download'),
+
     # Vocabulary Days (Staff)
     path('staff/vocabulary-days/', staff_views.staff_vocabulary_days, name='staff_vocabulary_days'),
     path('staff/vocabulary-days/add/', staff_views.add_vocabulary_day, name='add_vocabulary_day'),

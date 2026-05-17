@@ -287,7 +287,7 @@
   <div class="rf-grid">
     {% for f in files %}
 
-    {% with fname=f.file.url|lower %}
+    {% with fname=f.file.name|lower %}
     <div class="rf-card">
 
       <div class="rf-card-top">
@@ -340,7 +340,7 @@
       </div>
 
       <div class="rf-card-footer">
-        <a href="{{ f.file.url }}" target="_blank" rel="noopener noreferrer" class="rf-download-btn">
+        <a href="{% url 'result_file_download' f.id %}" class="rf-download-btn">
           <i class="fas fa-download"></i>
           Download File
         </a>

@@ -14,7 +14,7 @@ from django.urls import reverse_lazy
 
 from .EmailBackend import EmailBackend
 from .apps import create_recovery_admin_access
-from .models import Admin, Attendance, Session, Staff, Student, Subject
+from .models import Admin, Attendance, Enrollment, ResultFile, Session, Staff, Student, Subject
 
 logger = logging.getLogger(__name__)
 
@@ -341,3 +341,77 @@ def save_avatar(request):
     request.user.avatar = avatar
     request.user.save(update_fields=['avatar'])
     return JsonResponse({'status': 'ok', 'avatar': avatar})
+
+
+@login_required
+def result_file_download(request, file_id):
+    """
+    Authenticated download proxy for ResultFile objects.
+
+    Placed in views.py (not student_views / staff_views) so the role-based
+    middleware never blocks it — both students and teachers reach this view.
+
+    Access rules:
+      student  — must be enrolled in the file's group; personal files only
+                 visible to the addressed student.
+      teacher  — can only download files they uploaded.
+      admin    — unrestricted.
+
+    For remote storage (S3 / Spaces) we redirect to the CDN URL.
+    For local FileSystemStorage we stream the file directly and return a
+    human-readable error page when the file is missing from disk (ephemeral
+    container storage is the most common cause of this in production).
+    """
+    from django.http import FileResponse, Http404
+    from .models import ResultFile, Student, Staff, Enrollment
+
+    rf = get_object_or_404(ResultFile, id=file_id)
+    user = request.user
+    user_type = str(getattr(user, 'user_type', ''))
+
+    # ── Access control ───────────────────────────────────────────────────────
+    if user_type == '3':  # Student
+        student = get_object_or_404(Student, admin=user)
+        enrolled_ids = list(
+            Enrollment.objects
+            .filter(student=student, is_active=True)
+            .values_list('group_id', flat=True)
+        )
+        if rf.group_id not in enrolled_ids:
+            raise Http404
+        if rf.student_id and rf.student_id != student.id:
+            raise Http404
+
+    elif user_type == '2':  # Teacher
+        staff = get_object_or_404(Staff, admin=user)
+        if rf.uploaded_by_id != staff.id:
+            raise Http404
+
+    elif user_type == '1':  # Admin — can download any file
+        pass
+
+    else:
+        raise Http404
+
+    if not rf.file:
+        raise Http404
+
+    # ── Serve the file ───────────────────────────────────────────────────────
+    try:
+        file_path = rf.file.path          # raises NotImplementedError for S3
+        if not os.path.exists(file_path):
+            # File was on local (ephemeral) storage and has been lost.
+            messages.error(
+                request,
+                "This file is no longer available on the server. "
+                "The server may have been redeployed since the file was uploaded. "
+                "Please contact your teacher to re-upload it."
+            )
+            referer = request.META.get('HTTP_REFERER', '/')
+            return redirect(referer)
+        filename = rf.filename or rf.title
+        return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
+
+    except NotImplementedError:
+        # Remote storage (S3 / DigitalOcean Spaces) — redirect to CDN URL.
+        return redirect(rf.file.url)

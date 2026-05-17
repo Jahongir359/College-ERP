@@ -51,7 +51,7 @@
           <td style="font-size:12px; color:var(--ice-muted);">{{ f.uploaded_at|date:"d M Y, H:i" }}</td>
           <td>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <a href="{{ f.file.url }}" target="_blank" class="ab-success">
+              <a href="{% url 'result_file_download' f.id %}" class="ab-success">
                 <i class="fas fa-download me-1"></i>Download
               </a>
               <a href="{% url 'delete_result_file' f.id %}" class="ab-danger"
