@@ -1082,74 +1082,112 @@ textarea.form-control { height: auto; min-height: 90px; }
 }
 .quick-action-btn:hover i { color: var(--navy); }
 
-/* ── Mobile Bottom Navigation (NEW) ──────────────────── */
+/* ── Mobile Bottom Navigation — Floating Glassmorphism ── */
 .bottom-nav { display: none; }
 
 @media (max-width: 768px) {
+  /* Floating pill container */
   .bottom-nav {
     display: flex;
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 62px;
-    z-index: 1030;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    box-shadow: 0 -2px 16px rgba(12,31,69,.10);
+    bottom: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 14px;
+    right: 14px;
+    height: 64px;
+    z-index: 1040;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 8px 32px rgba(12, 31, 69, 0.18),
+      0 2px 8px rgba(12, 31, 69, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    padding: 0 6px;
   }
+
+  /* Each tab item */
   .bottom-nav-item {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 4px;
     text-decoration: none;
-    color: var(--text-muted);
+    color: #94A3B8;
     font-size: 10px;
-    font-weight: 500;
-    padding: 6px 4px;
-    transition: color .15s;
+    font-weight: 600;
+    letter-spacing: .02em;
+    padding: 8px 4px;
+    border-radius: 16px;
+    margin: 6px 2px;
+    transition: color .2s, background .2s, transform .15s;
     position: relative;
   }
+  .bottom-nav-item:active { transform: scale(.92); }
+
   .bottom-nav-item i {
-    font-size: 18px;
+    font-size: 19px;
     line-height: 1;
+    transition: transform .2s cubic-bezier(.34,1.56,.64,1);
   }
+
+  /* Active state — filled pill behind the icon */
   .bottom-nav-item.active {
     color: var(--navy);
+  }
+  .bottom-nav-item.active i {
+    transform: translateY(-1px);
   }
   .bottom-nav-item.active::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 20%;
-    right: 20%;
-    height: 2px;
-    background: var(--cyan);
-    border-radius: 0 0 2px 2px;
+    inset: 4px 6px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(6,182,212,.12), rgba(12,31,69,.08));
+    z-index: -1;
   }
+
+  /* Notification badge */
   .bottom-nav-item .notif-dot {
     position: absolute;
-    top: 6px;
-    right: calc(50% - 14px);
+    top: 7px;
+    right: calc(50% - 16px);
     width: 7px;
     height: 7px;
     border-radius: 50%;
     background: var(--danger);
-    border: 1.5px solid var(--surface);
+    border: 2px solid rgba(255,255,255,.9);
   }
 
-  /* Ensure main content padding so nothing is hidden behind bottom nav */
+  /* Push content above the floating bar (bar height 64 + bottom 12 + safe-area) */
   .erpnext-main {
-    padding-bottom: 72px !important;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important;
   }
-
-  /* Ensure sidebar scrolls fully — last item not cut off by the bottom nav */
   .erpnext-sidebar {
-    padding-bottom: 62px;
+    padding-bottom: 88px;
   }
+}
+
+/* Dark mode floating nav */
+@media (max-width: 768px) {
+  .dark-mode .bottom-nav {
+    background: rgba(13, 27, 47, 0.88) !important;
+    border-color: rgba(255,255,255,.08) !important;
+    box-shadow:
+      0 8px 32px rgba(0,0,0,.5),
+      0 2px 8px rgba(0,0,0,.3),
+      inset 0 1px 0 rgba(255,255,255,.06) !important;
+  }
+  .dark-mode .bottom-nav-item { color: #4A6080; }
+  .dark-mode .bottom-nav-item.active { color: #67E8F9; }
+  .dark-mode .bottom-nav-item.active::before {
+    background: linear-gradient(135deg, rgba(6,182,212,.18), rgba(6,182,212,.06));
+  }
+  .dark-mode .bottom-nav-item .notif-dot { border-color: rgba(13,27,47,.9); }
 }
 
 /* ── Dark Mode Toggle ─────────────────────────────────── */
@@ -1308,14 +1346,7 @@ textarea.form-control { height: auto; min-height: 90px; }
   box-shadow: none !important;
 }
 
-/* Bottom nav dark */
-.dark-mode .bottom-nav {
-  background: var(--surface) !important;
-  border-top-color: var(--border) !important;
-}
-.dark-mode .bottom-nav-item { color: var(--text-muted); }
-.dark-mode .bottom-nav-item.active { color: var(--cyan); }
-.dark-mode .bottom-nav-item.active::before { background: var(--cyan); }
+/* Bottom nav dark — handled in the @media block above */
 
 /* Notifications dark */
 .dark-mode .notification-item:hover { background: var(--surface-2); }

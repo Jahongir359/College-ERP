@@ -9,14 +9,27 @@
 /* ── Kill standard page-header — hero replaces it ────────────── */
 .page-header { display: none !important; }
 
+/* ── Global overflow guard ────────────────────────────────────── */
+.dash, .dash * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
 /* ── Root ─────────────────────────────────────────────────────── */
 .dash {
+  /* Match .erpnext-main padding exactly to avoid overflow */
   margin: -20px;
   background: #EEF3FB;
   min-height: 100%;
   padding-bottom: 40px;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  /* prevent the negative margin from creating a scrollbar */
+  width: calc(100% + 40px);
+}
+@media (max-width: 768px) {
+  .dash { margin: -12px -10px; width: calc(100% + 20px); }
 }
 .dark-mode .dash { background: #070F1C; }
 
@@ -24,97 +37,110 @@
    1. HERO
 ══════════════════════════════════════════════════════════════════ */
 .dash-hero {
-  background: linear-gradient(150deg, #07152A 0%, #0D2657 55%, #0C3A8C 100%);
-  padding: 28px 20px 32px;
+  background: linear-gradient(150deg, #07152A 0%, #0D2657 60%, #0C3A8C 100%);
+  padding: 24px 20px 28px;
   position: relative;
   overflow: hidden;
 }
+/* Decorative blobs — contained, won't cause overflow */
 .dash-hero::before {
   content: '';
-  position: absolute; right: -60px; top: -60px;
-  width: 280px; height: 280px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(6,182,212,.16) 0%, transparent 68%);
+  position: absolute; right: -40px; top: -40px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,.18) 0%, transparent 65%);
   pointer-events: none;
 }
 .dash-hero::after {
   content: '';
-  position: absolute; left: -50px; bottom: -80px;
-  width: 220px; height: 220px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(59,130,246,.12) 0%, transparent 70%);
+  position: absolute; left: -30px; bottom: -60px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,.13) 0%, transparent 68%);
   pointer-events: none;
 }
 
-/* Avatar */
-.dash-avatar-wrap { position: relative; display: inline-block; }
+/* Avatar — static gradient ring (no rotation, no overflow) */
+.dash-avatar-wrap {
+  position: relative;
+  width: 62px; height: 62px; flex-shrink: 0;
+}
+.dash-avatar-ring-bg {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(135deg, #06B6D4, #1B3F7A, #0C1F45);
+  padding: 3px;
+}
 .dash-avatar {
-  width: 58px; height: 58px; border-radius: 50%;
+  position: relative; z-index: 1;
+  width: 56px; height: 56px; border-radius: 50%;
   background: #1B3F7A;
-  color: #fff; font-size: 20px; font-weight: 800;
+  color: #fff; font-size: 19px; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 6px 20px rgba(0,0,0,.3);
-  position: relative; z-index: 1;
-  overflow: hidden;
+  border: 2.5px solid #07152A;
+  /* centre inside the ring */
+  position: absolute; inset: 3px;
 }
-.dash-avatar-ring {
-  position: absolute; inset: -4px;
-  border-radius: 50%;
-  background: conic-gradient(#06B6D4 0% 75%, rgba(255,255,255,.15) 75% 100%);
-  z-index: 0;
-  animation: spin-ring 3s linear infinite;
-}
-@keyframes spin-ring { to { transform: rotate(360deg); } }
 
-/* Text */
+/* Hero text row */
 .dash-hero-row {
-  display: flex; align-items: center; gap: 16px;
+  display: flex; align-items: center; gap: 14px;
   position: relative; z-index: 1;
-  margin-bottom: 24px;
-  animation: fadeUp .45s ease both;
+  margin-bottom: 22px;
+  animation: fadeUp .4s ease both;
 }
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .dash-hero-text { flex: 1; min-width: 0; }
-.dash-salute { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.55); letter-spacing: .04em; }
-.dash-name   { font-size: 20px; font-weight: 900; color: #fff; letter-spacing: -.3px; line-height: 1.2;
-               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-salute {
+  font-size: 11.5px; font-weight: 600;
+  color: rgba(255,255,255,.55); letter-spacing: .04em;
+  margin-bottom: 2px;
+}
+.dash-name {
+  font-size: 19px; font-weight: 800; color: #fff;
+  letter-spacing: -.3px; line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .dash-level-chip {
   display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
-  padding: 4px 11px; border-radius: 999px;
+  padding: 3px 10px; border-radius: 999px;
   background: rgba(6,182,212,.18); border: 1px solid rgba(6,182,212,.35);
   color: #67E8F9; font-size: 11px; font-weight: 700;
 }
 .dash-notif-btn {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
-  color: #fff; font-size: 15px;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.14);
+  color: rgba(255,255,255,.85); font-size: 14px;
   display: flex; align-items: center; justify-content: center;
   text-decoration: none; flex-shrink: 0; position: relative;
   transition: background .15s;
 }
-.dash-notif-btn:hover { background: rgba(255,255,255,.2); color: #fff; }
+.dash-notif-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
 .dash-notif-dot {
-  position: absolute; top: 6px; right: 6px;
-  width: 8px; height: 8px; border-radius: 50%;
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; border-radius: 50%;
   background: #EF4444; border: 2px solid #07152A;
 }
 
 /* Stat pills */
 .dash-hero-stats {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; position: relative; z-index: 1;
-  animation: fadeUp .45s ease .1s both;
+  gap: 8px; position: relative; z-index: 1;
+  animation: fadeUp .4s ease .08s both;
 }
 .dash-hstat {
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 14px; padding: 12px 8px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 14px; padding: 12px 6px;
   text-align: center;
 }
-.dash-hstat-num { font-size: 22px; font-weight: 900; color: #fff; line-height: 1; }
-.dash-hstat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.5); margin-top: 4px; }
+.dash-hstat-num {
+  font-size: 20px; font-weight: 900; color: #fff; line-height: 1;
+}
+.dash-hstat-lbl {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: rgba(255,255,255,.48); margin-top: 4px;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    2. NOTIFICATIONS STRIP
@@ -487,7 +513,7 @@
   <div class="dash-hero">
     <div class="dash-hero-row">
       <div class="dash-avatar-wrap">
-        <div class="dash-avatar-ring"></div>
+        <div class="dash-avatar-ring-bg"></div>
         <div class="dash-avatar" id="dash-avatar">
           <span id="dash-avatar-inner">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
         </div>
@@ -762,9 +788,6 @@
     inner.textContent = AVATARS[idx];
     inner.style.fontSize = '26px'; inner.style.lineHeight = '1';
     wrap.style.background = BG[idx];
-    /* Match the spinning ring colour to the avatar background */
-    wrap.previousElementSibling.style.background =
-      'conic-gradient(' + BG[idx] + ' 0% 75%, rgba(255,255,255,.15) 75% 100%)';
   }
 
   /* ── Group card arcs — pct → dashoffset ──────────────────── */
