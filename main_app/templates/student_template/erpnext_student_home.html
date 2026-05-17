@@ -6,266 +6,423 @@
 
 {% block custom_css %}
 <style>
-/* ── Reset page-header (hero replaces it) ─────────────────────── */
+/* ── Kill standard page-header — hero replaces it ────────────── */
 .page-header { display: none !important; }
 
-/* ── Page wrapper ─────────────────────────────────────────────── */
+/* ── Root ─────────────────────────────────────────────────────── */
 .dash {
   margin: -20px;
-  background: #F0F4FA;
+  background: #EEF3FB;
   min-height: 100%;
-  padding-bottom: 32px;
+  padding-bottom: 40px;
   font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-.dark-mode .dash { background: #07111E; }
+.dark-mode .dash { background: #070F1C; }
 
-/* ── Hero ─────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   1. HERO
+══════════════════════════════════════════════════════════════════ */
 .dash-hero {
-  background: #fff;
-  padding: 20px 18px 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  border-bottom: 1px solid #E8EEF8;
+  background: linear-gradient(150deg, #07152A 0%, #0D2657 55%, #0C3A8C 100%);
+  padding: 28px 20px 32px;
+  position: relative;
+  overflow: hidden;
 }
-.dark-mode .dash-hero { background: #0D1B2F; border-bottom-color: #18304F; }
+.dash-hero::before {
+  content: '';
+  position: absolute; right: -60px; top: -60px;
+  width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,.16) 0%, transparent 68%);
+  pointer-events: none;
+}
+.dash-hero::after {
+  content: '';
+  position: absolute; left: -50px; bottom: -80px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
 
+/* Avatar */
+.dash-avatar-wrap { position: relative; display: inline-block; }
 .dash-avatar {
-  width: 54px; height: 54px; border-radius: 50%;
-  background: #0C1F45;
-  color: #fff;
-  font-size: 18px; font-weight: 800;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: #1B3F7A;
+  color: #fff; font-size: 20px; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(12,31,69,.28);
-  position: relative;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 6px 20px rgba(0,0,0,.3);
+  position: relative; z-index: 1;
+  overflow: hidden;
 }
-.dash-avatar-emoji {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; line-height: 1;
+.dash-avatar-ring {
+  position: absolute; inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(#06B6D4 0% 75%, rgba(255,255,255,.15) 75% 100%);
+  z-index: 0;
+  animation: spin-ring 3s linear infinite;
+}
+@keyframes spin-ring { to { transform: rotate(360deg); } }
+
+/* Text */
+.dash-hero-row {
+  display: flex; align-items: center; gap: 16px;
+  position: relative; z-index: 1;
+  margin-bottom: 24px;
+  animation: fadeUp .45s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .dash-hero-text { flex: 1; min-width: 0; }
-.dash-salute {
-  font-size: 12px; font-weight: 600;
-  color: #60748E; letter-spacing: .02em;
-}
-.dark-mode .dash-salute { color: #8CA4BE; }
-.dash-name {
-  font-size: 19px; font-weight: 800;
-  color: #0C1A36; line-height: 1.2;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.dark-mode .dash-name { color: #E2E8F0; }
+.dash-salute { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.55); letter-spacing: .04em; }
+.dash-name   { font-size: 20px; font-weight: 900; color: #fff; letter-spacing: -.3px; line-height: 1.2;
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dash-level-chip {
-  display: inline-flex; align-items: center; gap: 4px;
-  margin-top: 4px;
-  padding: 3px 10px; border-radius: 999px;
-  background: rgba(6,182,212,.12); border: 1px solid rgba(6,182,212,.3);
-  color: #0891B2; font-size: 11px; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
+  padding: 4px 11px; border-radius: 999px;
+  background: rgba(6,182,212,.18); border: 1px solid rgba(6,182,212,.35);
+  color: #67E8F9; font-size: 11px; font-weight: 700;
+}
+.dash-notif-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+  color: #fff; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; flex-shrink: 0; position: relative;
+  transition: background .15s;
+}
+.dash-notif-btn:hover { background: rgba(255,255,255,.2); color: #fff; }
+.dash-notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #EF4444; border: 2px solid #07152A;
 }
 
-/* ── Horizontal group strip ───────────────────────────────────── */
-.dash-strip {
+/* Stat pills */
+.dash-hero-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; position: relative; z-index: 1;
+  animation: fadeUp .45s ease .1s both;
+}
+.dash-hstat {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px; padding: 12px 8px;
+  text-align: center;
+}
+.dash-hstat-num { font-size: 22px; font-weight: 900; color: #fff; line-height: 1; }
+.dash-hstat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.5); margin-top: 4px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   2. NOTIFICATIONS STRIP
+══════════════════════════════════════════════════════════════════ */
+.dash-notif-strip { padding: 14px 14px 0; display: flex; flex-direction: column; gap: 8px; }
+.dash-notif-card {
+  background: rgba(219,234,254,.85);
+  border: 1.5px solid rgba(27,63,122,.15);
+  border-radius: 14px; padding: 11px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  backdrop-filter: blur(6px);
+}
+.dark-mode .dash-notif-card { background: rgba(27,63,122,.18); border-color: rgba(6,182,212,.2); }
+.dash-notif-card i { color: #1B3F7A; flex-shrink: 0; font-size: 13px; margin-top: 2px; }
+.dark-mode .dash-notif-card i { color: #67E8F9; }
+.dash-notif-msg { font-size: 13px; font-weight: 600; color: #1E3A8A; flex: 1; line-height: 1.4; }
+.dark-mode .dash-notif-msg { color: #93C5FD; }
+.dash-notif-date { font-size: 11px; color: #64748B; white-space: nowrap; }
+
+/* ═══════════════════════════════════════════════════════════════
+   3. STORIES ROW
+══════════════════════════════════════════════════════════════════ */
+.dash-stories-wrap { padding: 18px 0 0; }
+.dash-stories-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px 12px;
+}
+.dash-stories-title { font-size: 16px; font-weight: 800; color: #0C1A36; }
+.dark-mode .dash-stories-title { color: #E2E8F0; }
+
+.dash-stories {
   display: flex; gap: 12px;
-  padding: 16px 18px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  padding: 0 18px 4px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
-.dash-strip::-webkit-scrollbar { display: none; }
+.dash-stories::-webkit-scrollbar { display: none; }
 
-.dash-strip-card {
-  flex-shrink: 0;
-  width: 110px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 14px 10px 12px;
-  text-align: center;
-  text-decoration: none;
-  border: 2px solid transparent;
-  box-shadow: 0 2px 10px rgba(12,31,69,.07);
-  transition: border-color .15s, box-shadow .15s;
+.dash-story-card {
+  flex-shrink: 0; width: 110px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
-.dark-mode .dash-strip-card { background: #0D1B2F; box-shadow: none; border-color: #18304F; }
-.dash-strip-card.active-card {
-  border-color: #0C1F45;
-  box-shadow: 0 4px 18px rgba(12,31,69,.15);
-}
-.dark-mode .dash-strip-card.active-card { border-color: #06B6D4; }
 
-.dash-strip-ring {
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  margin: 0 auto 10px;
+/* Ring border inspired by IG stories */
+.dash-story-ring {
+  width: 78px; height: 78px; border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, #06B6D4, #1B3F7A, #0C1F45);
+  box-shadow: 0 4px 16px rgba(6,182,212,.3);
+  transition: box-shadow .2s;
+}
+.dash-story-ring:hover { box-shadow: 0 6px 24px rgba(6,182,212,.5); }
+.dash-story-inner {
+  width: 100%; height: 100%; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 19px; font-weight: 900;
-  color: #fff;
+  font-size: 30px; overflow: hidden;
+  border: 2px solid #EEF3FB;
   position: relative;
 }
-.dash-strip-ring svg {
-  position: absolute; inset: 0; width: 52px; height: 52px;
+.dark-mode .dash-story-inner { border-color: #070F1C; }
+.dash-story-inner img { width: 100%; height: 100%; object-fit: cover; }
+
+.dash-story-lbl {
+  font-size: 11px; font-weight: 700; color: #334155; text-align: center;
+  line-height: 1.3; width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.dash-strip-ring-num {
-  position: relative; z-index: 1;
-  font-size: 14px; font-weight: 900; color: #0C1A36;
-  line-height: 1;
+.dark-mode .dash-story-lbl { color: #94AFC8; }
+
+/* ── Story fullscreen modal ───────────────────────────────────── */
+.story-modal {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,.92); align-items: center; justify-content: center;
+  padding: 20px;
 }
-.dark-mode .dash-strip-ring-num { color: #E2E8F0; }
-.dash-strip-name {
-  font-size: 11px; font-weight: 700;
-  color: #334155; line-height: 1.3;
-  overflow: hidden; text-overflow: ellipsis;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+.story-modal.open { display: flex; animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.story-modal-card {
+  background: #0D1B2F;
+  border-radius: 24px; width: 100%; max-width: 420px;
+  overflow: hidden; position: relative;
+  box-shadow: 0 24px 80px rgba(0,0,0,.7);
+  animation: slideUp .3s cubic-bezier(.4,0,.2,1);
 }
-.dark-mode .dash-strip-name { color: #94AFC8; }
-.dash-strip-pct {
-  font-size: 10px; font-weight: 700;
-  margin-top: 4px; color: #64748B;
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.story-modal-img {
+  width: 100%; height: 260px; object-fit: cover;
+}
+.story-modal-noimgbg {
+  width: 100%; height: 220px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 72px;
+}
+.story-modal-body { padding: 22px 22px 26px; }
+.story-modal-type {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  background: rgba(6,182,212,.18); color: #67E8F9;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+  margin-bottom: 10px;
+}
+.story-modal-title { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 8px; line-height: 1.25; }
+.story-modal-body-text { font-size: 14px; color: rgba(255,255,255,.65); line-height: 1.65; }
+.story-modal-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,0,0,.5); color: #fff;
+  border: none; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
 }
 
-/* ── Section label ────────────────────────────────────────────── */
+/* Progress bar at top of modal */
+.story-progress-bar {
+  height: 3px; background: rgba(255,255,255,.2);
+  position: relative; overflow: hidden;
+}
+.story-progress-fill {
+  height: 100%; background: #06B6D4;
+  animation: progressFill 5s linear forwards;
+}
+@keyframes progressFill { from { width: 0%; } to { width: 100%; } }
+
+/* ═══════════════════════════════════════════════════════════════
+   4. GROUP STRIP
+══════════════════════════════════════════════════════════════════ */
+.dash-group-strip {
+  display: flex; gap: 10px;
+  padding: 0 14px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.dash-group-strip::-webkit-scrollbar { display: none; }
+
+.dash-gcard {
+  flex-shrink: 0; width: 120px;
+  background: #fff; border-radius: 18px;
+  padding: 14px 10px 12px; text-align: center;
+  text-decoration: none;
+  border: 2px solid transparent;
+  box-shadow: 0 3px 12px rgba(12,31,69,.08);
+  transition: border-color .2s, box-shadow .2s, transform .15s;
+}
+.dark-mode .dash-gcard { background: #0D1B2F; border-color: #18304F; box-shadow: none; }
+.dash-gcard:active { transform: scale(.96); }
+.dash-gcard.top { border-color: #0C1F45; box-shadow: 0 5px 20px rgba(12,31,69,.18); }
+.dark-mode .dash-gcard.top { border-color: #06B6D4; }
+
+.dash-gcard-ring {
+  width: 56px; height: 56px; margin: 0 auto 10px;
+  position: relative;
+}
+.dash-gcard-ring svg { width: 56px; height: 56px; }
+.dash-gcard-ring-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.dash-gcard-pct { font-size: 14px; font-weight: 900; color: #0C1A36; line-height: 1; }
+.dark-mode .dash-gcard-pct { color: #E2E8F0; }
+.dash-gcard-name {
+  font-size: 11px; font-weight: 700; color: #334155;
+  overflow: hidden; text-overflow: ellipsis;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  line-height: 1.3;
+}
+.dark-mode .dash-gcard-name { color: #94AFC8; }
+.dash-gcard-sub { font-size: 10px; color: #94A3B8; margin-top: 3px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SHARED: SECTION LABEL
+══════════════════════════════════════════════════════════════════ */
 .dash-section {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 18px 10px;
+  padding: 22px 18px 10px;
 }
 .dash-section-title {
-  font-size: 17px; font-weight: 800;
-  color: #0C1A36; display: flex; align-items: center; gap: 8px;
+  font-size: 17px; font-weight: 900; color: #0C1A36;
+  display: flex; align-items: center; gap: 8px; margin: 0;
 }
 .dark-mode .dash-section-title { color: #E2E8F0; }
-.dash-section-title i { color: #0C1F45; font-size: 16px; }
+.dash-section-title i { font-size: 15px; color: #0C1F45; }
 .dark-mode .dash-section-title i { color: #06B6D4; }
 .dash-section-link {
-  font-size: 13px; font-weight: 600;
-  color: #0C1F45; text-decoration: none;
+  font-size: 12px; font-weight: 700; color: #0C1F45; text-decoration: none;
   display: inline-flex; align-items: center; gap: 3px;
 }
 .dark-mode .dash-section-link { color: #06B6D4; }
 
-/* ── Group lesson card ────────────────────────────────────────── */
-.dash-lesson-card {
-  background: #fff;
-  border-radius: 18px;
-  margin: 0 14px 12px;
-  padding: 16px;
-  box-shadow: 0 2px 12px rgba(12,31,69,.07);
+/* ═══════════════════════════════════════════════════════════════
+   5. LESSON CARDS
+══════════════════════════════════════════════════════════════════ */
+.dash-lesson {
+  background: #fff; border-radius: 20px;
+  margin: 0 14px 12px; overflow: hidden;
+  box-shadow: 0 3px 14px rgba(12,31,69,.07);
+  border: 1.5px solid #E8EEF8;
 }
-.dark-mode .dash-lesson-card { background: #0D1B2F; box-shadow: none; border: 1px solid #18304F; }
+.dark-mode .dash-lesson { background: #0D1B2F; border-color: #18304F; box-shadow: none; }
 
-.dash-lesson-name {
-  font-size: 16px; font-weight: 900;
-  color: #0C1A36; margin-bottom: 10px;
+.dash-lesson-accent { height: 4px; }
+.dash-lesson-body { padding: 16px 18px; }
+
+.dash-lesson-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 10px; margin-bottom: 12px;
 }
+.dash-lesson-name { font-size: 16px; font-weight: 900; color: #0C1A36; }
 .dark-mode .dash-lesson-name { color: #E2E8F0; }
+.dash-lesson-status {
+  padding: 4px 12px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.ls-great { background: #D1FAE5; color: #065F46; }
+.ls-good  { background: #FEF3C7; color: #92400E; }
+.ls-focus { background: #FEE2E2; color: #991B1B; }
+.dark-mode .ls-great { background: rgba(16,185,129,.18); color: #6EE7B7; }
+.dark-mode .ls-good  { background: rgba(245,158,11,.18); color: #FCD34D; }
+.dark-mode .ls-focus { background: rgba(239,68,68,.15);  color: #FCA5A5; }
+
 .dash-lesson-meta {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  margin-bottom: 10px;
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
 }
 .dash-lesson-pill {
   display: inline-flex; align-items: center; gap: 5px;
   font-size: 12px; color: #60748E; font-weight: 500;
 }
 .dark-mode .dash-lesson-pill { color: #8CA4BE; }
-.dash-lesson-pill i { font-size: 11px; color: #0C1F45; }
+.dash-lesson-pill i { font-size: 11px; color: #1B3F7A; }
 .dark-mode .dash-lesson-pill i { color: #06B6D4; }
 
 .dash-lesson-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 6px;
+  display: flex; align-items: center; gap: 10px;
 }
-.dash-lesson-teacher {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; color: #64748B; font-weight: 500;
+.dash-teacher-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  flex: 1; min-width: 0;
 }
-.dark-mode .dash-lesson-teacher { color: #8CA4BE; }
-.dash-status-chip {
-  padding: 4px 12px; border-radius: 999px;
-  font-size: 11px; font-weight: 700;
-  background: rgba(12,31,69,.08); color: #0C1F45;
+.dash-teacher-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #0C1F45, #1B3F7A);
+  color: #fff; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.dash-teacher-name { font-size: 12px; font-weight: 600; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dark-mode .dash-teacher-name { color: #8CA4BE; }
+.dash-open-btn {
+  padding: 7px 16px; border-radius: 10px;
+  background: #0C1F45; color: #fff;
+  font-size: 12px; font-weight: 700; text-decoration: none;
   display: inline-flex; align-items: center; gap: 5px;
+  flex-shrink: 0; transition: opacity .15s;
 }
-.dark-mode .dash-status-chip { background: rgba(6,182,212,.12); color: #67E8F9; }
+.dash-open-btn:hover { opacity: .88; color: #fff; }
 
-/* ── Stats row ────────────────────────────────────────────────── */
-.dash-stats {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; padding: 0 14px;
-  margin-bottom: 4px;
+/* ═══════════════════════════════════════════════════════════════
+   6. RESULT CARD
+══════════════════════════════════════════════════════════════════ */
+.dash-result {
+  background: linear-gradient(150deg, #07152A 0%, #0D2657 55%, #0C3A8C 100%);
+  border-radius: 20px; margin: 0 14px 12px;
+  padding: 20px 18px; position: relative; overflow: hidden;
 }
-.dash-stat {
-  background: #fff; border-radius: 16px;
-  padding: 14px 10px; text-align: center;
-  box-shadow: 0 2px 10px rgba(12,31,69,.06);
-}
-.dark-mode .dash-stat { background: #0D1B2F; border: 1px solid #18304F; box-shadow: none; }
-.dash-stat-icon { font-size: 18px; margin-bottom: 6px; }
-.dash-stat-num { font-size: 20px; font-weight: 900; color: #0C1A36; line-height: 1; }
-.dark-mode .dash-stat-num { color: #E2E8F0; }
-.dash-stat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #94A3B8; margin-top: 4px; }
-
-/* ── Latest result card ───────────────────────────────────────── */
-.dash-result-card {
-  background: linear-gradient(160deg, #07152E 0%, #0F2860 55%, #1040A0 100%);
-  border-radius: 18px; margin: 0 14px 12px;
-  padding: 18px;
-  position: relative; overflow: hidden;
-}
-.dash-result-card::before {
-  content: ''; position: absolute;
-  right: -30px; top: -30px;
-  width: 160px; height: 160px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(6,182,212,.18) 0%, transparent 70%);
+.dash-result::before {
+  content: ''; position: absolute; right: -40px; top: -40px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,.2) 0%, transparent 70%);
   pointer-events: none;
 }
 .dash-result-top {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
-.dash-result-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: rgba(255,255,255,.55); }
+.dash-result-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: rgba(255,255,255,.5); }
 .dash-result-group { font-size: 15px; font-weight: 800; color: #fff; margin-top: 2px; }
-.dash-result-score { font-size: 38px; font-weight: 900; color: #fff; line-height: 1; }
-.dash-result-score span { font-size: 14px; font-weight: 600; opacity: .6; }
-.dash-result-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-.dash-result-cell { background: rgba(255,255,255,.08); border-radius: 10px; padding: 10px 12px; }
+.dash-result-score { font-size: 44px; font-weight: 900; color: #fff; line-height: 1; }
+.dash-result-score span { font-size: 16px; font-weight: 600; opacity: .55; }
+.dash-result-cells { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dash-result-cell { background: rgba(255,255,255,.08); border-radius: 12px; padding: 12px 14px; }
 .dash-result-cell-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,.5); letter-spacing: .06em; }
-.dash-result-cell-val { font-size: 18px; font-weight: 900; color: #fff; margin-top: 2px; }
+.dash-result-cell-val { font-size: 20px; font-weight: 900; color: #fff; margin-top: 3px; }
+.dash-result-cell-val span { font-size: 12px; opacity: .55; font-weight: 600; }
 .dash-result-link {
-  display: inline-flex; align-items: center; gap: 5px;
-  margin-top: 14px;
-  padding: 8px 16px; border-radius: 10px;
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
+  padding: 9px 18px; border-radius: 12px;
   background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
-  color: #fff; font-size: 12px; font-weight: 700; text-decoration: none;
+  color: #fff; font-size: 13px; font-weight: 700; text-decoration: none;
   transition: background .15s;
 }
 .dash-result-link:hover { background: rgba(255,255,255,.2); color: #fff; }
 
-/* ── Notification strip ───────────────────────────────────────── */
-.dash-notif {
-  margin: 0 14px 4px;
-  padding: 12px 14px;
-  background: #EFF6FF; border: 1.5px solid rgba(27,63,122,.15);
-  border-radius: 14px;
-  display: flex; align-items: flex-start; gap: 10px;
-}
-.dark-mode .dash-notif { background: rgba(27,63,122,.12); border-color: rgba(6,182,212,.2); }
-.dash-notif i { color: #1B3F7A; flex-shrink: 0; margin-top: 1px; }
-.dark-mode .dash-notif i { color: #67E8F9; }
-.dash-notif-msg { font-size: 13px; font-weight: 600; color: #1E3A8A; flex: 1; line-height: 1.4; }
-.dark-mode .dash-notif-msg { color: #93C5FD; }
-.dash-notif-date { font-size: 11px; color: #64748B; white-space: nowrap; margin-top: 1px; }
-
-/* ── Assignment rows ──────────────────────────────────────────── */
-.dash-task-list {
-  background: #fff; border-radius: 18px;
+/* ═══════════════════════════════════════════════════════════════
+   7. ASSIGNMENTS
+══════════════════════════════════════════════════════════════════ */
+.dash-tasks {
+  background: #fff; border-radius: 20px;
   margin: 0 14px; overflow: hidden;
-  box-shadow: 0 2px 12px rgba(12,31,69,.07);
+  box-shadow: 0 3px 14px rgba(12,31,69,.07);
+  border: 1.5px solid #E8EEF8;
 }
-.dark-mode .dash-task-list { background: #0D1B2F; border: 1px solid #18304F; box-shadow: none; }
+.dark-mode .dash-tasks { background: #0D1B2F; border-color: #18304F; box-shadow: none; }
+
 .dash-task-row {
   display: flex; align-items: center; gap: 12px;
-  padding: 13px 16px;
-  border-bottom: 1px solid #F1F5F9;
+  padding: 13px 16px; border-bottom: 1px solid #F1F5F9;
   text-decoration: none; color: inherit;
   transition: background .12s;
 }
@@ -273,53 +430,52 @@
 .dash-task-row:last-child { border-bottom: none; }
 .dash-task-row:active { background: #F8FAFC; }
 .dark-mode .dash-task-row:active { background: rgba(255,255,255,.04); }
+
 .dash-task-icon {
   width: 42px; height: 42px; border-radius: 13px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 800; color: #fff; flex-shrink: 0;
+  font-size: 15px; font-weight: 900; color: #fff; flex-shrink: 0;
 }
 .dash-task-body { flex: 1; min-width: 0; }
 .dash-task-title { font-size: 14px; font-weight: 700; color: #0C1A36; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dark-mode .dash-task-title { color: #E2E8F0; }
 .dash-task-sub { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+
 .dash-task-badge {
-  flex-shrink: 0; padding: 3px 10px; border-radius: 999px;
+  flex-shrink: 0; padding: 4px 11px; border-radius: 999px;
   font-size: 11px; font-weight: 700;
 }
-.dash-task-done { background: #D1FAE5; color: #065F46; }
-.dash-task-todo { background: #FEF3C7; color: #92400E; }
-.dark-mode .dash-task-done { background: rgba(16,185,129,.18); color: #6EE7B7; }
-.dark-mode .dash-task-todo { background: rgba(245,158,11,.18); color: #FCD34D; }
+.badge-done { background: #D1FAE5; color: #065F46; }
+.badge-todo { background: #FEF3C7; color: #92400E; }
+.dark-mode .badge-done { background: rgba(16,185,129,.18); color: #6EE7B7; }
+.dark-mode .badge-todo { background: rgba(245,158,11,.18); color: #FCD34D; }
 
-/* ── Vocab section ────────────────────────────────────────────── */
-.dash-vocab-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-  padding: 0 14px;
-}
+.dash-empty { padding: 36px 24px; text-align: center; color: #94A3B8; font-size: 13px; }
+.dash-empty i { font-size: 30px; opacity: .3; display: block; margin-bottom: 10px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   8. VOCAB GRID
+══════════════════════════════════════════════════════════════════ */
+.dash-vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px; }
 .dash-vocab-tile {
-  background: #fff; border-radius: 16px;
+  background: #fff; border-radius: 18px;
   padding: 16px 14px; text-decoration: none;
-  box-shadow: 0 2px 10px rgba(12,31,69,.06);
+  box-shadow: 0 3px 12px rgba(12,31,69,.07);
+  border: 1.5px solid #E8EEF8;
   display: flex; flex-direction: column; gap: 8px;
-  transition: box-shadow .15s;
+  transition: box-shadow .15s, transform .15s;
 }
-.dark-mode .dash-vocab-tile { background: #0D1B2F; border: 1px solid #18304F; box-shadow: none; }
-.dash-vocab-tile:active { box-shadow: 0 4px 18px rgba(12,31,69,.14); }
+.dark-mode .dash-vocab-tile { background: #0D1B2F; border-color: #18304F; box-shadow: none; }
+.dash-vocab-tile:active { transform: scale(.97); }
+
 .dash-vocab-icon {
-  width: 42px; height: 42px; border-radius: 12px;
+  width: 44px; height: 44px; border-radius: 13px;
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; color: #fff;
 }
 .dash-vocab-name { font-size: 14px; font-weight: 800; color: #0C1A36; }
 .dark-mode .dash-vocab-name { color: #E2E8F0; }
-.dash-vocab-desc { font-size: 11px; color: #94A3B8; line-height: 1.35; }
-
-/* ── Empty state ──────────────────────────────────────────────── */
-.dash-empty {
-  padding: 32px 24px; text-align: center;
-  color: #94A3B8; font-size: 13px;
-}
-.dash-empty i { font-size: 28px; display: block; margin-bottom: 10px; opacity: .35; }
+.dash-vocab-desc { font-size: 11px; color: #94A3B8; line-height: 1.4; }
 </style>
 {% endblock custom_css %}
 
@@ -327,187 +483,242 @@
 {% with user=request.user %}
 <div class="dash">
 
-  <!-- ── Hero ─────────────────────────────────────────────────── -->
+  <!-- ══ 1. HERO ══════════════════════════════════════════════ -->
   <div class="dash-hero">
-    <div class="dash-avatar" id="dash-avatar">
-      <span id="dash-avatar-inner">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+    <div class="dash-hero-row">
+      <div class="dash-avatar-wrap">
+        <div class="dash-avatar-ring"></div>
+        <div class="dash-avatar" id="dash-avatar">
+          <span id="dash-avatar-inner">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+        </div>
+      </div>
+      <div class="dash-hero-text">
+        <div class="dash-salute" id="dash-salute">Good morning</div>
+        <div class="dash-name">{{ user.get_full_name|default:user.username }}</div>
+        {% if is_english and student_level %}
+        <div class="dash-level-chip"><i class="fas fa-layer-group"></i> {{ student_level }}</div>
+        {% endif %}
+      </div>
+      <a href="{% url 'student_view_notification' %}" class="dash-notif-btn" title="Notifications">
+        <i class="fas fa-bell"></i>
+        {% if recent_notifications %}<span class="dash-notif-dot"></span>{% endif %}
+      </a>
     </div>
-    <div class="dash-hero-text">
-      <div class="dash-salute" id="dash-salute">Good morning</div>
-      <div class="dash-name">{{ user.get_full_name|default:user.username }}</div>
-      {% if is_english and student_level %}
-      <div class="dash-level-chip"><i class="fas fa-layer-group"></i> {{ student_level }}</div>
-      {% endif %}
+
+    <!-- Stat pills -->
+    <div class="dash-hero-stats">
+      <div class="dash-hstat">
+        <div class="dash-hstat-num">{{ percent_present }}%</div>
+        <div class="dash-hstat-lbl">Attendance</div>
+      </div>
+      <div class="dash-hstat">
+        <div class="dash-hstat-num">{{ total_attendance }}</div>
+        <div class="dash-hstat-lbl">Classes</div>
+      </div>
+      <div class="dash-hstat">
+        <div class="dash-hstat-num">{{ total_subject }}</div>
+        <div class="dash-hstat-lbl">Groups</div>
+      </div>
     </div>
   </div>
 
-  <!-- ── Notifications ─────────────────────────────────────────── -->
+  <!-- ══ NOTIFICATIONS ════════════════════════════════════════ -->
   {% if recent_notifications %}
-  <div style="margin-top:14px;">
+  <div class="dash-notif-strip">
     {% for notif in recent_notifications %}
-    <div class="dash-notif">
+    <div class="dash-notif-card">
       <i class="fas fa-bell"></i>
       <span class="dash-notif-msg">{{ notif.message }}</span>
       <span class="dash-notif-date">{{ notif.created_at|date:"M j" }}</span>
     </div>
     {% endfor %}
-    <div style="text-align:right;padding:4px 18px 0;">
+    <div style="text-align:right;padding:4px 4px 0;">
       <a href="{% url 'student_view_notification' %}" class="dash-section-link">All notifications <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
     </div>
   </div>
   {% endif %}
 
-  <!-- ── Group strip ───────────────────────────────────────────── -->
+  <!-- ══ 2. STORIES ════════════════════════════════════════════ -->
+  {% if stories %}
+  <div class="dash-stories-wrap">
+    <div class="dash-stories-hd">
+      <span class="dash-stories-title">Updates</span>
+    </div>
+    <div class="dash-stories">
+      {% for s in stories %}
+      <div class="dash-story-card" onclick="openStory({{ forloop.counter0 }})">
+        <div class="dash-story-ring">
+          <div class="dash-story-inner" style="{% if not s.image %}background:{{ s.bg_color }};{% endif %}">
+            {% if s.image %}<img src="{{ s.image.url }}" alt="{{ s.title }}">{% else %}{{ s.emoji }}{% endif %}
+          </div>
+        </div>
+        <div class="dash-story-lbl">{{ s.title }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Story fullscreen modal -->
+  <div class="story-modal" id="story-modal" onclick="closeStoryIfOutside(event)">
+    <div class="story-modal-card" id="story-modal-card">
+      <div class="story-progress-bar"><div class="story-progress-fill" id="story-progress-fill"></div></div>
+      <button class="story-modal-close" onclick="closeStory()"><i class="fas fa-times"></i></button>
+      <div id="story-modal-content"></div>
+      <div class="story-modal-body">
+        <div class="story-modal-type" id="story-modal-type"></div>
+        <div class="story-modal-title" id="story-modal-title"></div>
+        <div class="story-modal-body-text" id="story-modal-body"></div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ══ GROUP STRIP ══════════════════════════════════════════ -->
   {% if subject_rows %}
-  <div class="dash-strip">
+  <div class="dash-section">
+    <h3 class="dash-section-title"><i class="fas fa-layer-group"></i> My Groups</h3>
+    <a href="{% url 'student_view_attendance' %}" class="dash-section-link">Details <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
+  </div>
+  <div class="dash-group-strip">
     {% for row in subject_rows %}
-    {% with idx=forloop.counter0 %}
-    <a href="{% url 'student_view_attendance' %}" class="dash-strip-card {% if forloop.first %}active-card{% endif %}">
-      <div class="dash-strip-ring">
-        <svg viewBox="0 0 52 52">
-          <circle cx="26" cy="26" r="22" fill="none"
+    <a href="{% url 'student_view_attendance' %}" class="dash-gcard {% if forloop.first %}top{% endif %}">
+      <div class="dash-gcard-ring">
+        <svg viewBox="0 0 56 56">
+          <circle cx="28" cy="28" r="23" fill="none"
             stroke="{% if row.pct >= 75 %}rgba(16,185,129,.2){% elif row.pct >= 50 %}rgba(245,158,11,.2){% else %}rgba(239,68,68,.2){% endif %}"
             stroke-width="5"/>
-          <circle cx="26" cy="26" r="22" fill="none"
+          <circle cx="28" cy="28" r="23" fill="none"
             stroke="{% if row.pct >= 75 %}#10B981{% elif row.pct >= 50 %}#F59E0B{% else %}#EF4444{% endif %}"
             stroke-width="5" stroke-linecap="round"
-            stroke-dasharray="138.23"
-            stroke-dashoffset="{{ row.pct|floatformat:0 }}"
-            transform="rotate(-90 26 26)"
-            class="strip-ring-arc"/>
+            stroke-dasharray="144.51"
+            stroke-dashoffset="{{ row.pct }}"
+            transform="rotate(-90 28 28)"
+            class="gcard-arc"/>
         </svg>
-        <span class="dash-strip-ring-num">{{ row.pct }}%</span>
+        <div class="dash-gcard-ring-inner">
+          <span class="dash-gcard-pct">{{ row.pct }}%</span>
+        </div>
       </div>
-      <div class="dash-strip-name">{{ row.name }}</div>
-      <div class="dash-strip-pct">{{ row.present }}/{{ row.total }} present</div>
+      <div class="dash-gcard-name">{{ row.name }}</div>
+      <div class="dash-gcard-sub">{{ row.present }}/{{ row.total }}</div>
     </a>
-    {% endwith %}
     {% endfor %}
   </div>
   {% endif %}
 
-  <!-- ── Stats row ─────────────────────────────────────────────── -->
-  <div class="dash-stats">
-    <div class="dash-stat">
-      <div class="dash-stat-icon">📊</div>
-      <div class="dash-stat-num">{{ percent_present }}%</div>
-      <div class="dash-stat-lbl">Attendance</div>
-    </div>
-    <div class="dash-stat">
-      <div class="dash-stat-icon">📚</div>
-      <div class="dash-stat-num">{{ total_attendance }}</div>
-      <div class="dash-stat-lbl">Classes</div>
-    </div>
-    <div class="dash-stat">
-      <div class="dash-stat-icon">🎓</div>
-      <div class="dash-stat-num">{{ total_subject }}</div>
-      <div class="dash-stat-lbl">Groups</div>
-    </div>
-  </div>
-
-  <!-- ── Upcoming lessons ──────────────────────────────────────── -->
+  <!-- ══ 3. UPCOMING LESSONS ══════════════════════════════════ -->
   {% if subject_rows %}
-  <div class="dash-section">
-    <div class="dash-section-title"><i class="fas fa-calendar-check"></i> My Groups</div>
-    <a href="{% url 'student_view_attendance' %}" class="dash-section-link">Details <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
+  {% with accent_colors="#3B82F6,#10B981,#8B5CF6,#F59E0B,#EF4444,#06B6D4,#EC4899" %}
+  <div class="dash-section" style="padding-top:22px;">
+    <h3 class="dash-section-title"><i class="fas fa-calendar-check"></i> Upcoming Lessons</h3>
   </div>
 
   {% for row in subject_rows %}
-  <div class="dash-lesson-card">
-    <div class="dash-lesson-name">{{ row.name }}</div>
-    <div class="dash-lesson-meta">
-      {% if row.schedule %}
-      <span class="dash-lesson-pill"><i class="fas fa-clock"></i> {{ row.schedule }}</span>
-      {% endif %}
-      {% if row.start_date %}
-      <span class="dash-lesson-pill"><i class="fas fa-calendar-alt"></i> Starts {{ row.start_date|date:"M j, Y" }}</span>
-      {% endif %}
-      {% if row.room %}
-      <span class="dash-lesson-pill"><i class="fas fa-door-open"></i> {{ row.room }}</span>
-      {% endif %}
-      {% if row.branch %}
-      <span class="dash-lesson-pill"><i class="fas fa-map-marker-alt"></i> {{ row.branch }}</span>
-      {% endif %}
+  {% with idx=forloop.counter0 %}
+  <div class="dash-lesson">
+    <div class="dash-lesson-accent"
+         style="background:{% cycle '#3B82F6' '#10B981' '#8B5CF6' '#F59E0B' '#EF4444' '#06B6D4' %};">
     </div>
-    <div class="dash-lesson-footer">
-      <span class="dash-lesson-teacher">
-        {% if row.teacher %}<i class="fas fa-chalkboard-teacher"></i> {{ row.teacher }}{% endif %}
-      </span>
-      <span class="dash-status-chip">
-        {% if row.pct >= 75 %}<i class="fas fa-circle" style="font-size:6px;color:#10B981;"></i> Great
-        {% elif row.pct >= 50 %}<i class="fas fa-circle" style="font-size:6px;color:#F59E0B;"></i> Good
-        {% else %}<i class="fas fa-circle" style="font-size:6px;color:#EF4444;"></i> Needs focus{% endif %}
-      </span>
+    <div class="dash-lesson-body">
+      <div class="dash-lesson-top">
+        <div class="dash-lesson-name">{{ row.name }}</div>
+        <span class="dash-lesson-status {% if row.pct >= 75 %}ls-great{% elif row.pct >= 50 %}ls-good{% else %}ls-focus{% endif %}">
+          <i class="fas fa-circle" style="font-size:5px;"></i>
+          {% if row.pct >= 75 %}Great{% elif row.pct >= 50 %}Good{% else %}Needs focus{% endif %}
+        </span>
+      </div>
+      <div class="dash-lesson-meta">
+        {% if row.schedule %}<span class="dash-lesson-pill"><i class="fas fa-clock"></i> {{ row.schedule }}</span>{% endif %}
+        {% if row.start_date %}<span class="dash-lesson-pill"><i class="fas fa-calendar-alt"></i> {{ row.start_date|date:"M j, Y" }}</span>{% endif %}
+        {% if row.room %}<span class="dash-lesson-pill"><i class="fas fa-door-open"></i> {{ row.room }}</span>{% endif %}
+        {% if row.branch %}<span class="dash-lesson-pill"><i class="fas fa-map-marker-alt"></i> {{ row.branch }}</span>{% endif %}
+      </div>
+      <div class="dash-lesson-footer">
+        <div class="dash-teacher-chip">
+          {% if row.teacher %}
+          <div class="dash-teacher-av">{{ row.teacher|first|upper }}</div>
+          <span class="dash-teacher-name">{{ row.teacher }}</span>
+          {% else %}
+          <span class="dash-teacher-name" style="opacity:.5;">No teacher assigned</span>
+          {% endif %}
+        </div>
+        <a href="{% url 'student_view_attendance' %}" class="dash-open-btn">
+          Open <i class="fas fa-arrow-right" style="font-size:10px;"></i>
+        </a>
+      </div>
     </div>
   </div>
+  {% endwith %}
   {% endfor %}
+  {% endwith %}
   {% endif %}
 
-  <!-- ── Latest result ─────────────────────────────────────────── -->
+  <!-- ══ LATEST RESULT ════════════════════════════════════════ -->
   {% if latest_result %}
   <div class="dash-section">
-    <div class="dash-section-title"><i class="fas fa-chart-bar"></i> Latest Result</div>
-    <a href="{% url 'student_view_result' %}" class="dash-section-link">All Results <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
+    <h3 class="dash-section-title"><i class="fas fa-chart-bar"></i> Latest Score</h3>
+    <a href="{% url 'student_view_result' %}" class="dash-section-link">All <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
   </div>
-  <div class="dash-result-card">
+  <div class="dash-result">
     <div class="dash-result-top">
       <div>
-        <div class="dash-result-label">Score</div>
+        <div class="dash-result-lbl">Result</div>
         <div class="dash-result-group">{{ latest_result.group.name|default:"General" }}</div>
       </div>
       <div class="dash-result-score">
-        {% with total=latest_result.test|add:latest_result.exam %}{{ total }}{% endwith %}<span> /100</span>
+        {% with t=latest_result.test|add:latest_result.exam %}{{ t }}{% endwith %}<span>/100</span>
       </div>
     </div>
-    <div class="dash-result-row">
+    <div class="dash-result-cells">
       <div class="dash-result-cell">
         <div class="dash-result-cell-lbl">Test</div>
-        <div class="dash-result-cell-val">{{ latest_result.test }} <span style="font-size:12px;opacity:.6;">/40</span></div>
+        <div class="dash-result-cell-val">{{ latest_result.test }}<span>/40</span></div>
       </div>
       <div class="dash-result-cell">
         <div class="dash-result-cell-lbl">Exam</div>
-        <div class="dash-result-cell-val">{{ latest_result.exam }} <span style="font-size:12px;opacity:.6;">/60</span></div>
+        <div class="dash-result-cell-val">{{ latest_result.exam }}<span>/60</span></div>
       </div>
     </div>
-    <a href="{% url 'student_view_result' %}" class="dash-result-link">View full results <i class="fas fa-arrow-right"></i></a>
+    <a href="{% url 'student_view_result' %}" class="dash-result-link">
+      View all results <i class="fas fa-arrow-right"></i>
+    </a>
   </div>
   {% endif %}
 
-  <!-- ── Assignments ───────────────────────────────────────────── -->
+  <!-- ══ ASSIGNMENTS ══════════════════════════════════════════ -->
   <div class="dash-section">
-    <div class="dash-section-title"><i class="fas fa-tasks"></i> Assignments</div>
+    <h3 class="dash-section-title"><i class="fas fa-tasks"></i> Assignments</h3>
     <a href="{% url 'student_assignments' %}" class="dash-section-link">View all <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
   </div>
-  {% if recent_assignments %}
-  <div class="dash-task-list">
-    {% for a in recent_assignments %}
-    {% with idx=forloop.counter0 %}
-    <a href="{% url 'submit_assignment' a.id %}" class="dash-task-row">
-      <div class="dash-task-icon" style="background:{% if idx == 0 %}#0C1F45{% elif idx == 1 %}#0D9488{% elif idx == 2 %}#D97706{% else %}#7C3AED{% endif %};">
-        {{ a.title|first|upper }}
-      </div>
-      <div class="dash-task-body">
-        <div class="dash-task-title">{{ a.title }}</div>
-        <div class="dash-task-sub">{{ a.group_name }} · Due {{ a.due_date|date:"M j" }}</div>
-      </div>
-      <span class="dash-task-badge {% if a.submitted %}dash-task-done{% else %}dash-task-todo{% endif %}">
-        {% if a.submitted %}Done{% else %}Pending{% endif %}
-      </span>
-    </a>
-    {% endwith %}
-    {% endfor %}
+  <div class="dash-tasks">
+    {% if recent_assignments %}
+      {% for a in recent_assignments %}
+      {% with idx=forloop.counter0 %}
+      <a href="{% url 'submit_assignment' a.id %}" class="dash-task-row">
+        <div class="dash-task-icon"
+             style="background:{% cycle '#0C1F45' '#0D9488' '#D97706' '#7C3AED' %};">
+          {{ a.title|first|upper }}
+        </div>
+        <div class="dash-task-body">
+          <div class="dash-task-title">{{ a.title }}</div>
+          <div class="dash-task-sub">{{ a.group_name }} · Due {{ a.due_date|date:"M j" }}</div>
+        </div>
+        <span class="dash-task-badge {% if a.submitted %}badge-done{% else %}badge-todo{% endif %}">
+          {% if a.submitted %}Done{% else %}Pending{% endif %}
+        </span>
+      </a>
+      {% endwith %}
+      {% endfor %}
+    {% else %}
+    <div class="dash-empty"><i class="fas fa-check-circle"></i>All caught up — no pending assignments!</div>
+    {% endif %}
   </div>
-  {% else %}
-  <div class="dash-task-list">
-    <div class="dash-empty"><i class="fas fa-check-circle"></i>All assignments complete!</div>
-  </div>
-  {% endif %}
 
-  <!-- ── Vocabulary ────────────────────────────────────────────── -->
+  <!-- ══ VOCABULARY ════════════════════════════════════════════ -->
   {% if is_english %}
   <div class="dash-section">
-    <div class="dash-section-title"><i class="fas fa-language"></i> Vocabulary</div>
-    <a href="{% url 'vocabulary_day_list' %}" class="dash-section-link">All Days <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
+    <h3 class="dash-section-title"><i class="fas fa-language"></i> Vocabulary</h3>
+    <a href="{% url 'vocabulary_day_list' %}" class="dash-section-link">All days <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
   </div>
   <div class="dash-vocab-grid">
     <a href="{% url 'vocabulary_day_list' %}" class="dash-vocab-tile">
@@ -518,25 +729,25 @@
     <a href="{% url 'student_progress' %}" class="dash-vocab-tile">
       <div class="dash-vocab-icon" style="background:#0D9488;"><i class="fas fa-chart-line"></i></div>
       <div class="dash-vocab-name">My Progress</div>
-      <div class="dash-vocab-desc">View charts and quiz scores</div>
+      <div class="dash-vocab-desc">Charts and quiz scores</div>
     </a>
   </div>
   {% endif %}
 
-</div>
+</div><!-- .dash -->
 {% endwith %}
 {% endblock content %}
 
 {% block custom_js %}
 <script>
 (function () {
-  /* ── Time-based greeting ─────────────────────────────────── */
+  /* ── Time-based greeting ──────────────────────────────────── */
   var h = new Date().getHours();
   var salute = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 21 ? 'Good evening' : 'Good night';
   var el = document.getElementById('dash-salute');
   if (el) el.textContent = salute;
 
-  /* ── Avatar sticker ─────────────────────────────────────── */
+  /* ── Avatar sticker ───────────────────────────────────────── */
   var AVATARS = ["🧑‍🎓","👨‍🎓","👩‍🎓","🧑‍💻","👨‍💻","👩‍💻","🧑‍🏫","👨‍🏫","👩‍🏫","🤓",
                  "😊","😎","💡","📚","🏆","⭐","💪","🎯","🌟","🦉","🌍","✏️","🎨","🔬"];
   var BG = ["#1B3F7A","#0C1F45","#7C3AED","#0891B2","#1F2937","#6D28D9",
@@ -545,21 +756,77 @@
             "#4F46E5","#65A30D","#0D9488","#6B7280","#DB2777","#0891B2"];
   var av = '{{ request.user.avatar }}';
   var idx = parseInt(av, 10) - 1;
-  var wrap = document.getElementById('dash-avatar');
+  var wrap  = document.getElementById('dash-avatar');
   var inner = document.getElementById('dash-avatar-inner');
   if (idx >= 0 && idx < AVATARS.length && wrap && inner) {
     inner.textContent = AVATARS[idx];
-    inner.style.fontSize = '26px';
-    inner.style.lineHeight = '1';
+    inner.style.fontSize = '26px'; inner.style.lineHeight = '1';
     wrap.style.background = BG[idx];
+    /* Match the spinning ring colour to the avatar background */
+    wrap.previousElementSibling.style.background =
+      'conic-gradient(' + BG[idx] + ' 0% 75%, rgba(255,255,255,.15) 75% 100%)';
   }
 
-  /* ── Strip ring arcs — convert pct → dashoffset ──────────── */
-  var CIRC = 138.23; /* 2π × 22 */
-  document.querySelectorAll('.strip-ring-arc').forEach(function (arc) {
+  /* ── Group card arcs — pct → dashoffset ──────────────────── */
+  var CIRC = 144.51; /* 2π × 23 */
+  document.querySelectorAll('.gcard-arc').forEach(function (arc) {
     var pct = parseFloat(arc.getAttribute('stroke-dashoffset')) || 0;
     arc.setAttribute('stroke-dashoffset', CIRC * (1 - pct / 100));
   });
+
+  /* ── Stories data ─────────────────────────────────────────── */
+  var STORIES = {{ stories_json|safe }};
+
+  var currentStory = 0;
+  var progressTimer = null;
+
+  window.openStory = function (idx) {
+    currentStory = idx;
+    renderStory(idx);
+    document.getElementById('story-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    startProgress();
+  };
+  window.closeStory = function () {
+    document.getElementById('story-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    if (progressTimer) clearTimeout(progressTimer);
+  };
+  window.closeStoryIfOutside = function (e) {
+    if (e.target === document.getElementById('story-modal')) closeStory();
+  };
+
+  function renderStory(idx) {
+    var s = STORIES[idx];
+    if (!s) return;
+    var content = document.getElementById('story-modal-content');
+    if (s.img) {
+      content.innerHTML = '<img class="story-modal-img" src="' + s.img + '" alt="">';
+    } else {
+      content.innerHTML = '<div class="story-modal-noimgbg" style="background:' + s.bg + ';">' + s.emoji + '</div>';
+    }
+    document.getElementById('story-modal-type').textContent  = s.type;
+    document.getElementById('story-modal-title').textContent = s.title;
+    document.getElementById('story-modal-body').textContent  = s.body;
+    /* Reset progress bar */
+    var fill = document.getElementById('story-progress-fill');
+    fill.style.animation = 'none';
+    fill.getBoundingClientRect(); /* flush */
+    fill.style.animation = '';
+  }
+
+  function startProgress() {
+    if (progressTimer) clearTimeout(progressTimer);
+    progressTimer = setTimeout(function () {
+      if (currentStory < STORIES.length - 1) {
+        currentStory++;
+        renderStory(currentStory);
+        startProgress();
+      } else {
+        closeStory();
+      }
+    }, 5000);
+  }
 })();
 </script>
 {% endblock custom_js %}

@@ -452,3 +452,20 @@ class VocabularyDayForm(forms.ModelForm):
             self.initial['release_at'] = self.instance.release_at.strftime('%Y-%m-%dT%H:%M')
 
 
+class DashboardStoryForm(FormSettings):
+    class Meta:
+        model = DashboardStory
+        fields = ['title', 'body', 'image', 'story_type', 'emoji', 'bg_color',
+                  'target_groups', 'is_active', 'expires_at']
+        widgets = {
+            'title':        forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Story title'}),
+            'body':         forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Short description…'}),
+            'story_type':   forms.Select(attrs={'class': 'form-control'}),
+            'emoji':        forms.TextInput(attrs={'class': 'form-control', 'placeholder': '📢', 'maxlength': 8}),
+            'bg_color':     forms.TextInput(attrs={'class': 'form-control', 'type': 'color'}),
+            'target_groups':forms.CheckboxSelectMultiple(),
+            'is_active':    forms.CheckboxInput(),
+            'expires_at':   forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+        }
+
+

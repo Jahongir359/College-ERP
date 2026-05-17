@@ -1191,3 +1191,61 @@ def manage_vocabulary_days(request):
         'days': days,
         'page_title': 'Manage Vocabulary Days',
     })
+
+
+@admin_only
+def manage_stories(request):
+    from django.utils import timezone as tz
+    stories = DashboardStory.objects.select_related('created_by').prefetch_related('target_groups').order_by('-created_at')
+    return render(request, 'hod_template/manage_stories.html', {
+        'stories': stories,
+        'now': tz.now(),
+        'page_title': 'Dashboard Stories',
+    })
+
+
+@admin_only
+def add_story(request):
+    if request.method == 'POST':
+        form = DashboardStoryForm(request.POST, request.FILES)
+        if form.is_valid():
+            story = form.save(commit=False)
+            story.created_by = request.user
+            story.save()
+            form.save_m2m()
+            messages.success(request, 'Story published.')
+            return redirect(reverse('manage_stories'))
+    else:
+        form = DashboardStoryForm()
+    return render(request, 'hod_template/story_form.html', {
+        'form': form,
+        'page_title': 'New Story',
+        'action': 'Add',
+    })
+
+
+@admin_only
+def edit_story(request, story_id):
+    story = get_object_or_404(DashboardStory, id=story_id)
+    if request.method == 'POST':
+        form = DashboardStoryForm(request.POST, request.FILES, instance=story)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Story updated.')
+            return redirect(reverse('manage_stories'))
+    else:
+        form = DashboardStoryForm(instance=story)
+    return render(request, 'hod_template/story_form.html', {
+        'form': form,
+        'story': story,
+        'page_title': 'Edit Story',
+        'action': 'Save',
+    })
+
+
+@admin_only
+def delete_story(request, story_id):
+    story = get_object_or_404(DashboardStory, id=story_id)
+    story.delete()
+    messages.success(request, 'Story deleted.')
+    return redirect(reverse('manage_stories'))

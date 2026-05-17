@@ -170,13 +170,21 @@
             </a>
         </div>
 
-        <h6 class="nav-section-title">Vocabulary</h6>
+        <h6 class="nav-section-title">Vocabulary & Content</h6>
 
         <div class="nav-item">
             {% url 'manage_vocabulary_days' as manage_vocabulary_days %}
             <a href="{{ manage_vocabulary_days }}" class="nav-link {% if 'vocabulary-day' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-language"></i>
                 <span class="nav-text">Vocabulary Days</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            {% url 'manage_stories' as manage_stories_url %}
+            <a href="{{ manage_stories_url }}" class="nav-link {% if 'stories' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-film"></i>
+                <span class="nav-text">Dashboard Stories</span>
             </a>
         </div>
 
@@ -297,6 +305,14 @@
             <a href="{{ staff_vocabulary_days }}" class="nav-link {% if 'vocabulary-day' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-language"></i>
                 <span class="nav-text">Daily Vocabulary</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            {% url 'staff_create_story' as staff_create_story_url %}
+            <a href="{{ staff_create_story_url }}" class="nav-link {% if 'stories' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-film"></i>
+                <span class="nav-text">Post a Story</span>
             </a>
         </div>
 

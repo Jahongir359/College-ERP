@@ -76,6 +76,23 @@ def student_home(request):
     # Notify student of any newly released vocabulary days
     _check_and_notify_vocab_days(student, [e.group_id for e in enrollments])
 
+    # Dashboard stories visible to this student
+    from django.utils import timezone as tz
+    now = tz.now()
+    enrolled_group_ids = [e.group_id for e in enrollments]
+    stories_qs = DashboardStory.objects.filter(
+        is_active=True
+    ).filter(
+        models.Q(expires_at__isnull=True) | models.Q(expires_at__gt=now)
+    ).select_related('created_by').prefetch_related('target_groups').order_by('-created_at')
+    # Keep only stories that target this student's groups OR have no group restriction
+    visible_stories = []
+    for s in stories_qs:
+        tg = list(s.target_groups.values_list('id', flat=True))
+        if not tg or any(gid in enrolled_group_ids for gid in tg):
+            visible_stories.append(s)
+    visible_stories = visible_stories[:12]
+
     # Recent unread notifications (show up to 3 on dashboard)
     recent_notifications = Notification.objects.filter(
         recipient=request.user, is_read=False
@@ -96,6 +113,15 @@ def student_home(request):
         'student_level': student_level,
         'recent_notifications': recent_notifications,
         'student_theme': student.theme,
+        'stories': visible_stories,
+        'stories_json': json.dumps([{
+            'title': s.title,
+            'body':  s.body,
+            'type':  s.get_story_type_display(),
+            'emoji': s.emoji,
+            'bg':    s.bg_color,
+            'img':   s.image.url if s.image else '',
+        } for s in visible_stories]),
         'page_title': 'My Dashboard',
     }
     return render(request, 'student_template/erpnext_student_home.html', context)

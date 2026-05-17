@@ -907,3 +907,25 @@ def _notify_vocab_day(day: VocabularyDay):
     if new_notifs:
         Notification.objects.bulk_create(new_notifs)
         day.notified_students.add(*new_notified)
+
+
+@staff_only
+def staff_create_story(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    if request.method == 'POST':
+        form = DashboardStoryForm(request.POST, request.FILES)
+        if form.is_valid():
+            story = form.save(commit=False)
+            story.created_by = request.user
+            story.save()
+            form.save_m2m()
+            messages.success(request, 'Story published to student dashboards.')
+            return redirect(reverse('staff_create_story'))
+    else:
+        form = DashboardStoryForm()
+        # Pre-filter groups to only this teacher's groups
+        form.fields['target_groups'].queryset = Group.objects.filter(teacher=staff, is_archived=False)
+    return render(request, 'staff_template/staff_story_form.html', {
+        'form': form,
+        'page_title': 'Post a Story',
+    })

@@ -1,0 +1,44 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'manage_stories' %}">Stories</a></li>
+<li class="breadcrumb-item active">{{ action }}</li>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:640px;margin:0 auto;">
+  <div style="background:var(--ice-surface);border:1.5px solid var(--ice-border);border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(12,31,69,.07);">
+    <div style="padding:18px 22px;border-bottom:1.5px solid var(--ice-border);font-size:13px;font-weight:700;color:var(--ice-text);">
+      <i class="fas fa-film me-2" style="color:var(--ice-cyan);"></i>{{ page_title }}
+    </div>
+    <div style="padding:24px 22px;">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+        <div style="margin-bottom:18px;">
+          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ice-muted);margin-bottom:7px;">
+            {{ field.label }}{% if field.field.required %} <span style="color:#EF4444;">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}<div style="font-size:11px;color:var(--ice-muted);margin-top:4px;">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<div style="font-size:11px;color:#EF4444;margin-top:4px;">{{ field.errors.0 }}</div>{% endif %}
+        </div>
+        {% endfor %}
+
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button type="submit" style="padding:11px 24px;border-radius:12px;background:linear-gradient(135deg,#0C1F45,#1B3F7A);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;">
+            <i class="fas fa-save me-1"></i> {{ action }} Story
+          </button>
+          <a href="{% url 'manage_stories' %}" style="padding:11px 20px;border-radius:12px;border:1.5px solid var(--ice-border);color:var(--ice-muted);font-size:14px;font-weight:600;text-decoration:none;">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

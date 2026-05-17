@@ -594,3 +594,43 @@ class VocabularyQuizResult(models.Model):
 
     def __str__(self):
         return f"{self.student} — {self.score:.0f}% ({self.taken_at.date()})"
+
+
+class DashboardStory(models.Model):
+    """Short-form content cards shown in the horizontal stories strip on the student dashboard."""
+    TYPE_ANNOUNCEMENT = 'announcement'
+    TYPE_VOCAB        = 'vocab'
+    TYPE_EVENT        = 'event'
+    TYPE_TIP          = 'tip'
+    TYPE_CHALLENGE    = 'challenge'
+    TYPE_UPDATE       = 'update'
+    STORY_TYPES = [
+        (TYPE_ANNOUNCEMENT, 'Announcement'),
+        (TYPE_VOCAB,        'Vocabulary Tip'),
+        (TYPE_EVENT,        'Event'),
+        (TYPE_TIP,          'Study Tip'),
+        (TYPE_CHALLENGE,    'Challenge'),
+        (TYPE_UPDATE,       'Teacher Update'),
+    ]
+
+    title      = models.CharField(max_length=120)
+    body       = models.TextField(blank=True)
+    image      = models.ImageField(upload_to='stories/', null=True, blank=True)
+    story_type = models.CharField(max_length=20, choices=STORY_TYPES, default=TYPE_ANNOUNCEMENT)
+    emoji      = models.CharField(max_length=8, blank=True, default='📢',
+                                  help_text='Emoji shown when no image is uploaded')
+    bg_color   = models.CharField(max_length=7, blank=True, default='#0C1F45',
+                                  help_text='Card background colour (hex) used when no image')
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='stories')
+    target_groups = models.ManyToManyField('Group', blank=True,
+                                           help_text='Leave empty to show to all students')
+    is_active  = models.BooleanField(default=True)
+    expires_at = models.DateTimeField(null=True, blank=True,
+                                      help_text='Story is hidden after this date/time')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title

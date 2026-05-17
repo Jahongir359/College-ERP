@@ -225,4 +225,13 @@ urlpatterns = [
 
     # Vocabulary Days (Admin/HOD)
     path('admin/vocabulary-days/', hod_views.manage_vocabulary_days, name='manage_vocabulary_days'),
+
+    # Dashboard Stories (Admin/HOD)
+    path('admin/stories/', hod_views.manage_stories, name='manage_stories'),
+    path('admin/stories/add/', hod_views.add_story, name='add_story'),
+    path('admin/stories/<int:story_id>/edit/', hod_views.edit_story, name='edit_story'),
+    path('admin/stories/<int:story_id>/delete/', hod_views.delete_story, name='delete_story'),
+
+    # Dashboard Stories (Staff)
+    path('staff/stories/post/', staff_views.staff_create_story, name='staff_create_story'),
 ]
