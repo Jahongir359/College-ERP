@@ -1092,14 +1092,14 @@
   /* ── Stories data ─────────────────────────────────────────── */
   var STORIES = {{ stories_json|safe }};
 
-  /* Preload story images so the modal opens with the image already cached.
-     Failed URLs silently flag the story so the modal skips trying to render
-     them (no flicker, no broken icon). */
+  /* Warm the browser cache for story images so the modal opens snappily.
+     Do NOT mutate s.img on failure — a transient miss (cold CDN, flaky
+     connection) would otherwise permanently hide the image for the rest
+     of the session even after the URL becomes reachable again.
+     Each per-render <img> has its own onerror handler that drops just
+     that image element, so the next open of the same story retries. */
   STORIES.forEach(function (s) {
-    if (!s.img) return;
-    var pre = new Image();
-    pre.onerror = function () { s.img = ''; };
-    pre.src = s.img;
+    if (s.img) { var pre = new Image(); pre.src = s.img; }
   });
 
   var currentStory = 0;

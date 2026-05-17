@@ -893,28 +893,40 @@ def _notify_vocab_day(day: VocabularyDay):
         day.notified_students.add(*new_notified)
 
 
-@staff_only
 def _story_storage_ok():
+    """True when a persistent remote storage backend (S3/Spaces) is configured."""
     import os
     return bool(os.environ.get('SPACES_KEY') and os.environ.get('SPACES_BUCKET'))
 
 
+@staff_only
 def staff_create_story(request):
     staff = get_object_or_404(Staff, admin=request.user)
+    teacher_groups = Group.objects.filter(teacher=staff, is_archived=False)
     if request.method == 'POST':
         form = DashboardStoryForm(request.POST, request.FILES)
-        # Restrict target_groups to teacher's own groups before validation
-        form.fields['target_groups'].queryset = Group.objects.filter(teacher=staff, is_archived=False)
+        # Restrict target_groups choices to teacher's own groups before validation,
+        # so a teacher can't post to a group they don't own even by tampering payload.
+        form.fields['target_groups'].queryset = teacher_groups
         if form.is_valid():
-            story = form.save(commit=False)
-            story.created_by = request.user
-            story.save()
-            form.save_m2m()
-            messages.success(request, 'Story published to student dashboards.')
-            return redirect(reverse('staff_create_story'))
+            try:
+                story = form.save(commit=False)
+                story.created_by = request.user
+                story.save()
+                form.save_m2m()
+                # If the teacher did not pick any specific group, default to ALL of
+                # their groups — so the story reaches only their students, not the
+                # entire school (which would happen with an empty M2M).
+                if not story.target_groups.exists():
+                    story.target_groups.set(teacher_groups)
+                messages.success(request, 'Story published to student dashboards.')
+                return redirect(reverse('staff_create_story'))
+            except Exception as exc:
+                logger.exception("staff_create_story save failed for user=%s", request.user.id)
+                messages.error(request, f"Could not publish story: {exc}")
     else:
         form = DashboardStoryForm()
-        form.fields['target_groups'].queryset = Group.objects.filter(teacher=staff, is_archived=False)
+        form.fields['target_groups'].queryset = teacher_groups
     return render(request, 'staff_template/staff_story_form.html', {
         'form': form,
         'page_title': 'Post a Story',

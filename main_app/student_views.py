@@ -197,7 +197,14 @@ def student_home(request):
         'hero_streak':     hero_streak,
         'page_title': 'My Dashboard',
     }
-    return render(request, 'student_template/erpnext_student_home.html', context)
+    response = render(request, 'student_template/erpnext_student_home.html', context)
+    # Stories expire on the server side. Disable bfcache + browser cache for the
+    # dashboard so a hard refresh always re-evaluates `expires_at` and shows a
+    # consistent set of active stories (no apparent disappear/reappear races
+    # caused by Chrome serving a stale snapshot from memory).
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    return response
 
 
 def _recent_assignments(student):
