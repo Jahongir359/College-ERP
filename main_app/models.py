@@ -735,3 +735,31 @@ class DashboardStory(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def has_valid_image(self):
+        """
+        True if the image field is set AND the file is actually accessible.
+        For local FileSystemStorage we check the disk; for S3-compatible
+        backends (DigitalOcean Spaces) we trust the URL since HEAD-checking
+        every page render would be too expensive.
+        """
+        if not self.image:
+            return False
+        try:
+            # `.path` raises NotImplementedError on remote storage backends
+            import os
+            return os.path.exists(self.image.path)
+        except (NotImplementedError, ValueError, AttributeError):
+            # Remote backend — assume the file is there.
+            return True
+
+    @property
+    def safe_image_url(self):
+        """Return the image URL, or empty string if the file isn't accessible."""
+        if not self.has_valid_image:
+            return ''
+        try:
+            return self.image.url
+        except (ValueError, AttributeError):
+            return ''
