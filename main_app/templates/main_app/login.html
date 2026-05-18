@@ -15,61 +15,102 @@
     html, body {
       height: 100%;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #F4F7FC;
+      background: #EEF3FB;
       color: #0C1F45;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px 20px 40px;
+      padding: 28px 20px 36px;
     }
 
-    /* ── Logo ── */
-    .logo-wrap {
-      text-align: center;
-      margin-bottom: 28px;
-      animation: fadeUp .45s ease both;
+    /* ─────────────────────────────────────────────
+       LOGO HERO
+    ───────────────────────────────────────────── */
+    .logo-hero {
+      margin-bottom: 20px;
+      animation: heroIn 1.2s cubic-bezier(.22,1,.36,1) both;
     }
-    .logo-wrap img {
-      width: 220px;
-      max-width: 68vw;
-      height: auto;
+
+    /* Floating wrapper — holds float + glow separately from the card */
+    .logo-float {
+      animation: logoFloat 5.5s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    /* Dark rounded card that frames the logo naturally */
+    .logo-card {
+      position: relative;
+      width: 200px;
+      border-radius: 26px;
+      overflow: hidden;
+      /* Soft cyan glow that pulses */
+      box-shadow:
+        0 8px 32px rgba(6,182,212,.22),
+        0 2px 8px rgba(0,0,0,.18);
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+
+    .logo-card img {
       display: block;
-      margin: 0 auto;
+      width: 100%;
+      height: auto;
     }
 
-    /* ── Card ── */
+    /* Shimmer sweep — light reflecting off ice */
+    .logo-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        108deg,
+        transparent 20%,
+        rgba(6,182,212,.12) 48%,
+        rgba(255,255,255,.06) 52%,
+        transparent 80%
+      );
+      transform: translateX(-110%);
+      animation: shimmer 7s ease-in-out infinite;
+    }
+
+    /* ─────────────────────────────────────────────
+       LOGIN CARD
+    ───────────────────────────────────────────── */
     .card {
       width: 100%;
-      max-width: 400px;
+      max-width: 390px;
       background: #fff;
-      border-radius: 20px;
-      padding: 36px 32px 32px;
+      border-radius: 22px;
+      padding: 34px 30px 30px;
       box-shadow:
-        0 2px 6px rgba(12,31,69,.06),
-        0 8px 28px rgba(12,31,69,.08);
-      animation: fadeUp .5s ease .07s both;
+        0 1px 3px rgba(12,31,69,.05),
+        0 6px 20px rgba(12,31,69,.08),
+        0 20px 48px rgba(12,31,69,.06);
+      animation: cardIn .7s cubic-bezier(.22,1,.36,1) .18s both;
     }
 
     .card-title {
-      font-size: 22px;
-      font-weight: 700;
+      font-size: 21px;
+      font-weight: 800;
       color: #0C1F45;
+      letter-spacing: -.25px;
       margin-bottom: 3px;
-      letter-spacing: -.2px;
     }
     .card-sub {
-      font-size: 14px;
+      font-size: 13.5px;
       color: #94A3B8;
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
 
-    /* ── Alerts ── */
+    /* ─────────────────────────────────────────────
+       ALERTS
+    ───────────────────────────────────────────── */
     .alert {
       padding: 11px 14px;
       border-radius: 10px;
@@ -87,13 +128,24 @@
     .alert-warning { background: #FFFBEB; color: #D97706; border-color: #FDE68A; }
     .alert-info    { background: #EFF6FF; color: #2563EB; border-color: #BFDBFE; }
 
-    /* ── Fields ── */
-    .field { margin-bottom: 18px; }
+    /* ─────────────────────────────────────────────
+       FIELDS
+    ───────────────────────────────────────────── */
+    .field {
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fieldIn .5s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .field:nth-child(1) { animation-delay: .30s; }
+    .field:nth-child(2) { animation-delay: .38s; }
+
     .field-label {
       display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: #64748B;
       margin-bottom: 7px;
     }
     .input-wrap {
@@ -107,90 +159,149 @@
       padding: 0 44px 0 16px;
       font-family: 'Inter', sans-serif;
       font-size: 15px;
+      font-weight: 500;
       color: #0C1F45;
-      background: #fff;
+      background: #F8FAFD;
       border: 1.5px solid #E2E8F0;
-      border-radius: 12px;
+      border-radius: 13px;
       outline: none;
-      transition: border-color .18s, box-shadow .18s;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
     }
-    .input-wrap input::placeholder { color: #CBD5E1; }
+    .input-wrap input::placeholder {
+      color: #B8C6D9;
+      font-weight: 400;
+    }
     .input-wrap input:focus {
+      background: #fff;
       border-color: #06B6D4;
-      box-shadow: 0 0 0 3px rgba(6,182,212,.12);
+      box-shadow: 0 0 0 3.5px rgba(6,182,212,.13);
     }
+    /* Force uppercase display for ID field */
+    #id_identifier { text-transform: uppercase; }
+    /* But don't uppercase placeholder */
+    #id_identifier::placeholder { text-transform: none; }
 
     /* Password toggle */
     .pw-btn {
       position: absolute;
       right: 10px;
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       background: none;
       border: none;
       cursor: pointer;
-      color: #CBD5E1;
+      color: #C8D5E5;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 6px;
+      border-radius: 8px;
       transition: color .15s;
     }
     .pw-btn:hover { color: #94A3B8; }
 
-    /* ── Button ── */
+    /* ─────────────────────────────────────────────
+       BUTTON
+    ───────────────────────────────────────────── */
+    .btn-wrap {
+      opacity: 0;
+      animation: fieldIn .5s cubic-bezier(.22,1,.36,1) .46s forwards;
+    }
     .btn-signin {
       width: 100%;
       height: 52px;
-      margin-top: 8px;
+      margin-top: 6px;
       border: none;
-      border-radius: 12px;
-      background: #1B4FD8;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #1B52E0 0%, #1840C4 100%);
       color: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 15px;
+      font-size: 15.5px;
       font-weight: 700;
       letter-spacing: .1px;
       cursor: pointer;
-      transition: background .15s, transform .1s;
+      transition: opacity .15s, transform .12s, box-shadow .2s;
+      box-shadow: 0 4px 14px rgba(27,82,224,.32);
     }
-    .btn-signin:hover  { background: #1741BB; }
-    .btn-signin:active { background: #1339A8; transform: translateY(1px); }
+    .btn-signin:hover {
+      opacity: .93;
+      box-shadow: 0 6px 20px rgba(27,82,224,.4);
+    }
+    .btn-signin:active {
+      transform: scale(.98);
+      box-shadow: 0 2px 8px rgba(27,82,224,.25);
+    }
 
-    /* ── Footer ── */
+    /* ─────────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────────── */
     .footer {
-      margin-top: 28px;
-      font-size: 12px;
-      color: #94A3B8;
-      animation: fadeUp .5s ease .14s both;
+      margin-top: 24px;
+      font-size: 11.5px;
+      color: #B0BEC5;
+      opacity: 0;
+      animation: fieldIn .5s ease .55s forwards;
     }
 
-    /* ── Animation ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
+    /* ─────────────────────────────────────────────
+       KEYFRAMES
+    ───────────────────────────────────────────── */
+    @keyframes heroIn {
+      from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fieldIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-5px); }
+    }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 8px 32px rgba(6,182,212,.22), 0 2px 8px rgba(0,0,0,.18); }
+      50%       { box-shadow: 0 10px 40px rgba(6,182,212,.36), 0 2px 10px rgba(0,0,0,.2); }
+    }
+    @keyframes shimmer {
+      0%  { transform: translateX(-110%); }
+      45% { transform: translateX(-110%); }
+      65% { transform: translateX(110%); }
+      100%{ transform: translateX(110%); }
+    }
 
-    /* ── Responsive ── */
+    /* ─────────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────────── */
     @media (max-width: 420px) {
-      .card { padding: 28px 22px 26px; border-radius: 16px; }
-      .logo-wrap img { width: 180px; }
+      .card { padding: 28px 22px 26px; border-radius: 18px; }
+      .logo-card { width: 172px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .logo-wrap, .card, .footer { animation: none; }
+      .logo-hero, .logo-float, .logo-card, .card, .field, .btn-wrap, .footer {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
       * { transition: none !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Logo -->
-  <div class="logo-wrap">
-    <img src="{% static 'dist/img/logo.png' %}" alt="ICEBERG Study Center">
+  <!-- ── Logo Hero ── -->
+  <div class="logo-hero">
+    <div class="logo-float">
+      <div class="logo-card">
+        <img src="{% static 'dist/img/logo.png' %}" alt="ICEBERG Study Center">
+      </div>
+    </div>
   </div>
 
-  <!-- Card -->
+  <!-- ── Login Card ── -->
   <div class="card">
     <h1 class="card-title">Welcome back</h1>
     <p class="card-sub">Sign in to continue</p>
@@ -222,7 +333,7 @@
         <label class="field-label" for="id_identifier">Your ID</label>
         <div class="input-wrap">
           <input type="text" id="id_identifier" name="identifier"
-                 placeholder="IC04821"
+                 placeholder="Student ID"
                  autocomplete="username" required autofocus
                  spellcheck="false" autocorrect="off" autocapitalize="characters">
         </div>
@@ -232,10 +343,10 @@
         <label class="field-label" for="id_password">Password</label>
         <div class="input-wrap">
           <input type="password" id="id_password" name="password"
-                 placeholder="••••••••"
+                 placeholder="Your Password"
                  autocomplete="current-password" required>
           <button type="button" class="pw-btn" id="pw-toggle" aria-label="Show or hide password">
-            <svg id="eye-ico" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+            <svg id="eye-ico" viewBox="0 0 20 20" fill="currentColor" width="17" height="17">
               <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
               <path fill-rule="evenodd" d="M.5 10C1.7 5.9 5.5 3 10 3s8.3 2.9 9.5 7c-1.2 4.1-5 7-9.5 7S1.7 14.1.5 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
             </svg>
@@ -243,14 +354,16 @@
         </div>
       </div>
 
-      <button type="submit" class="btn-signin">Sign In</button>
+      <div class="btn-wrap">
+        <button type="submit" class="btn-signin">Sign In</button>
+      </div>
     </form>
   </div>
 
   <p class="footer">&copy; {% now "Y" %} Iceberg Study Center</p>
 
   <script>
-  /* Password toggle */
+  /* ── Password visibility toggle ── */
   (function () {
     var btn = document.getElementById('pw-toggle');
     var inp = document.getElementById('id_password');
@@ -267,15 +380,26 @@
     }
   })();
 
-  /* Auto-uppercase IC / TC prefix */
+  /* ── Force full uppercase on ID field ── */
   (function () {
     var inp = document.getElementById('id_identifier');
     if (!inp) return;
     inp.addEventListener('input', function () {
-      var v = inp.value, p = inp.selectionStart;
-      var u = v.slice(0, 2).toUpperCase() + v.slice(2);
-      if (u !== v) { inp.value = u; try { inp.setSelectionRange(p, p); } catch (e) {} }
+      var v = inp.value;
+      var u = v.toUpperCase();
+      if (u !== v) {
+        var p = inp.selectionStart;
+        inp.value = u;
+        try { inp.setSelectionRange(p, p); } catch (e) {}
+      }
     });
+    /* Also uppercase on form submit to cover autofill edge cases */
+    var form = inp.closest('form');
+    if (form) {
+      form.addEventListener('submit', function () {
+        inp.value = inp.value.toUpperCase();
+      });
+    }
   })();
   </script>
 
