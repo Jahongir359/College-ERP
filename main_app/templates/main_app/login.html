@@ -15,135 +15,86 @@
     html, body {
       height: 100%;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #070B18;
-      color: #fff;
+      background: #F4F7FC;
+      color: #0C1F45;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow-x: hidden;
+      padding: 32px 20px 40px;
     }
 
-    /* ── Ambient layer ── */
-    .bg-glow {
-      position: fixed;
-      top: -160px; left: 50%; transform: translateX(-50%);
-      width: 700px; height: 420px;
-      background: radial-gradient(ellipse at center,
-        rgba(6,182,212,.07) 0%,
-        transparent 68%);
-      pointer-events: none; z-index: 0;
-    }
-    canvas {
-      position: fixed; inset: 0; z-index: 0;
-      pointer-events: none; opacity: .18;
-    }
-
-    /* ── Page shell ── */
-    .page {
-      position: relative; z-index: 1;
-      width: 100%;
-      padding: 40px 20px 48px;
-      display: flex; flex-direction: column;
-      align-items: center;
-    }
-
-    /* ── Brand ── */
-    .brand {
+    /* ── Logo ── */
+    .logo-wrap {
       text-align: center;
-      margin-bottom: 36px;
-      opacity: 0;
-      animation: fadeUp .5s ease .05s forwards;
+      margin-bottom: 28px;
+      animation: fadeUp .45s ease both;
     }
-    .brand-name {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: 7px;
-      color: #fff;
-      text-transform: uppercase;
-    }
-    .brand-rule {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 9px;
-    }
-    .brand-rule::before,
-    .brand-rule::after {
-      content: '';
-      width: 28px; height: 1px;
-      background: rgba(6,182,212,.35);
-    }
-    .brand-sub {
-      font-size: 9.5px;
-      font-weight: 600;
-      letter-spacing: 3.5px;
-      color: rgba(6,182,212,.65);
-      text-transform: uppercase;
+    .logo-wrap img {
+      width: 220px;
+      max-width: 68vw;
+      height: auto;
+      display: block;
+      margin: 0 auto;
     }
 
     /* ── Card ── */
     .card {
-      width: 100%; max-width: 372px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 22px;
-      padding: 40px 34px 36px;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 24px 60px rgba(0,0,0,.45);
-      opacity: 0;
-      animation: fadeUp .55s ease .12s forwards;
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 36px 32px 32px;
+      box-shadow:
+        0 2px 6px rgba(12,31,69,.06),
+        0 8px 28px rgba(12,31,69,.08);
+      animation: fadeUp .5s ease .07s both;
     }
 
     .card-title {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
-      color: #fff;
-      margin-bottom: 2px;
+      color: #0C1F45;
+      margin-bottom: 3px;
       letter-spacing: -.2px;
     }
     .card-sub {
-      font-size: 13px;
-      color: rgba(148,163,184,.6);
+      font-size: 14px;
+      color: #94A3B8;
       margin-bottom: 28px;
     }
 
     /* ── Alerts ── */
     .alert {
       padding: 11px 14px;
-      border-radius: 11px;
+      border-radius: 10px;
       font-size: 13px;
       margin-bottom: 20px;
       display: flex;
       align-items: flex-start;
-      gap: 9px;
+      gap: 8px;
       line-height: 1.45;
       border: 1px solid transparent;
     }
     .alert svg { flex-shrink: 0; width: 14px; height: 14px; margin-top: 1px; }
-    .alert-danger  { background: rgba(248,113,113,.1);  color: #FCA5A5; border-color: rgba(248,113,113,.15); }
-    .alert-success { background: rgba(52,211,153,.09);  color: #6EE7B7; border-color: rgba(52,211,153,.15); }
-    .alert-warning { background: rgba(251,191,36,.09);  color: #FCD34D; border-color: rgba(251,191,36,.15); }
-    .alert-info    { background: rgba(6,182,212,.09);   color: #7DD3FC; border-color: rgba(6,182,212,.15);  }
+    .alert-danger  { background: #FEF2F2; color: #DC2626; border-color: #FECACA; }
+    .alert-success { background: #F0FDF4; color: #16A34A; border-color: #BBF7D0; }
+    .alert-warning { background: #FFFBEB; color: #D97706; border-color: #FDE68A; }
+    .alert-info    { background: #EFF6FF; color: #2563EB; border-color: #BFDBFE; }
 
     /* ── Fields ── */
     .field { margin-bottom: 18px; }
     .field-label {
       display: block;
-      font-size: 11.5px;
+      font-size: 13px;
       font-weight: 600;
-      letter-spacing: .5px;
-      text-transform: uppercase;
-      color: rgba(203,213,225,.45);
-      margin-bottom: 8px;
+      color: #334155;
+      margin-bottom: 7px;
     }
     .input-wrap {
       position: relative;
@@ -152,206 +103,151 @@
     }
     .input-wrap input {
       width: 100%;
-      height: 48px;
+      height: 50px;
       padding: 0 44px 0 16px;
       font-family: 'Inter', sans-serif;
       font-size: 15px;
-      font-weight: 500;
-      color: #fff;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.1);
+      color: #0C1F45;
+      background: #fff;
+      border: 1.5px solid #E2E8F0;
       border-radius: 12px;
       outline: none;
-      transition: border-color .2s, background .2s;
-      -webkit-text-fill-color: #fff;
+      transition: border-color .18s, box-shadow .18s;
     }
-    .input-wrap input::placeholder {
-      color: rgba(148,163,184,.35);
-      font-weight: 400;
-    }
+    .input-wrap input::placeholder { color: #CBD5E1; }
     .input-wrap input:focus {
-      border-color: rgba(6,182,212,.5);
-      background: rgba(255,255,255,.08);
-    }
-    /* Autofill dark background fix */
-    .input-wrap input:-webkit-autofill,
-    .input-wrap input:-webkit-autofill:focus {
-      -webkit-box-shadow: 0 0 0 100px #0C1428 inset;
-      -webkit-text-fill-color: #fff;
-      caret-color: #fff;
+      border-color: #06B6D4;
+      box-shadow: 0 0 0 3px rgba(6,182,212,.12);
     }
 
     /* Password toggle */
     .pw-btn {
-      position: absolute; right: 10px;
-      width: 28px; height: 28px;
-      background: none; border: none;
-      cursor: pointer; color: rgba(148,163,184,.4);
-      display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #CBD5E1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 6px;
       transition: color .15s;
     }
-    .pw-btn:hover { color: rgba(148,163,184,.8); }
-
-    /* ── Meta row ── */
-    .meta-row {
-      display: flex;
-      align-items: center;
-      margin: 6px 0 24px;
-    }
-    .remember {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      user-select: none;
-      font-size: 13px;
-      color: rgba(148,163,184,.55);
-    }
-    .remember input[type="checkbox"] {
-      width: 15px; height: 15px;
-      accent-color: #06B6D4;
-      cursor: pointer;
-    }
+    .pw-btn:hover { color: #94A3B8; }
 
     /* ── Button ── */
     .btn-signin {
       width: 100%;
-      height: 50px;
+      height: 52px;
+      margin-top: 8px;
       border: none;
       border-radius: 12px;
-      background: #06B6D4;
-      color: #05111F;
+      background: #1B4FD8;
+      color: #fff;
       font-family: 'Inter', sans-serif;
       font-size: 15px;
       font-weight: 700;
       letter-spacing: .1px;
       cursor: pointer;
-      transition: opacity .15s, transform .1s;
+      transition: background .15s, transform .1s;
     }
-    .btn-signin:hover  { opacity: .88; }
-    .btn-signin:active { transform: translateY(1px); opacity: .8; }
-
-    /* ── Forgot link ── */
-    .forgot {
-      display: block;
-      text-align: center;
-      margin-top: 18px;
-      font-size: 13px;
-      color: rgba(148,163,184,.45);
-      text-decoration: none;
-      transition: color .15s;
-    }
-    .forgot:hover { color: rgba(148,163,184,.8); }
+    .btn-signin:hover  { background: #1741BB; }
+    .btn-signin:active { background: #1339A8; transform: translateY(1px); }
 
     /* ── Footer ── */
     .footer {
-      margin-top: 32px;
-      font-size: 11px;
-      color: rgba(148,163,184,.2);
-      letter-spacing: .2px;
-      opacity: 0;
-      animation: fadeUp .5s ease .22s forwards;
+      margin-top: 28px;
+      font-size: 12px;
+      color: #94A3B8;
+      animation: fadeUp .5s ease .14s both;
     }
 
-    /* ── Animations ── */
+    /* ── Animation ── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
     /* ── Responsive ── */
     @media (max-width: 420px) {
-      .card { padding: 32px 24px 28px; border-radius: 18px; }
+      .card { padding: 28px 22px 26px; border-radius: 16px; }
+      .logo-wrap img { width: 180px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .brand, .card, .footer { animation: none; opacity: 1; }
+      .logo-wrap, .card, .footer { animation: none; }
       * { transition: none !important; }
     }
   </style>
 </head>
 <body>
 
-  <div class="bg-glow"></div>
-  <canvas id="c"></canvas>
-
-  <div class="page">
-
-    <div class="brand">
-      <div class="brand-name">ICEBERG</div>
-      <div class="brand-rule">
-        <span class="brand-sub">Study Center</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <h1 class="card-title">Welcome back</h1>
-      <p class="card-sub">Sign in to continue</p>
-
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags|default:'info' }}">
-            <svg viewBox="0 0 20 20" fill="currentColor">
-              {% if message.tags == 'success' %}
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3l-4 4a1 1 0 01-1.4 0l-2-2a1 1 0 011.4-1.4L9 10.6l3.3-3.3a1 1 0 011.4 1.4z" clip-rule="evenodd"/>
-              {% elif message.tags == 'danger' or message.tags == 'error' %}
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 7a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-              {% elif message.tags == 'warning' %}
-                <path fill-rule="evenodd" d="M8.3 2.6c.8-1.5 2.9-1.5 3.7 0l6.5 12a2 2 0 01-1.8 3H3.7a2 2 0 01-1.9-3l6.5-12zM10 7a1 1 0 011 1v4a1 1 0 11-2 0V8a1 1 0 011-1zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-              {% else %}
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-              {% endif %}
-            </svg>
-            <span>{{ message }}</span>
-          </div>
-        {% endfor %}
-      {% endif %}
-
-      <form method="post" action="{% url 'user_login' %}" autocomplete="on" novalidate>
-        {% csrf_token %}
-        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
-
-        <div class="field">
-          <label class="field-label" for="id_identifier">Your ID</label>
-          <div class="input-wrap">
-            <input type="text" id="id_identifier" name="identifier"
-                   placeholder="IC04821"
-                   autocomplete="username" required autofocus
-                   spellcheck="false" autocorrect="off" autocapitalize="characters">
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field-label" for="id_password">Password</label>
-          <div class="input-wrap">
-            <input type="password" id="id_password" name="password"
-                   placeholder="••••••••"
-                   autocomplete="current-password" required>
-            <button type="button" class="pw-btn" id="pw-toggle" aria-label="Show or hide password">
-              <svg id="eye-ico" viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
-                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                <path fill-rule="evenodd" d="M.5 10C1.7 5.9 5.5 3 10 3s8.3 2.9 9.5 7c-1.2 4.1-5 7-9.5 7S1.7 14.1.5 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="meta-row">
-          <label class="remember">
-            <input type="checkbox" name="remember" id="remember">
-            Keep me signed in
-          </label>
-        </div>
-
-        <button type="submit" class="btn-signin">Sign In</button>
-      </form>
-
-      <a href="{% url 'forgot_password' %}" class="forgot">Forgot your password?</a>
-    </div>
-
-    <p class="footer">&copy; {% now "Y" %} Iceberg Study Center</p>
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <img src="{% static 'dist/img/logo.png' %}" alt="ICEBERG Study Center">
   </div>
+
+  <!-- Card -->
+  <div class="card">
+    <h1 class="card-title">Welcome back</h1>
+    <p class="card-sub">Sign in to continue</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }}">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            {% if message.tags == 'success' %}
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3l-4 4a1 1 0 01-1.4 0l-2-2a1 1 0 011.4-1.4L9 10.6l3.3-3.3a1 1 0 011.4 1.4z" clip-rule="evenodd"/>
+            {% elif message.tags == 'danger' or message.tags == 'error' %}
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 7a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+            {% elif message.tags == 'warning' %}
+              <path fill-rule="evenodd" d="M8.3 2.6c.8-1.5 2.9-1.5 3.7 0l6.5 12a2 2 0 01-1.8 3H3.7a2 2 0 01-1.9-3l6.5-12zM10 7a1 1 0 011 1v4a1 1 0 11-2 0V8a1 1 0 011-1zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+            {% else %}
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            {% endif %}
+          </svg>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{% url 'user_login' %}" autocomplete="on" novalidate>
+      {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+      <div class="field">
+        <label class="field-label" for="id_identifier">Your ID</label>
+        <div class="input-wrap">
+          <input type="text" id="id_identifier" name="identifier"
+                 placeholder="IC04821"
+                 autocomplete="username" required autofocus
+                 spellcheck="false" autocorrect="off" autocapitalize="characters">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="id_password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="id_password" name="password"
+                 placeholder="••••••••"
+                 autocomplete="current-password" required>
+          <button type="button" class="pw-btn" id="pw-toggle" aria-label="Show or hide password">
+            <svg id="eye-ico" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+              <path fill-rule="evenodd" d="M.5 10C1.7 5.9 5.5 3 10 3s8.3 2.9 9.5 7c-1.2 4.1-5 7-9.5 7S1.7 14.1.5 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-signin">Sign In</button>
+    </form>
+  </div>
+
+  <p class="footer">&copy; {% now "Y" %} Iceberg Study Center</p>
 
   <script>
   /* Password toggle */
@@ -359,7 +255,7 @@
     var btn = document.getElementById('pw-toggle');
     var inp = document.getElementById('id_password');
     var ico = document.getElementById('eye-ico');
-    var EYE = '<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.5 10C1.7 5.9 5.5 3 10 3s8.3 2.9 9.5 7c-1.2 4.1-5 7-9.5 7S1.7 14.1.5 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>';
+    var EYE     = '<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.5 10C1.7 5.9 5.5 3 10 3s8.3 2.9 9.5 7c-1.2 4.1-5 7-9.5 7S1.7 14.1.5 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>';
     var EYE_OFF = '<path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.515a4 4 0 00-5.478-5.48zM8.88 12.88l-3.29-3.29A3.98 3.98 0 014 10c0 2.21 1.79 4 4 4 .736 0 1.424-.207 2.015-.555l-1.136-1.136z" clip-rule="evenodd"/><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/>';
     var on = false;
     if (btn && inp) {
@@ -371,17 +267,7 @@
     }
   })();
 
-  /* Remember-me persistence */
-  (function () {
-    var r = document.getElementById('remember');
-    if (!r) return;
-    try { if (localStorage.getItem('iceRemember') === '1') r.checked = true; } catch (e) {}
-    r.addEventListener('change', function () {
-      try { localStorage.setItem('iceRemember', r.checked ? '1' : '0'); } catch (e) {}
-    });
-  })();
-
-  /* Auto-uppercase first two chars (IC / TC prefix) */
+  /* Auto-uppercase IC / TC prefix */
   (function () {
     var inp = document.getElementById('id_identifier');
     if (!inp) return;
@@ -390,56 +276,6 @@
       var u = v.slice(0, 2).toUpperCase() + v.slice(2);
       if (u !== v) { inp.value = u; try { inp.setSelectionRange(p, p); } catch (e) {} }
     });
-  })();
-
-  /* Minimal particle drift */
-  (function () {
-    var cv = document.getElementById('c');
-    if (!cv || !cv.getContext) return;
-    var ctx = cv.getContext('2d');
-    var W, H, pts = [];
-    var N = window.innerWidth < 600 ? 18 : 30;
-
-    function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight; }
-
-    function Dot() {
-      this.x  = Math.random() * W;
-      this.y  = Math.random() * H;
-      this.r  = Math.random() * .9 + .2;
-      this.dx = (Math.random() - .5) * .18;
-      this.dy = -(Math.random() * .18 + .04);
-      this.a  = Math.random() * .35 + .05;
-    }
-    Dot.prototype.move = function () {
-      this.x += this.dx;
-      this.y += this.dy;
-      if (this.y < -3)  { this.y = H + 3; this.x = Math.random() * W; }
-      if (this.x < -3)   this.x = W + 3;
-      if (this.x > W + 3) this.x = -3;
-    };
-
-    function init() {
-      resize();
-      pts = [];
-      for (var i = 0; i < N; i++) pts.push(new Dot());
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, W, H);
-      for (var i = 0; i < pts.length; i++) {
-        var p = pts[i];
-        p.move();
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, 6.2832);
-        ctx.fillStyle = 'rgba(6,182,212,' + p.a + ')';
-        ctx.fill();
-      }
-      requestAnimationFrame(draw);
-    }
-
-    window.addEventListener('resize', init);
-    init();
-    draw();
   })();
   </script>
 
