@@ -38,19 +38,16 @@
       animation: heroIn 1.2s cubic-bezier(.22,1,.36,1) both;
     }
 
-    /* Floating wrapper — holds float + glow separately from the card */
     .logo-float {
       animation: logoFloat 5.5s ease-in-out infinite;
       will-change: transform;
     }
 
-    /* Dark rounded card that frames the logo naturally */
     .logo-card {
       position: relative;
       width: 200px;
       border-radius: 26px;
       overflow: hidden;
-      /* Soft cyan glow that pulses */
       box-shadow:
         0 8px 32px rgba(6,182,212,.22),
         0 2px 8px rgba(0,0,0,.18);
@@ -63,7 +60,6 @@
       height: auto;
     }
 
-    /* Shimmer sweep — light reflecting off ice */
     .logo-card::after {
       content: '';
       position: absolute;
@@ -109,7 +105,7 @@
     }
 
     /* ─────────────────────────────────────────────
-       ALERTS
+       GLOBAL ALERT (non-field errors)
     ───────────────────────────────────────────── */
     .alert {
       padding: 11px 14px;
@@ -176,10 +172,34 @@
       border-color: #06B6D4;
       box-shadow: 0 0 0 3.5px rgba(6,182,212,.13);
     }
-    /* Force uppercase display for ID field */
-    #id_identifier { text-transform: uppercase; }
-    /* But don't uppercase placeholder */
-    #id_identifier::placeholder { text-transform: none; }
+
+    /* ── Error state ── */
+    .input-wrap input.input-error {
+      border-color: #F87171;
+      background: #FFF8F8;
+      box-shadow: 0 0 0 3.5px rgba(248,113,113,.12);
+      animation: shake .38s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    .input-wrap input.input-error:focus {
+      border-color: #EF4444;
+      box-shadow: 0 0 0 3.5px rgba(239,68,68,.15);
+    }
+
+    .field-error {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 7px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #EF4444;
+      animation: errorFadeIn .25s ease both;
+    }
+    .field-error svg {
+      flex-shrink: 0;
+      width: 13px;
+      height: 13px;
+    }
 
     /* Password toggle */
     .pw-btn {
@@ -271,6 +291,16 @@
       65% { transform: translateX(110%); }
       100%{ transform: translateX(110%); }
     }
+    @keyframes shake {
+      10%, 90% { transform: translateX(-2px); }
+      20%, 80% { transform: translateX(3px);  }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px);  }
+    }
+    @keyframes errorFadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
     /* ─────────────────────────────────────────────
        RESPONSIVE
@@ -286,6 +316,7 @@
         opacity: 1 !important;
         transform: none !important;
       }
+      .input-wrap input.input-error { animation: none !important; }
       * { transition: none !important; }
     }
   </style>
@@ -306,24 +337,21 @@
     <h1 class="card-title">Welcome back</h1>
     <p class="card-sub">Sign in to continue</p>
 
-    {% if messages %}
-      {% for message in messages %}
+    {# Render non-field messages (rate-limit, server error, missing both fields) #}
+    {% for message in messages %}
+      {% if 'id_error' not in message.extra_tags and 'pw_error' not in message.extra_tags %}
         <div class="alert alert-{{ message.tags|default:'info' }}">
           <svg viewBox="0 0 20 20" fill="currentColor">
             {% if message.tags == 'success' %}
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3l-4 4a1 1 0 01-1.4 0l-2-2a1 1 0 011.4-1.4L9 10.6l3.3-3.3a1 1 0 011.4 1.4z" clip-rule="evenodd"/>
-            {% elif message.tags == 'danger' or message.tags == 'error' %}
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 7a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-            {% elif message.tags == 'warning' %}
-              <path fill-rule="evenodd" d="M8.3 2.6c.8-1.5 2.9-1.5 3.7 0l6.5 12a2 2 0 01-1.8 3H3.7a2 2 0 01-1.9-3l6.5-12zM10 7a1 1 0 011 1v4a1 1 0 11-2 0V8a1 1 0 011-1zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
             {% else %}
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 7a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
             {% endif %}
           </svg>
           <span>{{ message }}</span>
         </div>
-      {% endfor %}
-    {% endif %}
+      {% endif %}
+    {% endfor %}
 
     <form method="post" action="{% url 'user_login' %}" autocomplete="on" novalidate>
       {% csrf_token %}
@@ -333,10 +361,20 @@
         <label class="field-label" for="id_identifier">Your ID</label>
         <div class="input-wrap">
           <input type="text" id="id_identifier" name="identifier"
+                 value="{{ request.GET.id|default:'' }}"
                  placeholder="Student ID"
                  autocomplete="username" required autofocus
-                 spellcheck="false" autocorrect="off" autocapitalize="characters">
+                 spellcheck="false" autocorrect="off" autocapitalize="none"
+                 {% for msg in messages %}{% if 'id_error' in msg.extra_tags %}class="input-error"{% endif %}{% endfor %}>
         </div>
+        {% for msg in messages %}{% if 'id_error' in msg.extra_tags %}
+          <p class="field-error">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM9 7a1 1 0 112 0v4a1 1 0 11-2 0V7zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+            </svg>
+            {{ msg }}
+          </p>
+        {% endif %}{% endfor %}
       </div>
 
       <div class="field">
@@ -344,7 +382,8 @@
         <div class="input-wrap">
           <input type="password" id="id_password" name="password"
                  placeholder="Your Password"
-                 autocomplete="current-password" required>
+                 autocomplete="current-password" required
+                 {% for msg in messages %}{% if 'pw_error' in msg.extra_tags %}class="input-error"{% endif %}{% endfor %}>
           <button type="button" class="pw-btn" id="pw-toggle" aria-label="Show or hide password">
             <svg id="eye-ico" viewBox="0 0 20 20" fill="currentColor" width="17" height="17">
               <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
@@ -352,6 +391,14 @@
             </svg>
           </button>
         </div>
+        {% for msg in messages %}{% if 'pw_error' in msg.extra_tags %}
+          <p class="field-error">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM9 7a1 1 0 112 0v4a1 1 0 11-2 0V7zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+            </svg>
+            {{ msg }}
+          </p>
+        {% endif %}{% endfor %}
       </div>
 
       <div class="btn-wrap">
@@ -380,26 +427,22 @@
     }
   })();
 
-  /* ── Force full uppercase on ID field ── */
+  /* ── Clear error state when user starts re-typing ── */
   (function () {
-    var inp = document.getElementById('id_identifier');
-    if (!inp) return;
-    inp.addEventListener('input', function () {
-      var v = inp.value;
-      var u = v.toUpperCase();
-      if (u !== v) {
-        var p = inp.selectionStart;
-        inp.value = u;
-        try { inp.setSelectionRange(p, p); } catch (e) {}
-      }
-    });
-    /* Also uppercase on form submit to cover autofill edge cases */
-    var form = inp.closest('form');
-    if (form) {
-      form.addEventListener('submit', function () {
-        inp.value = inp.value.toUpperCase();
+    ['id_identifier', 'id_password'].forEach(function (id) {
+      var inp = document.getElementById(id);
+      if (!inp) return;
+      inp.addEventListener('input', function () {
+        if (inp.classList.contains('input-error')) {
+          inp.classList.remove('input-error');
+          var wrap = inp.closest('.field');
+          if (wrap) {
+            var err = wrap.querySelector('.field-error');
+            if (err) err.style.display = 'none';
+          }
+        }
       });
-    }
+    });
   })();
   </script>
 

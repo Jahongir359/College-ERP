@@ -1,9 +1,10 @@
 import json
 import logging
 import os
+from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordResetView
 from django.core.exceptions import PermissionDenied
@@ -104,8 +105,26 @@ def doLogin(request, **kwargs):
             user = None
 
     if user is None:
-        messages.error(request, "Invalid ID/email or password.")
-        return redirect(reverse("login_page"))
+        UserModel = get_user_model()
+        if '@' in identifier:
+            exists = UserModel.objects.filter(email__iexact=identifier).exists()
+            id_err_msg  = "Account not found."
+            pw_err_msg  = "Incorrect password."
+            id_qp       = ''
+        else:
+            exists = UserModel.objects.filter(login_id__iexact=identifier).exists()
+            id_err_msg  = "Student ID not found."
+            pw_err_msg  = "Incorrect password."
+            id_qp       = identifier
+
+        if not exists:
+            messages.error(request, id_err_msg, extra_tags='id_error')
+        else:
+            messages.error(request, pw_err_msg, extra_tags='pw_error')
+        url = reverse("login_page")
+        if id_qp:
+            url += '?' + urlencode({'id': id_qp})
+        return redirect(url)
 
     try:
         login(request, user)
