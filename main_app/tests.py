@@ -8,6 +8,10 @@ from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 
 from main_app.hod_views import _generate_login_id
+from main_app.models import (
+    Course, Group, Student, Staff, Enrollment, Assignment,
+    Attendance, AttendanceReport,
+)
 
 
 _BASE_OVERRIDES = dict(
@@ -214,3 +218,94 @@ class LoginFlowResilienceTests(TestCase):
         self.assertEqual(response.status_code, 302)
         # doLogin redirects to reverse('login_page') == '/login/' on failure.
         self.assertEqual(response['Location'], '/login/')
+
+
+class StudentPrivacyTests(TestCase):
+    """Students must not be able to access other students' group data."""
+
+    def _make_user(self, email, user_type, login_id=None, dob=None):
+        UserModel = get_user_model()
+        return UserModel.objects.create_user(
+            email=email, password='Pass123!',
+            first_name='T', last_name='U', user_type=user_type,
+            gender='M', address='', profile_pic='',
+            login_id=login_id, date_of_birth=dob,
+        )
+
+    def setUp(self):
+        self.course = Course.objects.create(name='General English')
+
+        # Two separate teachers
+        teacher_a_user = self._make_user('ta@iceberg.internal', '2', 'TC50001')
+        teacher_b_user = self._make_user('tb@iceberg.internal', '2', 'TC50002')
+        self.teacher_a = Staff.objects.get(admin=teacher_a_user)
+        self.teacher_b = Staff.objects.get(admin=teacher_b_user)
+
+        # Two separate groups
+        self.group_a = Group.objects.create(name='Group A', course=self.course, teacher=self.teacher_a)
+        self.group_b = Group.objects.create(name='Group B', course=self.course, teacher=self.teacher_b)
+
+        # Student A → Group A only
+        student_a_user = self._make_user('ic10001@iceberg.internal', '3', 'IC10001', date(2005, 5, 1))
+        self.student_a = Student.objects.get(admin=student_a_user)
+        self.student_a.course = self.course
+        self.student_a.save()
+        Enrollment.objects.create(student=self.student_a, group=self.group_a, is_active=True)
+
+        # Student B → Group B only
+        student_b_user = self._make_user('ic10002@iceberg.internal', '3', 'IC10002', date(2005, 6, 1))
+        self.student_b = Student.objects.get(admin=student_b_user)
+        self.student_b.course = self.course
+        self.student_b.save()
+        Enrollment.objects.create(student=self.student_b, group=self.group_b, is_active=True)
+
+    @override_settings(SECURE_SSL_REDIRECT=False)
+    def test_attendance_ajax_blocks_cross_group_access(self):
+        """Student A cannot query attendance for Group B via the AJAX endpoint."""
+        self.client.force_login(self.student_a.admin)
+        response = self.client.post(
+            reverse('student_view_attendance'),
+            {
+                'group': str(self.group_b.id),
+                'start_date': '2026-01-01',
+                'end_date': '2026-12-31',
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(SECURE_SSL_REDIRECT=False)
+    def test_attendance_ajax_allows_own_group(self):
+        """Student A can query attendance for Group A."""
+        self.client.force_login(self.student_a.admin)
+        response = self.client.post(
+            reverse('student_view_attendance'),
+            {
+                'group': str(self.group_a.id),
+                'start_date': '2026-01-01',
+                'end_date': '2026-12-31',
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(SECURE_SSL_REDIRECT=False)
+    def test_submit_assignment_blocks_cross_group(self):
+        """Student A cannot submit an assignment belonging to Group B."""
+        assignment = Assignment.objects.create(
+            title='Test', group=self.group_b, due_date=date(2026, 12, 31),
+            created_by=self.teacher_b,
+        )
+        self.client.force_login(self.student_a.admin)
+        response = self.client.post(
+            reverse('submit_assignment', args=[assignment.id]),
+            {'note': 'hacked'},
+        )
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(SECURE_SSL_REDIRECT=False)
+    def test_student_b_cannot_access_student_home_as_student_a(self):
+        """Student B logged in sees their own dashboard, not Student A's."""
+        self.client.force_login(self.student_b.admin)
+        response = self.client.get(reverse('student_home'))
+        self.assertEqual(response.status_code, 200)
+        # Student B should NOT see Group A's name in their dashboard
+        self.assertNotIn(b'Group A', response.content)

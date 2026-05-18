@@ -216,6 +216,7 @@ class SafePasswordResetView(PasswordResetView):
 # ---------------------------------------------------------------------------
 
 @login_required
+@login_required
 def get_attendance(request):
     group_id = request.POST.get('group')
     try:

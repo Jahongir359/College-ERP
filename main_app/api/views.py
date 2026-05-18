@@ -599,6 +599,22 @@ class FileUploadView(APIView):
         except Group.DoesNotExist:
             return Response({'detail': 'Group not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+        # Admins may upload to any group; teachers only to their own groups.
+        user_type = str(request.user.user_type)
+        if user_type == '2':
+            try:
+                staff = request.user.staff
+            except Staff.DoesNotExist:
+                return Response({'detail': 'Staff profile not found.'},
+                                status=status.HTTP_403_FORBIDDEN)
+            if group.teacher_id != staff.id:
+                return Response(
+                    {'detail': 'You are not the teacher of this group.'},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+        else:
+            staff = None
+
         student_id = request.data.get('student_id')
         student = None
         if student_id:
@@ -606,12 +622,21 @@ class FileUploadView(APIView):
                 student = Student.objects.get(id=student_id)
             except Student.DoesNotExist:
                 return Response({'detail': 'Student not found.'}, status=status.HTTP_404_NOT_FOUND)
+            # Verify the student is enrolled in this group.
+            if not Enrollment.objects.filter(
+                student=student, group=group, is_active=True
+            ).exists():
+                return Response(
+                    {'detail': 'Student is not enrolled in this group.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        try:
-            staff = request.user.staff
-        except Staff.DoesNotExist:
-            return Response({'detail': 'Staff profile not found.'},
-                            status=status.HTTP_403_FORBIDDEN)
+        if staff is None:
+            try:
+                staff = request.user.staff
+            except Staff.DoesNotExist:
+                return Response({'detail': 'Staff profile not found.'},
+                                status=status.HTTP_403_FORBIDDEN)
 
         title = request.data.get('title', file_obj.name)
         description = request.data.get('description', '')

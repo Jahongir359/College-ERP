@@ -478,6 +478,12 @@ def student_view_attendance(request):
     start = request.POST.get('start_date')
     end = request.POST.get('end_date')
     try:
+        # Verify the student is actually enrolled in the requested group before
+        # returning any data — prevents enumeration of other groups' attendance.
+        if not Enrollment.objects.filter(
+            student=student, group_id=group_id, is_active=True
+        ).exists():
+            return JsonResponse({'error': 'Not enrolled in this group.'}, status=403)
         group = get_object_or_404(Group, id=group_id)
         start_date = datetime.strptime(start, "%Y-%m-%d")
         end_date = datetime.strptime(end, "%Y-%m-%d")
@@ -1225,6 +1231,12 @@ def student_assignments(request):
 def submit_assignment(request, assignment_id):
     student = get_object_or_404(Student, admin=request.user)
     assignment = get_object_or_404(Assignment, id=assignment_id)
+    # Verify the student is enrolled in the group that owns this assignment.
+    if assignment.group_id and not Enrollment.objects.filter(
+        student=student, group_id=assignment.group_id, is_active=True
+    ).exists():
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("You are not enrolled in the group this assignment belongs to.")
     existing = Submission.objects.filter(assignment=assignment, student=student).first()
     form = SubmissionForm(request.POST or None, request.FILES or None, instance=existing)
     if request.method == 'POST':
@@ -1452,6 +1464,9 @@ def save_quiz_result(request, day_id):
         return JsonResponse({'error': 'POST required'}, status=405)
     student = get_object_or_404(Student, admin=request.user)
     day = get_object_or_404(VocabularyDay, id=day_id)
+    enrolled = Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists()
+    if day.release_scope != VocabularyDay.SCOPE_ALL and not enrolled:
+        return JsonResponse({'error': 'Not enrolled in this group.'}, status=403)
     try:
         if request.content_type and 'application/json' in request.content_type:
             data = json.loads(request.body)

@@ -424,8 +424,10 @@ def fetch_student_result(request):
     try:
         group_id = request.POST.get('group')
         student_id = request.POST.get('student')
+        staff = get_object_or_404(Staff, admin=request.user)
         student = get_object_or_404(Student, id=student_id)
-        group = get_object_or_404(Group, id=group_id)
+        # Restrict to groups the teacher actually owns — prevents IDOR.
+        group = get_object_or_404(Group, id=group_id, teacher=staff)
         result = StudentResult.objects.get(student=student, group=group)
         return HttpResponse(json.dumps({'exam': result.exam, 'test': result.test, 'comment': result.comment}))
     except StudentResult.DoesNotExist:

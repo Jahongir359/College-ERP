@@ -41,16 +41,12 @@ class NotificationManager {
 
         switch (Notification.permission) {
             case 'granted':
-                console.log('Notification permission already granted.');
                 this.getAndSendToken();
                 break;
             case 'denied':
-                console.log('Notification permission has been blocked.');
                 this.showPermissionBlockedMessage();
                 break;
             case 'default':
-                // Don't request immediately on page load
-                console.log('Notification permission not requested yet.');
                 this.showPermissionPrompt();
                 break;
         }
@@ -60,13 +56,11 @@ class NotificationManager {
         if (!this.isInitialized) return false;
 
         try {
-            const permission = await this.messaging.requestPermission();
-            console.log('Notification permission granted.');
+            await this.messaging.requestPermission();
             this.getAndSendToken();
             this.hidePermissionPrompt();
             return true;
         } catch (error) {
-            console.log('Unable to get permission to notify.', error);
             return false;
         }
     }
@@ -76,14 +70,9 @@ class NotificationManager {
 
         this.messaging.getToken().then(token => {
             if (token) {
-                console.log('FCM Token:', token);
                 this.sendTokenToServer(token);
-            } else {
-                console.log('No registration token available.');
             }
-        }).catch(err => {
-            console.log('An error occurred while retrieving token:', err);
-        });
+        }).catch(() => {});
     }
 
     sendTokenToServer(token) {
@@ -94,12 +83,6 @@ class NotificationManager {
                 token: token,
                 csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val()
             },
-            success: (response) => {
-                console.log('Token sent to server successfully');
-            },
-            error: (response) => {
-                console.log('Failed to send token to server');
-            }
         });
     }
 
@@ -108,8 +91,6 @@ class NotificationManager {
 
         // Handle incoming messages when app is in foreground
         this.messaging.onMessage(payload => {
-            console.log('Message received:', payload);
-            
             if (Notification.permission === 'granted') {
                 this.showNotification(payload);
             }
@@ -118,11 +99,8 @@ class NotificationManager {
         // Handle token refresh
         this.messaging.onTokenRefresh(() => {
             this.messaging.getToken().then(newToken => {
-                console.log('New Token:', newToken);
                 this.sendTokenToServer(newToken);
-            }).catch(err => {
-                console.log('Unable to retrieve refreshed token:', err);
-            });
+            }).catch(() => {});
         });
     }
 
