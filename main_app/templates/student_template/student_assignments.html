@@ -123,17 +123,6 @@
 
 {% block content %}
 
-<!-- Weekly submission trend -->
-<div class="trend-card">
-  <div class="trend-card-head">
-    <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Submission Rate</h4>
-    <span class="trend-meta" id="hw-trend-meta">—</span>
-  </div>
-  <div class="trend-card-body" id="hw-trend-body">
-    <canvas id="hwTrendChart"></canvas>
-  </div>
-</div>
-
 <div class="page-toolbar">
   <div class="page-count">
     <i class="fas fa-tasks me-1" style="color:var(--ice-cyan);"></i>
@@ -191,6 +180,19 @@
   <p>Your teachers haven't assigned any homework yet.</p>
 </div>
 {% endif %}
+
+<!-- Submission trend — analytics at the bottom -->
+<div style="margin-top:24px;">
+  <div class="trend-card">
+    <div class="trend-card-head">
+      <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Submission Rate Trend</h4>
+      <span class="trend-meta" id="hw-trend-meta">—</span>
+    </div>
+    <div class="trend-card-body" id="hw-trend-body">
+      <canvas id="hwTrendChart"></canvas>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 

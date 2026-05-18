@@ -372,21 +372,9 @@ select.att-control {
     </div>
   </div>
 
-  <!-- Trend Chart -->
-  <span class="att-lbl att-anim att-anim-3" style="animation-delay:.18s;">Weekly Trend</span>
-  <div class="trend-card att-anim att-anim-4" style="margin: 0 16px 14px;">
-    <div class="trend-card-head">
-      <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Weekly Attendance</h4>
-      <span class="trend-meta" id="att-trend-meta">—</span>
-    </div>
-    <div class="trend-card-body" id="att-trend-body">
-      <canvas id="attTrendChart"></canvas>
-    </div>
-  </div>
-
   <!-- Calendar -->
-  <span class="att-lbl att-anim att-anim-4" style="animation-delay:.22s;">Attendance Calendar</span>
-  <div class="att-card att-anim att-anim-5">
+  <span class="att-lbl att-anim att-anim-3" style="animation-delay:.18s;">Attendance Calendar</span>
+  <div class="att-card att-anim att-anim-4">
     <div class="cal-head">
       <div class="att-card-title"><i class="fas fa-calendar-alt"></i> <span id="cal-month-name">—</span></div>
       <div class="cal-nav">
@@ -482,6 +470,18 @@ select.att-control {
     </div>
   </div>
   {% endif %}
+
+  <!-- Trend Chart — analytics at the bottom -->
+  <span class="att-lbl" style="margin:0 16px 8px;display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Weekly Trend</span>
+  <div class="trend-card" style="margin: 0 16px 14px;">
+    <div class="trend-card-head">
+      <h4 class="trend-card-title"><i class="fas fa-chart-line"></i> Weekly Attendance</h4>
+      <span class="trend-meta" id="att-trend-meta">—</span>
+    </div>
+    <div class="trend-card-body" id="att-trend-body">
+      <canvas id="attTrendChart"></canvas>
+    </div>
+  </div>
 
   {{ status_by_date|json_script:"status-by-date" }}
 </div>

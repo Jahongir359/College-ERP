@@ -53,33 +53,6 @@
 
 </div>
 
-{# ── Charts ─────────────────────────────────────────────────────────────────── #}
-<div class="row g-3 mb-3">
-
-  <div class="col-lg-4">
-    <div class="erpnext-card h-100">
-      <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-chart-pie me-2" style="color:var(--ice-cyan);"></i>Attendance vs Leave</h3>
-      </div>
-      <div class="card-body d-flex align-items-center justify-content-center">
-        <canvas id="pieChart" style="max-height:260px;"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-lg-8">
-    <div class="erpnext-card h-100">
-      <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-chart-bar me-2" style="color:var(--ice-cyan);"></i>Attendance Sessions per Group</h3>
-      </div>
-      <div class="card-body">
-        <canvas id="barChart" style="height:260px;"></canvas>
-      </div>
-    </div>
-  </div>
-
-</div>
-
 {# ── Quick actions ──────────────────────────────────────────────────────────── #}
 <div class="erpnext-card">
   <div class="card-header">
@@ -143,6 +116,33 @@
   {% endif %}
 </div>
 
+{# ── Analytics charts ────────────────────────────────────────────────────────── #}
+<div class="row g-3 mt-1 mb-3">
+
+  <div class="col-lg-4">
+    <div class="erpnext-card h-100">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-chart-pie me-2" style="color:var(--ice-cyan);"></i>Attendance vs Leave</h3>
+      </div>
+      <div class="card-body d-flex align-items-center justify-content-center" style="min-height:240px;">
+        <canvas id="pieChart" style="max-height:240px;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="erpnext-card h-100">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-chart-bar me-2" style="color:var(--ice-cyan);"></i>Attendance Sessions per Group</h3>
+      </div>
+      <div class="card-body" style="position:relative; min-height:240px;">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 {% endblock content %}
 
 {% block custom_js %}
@@ -180,10 +180,11 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 8, bottom: 4, left: 4, right: 4 } },
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true, grid: { color: gridColor() }, ticks: { color: textColor() } },
-        x: { grid: { display: false }, ticks: { color: textColor() } }
+        y: { beginAtZero: true, grid: { color: gridColor() }, ticks: { color: textColor(), padding: 6 } },
+        x: { grid: { display: false }, ticks: { color: textColor(), maxRotation: 30 } }
       }
     }
   });

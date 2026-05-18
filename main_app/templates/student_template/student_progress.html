@@ -291,8 +291,8 @@
       <h3 class="pg-chart-title"><i class="fas fa-calendar-alt" style="color:var(--cyan);"></i> Daily Activity</h3>
       <span class="pg-chart-meta">Days completed &amp; words</span>
     </div>
-    <div class="pg-chart-body">
-      <canvas id="activityChart" height="110"></canvas>
+    <div class="pg-chart-body" style="position:relative; height:220px;">
+      <canvas id="activityChart"></canvas>
     </div>
   </div>
 
@@ -303,8 +303,8 @@
       <h3 class="pg-chart-title"><i class="fas fa-question-circle" style="color:var(--amber);"></i> Quiz Scores</h3>
       <span class="pg-chart-meta">30-day avg per day</span>
     </div>
-    <div class="pg-chart-body">
-      <canvas id="quizChart" height="100"></canvas>
+    <div class="pg-chart-body" style="position:relative; height:200px;">
+      <canvas id="quizChart"></canvas>
     </div>
   </div>
 
@@ -386,12 +386,16 @@
           label: 'Days Completed',
           data: completions,
           borderColor: '#1B3F7A', backgroundColor: 'rgba(27,63,122,.08)',
-          fill: true, tension: .38, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2.5,
+          fill: true, tension: .38, spanGaps: true,
+          pointRadius: function(ctx){ return ctx.raw !== null ? 3 : 0; },
+          pointBackgroundColor: '#1B3F7A',
+          pointHoverRadius: 6, borderWidth: 2.5,
         },
       ],
     },
     options: {
-      responsive: true, maintainAspectRatio: true,
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 12, bottom: 4, left: 8, right: 8 } },
       interaction: { mode: 'index', intersect: false },
       animation: { duration: 800, easing: 'easeOutQuart' },
       plugins: {
@@ -399,7 +403,7 @@
         tooltip: { backgroundColor: isDark?'#0D1B2F':'#0F172A', cornerRadius:10, padding:10, titleFont:{size:11}, bodyFont:{size:12} },
       },
       scales: {
-        x: { ticks:{font:{size:10},maxTicksLimit:8,maxRotation:0,color:tickColor}, grid:{color:gridColor} },
+        x: { offset:true, ticks:{font:{size:10},maxTicksLimit:8,maxRotation:0,color:tickColor}, grid:{color:gridColor} },
         y: { beginAtZero:true, ticks:{font:{size:10},stepSize:1,color:tickColor}, grid:{color:gridColor} },
       },
     },
@@ -415,12 +419,14 @@
         data: quizScores,
         borderColor: '#F59E0B', backgroundColor: 'rgba(245,158,11,.08)',
         fill: true, tension: .38, spanGaps: true,
-        pointRadius: function(ctx){ return ctx.raw !== null ? 4 : 0; },
+        pointRadius: function(ctx){ return ctx.raw !== null ? 3.5 : 0; },
+        pointBackgroundColor: '#F59E0B',
         pointHoverRadius: 7, borderWidth: 2.5,
       }],
     },
     options: {
-      responsive: true, maintainAspectRatio: true,
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 12, bottom: 4, left: 8, right: 8 } },
       animation: { duration: 800, easing: 'easeOutQuart' },
       plugins: {
         legend: { display: false },
@@ -430,7 +436,7 @@
         },
       },
       scales: {
-        x: { ticks:{font:{size:10},maxTicksLimit:8,maxRotation:0,color:tickColor}, grid:{color:gridColor} },
+        x: { offset:true, ticks:{font:{size:10},maxTicksLimit:8,maxRotation:0,color:tickColor}, grid:{color:gridColor} },
         y: { min:0, max:100, ticks:{font:{size:10},callback:function(v){return v+'%';},color:tickColor}, grid:{color:gridColor} },
       },
     },

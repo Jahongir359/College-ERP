@@ -170,10 +170,11 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 10, bottom: 4, left: 4, right: 4 } },
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true, grid: { color: gridColor() }, ticks: { color: textColor() } },
-        x: { grid: { display: false }, ticks: { color: textColor() } }
+        y: { beginAtZero: true, grid: { color: gridColor() }, ticks: { color: textColor(), padding: 6 } },
+        x: { grid: { display: false }, ticks: { color: textColor(), maxRotation: 30 } }
       }
     }
   });
@@ -190,10 +191,11 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 10, bottom: 4, left: 4, right: 4 } },
       plugins: { legend: { position: 'top', labels: { color: textColor(), usePointStyle: true, padding: 16 } } },
       scales: {
-        y: { beginAtZero: true, grid: { color: gridColor() }, ticks: { color: textColor() } },
-        x: { grid: { display: false }, ticks: { color: textColor() } }
+        y: { beginAtZero: true, grid: { color: gridColor() }, ticks: { color: textColor(), padding: 6 } },
+        x: { grid: { display: false }, ticks: { color: textColor(), maxRotation: 30 } }
       }
     }
   });

@@ -41,7 +41,7 @@
     if (!canvas || typeof Chart === 'undefined') return null;
 
     var ctx = canvas.getContext('2d');
-    var height = canvas.height || 200;
+    var height = canvas.offsetHeight || canvas.height || 300;
     var dark = isDark();
 
     var datasets = cfg.series.map(function (s) {
@@ -82,6 +82,9 @@
         animation: {
           duration: 1100,
           easing: 'easeOutQuart',
+        },
+        layout: {
+          padding: { top: 12, bottom: 6, left: 8, right: 8 },
         },
         interaction: {
           mode: 'index',
@@ -126,6 +129,7 @@
         },
         scales: {
           x: {
+            offset: true,
             grid: { display: false },
             ticks: {
               color: dark ? '#4A6080' : '#94A3B8',
@@ -141,7 +145,7 @@
             min: yMin,
             max: yMax,
             grid: {
-              color: dark ? 'rgba(255,255,255,0.04)' : 'rgba(12,31,69,0.06)',
+              color: dark ? 'rgba(255,255,255,0.08)' : 'rgba(12,31,69,0.10)',
               drawBorder: false,
               tickBorderDash: [4, 4],
             },
