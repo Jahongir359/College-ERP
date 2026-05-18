@@ -208,6 +208,7 @@ urlpatterns = [
     path("ajax/groups-for-teacher/", hod_views.get_groups_for_teacher, name='get_groups_for_teacher'),
 
     # AJAX helpers (staff)
+    path("staff/ajax/teachers-for-course/", staff_views.staff_get_teachers_for_course, name='staff_get_teachers_for_course'),
     path("staff/ajax/groups-for-teacher/", staff_views.staff_get_groups_for_teacher, name='staff_get_groups_for_teacher'),
 
     # Vocabulary Days (Student)

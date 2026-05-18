@@ -697,10 +697,36 @@ def delete_result_file(request, file_id):
 
 
 @staff_only
+def staff_get_teachers_for_course(request):
+    """AJAX: return staff members who teach a given course (for the result-file cascade)."""
+    if request.method != 'POST':
+        return JsonResponse({'teachers': []})
+    course_id = request.POST.get('course_id', '').strip()
+    if not course_id:
+        return JsonResponse({'teachers': []})
+    teachers = (
+        Staff.objects.filter(course_id=course_id, is_active=True)
+        .select_related('admin')
+        .order_by('admin__first_name', 'admin__last_name')
+    )
+    data = [
+        {
+            'id': t.id,
+            'name': f"{t.admin.first_name} {t.admin.last_name}".strip() or t.admin.email,
+        }
+        for t in teachers
+    ]
+    return JsonResponse({'teachers': data})
+
+
+@staff_only
 def staff_get_groups_for_teacher(request):
-    """Return active groups for the logged-in teacher."""
+    """Return active groups for the logged-in teacher, optionally filtered by course."""
     staff = get_object_or_404(Staff, admin=request.user)
     qs = Group.objects.filter(teacher=staff, is_archived=False).order_by('name')
+    course_id = request.POST.get('course_id', '').strip()
+    if course_id:
+        qs = qs.filter(course_id=course_id)
     groups = [{'id': g.id, 'name': g.name} for g in qs]
     return JsonResponse({'groups': groups})
 

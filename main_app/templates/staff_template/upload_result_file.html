@@ -97,7 +97,7 @@
                 <label><i class="fas fa-paperclip mr-1"></i> File <span class="text-danger">*</span></label>
                 <input type="file" name="file" class="form-control-file {% if errors.file %}is-invalid{% endif %}"
                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp">
-                <small class="form-text text-muted">Allowed: PDF, Word (.doc / .docx), or image files. Max 25 MB.</small>
+                <small class="form-text text-muted">Allowed: PDF, Word (.doc / .docx), or image files. Max 10 MB.</small>
                 {% if errors.file %}
                 <div class="invalid-feedback d-block">{{ errors.file }}</div>
                 {% endif %}
