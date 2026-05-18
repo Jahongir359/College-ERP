@@ -767,7 +767,7 @@ def add_vocabulary_day(request):
         if form.is_valid():
             day = form.save(commit=False)
             day.created_by = staff
-            # Parse level
+            day.release_at = timezone.now()
             raw_level = form.cleaned_data.get('level')
             day.level = int(raw_level) if raw_level else None
             day.save()
@@ -817,6 +817,7 @@ def edit_vocabulary_day(request, day_id):
     if request.method == 'POST':
         if form.is_valid():
             day = form.save(commit=False)
+            day.release_at = timezone.now()
             raw_level = form.cleaned_data.get('level')
             day.level = int(raw_level) if raw_level else None
             day.save()

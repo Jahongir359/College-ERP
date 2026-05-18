@@ -110,17 +110,9 @@
           <label class="pf-label">Title <span style="color:#94A3B8; font-weight:400;">(optional)</span></label>
           {{ form.title }}
         </div>
-        <div class="form-grid-2">
-          <div class="pf-field">
-            <label class="pf-label">Level <span style="color:#94A3B8; font-weight:400;">(optional)</span></label>
-            {{ form.level }}
-          </div>
-          <div class="pf-field">
-            <label class="pf-label">Release Date & Time <span style="color:#DC2626;">*</span></label>
-            {{ form.release_at }}
-            {% if form.release_at.errors %}<div class="pf-error">{{ form.release_at.errors.0 }}</div>{% endif %}
-            <small style="font-size:11px;color:#94A3B8;">Defaults to <strong>now</strong> — students can see the words immediately. Set a future time to schedule.</small>
-          </div>
+        <div class="pf-field">
+          <label class="pf-label">Level <span style="color:#94A3B8; font-weight:400;">(optional)</span></label>
+          {{ form.level }}
         </div>
 
         <div class="pf-field">

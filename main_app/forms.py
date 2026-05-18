@@ -464,7 +464,7 @@ class IssueBookForm(forms.Form):
 class VocabularyDayForm(forms.ModelForm):
     class Meta:
         model = VocabularyDay
-        fields = ['group', 'day_number', 'title', 'level', 'release_at', 'release_scope', 'notes']
+        fields = ['group', 'day_number', 'title', 'level', 'release_scope', 'notes']
         widgets = {
             'day_number': forms.NumberInput(attrs={
                 'class': 'form-control', 'min': '1', 'max': '365', 'placeholder': '1',
@@ -473,10 +473,6 @@ class VocabularyDayForm(forms.ModelForm):
                 'class': 'form-control', 'placeholder': 'e.g. Describing People',
             }),
             'level': forms.Select(attrs={'class': 'form-control'}),
-            'release_at': forms.DateTimeInput(
-                attrs={'class': 'form-control', 'type': 'datetime-local'},
-                format='%Y-%m-%dT%H:%M',
-            ),
             'release_scope': forms.RadioSelect(attrs={'class': 'scope-radio'}),
             'notes': forms.Textarea(attrs={
                 'class': 'form-control', 'rows': 2,
@@ -500,13 +496,6 @@ class VocabularyDayForm(forms.ModelForm):
             )
         else:
             self.fields['group'].queryset = Group.objects.filter(is_archived=False)
-        if self.instance and self.instance.pk and self.instance.release_at:
-            # Editing an existing day — pre-fill with the saved time.
-            self.initial['release_at'] = self.instance.release_at.strftime('%Y-%m-%dT%H:%M')
-        else:
-            # New day — default to right now so it is released immediately on save.
-            from django.utils import timezone as _tz
-            self.initial['release_at'] = _tz.now().strftime('%Y-%m-%dT%H:%M')
 
 
 class DashboardStoryForm(FormSettings):
