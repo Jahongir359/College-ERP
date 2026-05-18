@@ -488,7 +488,7 @@ class VocabularyDayForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['title'].required = False
         self.fields['level'].required = False
-        self.fields['level'].choices = self.LEVEL_CHOICES
+        self.fields['level'].widget.choices = self.LEVEL_CHOICES
         self.fields['notes'].required = False
         if staff:
             self.fields['group'].queryset = Group.objects.filter(
