@@ -1,28 +1,63 @@
 {
-  "name": "ICEBERG Study Center",
+  "id": "https://iceberglc.com/",
+  "name": "ICEBERG LC",
   "short_name": "ICEBERG",
-  "description": "Student management and learning platform for Iceberg Study Center.",
-  "start_url": "/",
+  "description": "Student management and learning platform for Iceberg Language Center.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#0C1F45",
   "background_color": "#EEF3FB",
+  "lang": "en",
+  "categories": ["education"],
   "icons": [
     {
       "src": "/favicon-32x32.png",
       "sizes": "32x32",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ICEBERG LC — Student Dashboard"
+    }
+  ],
+  "prefer_related_applications": true,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.iceberglc.app",
+      "id": "com.iceberglc.app"
     }
   ]
 }

@@ -36,3 +36,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Android signing keystore (store in GitHub Secrets, never commit)
+*.keystore
+*.jks
+twa/iceberg-lc.keystore.b64
+
+# Bubblewrap build output
+twa/app-*.apk
+twa/app-*.aab
+twa/output-metadata.json
+twa/android/

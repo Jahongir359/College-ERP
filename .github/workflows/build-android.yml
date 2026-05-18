@@ -1,0 +1,84 @@
+name: Build Android TWA (APK + AAB)
+
+on:
+  push:
+    tags:
+      - 'v*'          # Trigger on version tags: v1.0.0, v1.1.0, etc.
+  workflow_dispatch:  # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      # Decode the base64-encoded keystore from GitHub Secrets
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > twa/iceberg-lc.keystore
+
+      # Build the APK and AAB using the pre-configured twa-manifest.json
+      - name: Build TWA with Bubblewrap
+        working-directory: twa
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          bubblewrap build \
+            --manifest twa-manifest.json \
+            --signingKeyPath iceberg-lc.keystore \
+            --signingKeyAlias iceberglc \
+            --signingKeyPassword "$KEYSTORE_PASSWORD" \
+            --signingKeyStorePassword "$KEYSTORE_PASSWORD"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iceberg-lc-apk
+          path: twa/app-release-signed.apk
+          retention-days: 30
+
+      - name: Upload AAB artifact (Play Store)
+        uses: actions/upload-artifact@v4
+        with:
+          name: iceberg-lc-aab
+          path: twa/app-release.aab
+          retention-days: 30
+
+      # Automatically create a GitHub Release on version tags
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            twa/app-release-signed.apk
+            twa/app-release.aab
+          body: |
+            ## ICEBERG LC ${{ github.ref_name }}
+
+            ### Installation
+            - **app-release-signed.apk** — install directly on Android devices
+            - **app-release.aab** — upload to Google Play Store
+
+            ### Play Store upload
+            Go to [Google Play Console](https://play.google.com/console) →
+            Your app → Production → Create new release → Upload the `.aab` file.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

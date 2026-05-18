@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>No Connection — ICEBERG LC</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <meta name="theme-color" content="#0C1F45">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      background: linear-gradient(160deg, #0C1F45 0%, #1B3F7A 55%, #0891B2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #fff;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      padding: 48px 36px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: #67E8F9;
+      margin-bottom: 32px;
+      opacity: .85;
+    }
+
+    .icon-wrap {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+    }
+
+    .icon-wrap svg {
+      width: 38px;
+      height: 38px;
+      stroke: #67E8F9;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 32px;
+    }
+
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #06B6D4;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      text-decoration: none;
+      letter-spacing: .01em;
+    }
+
+    .retry-btn:hover { background: #0891B2; }
+    .retry-btn:active { transform: scale(.97); }
+
+    .retry-btn svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: .04em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">ICEBERG LC</div>
+
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24">
+        <path d="M1 6l5.5 5.5M22.5 6l-5.5 5.5M12 12v9M12 12C12 7 7 3 2 3M12 12c0-5 5-9 10-9"/>
+        <line x1="2" y1="2" x2="22" y2="22"/>
+      </svg>
+    </div>
+
+    <h1>You're Offline</h1>
+    <p>No internet connection right now.<br>Check your Wi-Fi or mobile data and try again.</p>
+
+    <button class="retry-btn" onclick="tryReload()">
+      <svg viewBox="0 0 24 24">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Try Again
+    </button>
+  </div>
+
+  <div class="footer">ICEBERG Language Center &nbsp;·&nbsp; iceberglc.com</div>
+
+  <script>
+    function tryReload() {
+      window.location.reload();
+    }
+    /* Auto-reload when connection is restored */
+    window.addEventListener('online', function () {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>

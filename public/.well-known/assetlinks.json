@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.iceberglc.app",
+      "sha256_cert_fingerprints": [
+        "56:FB:77:2D:F3:FD:C9:8C:F8:26:5C:E7:76:40:2E:9B:EF:F5:E2:C8:3C:C7:0C:03:E3:40:4C:5B:1D:4C:24:FE"
+      ]
+    }
+  }
+]
