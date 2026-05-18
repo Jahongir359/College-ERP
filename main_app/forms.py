@@ -501,7 +501,12 @@ class VocabularyDayForm(forms.ModelForm):
         else:
             self.fields['group'].queryset = Group.objects.filter(is_archived=False)
         if self.instance and self.instance.pk and self.instance.release_at:
+            # Editing an existing day — pre-fill with the saved time.
             self.initial['release_at'] = self.instance.release_at.strftime('%Y-%m-%dT%H:%M')
+        else:
+            # New day — default to right now so it is released immediately on save.
+            from django.utils import timezone as _tz
+            self.initial['release_at'] = _tz.now().strftime('%Y-%m-%dT%H:%M')
 
 
 class DashboardStoryForm(FormSettings):
