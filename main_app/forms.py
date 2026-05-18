@@ -464,7 +464,7 @@ class IssueBookForm(forms.Form):
 class VocabularyDayForm(forms.ModelForm):
     class Meta:
         model = VocabularyDay
-        fields = ['group', 'day_number', 'title', 'level', 'release_at', 'notes']
+        fields = ['group', 'day_number', 'title', 'level', 'release_at', 'release_scope', 'notes']
         widgets = {
             'day_number': forms.NumberInput(attrs={
                 'class': 'form-control', 'min': '1', 'max': '365', 'placeholder': '1',
@@ -477,6 +477,7 @@ class VocabularyDayForm(forms.ModelForm):
                 attrs={'class': 'form-control', 'type': 'datetime-local'},
                 format='%Y-%m-%dT%H:%M',
             ),
+            'release_scope': forms.RadioSelect(attrs={'class': 'scope-radio'}),
             'notes': forms.Textarea(attrs={
                 'class': 'form-control', 'rows': 2,
                 'placeholder': 'Private teacher notes (not shown to students)',

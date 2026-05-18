@@ -294,6 +294,7 @@
           <span class="vdl-chip"><i class="fas fa-users"></i> {{ row.day.group.name }}</span>
           <span class="vdl-chip"><i class="fas fa-font"></i> {{ row.word_count }} words</span>
           {% if row.day.level %}<span class="vdl-chip"><i class="fas fa-layer-group"></i> Level {{ row.day.level }}</span>{% endif %}
+          {% if row.day.release_scope == 'all' %}<span class="vdl-chip" style="color:#047857;"><i class="fas fa-globe"></i> School-wide</span>{% endif %}
         </div>
         <div class="vdl-actions">
           <a href="{% url 'vocabulary_day_detail' row.day.id %}" class="vdl-action vdl-action-study">

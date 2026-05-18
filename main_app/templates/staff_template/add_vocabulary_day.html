@@ -48,6 +48,22 @@
 }
 .btn-add-row:hover { background:#EEF4FF; }
 
+/* Audience selector */
+.scope-options { display:flex; gap:12px; flex-wrap:wrap; margin-top:4px; }
+.scope-option {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 16px; border-radius:11px;
+  border:1.5px solid #D1DCF0; background:#F8FAFC;
+  cursor:pointer; transition:border-color .15s, background .15s;
+  flex:1; min-width:160px;
+}
+.scope-option:has(input:checked) {
+  border-color:#1B3F7A; background:#EEF4FF;
+}
+.scope-option input[type=radio] { accent-color:#1B3F7A; width:16px; height:16px; flex-shrink:0; }
+.scope-label { font-size:13px; font-weight:600; color:#0C1F45; line-height:1.2; }
+.scope-label small { display:block; font-size:11px; font-weight:400; color:#64748B; margin-top:2px; }
+
 .btn-submit {
   padding:12px 32px; border-radius:10px; border:none;
   background:linear-gradient(135deg,#1B3F7A,#0C1F45); color:#fff;
@@ -106,6 +122,30 @@
             <small style="font-size:11px;color:#94A3B8;">Students see the words only after this time.</small>
           </div>
         </div>
+
+        <div class="pf-field">
+          <label class="pf-label">Audience <span style="color:#DC2626;">*</span></label>
+          <div class="scope-options">
+            <label class="scope-option">
+              <input type="radio" name="release_scope" value="group"
+                {% if not form.instance.pk or form.instance.release_scope == 'group' %}checked{% endif %}>
+              <span class="scope-label">
+                <i class="fas fa-users" style="color:#1B3F7A;margin-right:4px;"></i>Assigned group only
+                <small>Only students enrolled in the selected group.</small>
+              </span>
+            </label>
+            <label class="scope-option">
+              <input type="radio" name="release_scope" value="all"
+                {% if form.instance.pk and form.instance.release_scope == 'all' %}checked{% endif %}>
+              <span class="scope-label">
+                <i class="fas fa-globe" style="color:#047857;margin-right:4px;"></i>All students
+                <small>Every active student in the school.</small>
+              </span>
+            </label>
+          </div>
+          {% if form.release_scope.errors %}<div class="pf-error">{{ form.release_scope.errors.0 }}</div>{% endif %}
+        </div>
+
         <div class="pf-field">
           <label class="pf-label">Notes <span style="color:#94A3B8; font-weight:400;">(private — not shown to students)</span></label>
           {{ form.notes }}

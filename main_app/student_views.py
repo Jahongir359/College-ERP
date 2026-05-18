@@ -1248,10 +1248,11 @@ def _check_and_notify_vocab_days(student, enrolled_group_ids):
     """Create notifications for any released VocabularyDays the student hasn't been told about."""
     from django.utils import timezone as tz
     from django.urls import reverse as _rev
+    from django.db.models import Q
     now = tz.now()
     new_days = (
         VocabularyDay.objects.filter(
-            group_id__in=enrolled_group_ids,
+            Q(group_id__in=enrolled_group_ids) | Q(release_scope=VocabularyDay.SCOPE_ALL),
             release_at__lte=now,
         ).exclude(notified_students=student)
         .select_related('group')
@@ -1285,10 +1286,14 @@ def vocabulary_day_list(request):
     )
     now = tz.now()
     days = (
-        VocabularyDay.objects.filter(group_id__in=enrolled_group_ids, release_at__lte=now)
+        VocabularyDay.objects.filter(
+            models.Q(group_id__in=enrolled_group_ids) | models.Q(release_scope=VocabularyDay.SCOPE_ALL),
+            release_at__lte=now,
+        )
         .select_related('group', 'created_by__admin')
         .prefetch_related('words', 'completions')
         .order_by('day_number')
+        .distinct()
     )
     completed_ids = set(
         VocabularyDayCompletion.objects.filter(student=student)
@@ -1323,8 +1328,8 @@ def vocabulary_day_detail(request, day_id):
     from django.utils import timezone as tz
     student = get_object_or_404(Student, admin=request.user)
     day = get_object_or_404(VocabularyDay, id=day_id)
-    # Security: student must be in the day's group
-    if not Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists():
+    enrolled = Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists()
+    if day.release_scope != VocabularyDay.SCOPE_ALL and not enrolled:
         messages.error(request, "You are not enrolled in this group.")
         return redirect(reverse('vocabulary_day_list'))
     if not day.is_released:
@@ -1352,7 +1357,8 @@ def vocabulary_day_complete(request, day_id):
         return JsonResponse({'error': 'POST required'}, status=405)
     student = get_object_or_404(Student, admin=request.user)
     day = get_object_or_404(VocabularyDay, id=day_id)
-    if not Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists():
+    enrolled = Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists()
+    if day.release_scope != VocabularyDay.SCOPE_ALL and not enrolled:
         return JsonResponse({'error': 'Not enrolled'}, status=403)
     _, created = VocabularyDayCompletion.objects.get_or_create(student=student, day=day)
     return JsonResponse({'status': 'ok', 'created': created})
@@ -1364,7 +1370,8 @@ def vocabulary_day_flashcard(request, day_id):
     from django.utils import timezone as tz
     student = get_object_or_404(Student, admin=request.user)
     day = get_object_or_404(VocabularyDay, id=day_id)
-    if not Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists():
+    enrolled = Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists()
+    if day.release_scope != VocabularyDay.SCOPE_ALL and not enrolled:
         messages.error(request, "You are not enrolled in this group.")
         return redirect(reverse('vocabulary_day_list'))
     if not day.is_released:
@@ -1394,7 +1401,8 @@ def vocabulary_day_quiz(request, day_id):
     import random
     student = get_object_or_404(Student, admin=request.user)
     day = get_object_or_404(VocabularyDay, id=day_id)
-    if not Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists():
+    enrolled = Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists()
+    if day.release_scope != VocabularyDay.SCOPE_ALL and not enrolled:
         messages.error(request, "You are not enrolled in this group.")
         return redirect(reverse('vocabulary_day_list'))
     if not day.is_released:

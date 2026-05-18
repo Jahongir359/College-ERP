@@ -508,6 +508,14 @@ class Loan(models.Model):
 
 class VocabularyDay(models.Model):
     """A teacher-curated vocabulary set for a group on a specific day number."""
+
+    SCOPE_GROUP = 'group'
+    SCOPE_ALL   = 'all'
+    SCOPE_CHOICES = [
+        (SCOPE_GROUP, 'Assigned group only'),
+        (SCOPE_ALL,   'All students'),
+    ]
+
     group = models.ForeignKey('Group', on_delete=models.CASCADE, related_name='vocabulary_days')
     day_number = models.PositiveIntegerField(help_text='Day 1, Day 2, …')
     title = models.CharField(max_length=200, blank=True, default='',
@@ -518,6 +526,12 @@ class VocabularyDay(models.Model):
     )
     release_at = models.DateTimeField(
         help_text='Words become visible to students at this date/time.',
+    )
+    release_scope = models.CharField(
+        max_length=10,
+        choices=SCOPE_CHOICES,
+        default=SCOPE_GROUP,
+        help_text='Who can see this vocabulary day after it is released.',
     )
     notes = models.TextField(blank=True, default='',
                              help_text='Private teaching notes (not shown to students).')

@@ -881,31 +881,45 @@ def staff_vocabulary_day_detail(request, day_id):
 
 
 def _notify_vocab_day(day: VocabularyDay):
-    """Create Notification objects for all enrolled students if day is released."""
+    """Create Notification objects for students when a vocabulary day is released.
+
+    Scope 'all'  → every active student in the system.
+    Scope 'group' → only students actively enrolled in day.group.
+    """
     from django.urls import reverse as _rev
     if not day.is_released:
         return
-    enrollments = Enrollment.objects.filter(
-        group=day.group, is_active=True
-    ).select_related('student__admin')
+
+    if day.release_scope == VocabularyDay.SCOPE_ALL:
+        students_qs = (
+            Student.objects.filter(admin__is_active=True)
+            .select_related('admin')
+        )
+    else:
+        students_qs = (
+            Student.objects.filter(
+                enrollment__group=day.group, enrollment__is_active=True,
+            ).select_related('admin')
+        )
+
     word_count = day.word_count
     link = _rev('vocabulary_day_detail', args=[day.id])
+    already = set(day.notified_students.values_list('id', flat=True))
     new_notifs = []
     new_notified = []
-    already = set(day.notified_students.values_list('id', flat=True))
-    for e in enrollments:
-        if e.student_id not in already:
+    for student in students_qs:
+        if student.id not in already:
             new_notifs.append(Notification(
-                recipient=e.student.admin,
+                recipient=student.admin,
                 category=Notification.VOCABULARY,
                 message=(
                     f"Day {day.day_number} Vocabulary is ready"
                     + (f' — "{day.title}"' if day.title else '')
-                    + f"! Review {word_count} new words for {day.group.name}."
+                    + f"! Review {word_count} new words."
                 ),
                 link=link,
             ))
-            new_notified.append(e.student)
+            new_notified.append(student)
     if new_notifs:
         Notification.objects.bulk_create(new_notifs)
         day.notified_students.add(*new_notified)
