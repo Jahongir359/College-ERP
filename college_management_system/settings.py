@@ -142,6 +142,11 @@ STATIC_URL = '/static/'
 # collectstatic copies everything here; WhiteNoise serves from here.
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Files in public/ are served by WhiteNoise at the site root (no /static/ prefix).
+# This makes /favicon.ico, /manifest.json, /robots.txt, etc. publicly accessible
+# at the paths browsers and crawlers expect to find them.
+WHITENOISE_ROOT = BASE_DIR / 'public'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
