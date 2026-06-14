@@ -331,7 +331,6 @@ class _AuthListenable extends ChangeNotifier {
 
 const _kNavy = Color(0xFF050F1A);
 const _kCyan = Color(0xFF00CFFF);
-const _kCyanSoft = Color(0xFF00A8D4);
 
 class _SplashScreen extends StatefulWidget {
   const _SplashScreen();
@@ -341,75 +340,279 @@ class _SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<_SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
+    with TickerProviderStateMixin {
+  // ── Controllers ────────────────────────────────────────────────────────────
+  late final AnimationController _mainCtrl;   // 1800 ms one-shot sequence
+  late final AnimationController _floatCtrl;  // 3200 ms continuous levitation
+  late final AnimationController _glowCtrl;   // 2200 ms continuous glow breathe
+  late final AnimationController _sheenCtrl;  // 560 ms one-shot sheen sweep
 
-  // Phase 1: logo (0 → 500 ms)
-  late final Animation<double> _logoFade;
-  late final Animation<double> _logoScale;
-
-  // Phase 2: each of 6 icons gets its own window (450 → 1300 ms, 130 ms apart)
+  // ── Sequence animations (driven by _mainCtrl) ───────────────────────────
+  late final Animation<double> _logoFade;    // 0–380 ms
+  late final Animation<double> _logoScale;   // 0–700 ms elasticOut
+  late final Animation<double> _glowIn;      // 380–780 ms glow enters
+  late final Animation<double> _ringScale;   // 640–1120 ms ripple expands
+  late final Animation<double> _ringFade;    // 640–1120 ms ripple fades
   late final List<Animation<double>> _iconScales;
   late final List<Animation<double>> _iconFades;
+  late final Animation<double> _tagFade;     // 1380–1720 ms
+  late final Animation<Offset> _tagSlide;    // 1380–1720 ms slides up
 
-  // Phase 3: tagline (1250 → 1600 ms)
-  late final Animation<double> _tagFade;
+  // ── Continuous animations ────────────────────────────────────────────────
+  late final Animation<double> _floatY;      // –6 ↔ +6 px
+  late final Animation<double> _glowPulse;   // 0.72 ↔ 1.0
+
+  // Sheen sweep: 0 = left edge, 1 = right edge
+  late final Animation<double> _sheenX;
 
   static const _icons = ['📚', '📅', '📝', '💳', '🏆', '📖'];
   static const _totalMs = 1800;
 
+  double _t(int ms) => ms / _totalMs;
+
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
+
+    _mainCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: _totalMs),
     )..forward();
 
-    double t(int ms) => ms / _totalMs;
-
-    _logoFade = CurvedAnimation(
-      parent: _ctrl,
-      curve: Interval(t(0), t(500), curve: Curves.easeOut),
+    _floatCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3200),
     );
-    _logoScale = Tween<double>(begin: 0.78, end: 1.0).animate(
+
+    _glowCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    );
+
+    _sheenCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 560),
+    );
+
+    // ── Logo fade & elastic spring pop ─────────────────────────────────────
+    _logoFade = CurvedAnimation(
+      parent: _mainCtrl,
+      curve: Interval(_t(0), _t(380), curve: Curves.easeOut),
+    );
+    _logoScale = Tween<double>(begin: 0.52, end: 1.0).animate(
       CurvedAnimation(
-        parent: _ctrl,
-        curve: Interval(t(0), t(500), curve: Curves.easeOutCubic),
+        parent: _mainCtrl,
+        curve: Interval(_t(0), _t(700), curve: Curves.elasticOut),
       ),
     );
 
+    // ── Ambient glow enters behind logo ───────────────────────────────────
+    _glowIn = CurvedAnimation(
+      parent: _mainCtrl,
+      curve: Interval(_t(380), _t(780), curve: Curves.easeOut),
+    );
+
+    // ── Impact ripple ring ────────────────────────────────────────────────
+    _ringScale = Tween<double>(begin: 1.0, end: 2.4).animate(
+      CurvedAnimation(
+        parent: _mainCtrl,
+        curve: Interval(_t(640), _t(1120), curve: Curves.easeOut),
+      ),
+    );
+    _ringFade = Tween<double>(begin: 0.55, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _mainCtrl,
+        curve: Interval(_t(640), _t(1120), curve: Curves.easeIn),
+      ),
+    );
+
+    // ── Feature icons stagger 82 ms apart ────────────────────────────────
     _iconScales = List.generate(_icons.length, (i) {
-      final start = 450 + i * 130;
-      final end = start + 260;
+      final start = 900 + i * 82;
+      final end = (start + 220).clamp(0, _totalMs);
       return Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
-          parent: _ctrl,
-          curve: Interval(t(start), t(end.clamp(0, _totalMs)),
-              curve: Curves.easeOutBack),
+          parent: _mainCtrl,
+          curve: Interval(_t(start), _t(end), curve: Curves.easeOutBack),
         ),
       );
     });
     _iconFades = List.generate(_icons.length, (i) {
-      final start = 450 + i * 130;
-      final end = start + 180;
+      final start = 900 + i * 82;
+      final end = (start + 160).clamp(0, _totalMs);
       return CurvedAnimation(
-        parent: _ctrl,
-        curve: Interval(t(start), t(end.clamp(0, _totalMs)),
-            curve: Curves.easeOut),
+        parent: _mainCtrl,
+        curve: Interval(_t(start), _t(end), curve: Curves.easeOut),
       );
     });
 
+    // ── Tagline slides up and fades in ────────────────────────────────────
     _tagFade = CurvedAnimation(
-      parent: _ctrl,
-      curve: Interval(t(1250), t(1600), curve: Curves.easeOut),
+      parent: _mainCtrl,
+      curve: Interval(_t(1380), _t(1720), curve: Curves.easeOut),
     );
+    _tagSlide = Tween<Offset>(
+      begin: const Offset(0, 0.5),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _mainCtrl,
+        curve: Interval(_t(1380), _t(1720), curve: Curves.easeOutCubic),
+      ),
+    );
+
+    // ── Float: gentle –6 ↔ +6 px vertical ───────────────────────────────
+    _floatY = Tween<double>(begin: -6.0, end: 6.0).animate(
+      CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut),
+    );
+
+    // ── Glow pulse: opacity 0.72 ↔ 1.0 ──────────────────────────────────
+    _glowPulse = Tween<double>(begin: 0.72, end: 1.0).animate(
+      CurvedAnimation(parent: _glowCtrl, curve: Curves.easeInOut),
+    );
+
+    // ── Sheen sweep ──────────────────────────────────────────────────────
+    _sheenX = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _sheenCtrl, curve: Curves.easeInOut),
+    );
+
+    // Start continuous effects when logo settles; trigger sheen at 860 ms.
+    _mainCtrl.addListener(() {
+      final v = _mainCtrl.value;
+      if (v >= _t(700) && !_floatCtrl.isAnimating) {
+        _floatCtrl.repeat(reverse: true);
+      }
+      if (v >= _t(700) && !_glowCtrl.isAnimating) {
+        _glowCtrl.repeat(reverse: true);
+      }
+      if (v >= _t(860) && !_sheenCtrl.isAnimating && _sheenCtrl.value == 0) {
+        _sheenCtrl.forward();
+      }
+    });
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _mainCtrl.dispose();
+    _floatCtrl.dispose();
+    _glowCtrl.dispose();
+    _sheenCtrl.dispose();
     super.dispose();
+  }
+
+  // ── Build helpers ─────────────────────────────────────────────────────────
+
+  Widget _buildGlowBlob() {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_glowIn, _glowPulse]),
+      builder: (_, __) => Opacity(
+        opacity: _glowIn.value * _glowPulse.value,
+        child: Container(
+          width: 220,
+          height: 220,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [Color(0x5500CFFF), Color(0x1500CFFF), Colors.transparent],
+              stops: [0.0, 0.5, 1.0],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRippleRing() {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_ringScale, _ringFade]),
+      builder: (_, __) => Opacity(
+        opacity: _ringFade.value,
+        child: Transform.scale(
+          scale: _ringScale.value,
+          child: Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: _kCyan, width: 1.5),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoWithSheen() {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_logoFade, _logoScale, _floatY, _sheenX]),
+      builder: (_, __) => Opacity(
+        opacity: _logoFade.value,
+        child: Transform.translate(
+          offset: Offset(0, _floatY.value),
+          child: Transform.scale(
+            scale: _logoScale.value,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: SizedBox(
+                width: 200,
+                height: 200,
+                child: Stack(
+                  children: [
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.contain,
+                    ),
+                    // Diagonal sheen sweep
+                    Positioned.fill(
+                      child: Transform.translate(
+                        offset: Offset(_sheenX.value * 200, 0),
+                        child: Transform.rotate(
+                          angle: 0.45,
+                          child: Container(
+                            width: 60,
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.transparent,
+                                  Color(0x26FFFFFF),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBorderRing() {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_glowIn, _glowPulse]),
+      builder: (_, __) => Opacity(
+        opacity: _glowIn.value * (_glowPulse.value * 0.6 + 0.4),
+        child: Container(
+          width: 208,
+          height: 208,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(34),
+            border: Border.all(
+              color: _kCyan.withValues(alpha: 0.45),
+              width: 1.0,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -421,203 +624,76 @@ class _SplashScreenState extends State<_SplashScreen>
           gradient: RadialGradient(
             center: Alignment(0, -0.15),
             radius: 1.2,
-            colors: [Color(0xFF0A1F35), Color(0xFF071629), _kNavy],
+            colors: [Color(0xFF0E2840), Color(0xFF071629), _kNavy],
             stops: [0.0, 0.5, 1.0],
           ),
         ),
-        child: Stack(
-          children: [
-            // Faint mountain wireframe background
-            Positioned.fill(
-              child: AnimatedBuilder(
-                animation: _logoFade,
-                builder: (_, __) => CustomPaint(
-                  painter: _IcebergPainter(opacity: _logoFade.value * 0.18),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ── Logo block: glow → ripple → logo → border ────────────────
+              SizedBox(
+                width: 220,
+                height: 220,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    _buildGlowBlob(),
+                    _buildRippleRing(),
+                    _buildBorderRing(),
+                    _buildLogoWithSheen(),
+                  ],
                 ),
               ),
-            ),
-            // Main content column
-            Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // ── Logo block ──────────────────────────────────────────
-                  AnimatedBuilder(
-                    animation: _ctrl,
-                    builder: (_, __) => Opacity(
-                      opacity: _logoFade.value,
-                      child: Transform.scale(
-                        scale: _logoScale.value,
-                        child: const _IcebergLogo(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-                  // ── Feature icons ───────────────────────────────────────
-                  SizedBox(
-                    width: 280,
-                    child: AnimatedBuilder(
-                      animation: _ctrl,
-                      builder: (_, __) => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(
-                          _icons.length,
-                          (i) => Opacity(
-                            opacity: _iconFades[i].value,
-                            child: Transform.scale(
-                              scale: _iconScales[i].value,
-                              child: Text(
-                                _icons[i],
-                                style: const TextStyle(fontSize: 28),
-                              ),
-                            ),
+              const SizedBox(height: 48),
+              // ── Feature icons staggered ───────────────────────────────────
+              SizedBox(
+                width: 300,
+                child: AnimatedBuilder(
+                  animation: _mainCtrl,
+                  builder: (_, __) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(
+                      _icons.length,
+                      (i) => Opacity(
+                        opacity: _iconFades[i].value,
+                        child: Transform.scale(
+                          scale: _iconScales[i].value,
+                          child: Text(
+                            _icons[i],
+                            style: const TextStyle(fontSize: 26),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 28),
-                  // ── Tagline ─────────────────────────────────────────────
-                  AnimatedBuilder(
-                    animation: _tagFade,
-                    builder: (_, __) => Opacity(
-                      opacity: _tagFade.value,
-                      child: const Text(
-                        'Learn. Track. Grow.',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 2.0,
-                          color: Color(0xFF7DCFE8),
-                        ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              // ── Tagline slides up ─────────────────────────────────────────
+              AnimatedBuilder(
+                animation: Listenable.merge([_tagFade, _tagSlide]),
+                builder: (_, __) => FadeTransition(
+                  opacity: _tagFade,
+                  child: SlideTransition(
+                    position: _tagSlide,
+                    child: const Text(
+                      'LEARN · TRACK · GROW',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 3.5,
+                        color: Color(0xFF7DCFE8),
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-}
-
-class _IcebergLogo extends StatelessWidget {
-  const _IcebergLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: 96,
-          height: 88,
-          child: CustomPaint(painter: _IcebergPainter(opacity: 1.0)),
-        ),
-        const SizedBox(height: 14),
-        const Text(
-          'ICEBERG',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 6,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 3),
-        const Text(
-          'LEARNING CENTER',
-          style: TextStyle(
-            fontSize: 8.5,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 3.5,
-            color: _kCyanSoft,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Draws a geometric iceberg / mountain wireframe in cyan lines.
-class _IcebergPainter extends CustomPainter {
-  final double opacity;
-  const _IcebergPainter({required this.opacity});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (opacity <= 0) return;
-
-    final w = size.width;
-    final h = size.height;
-    final cx = w / 2;
-
-    final mainPaint = Paint()
-      ..color = _kCyan.withOpacity(opacity)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final dimPaint = Paint()
-      ..color = _kCyan.withOpacity(opacity * 0.45)
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    // Peak
-    final apex = Offset(cx, h * 0.04);
-    // Left & right base corners
-    final bl = Offset(w * 0.04, h * 0.92);
-    final br = Offset(w * 0.96, h * 0.92);
-
-    // Outer silhouette
-    final outline = Path()
-      ..moveTo(bl.dx, bl.dy)
-      ..lineTo(apex.dx, apex.dy)
-      ..lineTo(br.dx, br.dy);
-    canvas.drawPath(outline, mainPaint);
-
-    // Inner ridge lines (left face — 2 ribs)
-    for (final f in [0.35, 0.65]) {
-      final mid = Offset(cx * (1 - f) + bl.dx * f, apex.dy * (1 - f) + bl.dy * f);
-      canvas.drawLine(apex, mid, dimPaint);
-    }
-    // Right face ribs
-    for (final f in [0.35, 0.65]) {
-      final mid = Offset(cx * (1 - f) + br.dx * f, apex.dy * (1 - f) + br.dy * f);
-      canvas.drawLine(apex, mid, dimPaint);
-    }
-
-    // Horizontal contour lines
-    for (final level in [0.28, 0.52, 0.74]) {
-      final y = apex.dy + (bl.dy - apex.dy) * level;
-      // x extent matches the silhouette edges at this level
-      final xLeft = bl.dx + (apex.dx - bl.dx) * (1 - level);
-      final xRight = br.dx + (apex.dx - br.dx) * (1 - level);
-      canvas.drawLine(Offset(xLeft, y), Offset(xRight, y), dimPaint);
-    }
-
-    // Waterline — slightly thicker, full width
-    final wlPaint = Paint()
-      ..color = _kCyan.withOpacity(opacity * 0.7)
-      ..strokeWidth = 1.4
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(
-      Offset(bl.dx, h * 0.92),
-      Offset(br.dx, h * 0.92),
-      wlPaint,
-    );
-
-    // Small dot at apex
-    canvas.drawCircle(
-      apex,
-      2.5,
-      Paint()..color = _kCyan.withOpacity(opacity),
-    );
-  }
-
-  @override
-  bool shouldRepaint(_IcebergPainter old) => old.opacity != opacity;
 }
