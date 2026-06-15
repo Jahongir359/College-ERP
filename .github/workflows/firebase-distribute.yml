@@ -78,7 +78,23 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > iceberg-release.keystore
+          if [[ -z "$KEYSTORE_BASE64" ]]; then
+            echo "::error::KEYSTORE_BASE64 secret is empty or unset. Add it under Settings → Secrets → Actions."
+            exit 1
+          fi
+          # Strip any whitespace/newlines that may have been introduced when the
+          # base64 value was pasted into the GitHub secret, then decode.
+          echo "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > iceberg-release.keystore
+          # Fail loudly if the decoded keystore is empty or not a real keystore.
+          if [[ ! -s iceberg-release.keystore ]]; then
+            echo "::error::Decoded keystore is empty — KEYSTORE_BASE64 is not valid base64."
+            exit 1
+          fi
+          keytool -list -keystore iceberg-release.keystore \
+            -storepass "$KEY_STORE_PASSWORD" >/dev/null 2>&1 || {
+            echo "::error::keytool could not open the keystore — bad KEYSTORE_BASE64 or wrong KEY_STORE_PASSWORD."
+            exit 1
+          }
           cat > key.properties <<EOF
           storePassword=$KEY_STORE_PASSWORD
           keyPassword=$KEY_PASSWORD
