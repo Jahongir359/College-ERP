@@ -1,0 +1,120 @@
+name: Firebase App Distribution
+
+# Runs automatically on every push to main, and can be triggered manually.
+# On manual trigger you can override the release notes.
+on:
+  push:
+    branches: [main]
+    paths:
+      # Only rebuild when mobile code or this workflow changes
+      - 'mobile/iceberg_app/**'
+      - '.github/workflows/firebase-distribute.yml'
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        description: 'Release notes shown to testers'
+        required: false
+        default: ''
+
+# ---------------------------------------------------------------------------
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#
+#   FIREBASE_APP_ID            — Android app ID from Firebase Console
+#                                Format: 1:123456789012:android:abcdef1234
+#                                Firebase Console → Project settings → Your apps
+#
+#   FIREBASE_SERVICE_ACCOUNT   — Service account JSON key (entire file content)
+#                                Google Cloud Console → IAM → Service Accounts
+#                                Role: Firebase App Distribution Admin
+#
+#   FIREBASE_TESTERS           — Comma-separated tester emails to notify
+#                                Example: student1@gmail.com,teacher@school.com
+#
+#   KEYSTORE_BASE64            — Base64-encoded release keystore (.keystore file)
+#                                Generate: base64 -w 0 iceberg-release.keystore
+#
+#   KEY_STORE_PASSWORD         — Password used when creating the keystore
+#
+#   KEY_ALIAS                  — Key alias (iceberg)
+#
+#   KEY_PASSWORD               — Password for the key entry (same as store password)
+# ---------------------------------------------------------------------------
+
+jobs:
+  distribute:
+    name: Build & distribute to Firebase
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter pub get
+        working-directory: mobile/iceberg_app
+        run: flutter pub get
+
+      # Decode the release keystore from the GitHub secret and write key.properties
+      # so build.gradle.kts picks it up automatically. The keystore path is written
+      # relative to the android/ directory (same as local dev key.properties).
+      - name: Set up release signing
+        working-directory: mobile/iceberg_app/android
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > iceberg-release.keystore
+          cat > key.properties <<EOF
+          storePassword=$KEY_STORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=../iceberg-release.keystore
+          EOF
+
+      # One universal APK that installs on every Android device (all ABIs in a
+      # single file). Firebase App Distribution can't auto-pick an ABI like the
+      # Play Store, so a universal build is the only thing that "just works" for
+      # every tester — one release per run, clean in-place updates.
+      - name: Build universal APK
+        working-directory: mobile/iceberg_app
+        run: flutter build apk --release
+
+      - name: Determine release notes
+        id: notes
+        run: |
+          NOTES="${{ github.event.inputs.release_notes }}"
+          if [[ -z "$NOTES" ]]; then
+            NOTES="$(git log -1 --pretty=format:'%s')"
+          fi
+          echo "text=$NOTES" >> "$GITHUB_OUTPUT"
+
+      - name: Distribute universal APK to testers
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          testers: ${{ secrets.FIREBASE_TESTERS }}
+          file: mobile/iceberg_app/build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: "${{ steps.notes.outputs.text }}"
+
+      - name: Upload artifact (30-day retention)
+        uses: actions/upload-artifact@v4
+        with:
+          name: iceberg-apk
+          path: mobile/iceberg_app/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
