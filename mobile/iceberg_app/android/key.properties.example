@@ -1,0 +1,16 @@
+# Release signing credentials for the Play Store build.
+#
+# 1. Copy this file to android/key.properties (already gitignored — never commit it).
+# 2. Generate an upload keystore, e.g.:
+#
+#      keytool -genkey -v -keystore ~/iceberg-upload.jks \
+#        -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# 3. Fill in the values below. storeFile may be absolute or relative to the
+#    android/app directory. Keep the .jks file and these passwords backed up
+#    securely — losing the upload key means you cannot ship updates.
+
+storePassword=your-keystore-password
+keyPassword=your-key-password
+keyAlias=upload
+storeFile=/absolute/path/to/iceberg-upload.jks
