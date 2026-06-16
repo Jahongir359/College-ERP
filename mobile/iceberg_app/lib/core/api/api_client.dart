@@ -13,7 +13,12 @@ class ApiClient {
   static ApiClient? _instance;
   static ApiClient get instance => _instance ??= ApiClient._();
 
-  final _storage = const FlutterSecureStorage();
+  // EncryptedSharedPreferences avoids the Android Keystore lock-up that occurs
+  // on MIUI/EMUI/OneUI when the Keystore provider is busy or uninitialized —
+  // which caused _tokensLoaded to never complete and login requests to time out.
+  final _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
 
   // In-memory copies so requests stay authenticated even if a per-request
   // secure-storage read is slow/flaky (notably on web, where the storage
@@ -37,8 +42,8 @@ class ApiClient {
     final d = Dio(
       BaseOptions(
         baseUrl: kBaseUrl,
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 15),
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -125,8 +130,19 @@ class ApiClient {
   /// Always completes _tokensLoaded so waiting requests are unblocked.
   Future<void> loadTokens() async {
     try {
-      _access = await _storage.read(key: 'access_token');
-      _refresh = await _storage.read(key: 'refresh_token');
+      // Individual timeouts ensure _tokensLoaded is completed promptly even
+      // when the underlying storage (Keystore or EncryptedSharedPrefs) is slow
+      // on first access. Without these, the auth interceptor could block login
+      // requests for the full 6s fallback timeout.
+      _access = await _storage
+          .read(key: 'access_token')
+          .timeout(const Duration(seconds: 5));
+      _refresh = await _storage
+          .read(key: 'refresh_token')
+          .timeout(const Duration(seconds: 5));
+    } catch (_) {
+      // Storage timed out or errored — continue with null tokens; the user
+      // will simply be asked to log in again.
     } finally {
       if (!_tokensLoaded.isCompleted) _tokensLoaded.complete();
     }

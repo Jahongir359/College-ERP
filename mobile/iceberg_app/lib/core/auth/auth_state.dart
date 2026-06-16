@@ -87,7 +87,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _init();
   }
 
-  final _storage = const FlutterSecureStorage();
+  // Must match the backend used in ApiClient so token reads are consistent.
+  final _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
   final _api = ApiClient.instance;
 
   Future<void> _init() async {
@@ -122,39 +125,56 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Login with email OR login_id + password.
   Future<String?> login(String identifier, String password) async {
-    try {
-      final res = await _api.dio.post(
-        '/auth/login/',
-        data: {'identifier': identifier, 'password': password},
-      );
-      final data = res.data as Map<String, dynamic>;
-      await _api.saveTokens(data['access'], data['refresh']);
-      final user = IceUser.fromJson(data['user']);
-      await _storage.write(key: 'user_json', value: jsonEncode(user.toJson()));
-      state = AuthState.auth(user);
-      return null; // success
-    } on DioException catch (e) {
-      final data = e.response?.data;
-      // Surface the server's own detail message when available.
-      if (data is Map) {
-        final detail = data['detail']?.toString();
-        if (detail != null && detail.isNotEmpty) return detail;
+    // One automatic retry on network errors — covers a flaky first-connect on
+    // mobile where the TCP/TLS handshake drops on the initial attempt.
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        final res = await _api.dio.post(
+          '/auth/login/',
+          data: {'identifier': identifier, 'password': password},
+        );
+        final data = res.data as Map<String, dynamic>;
+        await _api.saveTokens(data['access'], data['refresh']);
+        final user = IceUser.fromJson(data['user']);
+        await _storage.write(key: 'user_json', value: jsonEncode(user.toJson()));
+        state = AuthState.auth(user);
+        return null; // success
+      } on DioException catch (e) {
+        final isNetworkError =
+            e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout;
+
+        // On the first attempt, retry network errors after a short delay.
+        if (isNetworkError && attempt == 0) {
+          await Future.delayed(const Duration(seconds: 2));
+          continue;
+        }
+
+        final data = e.response?.data;
+        // Surface the server's own detail message when available.
+        if (data is Map) {
+          final detail = data['detail']?.toString();
+          if (detail != null && detail.isNotEmpty) return detail;
+        }
+        final code = e.response?.statusCode;
+        if (code == 401) return 'Invalid ID or password.';
+        if (code == 403) return 'Account locked or disabled.';
+        if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          return 'Connection timed out. Check your internet.';
+        }
+        if (e.type == DioExceptionType.connectionError) {
+          return 'Cannot reach server. Check your internet connection.';
+        }
+        return 'Login failed (${e.type.name}). Check your credentials.';
+      } on Exception catch (e) {
+        return 'Unexpected error: $e';
       }
-      final code = e.response?.statusCode;
-      if (code == 401) return 'Invalid ID or password.';
-      if (code == 403) return 'Account locked or disabled.';
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.sendTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
-        return 'Connection timed out. Check your internet.';
-      }
-      if (e.type == DioExceptionType.connectionError) {
-        return 'Cannot reach server. Check your internet connection.';
-      }
-      return 'Login failed (${e.type.name}). Check your credentials.';
-    } on Exception catch (e) {
-      return 'Unexpected error: $e';
     }
+    return 'Cannot reach server. Check your internet connection.';
   }
 
   Future<void> logout() async {
