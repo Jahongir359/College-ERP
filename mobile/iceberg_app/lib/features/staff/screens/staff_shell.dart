@@ -129,6 +129,7 @@ class _StaffBottomNav extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     const items = [
       (Icons.grid_view_rounded, 'Dashboard'),
       (Icons.event_available_rounded, 'Attendance'),
@@ -201,7 +202,7 @@ class _StaffBottomNav extends ConsumerWidget {
                             Icon(icon, color: t.textMid, size: 22),
                             const SizedBox(height: 3),
                             Text(
-                              label,
+                              s(label),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(

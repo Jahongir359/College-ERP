@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/app_theme.dart';
 
-class StudentMoreScreen extends StatelessWidget {
+class StudentMoreScreen extends ConsumerWidget {
   const StudentMoreScreen({super.key});
 
   static const _tiles = [
@@ -21,7 +23,8 @@ class StudentMoreScreen extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(stringsProvider);
     final top = MediaQuery.paddingOf(context).top;
     final cols = MediaQuery.of(context).size.width >= 600 ? 3 : 2;
 
@@ -37,12 +40,12 @@ class StudentMoreScreen extends StatelessWidget {
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('More',
-                  style: TextStyle(
+              Text(s('More'),
+                  style: const TextStyle(
                       color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900))
                   .animate().slideX(begin: -0.1, duration: 400.ms).fadeIn(duration: 300.ms),
               const SizedBox(height: 4),
-              Text('All your learning tools',
+              Text(s('All your learning tools'),
                   style: TextStyle(color: Colors.white.withAlpha(160), fontSize: 13))
                   .animate(delay: 80.ms).fadeIn(),
             ]),
@@ -80,12 +83,13 @@ class _MoreTile {
   });
 }
 
-class _MoreTileWidget extends StatelessWidget {
+class _MoreTileWidget extends ConsumerWidget {
   final _MoreTile tile;
   const _MoreTileWidget(this.tile);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(stringsProvider);
     final iconColor = tile.isLogout ? IceColors.danger : IceColors.navyDeep;
     final bgColor = tile.isLogout ? IceColors.danger.withAlpha(20) : IceColors.surface2;
 
@@ -113,7 +117,7 @@ class _MoreTileWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
-                  tile.label,
+                  s(tile.label),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,

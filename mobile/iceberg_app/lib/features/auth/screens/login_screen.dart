@@ -4,6 +4,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/auth/auth_state.dart';
+import '../../../core/i18n/strings.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 
 /// ICEBERG login — dark navy/teal hero with the lime accent, shared by all
@@ -52,6 +54,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = ref.watch(stringsProvider);
     return Scaffold(
       backgroundColor: t.bg,
       body: Container(
@@ -127,7 +130,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Xush kelibsiz',
+                                s('Welcome'),
                                 style: TextStyle(
                                   fontSize: 23,
                                   fontWeight: FontWeight.w800,
@@ -136,7 +139,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Iltimos, akkauntingizga kiring',
+                                s('Please sign in to your account'),
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -144,7 +147,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ),
                               const SizedBox(height: 24),
-                              _form(),
+                              _form(s),
                             ],
                           ),
                         )
@@ -194,7 +197,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _form() {
+  Widget _form(S s) {
     return Form(
       key: _formKey,
       child: Column(
@@ -206,11 +209,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             textInputAction: TextInputAction.next,
             style: TextStyle(color: t.textHi, fontWeight: FontWeight.w600),
             decoration: _dec(
-              label: 'ID raqam yoki email',
+              label: s('ID number or email'),
               icon: Icons.person_outline_rounded,
             ),
             validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Majburiy' : null,
+                (v == null || v.trim().isEmpty) ? s('Required') : null,
           ),
           const SizedBox(height: 14),
           TextFormField(
@@ -220,7 +223,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             onFieldSubmitted: (_) => _submit(),
             style: TextStyle(color: t.textHi, fontWeight: FontWeight.w600),
             decoration: _dec(
-              label: 'Parol',
+              label: s('Password'),
               icon: Icons.lock_outline_rounded,
               suffixIcon: IconButton(
                 icon: Icon(
@@ -233,7 +236,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 onPressed: () => setState(() => _obscure = !_obscure),
               ),
             ),
-            validator: (v) => (v == null || v.isEmpty) ? 'Majburiy' : null,
+            validator: (v) => (v == null || v.isEmpty) ? s('Required') : null,
           ),
           AnimatedSize(
             duration: 300.ms,
@@ -295,9 +298,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         color: t.onAccent,
                       ),
                     )
-                  : const Text(
-                      'KIRISH',
-                      style: TextStyle(
+                  : Text(
+                      s('LOGIN'),
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.5,
@@ -308,7 +311,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           const SizedBox(height: 16),
           Center(
             child: Text(
-              'Parolni tiklash uchun administratorga murojaat qiling.',
+              s('Contact your administrator to reset your password.'),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12, color: t.textLow),
             ),

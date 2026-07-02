@@ -13,14 +13,14 @@ class AppSettings {
   final ThemeMode themeMode;
   final String accent; // key into IceAccents.byName
   final String fontSize; // small | medium | large
-  final String language; // en | uz | ru | ko
+  final String language; // uz | en | ru | ko (Uzbek is the default)
   final Map<String, bool> notifications;
 
   const AppSettings({
     this.themeMode = ThemeMode.light,
     this.accent = 'ice',
     this.fontSize = 'medium',
-    this.language = 'en',
+    this.language = 'uz',
     this.notifications = const {
       'assignments': true,
       'vocabulary': true,
@@ -79,11 +79,13 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
       await p.setBool('ice_rebrand_blue', true);
       await p.setString('ice_accent', accent);
     }
-    // Migrate: Japanese removed in this version — reset to English.
-    var lang = p.getString('ice_lang') ?? 'en';
+    // Uzbek is the default language for new installs (our user base is in
+    // Uzbekistan). Users who explicitly picked another language keep it.
+    var lang = p.getString('ice_lang') ?? 'uz';
+    // Migrate: Japanese removed in this version — reset to the default.
     if (lang == 'ja') {
-      lang = 'en';
-      await p.setString('ice_lang', 'en');
+      lang = 'uz';
+      await p.setString('ice_lang', 'uz');
     }
     state = AppSettings(
       themeMode: AppSettings.themeModeFrom(p.getString('ice_theme') ?? 'light'),
@@ -122,7 +124,7 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
         themeMode: AppSettings.themeModeFrom(d['theme'] ?? 'system'),
         accent: d['accent'] ?? 'ice',
         fontSize: d['font_size'] ?? 'medium',
-        language: d['language'] ?? 'en',
+        language: d['language'] ?? 'uz',
         notifications: {
           ...state.notifications,
           ...((d['notifications'] as Map?)?.map(

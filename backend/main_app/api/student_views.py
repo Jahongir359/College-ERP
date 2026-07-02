@@ -241,7 +241,7 @@ SETTINGS_DEFAULTS = {
     "theme": "system",  # system | light | dark
     "accent": "ice",  # ice | cyan | blue | lime | purple | pink | orange
     "font_size": "medium",  # small | medium | large
-    "language": "en",  # en | uz | ja
+    "language": "uz",  # uz | en | ru | ko  (Uzbek is the default)
     "notifications": {
         "assignments": True,
         "vocabulary": True,
@@ -253,7 +253,7 @@ SETTINGS_DEFAULTS = {
 _THEME_VALUES = {"system", "light", "dark"}
 _ACCENT_VALUES = {"ice", "cyan", "blue", "lime", "purple", "pink", "orange"}
 _FONT_VALUES = {"small", "medium", "large"}
-_LANGUAGE_VALUES = {"en", "uz", "ja"}
+_LANGUAGE_VALUES = {"uz", "en", "ru", "ko"}
 
 # Student.theme uses "bright" where the app uses "light".
 _THEME_TO_MODEL = {
