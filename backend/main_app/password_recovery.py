@@ -128,12 +128,12 @@ def forgot_password(request):
                 logger.error("[PRC] Email send failed for %s: %s", email, exc, exc_info=True)
                 obj.delete()  # Don't count a failed send against the rate limit.
             else:
-                # Always log the code so it's findable in server/DO logs.
-                logger.warning("[PRC] Verification code for %s: %s", email, code)
-                # In DEBUG mode, stash the code in the session so the verify
-                # page can display it directly — removes the need for real SMTP
-                # during development and testing.
+                # Only log the code in DEBUG. Logging a live password-reset code in
+                # production lets anyone with log access hijack an in-flight reset.
                 if settings.DEBUG:
+                    logger.warning("[PRC] Verification code for %s: %s", email, code)
+                    # Stash the code in the session so the verify page can display
+                    # it directly — removes the need for real SMTP during dev/tests.
                     request.session["_prc_dev_code"] = code
 
     except CustomUser.DoesNotExist:
@@ -338,8 +338,9 @@ def resend_code(request):
                 logger.error("[PRC] Resend email failed for %s: %s", email, exc, exc_info=True)
                 obj.delete()
             else:
-                logger.warning("[PRC] Resend code for %s: %s", email, code)
+                # Only log the code in DEBUG (see rationale above).
                 if settings.DEBUG:
+                    logger.warning("[PRC] Resend code for %s: %s", email, code)
                     request.session["_prc_dev_code"] = code
     except CustomUser.DoesNotExist:
         logger.info("[PRC] Resend: email not found: %s", email)

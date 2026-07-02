@@ -29,7 +29,7 @@
 {% if show_resend %}
 {# Code is expired / used / locked — show resend option, no code form #}
 <div class="text-center" style="margin-top:8px;">
-  <form method="post" action="{% url 'resend_code' %}">
+  <form method="post" action="{% url 'resend_reset_code' %}">
     {% csrf_token %}
     <input type="hidden" name="email" value="{{ email }}">
     <button type="submit" class="btn-primary" style="width:auto; padding:10px 24px;">
@@ -79,7 +79,7 @@
 </form>
 
 <div class="text-center" style="margin-top:16px;">
-  <form method="post" action="{% url 'resend_code' %}" style="display:inline;">
+  <form method="post" action="{% url 'resend_reset_code' %}" style="display:inline;">
     {% csrf_token %}
     <input type="hidden" name="email" value="{{ email }}">
     <button type="submit" class="link" style="background:none; border:none; padding:0; cursor:pointer; font-size:13px; color:var(--cyan-dk); font-weight:500; font-family:inherit;">

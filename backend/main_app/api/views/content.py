@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from ... import branching
 from ...models import (
     DashboardStory,
     Enrollment,
@@ -503,7 +504,12 @@ class StoryCreateView(APIView):
         )
 
         if target_group_ids:
-            groups = Group.objects.filter(id__in=target_group_ids)
+            # Object-level auth: restrict targeting to groups the caller may access
+            # (a teacher's own groups, a branch admin's branches). Otherwise a
+            # teacher could broadcast a story to groups they don't teach.
+            groups = branching.filter_groups_for_user(
+                user, Group.objects.filter(id__in=target_group_ids)
+            )
             story.target_groups.set(groups)
 
         serializer = StorySerializer(story, context={"request": request})

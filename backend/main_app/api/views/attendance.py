@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ... import branching
-from ...models import Attendance, AttendanceReport, Group, Student
+from ...models import Attendance, AttendanceReport, Enrollment, Group, Student
 from ..serializers import AttendanceSaveSerializer, AttendanceSerializer
 
 
@@ -71,7 +71,10 @@ class AttendanceView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         data = serializer.validated_data
-        group = Group.objects.get(id=data["group_id"])
+        try:
+            group = Group.objects.get(id=data["group_id"])
+        except Group.DoesNotExist:
+            return Response({"detail": "Group not found."}, status=status.HTTP_404_NOT_FOUND)
 
         if not branching.user_can_access_group(request.user, group):
             return Response(
@@ -80,6 +83,14 @@ class AttendanceView(APIView):
             )
 
         records = data["records"]
+        # Object-level auth: only accept records for students actually enrolled in
+        # this group. Without this filter a teacher could write attendance onto any
+        # student's record by supplying an arbitrary student_id.
+        enrolled_ids = set(
+            Enrollment.objects.filter(group=group, is_active=True).values_list(
+                "student_id", flat=True
+            )
+        )
         with transaction.atomic():
             attendance, _ = Attendance.objects.get_or_create(group=group, date=data["date"])
             existing = {
@@ -88,6 +99,8 @@ class AttendanceView(APIView):
             to_create, to_update = [], []
             for rec in records:
                 sid = int(rec["student_id"])
+                if sid not in enrolled_ids:
+                    continue
                 st = int(rec["status"])
                 if sid in existing:
                     existing[sid].status = st

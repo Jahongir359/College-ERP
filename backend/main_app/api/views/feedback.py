@@ -43,14 +43,25 @@ class FeedbackView(APIView):
         if user_type == "1":
             feedback_type = request.query_params.get("type", "student")
             if feedback_type == "staff":
-                qs = FeedbackStaff.objects.select_related("staff__admin").order_by("-created_at")
+                # Branch isolation: a branch admin only sees feedback from staff in
+                # their branches; a super admin sees all (filter_staff_for_user
+                # returns the full queryset for super admins).
+                allowed_staff = branching.filter_staff_for_user(user, Staff.objects.all())
+                qs = (
+                    FeedbackStaff.objects.filter(staff__in=allowed_staff)
+                    .select_related("staff__admin")
+                    .order_by("-created_at")
+                )
                 page = paginator.paginate_queryset(qs, request)
                 return paginator.get_paginated_response(
                     AdminStaffFeedbackSerializer(page, many=True).data
                 )
             else:
-                qs = FeedbackStudent.objects.select_related("student__admin").order_by(
-                    "-created_at"
+                allowed_students = branching.filter_students_for_user(user, Student.objects.all())
+                qs = (
+                    FeedbackStudent.objects.filter(student__in=allowed_students)
+                    .select_related("student__admin")
+                    .order_by("-created_at")
                 )
                 page = paginator.paginate_queryset(qs, request)
                 return paginator.get_paginated_response(

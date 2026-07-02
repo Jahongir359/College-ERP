@@ -1479,6 +1479,84 @@ class PaymentsTests(TestCase):
         self.assertIsNone(_normalize_uz_phone("12345"))
 
 
+@override_settings(**_BASE_OVERRIDES)
+class ApiObjectAuthTests(TestCase):
+    """Object-level authorization on mobile API write paths — a teacher must not
+    be able to act on groups they don't teach or students not in their group."""
+
+    def _make_user(self, email, user_type, login_id):
+        UserModel = get_user_model()
+        return UserModel.objects.create_user(
+            email=email, password="Pass123!", first_name="T", last_name="U",
+            user_type=user_type, gender="M", address="", profile_pic="", login_id=login_id,
+        )
+
+    def setUp(self):
+        from rest_framework.test import APIClient
+
+        self.course = Course.objects.create(name="English")
+        # Teacher A owns group A (with an enrolled student); teacher B owns group B.
+        self.teacher_a = Staff.objects.get(admin=self._make_user("ta@iceberg.internal", "2", "TC80001"))
+        self.teacher_b = Staff.objects.get(admin=self._make_user("tb@iceberg.internal", "2", "TC80002"))
+        self.group_a = Group.objects.create(name="Group A", course=self.course, teacher=self.teacher_a)
+        self.group_b = Group.objects.create(name="Group B", course=self.course, teacher=self.teacher_b)
+
+        self.student_a = Student.objects.get(admin=self._make_user("ic80001@iceberg.internal", "3", "IC80001"))
+        Enrollment.objects.create(student=self.student_a, group=self.group_a, is_active=True)
+        # A student enrolled only in teacher B's group.
+        self.student_b = Student.objects.get(admin=self._make_user("ic80002@iceberg.internal", "3", "IC80002"))
+        Enrollment.objects.create(student=self.student_b, group=self.group_b, is_active=True)
+
+        self.api = APIClient()
+        self.api.force_authenticate(user=self.teacher_a.admin)
+
+    def test_teacher_cannot_create_assignment_for_foreign_group(self):
+        from main_app.models import Assignment
+
+        res = self.api.post(
+            "/api/v1/assignments/",
+            {"title": "X", "description": "d", "group": self.group_b.id, "due_date": "2026-02-01"},
+            format="json",
+        )
+        self.assertEqual(res.status_code, 403)
+        self.assertFalse(Assignment.objects.filter(group=self.group_b).exists())
+
+    def test_teacher_cannot_result_non_enrolled_student(self):
+        from main_app.models import StudentResult
+
+        # student_b is not enrolled in group_a (which teacher A owns).
+        res = self.api.post(
+            "/api/v1/results/",
+            {"student_id": self.student_b.id, "group_id": self.group_a.id, "test": 10, "exam": 10},
+            format="json",
+        )
+        self.assertEqual(res.status_code, 403)
+        self.assertFalse(
+            StudentResult.objects.filter(student=self.student_b, group=self.group_a).exists()
+        )
+
+    def test_attendance_drops_non_enrolled_student(self):
+        from main_app.models import AttendanceReport
+
+        res = self.api.post(
+            "/api/v1/attendance/",
+            {
+                "group_id": self.group_a.id,
+                "date": "2026-01-15",
+                "records": [
+                    {"student_id": self.student_a.id, "status": AttendanceReport.PRESENT},
+                    {"student_id": self.student_b.id, "status": AttendanceReport.PRESENT},
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 200)
+        # Enrolled student recorded; the foreign student silently dropped.
+        self.assertTrue(AttendanceReport.objects.filter(student=self.student_a).exists())
+        self.assertFalse(AttendanceReport.objects.filter(student=self.student_b).exists())
+
+
+@override_settings(**_BASE_OVERRIDES)
 class ScoreValidationTests(TestCase):
     """Server-side enforcement of the grading scale (test ≤ 40, exam ≤ 60)."""
 

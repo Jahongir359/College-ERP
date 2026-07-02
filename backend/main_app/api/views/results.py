@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ... import branching
-from ...models import Group, Notification, Student, StudentResult
+from ...models import Enrollment, Group, Notification, Student, StudentResult
 from ..serializers import StudentResultSerializer
 
 
@@ -51,6 +51,14 @@ class ResultView(APIView):
         if not branching.user_can_access_group(request.user, group):
             return Response(
                 {"detail": "You can only update results for groups in your scope."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Object-level auth: the student must actually be enrolled in this group,
+        # otherwise a teacher could write a result onto any student's record.
+        if not Enrollment.objects.filter(student=student, group=group, is_active=True).exists():
+            return Response(
+                {"detail": "That student is not enrolled in this group."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 

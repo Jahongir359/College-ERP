@@ -50,11 +50,14 @@ class LeaveView(APIView):
             paginator.page_size = 20
 
             if leave_type == "staff":
-                qs = LeaveReportStaff.objects.select_related("staff__admin").order_by("-created_at")
+                # Branch isolation: branch admins only see leave from staff in their
+                # branches; super admins see all (filter_staff_for_user returns the
+                # full queryset for super admins).
+                allowed_staff = branching.filter_staff_for_user(user, Staff.objects.all())
                 qs = (
-                    branching.filter_staff_leave_for_user(user, qs)
-                    if hasattr(branching, "filter_staff_leave_for_user")
-                    else qs
+                    LeaveReportStaff.objects.filter(staff__in=allowed_staff)
+                    .select_related("staff__admin")
+                    .order_by("-created_at")
                 )
                 if status_filter is not None:
                     qs = qs.filter(status=status_filter)
@@ -63,8 +66,11 @@ class LeaveView(APIView):
                     AdminStaffLeaveSerializer(page, many=True).data
                 )
             else:
-                qs = LeaveReportStudent.objects.select_related("student__admin").order_by(
-                    "-created_at"
+                allowed_students = branching.filter_students_for_user(user, Student.objects.all())
+                qs = (
+                    LeaveReportStudent.objects.filter(student__in=allowed_students)
+                    .select_related("student__admin")
+                    .order_by("-created_at")
                 )
                 if status_filter is not None:
                     qs = qs.filter(status=status_filter)

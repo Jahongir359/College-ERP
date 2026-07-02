@@ -72,6 +72,15 @@ class AssignmentListView(APIView):
         serializer = AssignmentSerializer(data=request.data, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Object-level auth: only create assignments for a group the caller may
+        # access (a teacher's own group, or a branch admin's branch). Without
+        # this a teacher could target any group by id.
+        group = serializer.validated_data.get("group")
+        if group is None or not branching.user_can_access_group(request.user, group):
+            return Response(
+                {"detail": "You can only create assignments for your own groups."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         assignment = serializer.save(created_by=staff)
         return Response(
             AssignmentSerializer(assignment, context={"request": request}).data,
