@@ -277,7 +277,7 @@ class StudentSettingsScreen extends ConsumerWidget {
                     final data = e.response?.data;
                     setSheet(() {
                       busy = false;
-                      error = data is Map
+                      error = data is Map && data.isNotEmpty
                           ? data.values.first.toString()
                           : 'Could not change password.';
                     });

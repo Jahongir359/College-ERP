@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Iceberg App</string>
+	<string>ICEBERG</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -45,5 +45,21 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Required so image_picker can open the photo library / camera to set a
+	     profile photo. Without these usage strings iOS hard-crashes the app the
+	     moment the picker is invoked, and App Store review rejects the binary. -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ICEBERG needs access to your photos so you can set a profile picture.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>ICEBERG needs access to your camera so you can take a profile picture.</string>
+	<!-- The app only uses standard HTTPS/TLS. Declaring non-exempt encryption as
+	     false auto-clears the export-compliance step on every App Store upload. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<!-- Allow launching the mail composer (the "email teacher" action). -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>mailto</string>
+	</array>
 </dict>
 </plist>

@@ -73,7 +73,7 @@ class _StudentAssignmentDetailScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              data is Map
+              data is Map && data.isNotEmpty
                   ? data.values.first.toString()
                   : 'Submission failed. Try again.',
             ),
