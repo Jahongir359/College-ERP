@@ -200,7 +200,7 @@ function saveAvatar(){
     if(d.status==='ok'){ currentAvatar=pendingAvatar; applyAvatarToHero(currentAvatar); closeAvatarModal();
       var t=document.getElementById('avatar-toast'); t.classList.add('show');
       setTimeout(function(){t.classList.remove('show');},2200); }
-  });
+  }).catch(function(){ closeAvatarModal(); });
 }
 (function(){
   if(currentAvatar) applyAvatarToHero(currentAvatar);
@@ -230,7 +230,8 @@ function saveAvatar(){
       btn.classList.add('active');
       applyTheme(theme);
       fetch(SAVE_URL,{ method:'POST', headers:{'X-CSRFToken':CSRF2,'Content-Type':'application/x-www-form-urlencoded'}, body:'theme='+theme })
-      .then(function(){ var m=document.getElementById('theme-msg'); if(m){ m.style.display='block'; setTimeout(function(){m.style.display='none';},2200);} });
+      .then(function(){ var m=document.getElementById('theme-msg'); if(m){ m.style.display='block'; setTimeout(function(){m.style.display='none';},2200);} })
+      .catch(function(){});
     });
   });
 })();

@@ -154,7 +154,8 @@ if (emailField) {
         ? '<i class="fas fa-times-circle me-1"></i>Email already registered'
         : '<i class="fas fa-check-circle me-1"></i>Email available';
       emailField.closest('.ice-field').appendChild(hint);
-    });
+    })
+    .catch(() => {});
   });
 }
 
