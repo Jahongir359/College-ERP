@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/api_providers.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/ice_kit.dart';
@@ -15,6 +16,7 @@ class StaffPaymentsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final invoices = ref.watch(staffPaymentsProvider);
+    final s = ref.watch(stringsProvider);
 
     return invoices.when(
       loading: () => const PageSkeleton(),
@@ -23,8 +25,8 @@ class StaffPaymentsScreen extends ConsumerWidget {
         onRetry: () => ref.invalidate(staffPaymentsProvider),
       ),
       data: (list) => IcePage(
-        title: 'Payments',
-        subtitle: 'Student invoices for your groups',
+        title: s('Payments'),
+        subtitle: s('Student invoices for your groups'),
         backButton: true,
         onRefresh: () => ref.refresh(staffPaymentsProvider.future),
         children: [
@@ -32,8 +34,8 @@ class StaffPaymentsScreen extends ConsumerWidget {
             IceCard(
               child: EmptyState(
                 icon: Icons.payment_outlined,
-                title: 'No payment records',
-                message: 'Student invoices will appear here.',
+                title: s('No payment records'),
+                message: s('Student invoices will appear here.'),
               ),
             )
           else ...[
@@ -58,7 +60,7 @@ class StaffPaymentsScreen extends ConsumerWidget {
   }
 }
 
-class _SummaryRow extends StatelessWidget {
+class _SummaryRow extends ConsumerWidget {
   final int total, paid, pending;
   const _SummaryRow({
     required this.total,
@@ -67,15 +69,16 @@ class _SummaryRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     return Row(
       children: [
-        Expanded(child: _StatChip('Total', '$total', t.accentInk)),
+        Expanded(child: _StatChip(s('Total'), '$total', t.accentInk)),
         const SizedBox(width: 8),
-        Expanded(child: _StatChip('Paid', '$paid', t.accentInk)),
+        Expanded(child: _StatChip(s('Paid'), '$paid', t.accentInk)),
         const SizedBox(width: 8),
-        Expanded(child: _StatChip('Pending', '$pending', t.amber)),
+        Expanded(child: _StatChip(s('Pending'), '$pending', t.amber)),
       ],
     );
   }
@@ -116,14 +119,15 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-class _InvoiceCard extends StatelessWidget {
+class _InvoiceCard extends ConsumerWidget {
   final dynamic inv;
   final int idx;
   const _InvoiceCard({required this.inv, required this.idx});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final isPaid = inv['status']?.toString() == 'paid';
     final statusTone = isPaid ? BadgeTone.accent : BadgeTone.amber;
     final iconColor = isPaid ? t.accentInk : t.amber;
@@ -170,7 +174,7 @@ class _InvoiceCard extends StatelessWidget {
                 ),
                 if (due.isNotEmpty)
                   Text(
-                    'Due $due',
+                    '${s('Due')} $due',
                     style: TextStyle(fontSize: 11, color: t.textLow),
                   ),
               ],
@@ -188,7 +192,7 @@ class _InvoiceCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              StatusBadge(isPaid ? 'Paid' : 'Pending', tone: statusTone),
+              StatusBadge(isPaid ? s('Paid') : s('Pending'), tone: statusTone),
             ],
           ),
         ],
@@ -207,6 +211,7 @@ class StaffNotificationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifs = ref.watch(notificationsProvider);
+    final s = ref.watch(stringsProvider);
 
     return notifs.when(
       loading: () => const PageSkeleton(),
@@ -215,8 +220,8 @@ class StaffNotificationsScreen extends ConsumerWidget {
         onRetry: () => ref.invalidate(notificationsProvider),
       ),
       data: (list) => IcePage(
-        title: 'Notifications',
-        subtitle: 'Admin broadcasts and system alerts',
+        title: s('Notifications'),
+        subtitle: s('Admin broadcasts and system alerts'),
         backButton: true,
         onRefresh: () => ref.refresh(notificationsProvider.future),
         children: [
@@ -224,8 +229,8 @@ class StaffNotificationsScreen extends ConsumerWidget {
             IceCard(
               child: EmptyState(
                 icon: Icons.notifications_none_rounded,
-                title: 'No notifications',
-                message: 'New notifications from the admin will appear here.',
+                title: s('No notifications'),
+                message: s('New notifications from the admin will appear here.'),
               ),
             )
           else

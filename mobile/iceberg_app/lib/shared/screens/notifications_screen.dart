@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/api_providers.dart';
+import '../../core/settings/app_settings.dart';
 import '../../core/theme/app_theme.dart';
 import '../widgets/ice_page_header.dart';
 
@@ -31,6 +32,7 @@ class _State extends ConsumerState<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(notificationsProvider);
+    final s = ref.watch(stringsProvider);
     return Scaffold(
       backgroundColor: IceColors.bg,
       body: RefreshIndicator(
@@ -41,12 +43,12 @@ class _State extends ConsumerState<NotificationsScreen> {
           slivers: [
             SliverToBoxAdapter(
               child: IcePageHeader(
-                title: 'Notifications',
-                subtitle: 'Updates from your teachers and admins',
+                title: s('Notifications'),
+                subtitle: s('Updates from your teachers and admins'),
                 chips: [
                   IceHeaderChip(
                     icon: Icons.done_all_rounded,
-                    label: 'Mark all read',
+                    label: s('Mark all read'),
                     onTap: _markAllRead,
                   ),
                 ],
@@ -256,34 +258,37 @@ class _Skeleton extends StatelessWidget {
   );
 }
 
-class _Empty extends StatelessWidget {
+class _Empty extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.all(40),
-    child: Column(
-      children: [
-        Icon(
-          Icons.notifications_none_rounded,
-          size: 56,
-          color: IceColors.muted.withAlpha(100),
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'All clear',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: IceColors.muted,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(stringsProvider);
+    return Padding(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          Icon(
+            Icons.notifications_none_rounded,
+            size: 56,
+            color: IceColors.muted.withAlpha(100),
           ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'No notifications yet.',
-          style: TextStyle(fontSize: 13, color: IceColors.muted),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(height: 16),
+          Text(
+            s('All clear'),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: IceColors.muted,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            s('No notifications yet.'),
+            style: const TextStyle(fontSize: 13, color: IceColors.muted),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _ErrorCard extends StatelessWidget {

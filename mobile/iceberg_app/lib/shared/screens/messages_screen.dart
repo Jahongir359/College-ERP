@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/api_client.dart';
+import '../../core/settings/app_settings.dart';
 import '../../core/theme/ice_tokens.dart';
 import '../widgets/ice_kit.dart';
 import '../widgets/ice_shell.dart';
 
-class MessagesScreen extends StatefulWidget {
+class MessagesScreen extends ConsumerStatefulWidget {
   const MessagesScreen({super.key});
 
   @override
-  State<MessagesScreen> createState() => _State();
+  ConsumerState<MessagesScreen> createState() => _State();
 }
 
-class _State extends State<MessagesScreen> {
+class _State extends ConsumerState<MessagesScreen> {
   bool _loading = true;
   bool _notAvailable = false;
   List<dynamic> _threads = [];
@@ -52,10 +54,11 @@ class _State extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) return const PageSkeleton();
+    final s = ref.watch(stringsProvider);
 
     return IcePage(
-      title: 'Messages',
-      subtitle: 'Group conversations',
+      title: s('Messages'),
+      subtitle: s('Group conversations'),
       backButton: true,
       onRefresh: _fetch,
       children: [
@@ -63,16 +66,16 @@ class _State extends State<MessagesScreen> {
           IceCard(
             child: EmptyState(
               icon: Icons.chat_bubble_outline_rounded,
-              title: 'Messaging unavailable',
-              message: 'Group chat could not be loaded. Pull to retry.',
+              title: s('Messaging unavailable'),
+              message: s('Group chat could not be loaded. Pull to retry.'),
             ),
           )
         else if (_threads.isEmpty)
           IceCard(
             child: EmptyState(
               icon: Icons.mark_chat_unread_outlined,
-              title: 'No conversations yet',
-              message: 'Messages from your groups will appear here.',
+              title: s('No conversations yet'),
+              message: s('Messages from your groups will appear here.'),
             ),
           )
         else
@@ -99,7 +102,7 @@ class _State extends State<MessagesScreen> {
 
 // ─── Thread Tile ──────────────────────────────────────────────────────────────
 
-class _ThreadTile extends StatelessWidget {
+class _ThreadTile extends ConsumerWidget {
   final Map thread;
   final int index;
   final VoidCallback onTap;
@@ -141,8 +144,9 @@ class _ThreadTile extends StatelessWidget {
       thread['unread_count'] is int ? thread['unread_count'] as int : 0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     return GestureDetector(
           onTap: onTap,
           child: IceCard(
@@ -206,7 +210,7 @@ class _ThreadTile extends StatelessWidget {
                           Expanded(
                             child: Text(
                               _lastMessage.isEmpty
-                                  ? 'No messages yet'
+                                  ? s('No messages yet')
                                   : _lastMessage,
                               style: TextStyle(
                                 fontSize: 12,
@@ -259,15 +263,15 @@ class _ThreadTile extends StatelessWidget {
 
 // ─── Chat Screen ──────────────────────────────────────────────────────────────
 
-class _ChatScreen extends StatefulWidget {
+class _ChatScreen extends ConsumerStatefulWidget {
   final Map thread;
   const _ChatScreen({required this.thread});
 
   @override
-  State<_ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<_ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<_ChatScreen> {
+class _ChatScreenState extends ConsumerState<_ChatScreen> {
   bool _loading = true;
   List<dynamic> _messages = [];
   final _scrollCtrl = ScrollController();
@@ -345,6 +349,7 @@ class _ChatScreenState extends State<_ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     return Scaffold(
       backgroundColor: t.bg,
       appBar: AppBar(
@@ -394,7 +399,7 @@ class _ChatScreenState extends State<_ChatScreen> {
                 : _messages.isEmpty
                 ? Center(
                     child: Text(
-                      'No messages yet.',
+                      s('No messages yet.'),
                       style: TextStyle(color: t.textLow),
                     ),
                   )
@@ -423,7 +428,7 @@ class _ChatScreenState extends State<_ChatScreen> {
                       controller: _msgCtrl,
                       style: TextStyle(color: t.textHi),
                       decoration: InputDecoration(
-                        hintText: 'Type a message...',
+                        hintText: s('Type a message...'),
                         hintStyle: TextStyle(color: t.textLow),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),

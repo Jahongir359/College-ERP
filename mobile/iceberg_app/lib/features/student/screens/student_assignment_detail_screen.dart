@@ -9,6 +9,7 @@ import 'package:open_filex/open_filex.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_providers.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
 import '../../../shared/widgets/ice_shell.dart';
@@ -44,6 +45,7 @@ class _StudentAssignmentDetailScreenState
   }
 
   Future<void> _submit() async {
+    final s = ref.read(stringsProvider);
     setState(() => _busy = true);
     try {
       final form = FormData.fromMap({
@@ -65,7 +67,7 @@ class _StudentAssignmentDetailScreenState
         setState(() => _picked = null);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Assignment submitted.')));
+        ).showSnackBar(SnackBar(content: Text(s('Assignment submitted.'))));
       }
     } on DioException catch (e) {
       if (mounted) {
@@ -75,7 +77,7 @@ class _StudentAssignmentDetailScreenState
             content: Text(
               data is Map && data.isNotEmpty
                   ? data.values.first.toString()
-                  : 'Submission failed. Try again.',
+                  : s('Submission failed. Try again.'),
             ),
           ),
         );
@@ -102,6 +104,7 @@ class _StudentAssignmentDetailScreenState
 
   Widget _buildBody(BuildContext context, Map<String, dynamic> a) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final sub = a['my_submission'] as Map<String, dynamic>?;
     final due = DateTime.tryParse(a['due_date'] ?? '');
     final overdue = due != null && due.isBefore(DateTime.now());
@@ -113,7 +116,7 @@ class _StudentAssignmentDetailScreenState
     }
 
     return IcePage(
-      title: 'Submit Assignment',
+      title: s('Submit Assignment'),
       backButton: true,
       onRefresh: () async =>
           ref.refresh(assignmentDetailProvider(widget.assignmentId).future),
@@ -138,8 +141,8 @@ class _StudentAssignmentDetailScreenState
                   ),
                   StatusBadge(
                     sub != null
-                        ? (graded ? 'Graded' : 'Submitted')
-                        : (overdue ? 'Overdue' : 'To Do'),
+                        ? (graded ? s('Graded') : s('Submitted'))
+                        : (overdue ? s('Overdue') : s('To Do')),
                     tone: sub != null
                         ? (graded ? BadgeTone.sky : BadgeTone.accent)
                         : (overdue ? BadgeTone.coral : BadgeTone.amber),
@@ -178,7 +181,7 @@ class _StudentAssignmentDetailScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MicroLabel('Instructions'),
+                MicroLabel(s('Instructions')),
                 const SizedBox(height: 8),
                 Text(
                   a['description'],
@@ -197,7 +200,7 @@ class _StudentAssignmentDetailScreenState
                 Icon(Icons.workspace_premium_rounded, color: t.sky),
                 const SizedBox(width: 12),
                 Text(
-                  'Grade: ',
+                  s('Grade: '),
                   style: TextStyle(fontSize: 15, color: t.textMid),
                 ),
                 Text(
@@ -217,7 +220,7 @@ class _StudentAssignmentDetailScreenState
         // ── Current submission ───────────────────────────────────────────
         if (sub != null &&
             (sub['file_url'] as String?)?.isNotEmpty == true) ...[
-          MicroLabel('Your Submission'),
+          MicroLabel(s('Your Submission')),
           const SizedBox(height: 8),
           _FileChip(
             name: _fileName(sub['file_url']),
@@ -259,7 +262,7 @@ class _StudentAssignmentDetailScreenState
                   Icon(Icons.upload_file_rounded, size: 28, color: t.textMid),
                   const SizedBox(height: 8),
                   Text(
-                    'Choose File',
+                    s('Choose File'),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -272,20 +275,20 @@ class _StudentAssignmentDetailScreenState
           ),
         const SizedBox(height: 16),
 
-        MicroLabel('Comments (Optional)'),
+        MicroLabel(s('Comments (Optional)')),
         const SizedBox(height: 8),
         TextField(
           controller: _comment,
           maxLines: 3,
           maxLength: 200,
           style: TextStyle(color: t.textHi, fontWeight: FontWeight.w500),
-          decoration: const InputDecoration(
-            hintText: 'Add a note for your teacher…',
+          decoration: InputDecoration(
+            hintText: s('Add a note for your teacher…'),
           ),
         ),
         const SizedBox(height: 8),
         IceButton(
-          sub != null ? 'Update Submission' : 'Submit Assignment',
+          sub != null ? s('Update Submission') : s('Submit Assignment'),
           busy: _busy,
           onPressed: (_picked == null && sub == null) ? null : _submit,
         ),
