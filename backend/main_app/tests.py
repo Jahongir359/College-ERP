@@ -1557,6 +1557,34 @@ class ApiObjectAuthTests(TestCase):
 
 
 @override_settings(**_BASE_OVERRIDES)
+class AttendanceIntegrityTests(TestCase):
+    """DB-level guard against duplicate per-student attendance rows."""
+
+    def _make_user(self, email, user_type, login_id):
+        UserModel = get_user_model()
+        return UserModel.objects.create_user(
+            email=email, password="Pass123!", first_name="T", last_name="U",
+            user_type=user_type, gender="M", address="", profile_pic="", login_id=login_id,
+        )
+
+    def test_duplicate_attendance_report_rejected(self):
+        from django.db import IntegrityError, transaction
+        from main_app.models import Attendance, AttendanceReport
+
+        course = Course.objects.create(name="English")
+        teacher = Staff.objects.get(admin=self._make_user("at@iceberg.internal", "2", "TC60001"))
+        group = Group.objects.create(name="G", course=course, teacher=teacher)
+        student = Student.objects.get(admin=self._make_user("ic60001@iceberg.internal", "3", "IC60001"))
+        att = Attendance.objects.create(group=group, date=date(2026, 1, 10))
+        AttendanceReport.objects.create(attendance=att, student=student, status=AttendanceReport.PRESENT)
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                AttendanceReport.objects.create(
+                    attendance=att, student=student, status=AttendanceReport.ABSENT
+                )
+
+
+@override_settings(**_BASE_OVERRIDES)
 class MediaProtectionTests(TestCase):
     """Raw /media/results/ paths must not leak student result PDFs to anonymous
     users or across students; public assets stay reachable."""

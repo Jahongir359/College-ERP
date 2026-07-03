@@ -309,7 +309,9 @@ class AttendanceReport(models.Model):
     LATE = 2
     STATUS_CHOICES = ((ABSENT, "Absent"), (PRESENT, "Present"), (LATE, "Late"))
 
-    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
+    # CASCADE matches every other student-owned table; DO_NOTHING left dangling
+    # rows (or a hard IntegrityError) when a student was deleted.
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
     status = models.SmallIntegerField(default=ABSENT, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -319,6 +321,14 @@ class AttendanceReport(models.Model):
         indexes = [
             models.Index(fields=["student"]),
             models.Index(fields=["attendance"]),
+        ]
+        # One attendance row per student per class/day. The UI rewrites cleanly,
+        # but without this a race or bulk path could insert duplicate reports,
+        # inflating present/absent counts and the leaderboard.
+        constraints = [
+            models.UniqueConstraint(
+                fields=["attendance", "student"], name="uniq_attendance_student"
+            ),
         ]
 
 
