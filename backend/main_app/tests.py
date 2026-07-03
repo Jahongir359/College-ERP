@@ -1557,6 +1557,53 @@ class ApiObjectAuthTests(TestCase):
 
 
 @override_settings(**_BASE_OVERRIDES)
+class MediaProtectionTests(TestCase):
+    """Raw /media/results/ paths must not leak student result PDFs to anonymous
+    users or across students; public assets stay reachable."""
+
+    def _make_user(self, email, user_type, login_id):
+        UserModel = get_user_model()
+        return UserModel.objects.create_user(
+            email=email, password="Pass123!", first_name="T", last_name="U",
+            user_type=user_type, gender="M", address="", profile_pic="", login_id=login_id,
+        )
+
+    def setUp(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from main_app.models import ResultFile
+
+        self.course = Course.objects.create(name="English")
+        self.teacher = Staff.objects.get(admin=self._make_user("mt@iceberg.internal", "2", "TC70001"))
+        self.group = Group.objects.create(name="G", course=self.course, teacher=self.teacher)
+        self.enrolled_user = self._make_user("ic70001@iceberg.internal", "3", "IC70001")
+        self.enrolled = Student.objects.get(admin=self.enrolled_user)
+        Enrollment.objects.create(student=self.enrolled, group=self.group, is_active=True)
+        self.outsider_user = self._make_user("ic70002@iceberg.internal", "3", "IC70002")
+
+        self.rf = ResultFile.objects.create(
+            group=self.group, title="Midterm", uploaded_by=self.teacher,
+            file=SimpleUploadedFile("midterm.pdf", b"PDF-DATA"),
+        )
+        self.media_path = "/media/" + self.rf.file.name
+
+    def test_anonymous_cannot_download_result_pdf(self):
+        # Anonymous users are bounced to login by LoginCheckMiddleWare (302);
+        # either way the file is never served.
+        res = self.client.get(self.media_path)
+        self.assertIn(res.status_code, (302, 404))
+        self.assertNotEqual(res.status_code, 200)
+
+    def test_enrolled_student_can_download_result_pdf(self):
+        self.client.force_login(self.enrolled_user)
+        res = self.client.get(self.media_path)
+        self.assertEqual(res.status_code, 200)
+
+    def test_other_student_cannot_download_result_pdf(self):
+        self.client.force_login(self.outsider_user)
+        self.assertEqual(self.client.get(self.media_path).status_code, 404)
+
+
+@override_settings(**_BASE_OVERRIDES)
 class ScoreValidationTests(TestCase):
     """Server-side enforcement of the grading scale (test ≤ 40, exam ≤ 60)."""
 

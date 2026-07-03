@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
-from django.views.static import serve
 from rest_framework_simplejwt.views import TokenRefreshView
 from . import settings
 from main_app.flutter_view import (
@@ -11,6 +10,7 @@ from main_app.flutter_view import (
     download_apk,
     download_page,
 )
+from main_app.media_views import protected_media
 
 urlpatterns = [
     path("", include("main_app.urls")),
@@ -37,7 +37,7 @@ urlpatterns = [
 #   - For a college ERP the traffic volume is low enough that Django serving
 #     media is acceptable. For high traffic, replace with nginx or DO Spaces.
 urlpatterns += [
-    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    re_path(r"^media/(?P<path>.*)$", protected_media),
 ]
 
 # In development also serve the static files via Django (not needed in
