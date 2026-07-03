@@ -270,8 +270,8 @@ class _StudentChatScreenState extends ConsumerState<StudentChatScreen> {
           _error = null;
         });
         _jumpToBottom();
+        ref.invalidate(messageThreadsProvider);
       }
-      ref.invalidate(messageThreadsProvider);
     } catch (e) {
       if (mounted && !silent) {
         setState(() {

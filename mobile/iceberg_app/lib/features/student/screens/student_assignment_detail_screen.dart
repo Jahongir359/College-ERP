@@ -58,10 +58,10 @@ class _StudentAssignmentDetailScreenState
         '/assignments/${widget.assignmentId}/submit/',
         data: form,
       );
-      ref.invalidate(assignmentDetailProvider(widget.assignmentId));
-      ref.invalidate(assignmentsProvider);
-      ref.invalidate(studentDashProvider);
       if (mounted) {
+        ref.invalidate(assignmentDetailProvider(widget.assignmentId));
+        ref.invalidate(assignmentsProvider);
+        ref.invalidate(studentDashProvider);
         setState(() => _picked = null);
         ScaffoldMessenger.of(
           context,
@@ -221,9 +221,13 @@ class _StudentAssignmentDetailScreenState
           const SizedBox(height: 8),
           _FileChip(
             name: _fileName(sub['file_url']),
-            subtitle: sub['submitted_at'] != null
-                ? 'Submitted ${DateFormat('MMM d, h:mm a').format(DateTime.parse(sub['submitted_at']))}'
-                : null,
+            subtitle: () {
+              final at =
+                  DateTime.tryParse(sub['submitted_at']?.toString() ?? '');
+              return at != null
+                  ? 'Submitted ${DateFormat('MMM d, h:mm a').format(at)}'
+                  : null;
+            }(),
             onOpen: () => _openUrl(sub['file_url']),
           ),
           const SizedBox(height: 14),

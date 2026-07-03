@@ -19,6 +19,18 @@ void _toast(BuildContext context, String msg) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 }
 
+/// Extracts the server's `detail` message from an error response. Gateways
+/// (Cloudflare/nginx) return HTML or plain-text bodies on 5xx, so the body is
+/// not always a Map — indexing a String with `['detail']` throws.
+String _errDetail(DioException e, String fallback) {
+  final data = e.response?.data;
+  if (data is Map) {
+    final d = data['detail']?.toString();
+    if (d != null && d.isNotEmpty) return d;
+  }
+  return fallback;
+}
+
 String _studentName(Map s) {
   final f = (s['first_name'] ?? '').toString().trim();
   final l = (s['last_name'] ?? '').toString().trim();
@@ -352,10 +364,7 @@ class _StaffAttendanceScreenState
       if (mounted) _toast(context, 'Attendance saved.');
     } on DioException catch (e) {
       if (mounted) {
-        _toast(
-          context,
-          e.response?.data?['detail']?.toString() ?? 'Could not save.',
-        );
+        _toast(context, _errDetail(e, 'Could not save.'));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -819,11 +828,7 @@ class _StaffResultsScreenState extends ConsumerState<StaffResultsScreen> {
                       } on DioException catch (e) {
                         setLocal(() => saving = false);
                         if (dctx.mounted) {
-                          _toast(
-                            dctx,
-                            e.response?.data?['detail']?.toString() ??
-                                'Could not save.',
-                          );
+                          _toast(dctx, _errDetail(e, 'Could not save.'));
                         }
                       }
                     },
@@ -980,7 +985,14 @@ class StaffAssignmentsScreen extends ConsumerStatefulWidget {
 
 class _StaffAssignmentsScreenState
     extends ConsumerState<StaffAssignmentsScreen> {
-  String _filter = 'Active';
+  int _filter = 0; // 0 All · 1 Active · 2 Past due
+
+  bool _isPastDue(Map<String, dynamic> a) {
+    final due = DateTime.tryParse(a['due_date']?.toString() ?? '');
+    if (due == null) return false;
+    final today = DateTime.now();
+    return due.isBefore(DateTime(today.year, today.month, today.day));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1002,42 +1014,55 @@ class _StaffAssignmentsScreenState
           error: e,
           onRetry: () => ref.invalidate(staffAssignmentsProvider),
         ),
-        data: (list) => IcePage(
-          title: s('Assignments'),
-          subtitle: s('Manage and track student assignments'),
-          onRefresh: () => ref.refresh(staffAssignmentsProvider.future),
-          children: [
-            // Filter chips
-            IceChipTabs(
-              tabs: const ['Active', 'Scheduled', 'Drafts'],
-              index: ['Active', 'Scheduled', 'Drafts'].indexOf(_filter),
-              onChanged: (i) => setState(
-                () => _filter = ['Active', 'Scheduled', 'Drafts'][i],
+        data: (list) {
+          final all = list.cast<Map<String, dynamic>>();
+          final visible = switch (_filter) {
+            1 => all.where((a) => !_isPastDue(a)).toList(),
+            2 => all.where(_isPastDue).toList(),
+            _ => all,
+          };
+          return IcePage(
+            title: s('Assignments'),
+            subtitle: s('Manage and track student assignments'),
+            onRefresh: () => ref.refresh(staffAssignmentsProvider.future),
+            children: [
+              // Filter chips
+              IceChipTabs(
+                tabs: [s('All'), s('Active'), s('Past due')],
+                index: _filter,
+                onChanged: (i) => setState(() => _filter = i),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            if (list.isEmpty)
-              IceCard(
-                child: EmptyState(
-                  icon: Icons.assignment_outlined,
-                  title: s('No assignments yet'),
-                  message: s(
-                    'Create your first assignment using the + button.',
+              if (all.isEmpty)
+                IceCard(
+                  child: EmptyState(
+                    icon: Icons.assignment_outlined,
+                    title: s('No assignments yet'),
+                    message: s(
+                      'Create your first assignment using the + button.',
+                    ),
+                  ),
+                )
+              else if (visible.isEmpty)
+                IceCard(
+                  child: EmptyState(
+                    icon: Icons.filter_alt_off_outlined,
+                    title: s('Nothing here'),
+                  ),
+                )
+              else
+                ...visible.map(
+                  (a) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _AssignmentCard(a: a),
                   ),
                 ),
-              )
-            else
-              ...list.map(
-                (a) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _AssignmentCard(a: a as Map<String, dynamic>),
-                ),
-              ),
-            // Extra bottom padding for FAB
-            const SizedBox(height: 60),
-          ],
-        ),
+              // Extra bottom padding for FAB
+              const SizedBox(height: 60),
+            ],
+          );
+        },
       ),
     );
   }
@@ -1135,11 +1160,7 @@ class _StaffAssignmentsScreenState
                       } on DioException catch (e) {
                         setLocal(() => saving = false);
                         if (dctx.mounted) {
-                          _toast(
-                            dctx,
-                            e.response?.data?['detail']?.toString() ??
-                                'Could not create.',
-                          );
+                          _toast(dctx, _errDetail(e, 'Could not create.'));
                         }
                       }
                     },
@@ -1418,11 +1439,7 @@ class StaffVocabularyScreen extends ConsumerWidget {
                       } on DioException catch (e) {
                         setLocal(() => saving = false);
                         if (dctx.mounted) {
-                          _toast(
-                            dctx,
-                            e.response?.data?['detail']?.toString() ??
-                                'Could not create.',
-                          );
+                          _toast(dctx, _errDetail(e, 'Could not create.'));
                         }
                       }
                     },
@@ -1687,11 +1704,7 @@ class StaffVocabularyDetailScreen extends ConsumerWidget {
                       } on DioException catch (e) {
                         setLocal(() => saving = false);
                         if (dctx.mounted) {
-                          _toast(
-                            dctx,
-                            e.response?.data?['detail']?.toString() ??
-                                'Could not add.',
-                          );
+                          _toast(dctx, _errDetail(e, 'Could not add.'));
                         }
                       }
                     },
@@ -1752,8 +1765,10 @@ class _WordTile extends ConsumerWidget {
               try {
                 await ApiClient.instance.dio
                     .delete('/staff/vocabulary/$id/words/${word['id']}/');
-                ref.invalidate(staffVocabDetailProvider(id));
-                ref.invalidate(staffVocabularyProvider);
+                if (context.mounted) {
+                  ref.invalidate(staffVocabDetailProvider(id));
+                  ref.invalidate(staffVocabularyProvider);
+                }
               } on DioException {
                 if (context.mounted) _toast(context, 'Could not delete.');
               }
