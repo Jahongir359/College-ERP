@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_providers.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
 import '../../../shared/widgets/ice_shell.dart';
@@ -37,6 +38,7 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
 
   Widget _buildBody(BuildContext context, Map<String, dynamic> d) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
 
     final activity = ((d['activity_30d'] as List?) ?? []).cast<num>();
     final labels = ((d['date_labels_30d'] as List?) ?? []).cast<String>();
@@ -65,11 +67,11 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
         : quizScores;
 
     return IcePage(
-      title: 'My Progress',
-      subtitle: 'Overview of your learning',
+      title: s('My Progress'),
+      subtitle: s('Overview of your learning'),
       onRefresh: () async => ref.refresh(studentProgressProvider.future),
       action: IceChipTabs(
-        tabs: const ['7d', '30d', 'All'],
+        tabs: ['7d', '30d', s('All')],
         index: _range,
         onChanged: (i) => setState(() => _range = i),
       ),
@@ -81,7 +83,7 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
               child: StatCard(
                 icon: Icons.menu_book_rounded,
                 value: '$completedDays',
-                label: 'Vocab days done',
+                label: s('Vocab days done'),
               ),
             ),
             const SizedBox(width: 14),
@@ -90,7 +92,7 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
                 icon: Icons.quiz_outlined,
                 iconColor: t.sky,
                 value: '${avgQuiz.toStringAsFixed(avgQuiz % 1 == 0 ? 0 : 1)}%',
-                label: 'Avg quiz score',
+                label: s('Avg quiz score'),
               ),
             ),
           ],
@@ -99,10 +101,10 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
 
         // ── Vocabulary days completed ────────────────────────────────────
         _ChartCard(
-          title: 'Vocabulary Days Completed',
-          subtitle: '${actSlice.fold<num>(0, (a, b) => a + b)} in this period',
+          title: s('Vocabulary Days Completed'),
+          subtitle: '${actSlice.fold<num>(0, (a, b) => a + b)} ${s('in this period')}',
           child: actSlice.every((v) => v == 0)
-              ? _NoData(text: 'Complete vocabulary days to see your activity.')
+              ? _NoData(text: s('Complete vocabulary days to see your activity.'))
               : LineChart(
                   LineChartData(
                     minY: 0,
@@ -175,13 +177,13 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
 
         // ── Quiz scores ──────────────────────────────────────────────────
         _ChartCard(
-          title: 'Average Quiz Score',
+          title: s('Average Quiz Score'),
           subtitle: quizSlice.isEmpty
-              ? 'No quizzes yet'
-              : 'Last ${quizSlice.length} quizzes',
+              ? s('No quizzes yet')
+              : '${s('Last')} ${quizSlice.length} ${s('quizzes')}',
           child: quizSlice.isEmpty
               ? _NoData(
-                  text: 'Take a vocabulary quiz to start tracking scores.',
+                  text: s('Take a vocabulary quiz to start tracking scores.'),
                 )
               : LineChart(
                   LineChartData(
@@ -256,12 +258,12 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
 
         // ── Exam scores ──────────────────────────────────────────────────
         _ChartCard(
-          title: 'Exam Scores (Average)',
+          title: s('Exam Scores (Average)'),
           subtitle: examResults.isEmpty
-              ? 'No results yet'
-              : '${examResults.length} subject${examResults.length == 1 ? '' : 's'}',
+              ? s('No results yet')
+              : '${examResults.length} ${examResults.length == 1 ? s('subject') : s('subjects')}',
           child: examResults.isEmpty
-              ? _NoData(text: 'Exam results will appear here once published.')
+              ? _NoData(text: s('Exam results will appear here once published.'))
               : BarChart(
                   BarChartData(
                     minY: 0,
@@ -356,7 +358,7 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Attendance Progress',
+                      s('Attendance Progress'),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
@@ -365,7 +367,7 @@ class _StudentProgressScreenState extends ConsumerState<StudentProgressScreen> {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'Open the Attendance Hub for the full calendar.',
+                      s('Open the Attendance Hub for the full calendar.'),
                       style: TextStyle(fontSize: 12.5, color: t.textMid),
                     ),
                   ],
