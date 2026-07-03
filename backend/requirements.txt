@@ -1,8 +1,9 @@
 # Web framework. Django 5.2 LTS matches the Python 3.11 production runtime.
 Django>=5.2,<6.0
 
-# WSGI server (production)
-gunicorn==20.0.4
+# WSGI server (production). 23.x fixes the HTTP request-smuggling advisories
+# that affected 20.0.4 (GHSA request-smuggling / RFC-compliance hardening).
+gunicorn>=23.0.0
 
 # Static file serving
 whitenoise==6.12.0

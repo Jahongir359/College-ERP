@@ -84,7 +84,13 @@ def create_recovery_admin_access(sender, **kwargs):
     recovery_email = (
         os.environ.get("RECOVERY_ADMIN_EMAIL", "iceberg.edu.center@gmail.com").strip().lower()
     )
-    recovery_password = os.environ.get("RECOVERY_ADMIN_PASSWORD", "iceberg").strip()
+    recovery_password = os.environ.get("RECOVERY_ADMIN_PASSWORD", "").strip()
+    # Never fall back to a known weak password in production. A dev convenience
+    # default is fine under DEBUG; in production an unset password yields an
+    # unusable-password account (must be set via the reset flow) instead of a
+    # publicly-known "iceberg" super admin — closing a full-takeover landmine.
+    if not recovery_password and settings.DEBUG:
+        recovery_password = "iceberg"
 
     if not recovery_email:
         return
