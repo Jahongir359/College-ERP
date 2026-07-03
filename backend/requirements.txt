@@ -2,7 +2,7 @@
 Django>=5.2,<6.0
 
 # WSGI server (production)
-gunicorn==20.0.4
+gunicorn==23.0.0
 
 # Static file serving
 whitenoise==6.12.0
