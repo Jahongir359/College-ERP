@@ -50,15 +50,23 @@ class IcebergApp extends ConsumerWidget {
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
-        // Final safety net: force "no underline" on the default text style for
-        // the entire navigator (covers dialogs/overlays too).
-        return DefaultTextStyle.merge(
-          style: const TextStyle(
-            decoration: TextDecoration.none,
-            decorationColor: Colors.transparent,
-            decorationThickness: 0,
+        // Apply the user's font-size preference to EVERY route — including the
+        // standalone screens outside the role shells (staff more/vocabulary/
+        // leave, notifications, settings, …). The shells rely on this too.
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(settings.textScale),
           ),
-          child: child ?? const SizedBox.shrink(),
+          // Final safety net: force "no underline" on the default text style
+          // for the entire navigator (covers dialogs/overlays too).
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(
+              decoration: TextDecoration.none,
+              decorationColor: Colors.transparent,
+              decorationThickness: 0,
+            ),
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );

@@ -36,11 +36,25 @@ class _StudentAssignmentDetailScreenState
     super.dispose();
   }
 
+  // withData loads the file fully into memory for the multipart upload, so
+  // cap the size well below what a low-end device can hold.
+  static const _maxUploadBytes = 20 * 1024 * 1024; // 20 MB
+
   Future<void> _pickFile() async {
     final result = await FilePicker.pickFiles(withData: true);
-    if (result != null && result.files.isNotEmpty) {
-      setState(() => _picked = result.files.first);
+    if (result == null || result.files.isEmpty) return;
+    final file = result.files.first;
+    if (file.size > _maxUploadBytes) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('File is too large — maximum size is 20 MB.'),
+          ),
+        );
+      }
+      return;
     }
+    setState(() => _picked = file);
   }
 
   Future<void> _submit() async {

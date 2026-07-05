@@ -1,0 +1,43 @@
+name: Flutter CI
+
+# Static analysis + tests for the mobile app. Gates every PR and push that
+# touches mobile code, so regressions are caught before a build is distributed.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/iceberg_app/**'
+      - '.github/workflows/flutter-ci.yml'
+  pull_request:
+    paths:
+      - 'mobile/iceberg_app/**'
+      - '.github/workflows/flutter-ci.yml'
+
+jobs:
+  analyze-and-test:
+    name: Analyze & test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter pub get
+        working-directory: mobile/iceberg_app
+        run: flutter pub get
+
+      - name: Flutter analyze
+        working-directory: mobile/iceberg_app
+        run: flutter analyze --no-fatal-infos
+
+      - name: Flutter test
+        working-directory: mobile/iceberg_app
+        run: flutter test

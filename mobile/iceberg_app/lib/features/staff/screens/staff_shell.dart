@@ -79,15 +79,14 @@ class _StaffShellState extends ConsumerState<StaffShell>
       value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Theme(
         data: theme,
+        // Font-size preference is applied once, globally, in the MaterialApp
+        // builder (main.dart) — re-applying it here would scale text twice.
         child: DefaultTextStyle.merge(
           style: const TextStyle(
             decoration: TextDecoration.none,
             decorationColor: Colors.transparent,
           ),
-          child: MediaQuery(
-            data: MediaQuery.of(context)
-                .copyWith(textScaler: TextScaler.linear(settings.textScale)),
-            child: Builder(
+          child: Builder(
               builder: (themed) => Scaffold(
                 backgroundColor: themed.ice.bg,
                 drawer: const IceDrawer(),
@@ -114,7 +113,6 @@ class _StaffShellState extends ConsumerState<StaffShell>
                 ),
               ),
             ),
-          ),
         ),
       ),
     );

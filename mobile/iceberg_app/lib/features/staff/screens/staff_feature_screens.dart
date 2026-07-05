@@ -341,6 +341,42 @@ class _StaffAttendanceScreenState
   DateTime _date = DateTime.now();
   final Map<int, String> _status = {}; // studentId -> 'P'/'L'/'A'
   bool _saving = false;
+  // Serial number of the latest _loadExisting call, so a slow response for a
+  // previous group/date can't overwrite the roster the teacher is looking at.
+  int _loadSeq = 0;
+
+  /// Pull already-saved attendance for the selected group + date so the
+  /// toggles show what was previously marked instead of resetting to Present.
+  Future<void> _loadExisting() async {
+    final groupId = _groupId;
+    if (groupId == null) return;
+    final seq = ++_loadSeq;
+    final dateStr = DateFormat('yyyy-MM-dd').format(_date);
+    try {
+      final data =
+          await apiGet('/attendance/?group_id=$groupId&date=$dateStr');
+      if (!mounted || seq != _loadSeq) return;
+      final results = (data['results'] as List?) ?? [];
+      final reports = results.isNotEmpty
+          ? ((results.first as Map)['reports'] as List?) ?? []
+          : [];
+      setState(() {
+        _status.clear();
+        for (final r in reports) {
+          final rec = r as Map;
+          final sid = rec['student_id'];
+          if (sid is! int) continue;
+          _status[sid] = switch (rec['status']) {
+            1 => 'P',
+            2 => 'L',
+            _ => 'A',
+          };
+        }
+      });
+    } catch (_) {
+      // No saved attendance (or offline) — leave the default Present state.
+    }
+  }
 
   Future<void> _save(List students) async {
     if (_groupId == null) return;
@@ -387,15 +423,24 @@ class _StaffAttendanceScreenState
         // ── Group + Date selectors ─────────────────────────────────────
         _GroupDropdown(
           value: _groupId,
-          onChanged: (v) => setState(() {
-            _groupId = v;
-            _status.clear();
-          }),
+          onChanged: (v) {
+            setState(() {
+              _groupId = v;
+              _status.clear();
+            });
+            _loadExisting();
+          },
         ),
         const SizedBox(height: 12),
         _IceDatePicker(
           date: _date,
-          onPick: (d) => setState(() => _date = d),
+          onPick: (d) {
+            setState(() {
+              _date = d;
+              _status.clear();
+            });
+            _loadExisting();
+          },
         ),
         const SizedBox(height: 20),
 
