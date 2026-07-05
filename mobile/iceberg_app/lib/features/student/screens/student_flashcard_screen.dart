@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../core/api/api_providers.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/storage/vocab_progress.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
@@ -93,10 +94,11 @@ class _StudentFlashcardScreenState
 
   Widget _buildBody(BuildContext context, Map<String, dynamic> d) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     if (_cards.isEmpty) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.style_rounded,
-        title: 'No words in this day',
+        title: s('No words in this day'),
       );
     }
     final card = _cards[_index];
@@ -109,9 +111,9 @@ class _StudentFlashcardScreenState
         );
 
     return IcePage(
-      title: 'Flashcards',
+      title: s('Flashcards'),
       subtitle:
-          'Day ${d['day_number']} · ${_reverse ? 'Tarjima → Soʻz' : 'Soʻz → Tarjima'}',
+          '${s('Day')} ${d['day_number']} · ${_reverse ? s('Translation → Word') : s('Word → Translation')}',
       backButton: true,
       action: GestureDetector(
         onTap: () => setState(() {
@@ -137,7 +139,7 @@ class _StudentFlashcardScreenState
               tone: BadgeTone.accent,
             ),
             const SizedBox(width: 8),
-            if (known) const StatusBadge('Known ✓', tone: BadgeTone.sky),
+            if (known) StatusBadge('${s('Known')} ✓', tone: BadgeTone.sky),
           ],
         ),
         const SizedBox(height: 14),
@@ -183,7 +185,7 @@ class _StudentFlashcardScreenState
         const SizedBox(height: 10),
         Center(
           child: Text(
-            'Tap card to ${_flipped ? 'hide' : 'see'} the ${_reverse ? 'word' : 'meaning'} · swipe to move',
+            s('Tap card to flip · swipe to move'),
             style: TextStyle(fontSize: 12, color: t.textLow),
           ),
         ),
@@ -201,7 +203,7 @@ class _StudentFlashcardScreenState
             const SizedBox(width: 14),
             _ControlButton(
               icon: Icons.shuffle_rounded,
-              label: 'Shuffle',
+              label: s('Shuffle'),
               onTap: _shuffle,
             ),
             const SizedBox(width: 14),
@@ -231,9 +233,9 @@ class _StudentFlashcardScreenState
                     ),
                   ),
                   icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: const Text(
-                    'Need practice',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  label: Text(
+                    s('Need practice'),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                   ),
                 ),
               ),
@@ -252,9 +254,9 @@ class _StudentFlashcardScreenState
                     ),
                   ),
                   icon: const Icon(Icons.check_rounded, size: 18),
-                  label: const Text(
-                    'I know it',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                  label: Text(
+                    s('I know it'),
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
                   ),
                 ),
               ),

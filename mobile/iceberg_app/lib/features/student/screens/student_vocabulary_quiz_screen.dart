@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_providers.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
 import '../../../shared/widgets/ice_shell.dart';
@@ -136,15 +137,16 @@ class _StudentVocabularyQuizScreenState
 
   @override
   Widget build(BuildContext context) {
+    final s = ref.watch(stringsProvider);
     if (_loading) return const PageSkeleton();
     if (_loadError != null) {
       return ErrorState(error: _loadError, onRetry: _fetch);
     }
     if (_questions.isEmpty) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.quiz_outlined,
-        title: 'Quiz unavailable',
-        message: 'This day needs at least 2 words for a quiz.',
+        title: s('Quiz unavailable'),
+        message: s('This day needs at least 2 words for a quiz.'),
       );
     }
     return _finished ? _buildResult(context) : _buildQuiz(context);
@@ -153,6 +155,7 @@ class _StudentVocabularyQuizScreenState
   // ── Quiz ───────────────────────────────────────────────────────────────
   Widget _buildQuiz(BuildContext context) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final q = _questions[_index];
     final choices = ((q['choices'] as List?) ?? [])
         .cast<Map<String, dynamic>>();
@@ -160,7 +163,7 @@ class _StudentVocabularyQuizScreenState
 
     return IcePage(
       title: widget.dayTitle,
-      subtitle: 'Quiz · Question ${_index + 1} / ${_questions.length}',
+      subtitle: '${s('Quiz')} · ${s('Question')} ${_index + 1} / ${_questions.length}',
       backButton: true,
       children: [
         ClipRRect(
@@ -279,12 +282,13 @@ class _StudentVocabularyQuizScreenState
   // ── Result ─────────────────────────────────────────────────────────────
   Widget _buildResult(BuildContext context) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final total = _questions.length;
     final score = total == 0 ? 0.0 : _correct / total * 100;
     final passed = score >= 60;
 
     return IcePage(
-      title: 'Quiz Result',
+      title: s('Quiz Result'),
       subtitle: widget.dayTitle,
       backButton: true,
       children: [
@@ -307,7 +311,7 @@ class _StudentVocabularyQuizScreenState
                   ),
                 ),
                 Text(
-                  passed ? 'Great Job! 🎉' : 'Keep Going!',
+                  passed ? s('Great Job! 🎉') : s('Keep Going!'),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -323,7 +327,7 @@ class _StudentVocabularyQuizScreenState
           children: [
             Expanded(
               child: _ResultStat(
-                label: 'Correct',
+                label: s('Correct'),
                 value: '$_correct',
                 color: t.accent,
               ),
@@ -331,7 +335,7 @@ class _StudentVocabularyQuizScreenState
             const SizedBox(width: 10),
             Expanded(
               child: _ResultStat(
-                label: 'Incorrect',
+                label: s('Incorrect'),
                 value: '${total - _correct}',
                 color: t.coral,
               ),
@@ -339,7 +343,7 @@ class _StudentVocabularyQuizScreenState
             const SizedBox(width: 10),
             Expanded(
               child: _ResultStat(
-                label: 'Total',
+                label: s('Total'),
                 value: '$total',
                 color: t.textHi,
               ),
@@ -355,11 +359,11 @@ class _StudentVocabularyQuizScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    MicroLabel('Best score'),
+                    MicroLabel(s('Best score')),
                     const SizedBox(height: 4),
                     Text(
                       _saving
-                          ? 'Saving…'
+                          ? s('Saving…')
                           : _bestScore != null
                           ? '${_bestScore!.toStringAsFixed(0)}%'
                           : '${score.toStringAsFixed(0)}%',
@@ -375,7 +379,7 @@ class _StudentVocabularyQuizScreenState
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  MicroLabel('Completed'),
+                  MicroLabel(s('Completed')),
                   const SizedBox(height: 4),
                   Text(
                     _completedAt != null
@@ -439,7 +443,7 @@ class _StudentVocabularyQuizScreenState
           const SizedBox(height: 8),
         ],
 
-        IceButton('Retry Quiz', icon: Icons.replay_rounded, onPressed: _retry),
+        IceButton(s('Retry Quiz'), icon: Icons.replay_rounded, onPressed: _retry),
         const SizedBox(height: 10),
         IceButton(
           'Back to Vocabulary',

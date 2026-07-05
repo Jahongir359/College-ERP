@@ -4,6 +4,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_providers.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/storage/vocab_progress.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
@@ -57,6 +58,7 @@ class _StudentVocabularyDetailScreenState
 
   Widget _buildBody(BuildContext context, Map<String, dynamic> d) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final words = ((d['words'] as List?) ?? []).cast<Map<String, dynamic>>();
     final sorted = [...words];
     if (_shuffled) sorted.shuffle();
@@ -71,9 +73,9 @@ class _StudentVocabularyDetailScreenState
     );
 
     return IcePage(
-      title: 'Day ${d['day_number']}',
+      title: '${s('Day')} ${d['day_number']}',
       subtitle:
-          '${d['day_number']}-dars · ${words.length} ta soʻz'
+          '${words.length} ${s('Words')}'
           '${(d['title'] as String?)?.isNotEmpty == true ? ' · ${d['title']}' : ''}',
       backButton: true,
       onRefresh: () async => ref.refresh(vocabDayProvider(_dayId).future),
@@ -155,13 +157,13 @@ class _StudentVocabularyDetailScreenState
 
         // ── Direction progress ───────────────────────────────────────────
         _DirectionRow(
-          label: 'Soʻz → Tarjima',
+          label: s('Word → Translation'),
           done: countIn(knownFwd),
           total: words.length,
         ),
         const SizedBox(height: 8),
         _DirectionRow(
-          label: 'Tarjima → Soʻz',
+          label: s('Translation → Word'),
           done: countIn(knownRev),
           total: words.length,
         ),
@@ -170,8 +172,8 @@ class _StudentVocabularyDetailScreenState
         // ── Mode launcher ────────────────────────────────────────────────
         ActionTile(
           icon: Icons.style_rounded,
-          title: 'Kartochkalar',
-          subtitle: 'Flip through flashcards',
+          title: s('Flashcards'),
+          subtitle: s('Flip through flashcards'),
           onTap: () =>
               context.go('/student/vocabulary/${widget.vocabId}/flashcards'),
         ),
@@ -179,8 +181,8 @@ class _StudentVocabularyDetailScreenState
         ActionTile(
           icon: Icons.school_rounded,
           iconColor: t.mint,
-          title: 'Oʻrganish',
-          subtitle: 'Learn with known / practice piles',
+          title: s('Learn'),
+          subtitle: s('Learn with known / practice piles'),
           onTap: () =>
               context.go('/student/vocabulary/${widget.vocabId}/learn'),
         ),
@@ -188,8 +190,8 @@ class _StudentVocabularyDetailScreenState
         ActionTile(
           icon: Icons.quiz_rounded,
           iconColor: t.sky,
-          title: 'Test',
-          subtitle: 'Multiple-choice quiz · 60% to complete the day',
+          title: s('Test'),
+          subtitle: s('Multiple-choice quiz · 60% to complete the day'),
           onTap: () => context.go(
             '/student/vocabulary/${widget.vocabId}/quiz?title=Day ${d['day_number']}',
           ),
@@ -198,8 +200,8 @@ class _StudentVocabularyDetailScreenState
 
         // ── Word list ────────────────────────────────────────────────────
         SectionHeader(
-          'Kartochkalar',
-          actionLabel: _shuffled ? 'Aralash ✓' : 'Asl tartib',
+          s('Flashcards'),
+          actionLabel: _shuffled ? '${s('Shuffled')} ✓' : s('Original order'),
           onAction: () => setState(() => _shuffled = !_shuffled),
         ),
         ...sorted.map(

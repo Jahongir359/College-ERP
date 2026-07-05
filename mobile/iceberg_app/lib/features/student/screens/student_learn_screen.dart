@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_providers.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/storage/vocab_progress.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
@@ -93,17 +94,18 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
 
   Widget _buildBody(BuildContext context, Map<String, dynamic> d) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
 
     if (_total == 0) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.school_rounded,
-        title: 'No words to learn',
+        title: s('No words to learn'),
       );
     }
 
     if (_finished) {
       return IcePage(
-        title: 'Oʻrganish',
+        title: s('Learn'),
         backButton: true,
         children: [
           const SizedBox(height: 30),
@@ -118,7 +120,7 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
           const SizedBox(height: 22),
           Center(
             child: Text(
-              'Day ${d['day_number']} learned! 🎉',
+              '${s('Day')} ${d['day_number']} ${s('learned!')} 🎉',
               style: TextStyle(
                 fontSize: 21,
                 fontWeight: FontWeight.w800,
@@ -129,13 +131,13 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
           const SizedBox(height: 8),
           Center(
             child: Text(
-              'Known first try: $_knownCount · Needed practice: $_practiceCount',
+              '${s('Known first try:')} $_knownCount · ${s('Needed practice:')} $_practiceCount',
               style: TextStyle(fontSize: 13.5, color: t.textMid),
             ),
           ),
           const SizedBox(height: 28),
           IceButton(
-            'Take the Test',
+            s('Take the Test'),
             icon: Icons.quiz_rounded,
             onPressed: () => context.go(
               '/student/vocabulary/${widget.vocabId}/quiz?title=Day ${d['day_number']}',
@@ -143,7 +145,7 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
           ),
           const SizedBox(height: 10),
           IceButton(
-            'Back to Day',
+            s('Back to Day'),
             secondary: true,
             onPressed: () =>
                 context.go('/student/vocabulary/${widget.vocabId}'),
@@ -157,8 +159,8 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
         (_total - _queue.length + _practiceCount) / (_total + _practiceCount);
 
     return IcePage(
-      title: 'Oʻrganish',
-      subtitle: 'Day ${d['day_number']} · ${_queue.length} left',
+      title: s('Learn'),
+      subtitle: '${s('Day')} ${d['day_number']} · ${_queue.length} ${s('left')}',
       backButton: true,
       children: [
         ClipRRect(
@@ -276,9 +278,9 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
                     ),
                   ),
                   icon: const Icon(Icons.refresh_rounded, size: 19),
-                  label: const Text(
-                    'Need practice',
-                    style: TextStyle(
+                  label: Text(
+                    s('Need practice'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 13.5,
                     ),
@@ -300,9 +302,9 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
                     ),
                   ),
                   icon: const Icon(Icons.check_rounded, size: 19),
-                  label: const Text(
-                    'I know it',
-                    style: TextStyle(
+                  label: Text(
+                    s('I know it'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 13.5,
                     ),

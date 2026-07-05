@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_providers.dart';
 import '../../../core/auth/auth_state.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
 import '../../../shared/widgets/ice_shell.dart';
@@ -42,6 +43,7 @@ class _StudentMessagesScreenState extends ConsumerState<StudentMessagesScreen> {
 
   Widget _buildBody(BuildContext context, Map<String, dynamic> data) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final all = ((data['threads'] as List?) ?? []).cast<Map<String, dynamic>>();
     final visible = _query.isEmpty
         ? all
@@ -55,7 +57,7 @@ class _StudentMessagesScreenState extends ConsumerState<StudentMessagesScreen> {
               .toList();
 
     return IcePage(
-      title: 'Messages',
+      title: s('Messages'),
       backButton: true,
       onRefresh: () async => ref.refresh(messageThreadsProvider.future),
       children: [
@@ -63,24 +65,24 @@ class _StudentMessagesScreenState extends ConsumerState<StudentMessagesScreen> {
           onChanged: (v) => setState(() => _query = v.trim().toLowerCase()),
           style: TextStyle(color: t.textHi, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-            hintText: 'Search groups…',
+            hintText: s('Search groups…'),
             prefixIcon: Icon(Icons.search_rounded, color: t.textMid, size: 20),
           ),
         ),
         const SizedBox(height: 16),
         if (all.isEmpty)
-          const IceCard(
+          IceCard(
             child: EmptyState(
               icon: Icons.chat_bubble_outline_rounded,
-              title: 'No group chats',
-              message: 'Your class group conversations will appear here.',
+              title: s('No group chats'),
+              message: s('Your class group conversations will appear here.'),
             ),
           )
         else if (visible.isEmpty)
-          const IceCard(
+          IceCard(
             child: EmptyState(
               icon: Icons.search_off_rounded,
-              title: 'No matches',
+              title: s('No matches'),
             ),
           )
         else
@@ -95,13 +97,14 @@ class _StudentMessagesScreenState extends ConsumerState<StudentMessagesScreen> {
   }
 }
 
-class _ThreadCard extends StatelessWidget {
+class _ThreadCard extends ConsumerWidget {
   final Map<String, dynamic> thread;
   const _ThreadCard({required this.thread});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final name = (thread['group_name'] ?? 'Group').toString();
     final unread = (thread['unread_count'] as num?)?.toInt() ?? 0;
     final lastTime = DateTime.tryParse(thread['last_message_time'] ?? '');
@@ -158,7 +161,7 @@ class _ThreadCard extends StatelessWidget {
                       child: Text(
                         (thread['last_message'] as String?)?.isNotEmpty == true
                             ? thread['last_message']
-                            : 'No messages yet',
+                            : s('No messages yet'),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -308,7 +311,9 @@ class _StudentChatScreenState extends ConsumerState<StudentChatScreen> {
       if (mounted) {
         _input.text = text;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Message not sent. Try again.')),
+          SnackBar(
+            content: Text(ref.read(stringsProvider)('Message not sent. Try again.')),
+          ),
         );
       }
     } finally {
@@ -367,10 +372,11 @@ class _StudentChatScreenState extends ConsumerState<StudentChatScreen> {
       return ErrorState(error: _error, onRetry: _fetch);
     }
     if (_messages.isEmpty) {
-      return const EmptyState(
+      final s = ref.watch(stringsProvider);
+      return EmptyState(
         icon: Icons.chat_bubble_outline_rounded,
-        title: 'No messages yet',
-        message: 'Be the first to say hello 👋',
+        title: s('No messages yet'),
+        message: s('Be the first to say hello 👋'),
       );
     }
     return ListView.builder(
@@ -384,6 +390,7 @@ class _StudentChatScreenState extends ConsumerState<StudentChatScreen> {
 
   Widget _composer(BuildContext context) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     return SafeArea(
       top: false,
       child: Container(
@@ -402,7 +409,7 @@ class _StudentChatScreenState extends ConsumerState<StudentChatScreen> {
                 maxLines: 4,
                 style: TextStyle(color: t.textHi),
                 decoration: InputDecoration(
-                  hintText: 'Message…',
+                  hintText: s('Message…'),
                   fillColor: t.inset,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
