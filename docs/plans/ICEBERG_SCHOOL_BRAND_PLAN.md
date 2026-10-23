@@ -471,6 +471,13 @@ together with translations.
 
 ## 8. School public website (Phase 4)
 
+> **Superseded (2026-10-23).** The School website will live in the **existing iceberglc.com website
+> codebase** (owned by the owner) at `iceberglc.com/school`, connected to this ERP through the existing
+> lead endpoint; that site also moves onto the shared Iceberg design system. The full plan is
+> [`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](ICEBERG_SCHOOL_WEBSITE_PLAN.md). The Django-hosted design below
+> is kept for reference only — **do not build it**, and do not add `/school/` to
+> `LoginCheckMiddleWare`. Section 8.1 (search) still applies, in the website repo.
+
 Do **not** touch `/` (it is the ERP login). Serve the site under `/school/`:
 
 | URL | Name | Template |
@@ -525,8 +532,8 @@ needs its own URLs with its own clearly different signals. Do all of the followi
    `/school/admissions/`, later `/school/about/`, `/school/news/…`). Learning Center URLs are never
    changed or redirected. Never serve School content on a Learning Center URL or vice versa.
 2. **Unique titles and descriptions per page** (in the page's language):
-   - `<title>Iceberg School — Private School in Tashkent, Grades [1–11]</title>`
-   - `<meta name="description" content="Iceberg School is a private school in Tashkent …">`
+   - `<title>Iceberg School — Private School in [Namangan], Grades [1–11]</title>`
+   - `<meta name="description" content="Iceberg School is a private school in [Namangan] …">`
    - Learning Center pages keep their own titles; never reuse the same title/description across
      brands.
    - First `<h1>` on School pages contains "Iceberg School".
@@ -539,7 +546,7 @@ needs its own URLs with its own clearly different signals. Do all of the followi
    ```json
    {"@context":"https://schema.org","@type":"School","name":"Iceberg School",
     "url":"https://<domain>/school/","logo":"https://<domain>/static/dist/img/brand/school/logo-v-maroon.png",
-    "address":{"@type":"PostalAddress","streetAddress":"[ADDRESS]","addressLocality":"Tashkent","addressCountry":"UZ"},
+    "address":{"@type":"PostalAddress","streetAddress":"[ADDRESS]","addressLocality":"[Namangan]","addressCountry":"UZ"},
     "telephone":"[PHONE]",
     "parentOrganization":{"@type":"Organization","name":"Iceberg"},
     "sameAs":["[School Instagram URL]","[School Telegram URL]"]}
@@ -575,6 +582,9 @@ needs its own URLs with its own clearly different signals. Do all of the followi
     - **B:** build them in this Django app at `app.iceberglc.com/school/…` as described in section 8.
       Points 1–10 still apply. Works, but `app.` is the ERP subdomain, so the School site lives next
       to the login rather than next to the Learning Center's public site.
+    - **Decided 2026-10-23:** option **A** — the owner runs iceberglc.com and its code, so the School
+      pages go into that codebase at `iceberglc.com/school`, and the site adopts the shared design
+      system — see [`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](ICEBERG_SCHOOL_WEBSITE_PLAN.md). Option B is dropped.
 
 ## 9. Flutter app (Phase 5)
 
@@ -678,14 +688,11 @@ Tick boxes as you finish. One PR per phase.
 - [x] Reset-code email subject uses the user's brand name
 - [x] Tests `tests_brand_auth.py` (16); screenshots checked (light, dark, phone)
 
-**Phase 4 — School website** (owner picks hosting option A or B in 8.1 point 11 first)
-- [ ] Search setup from 8.1: titles, descriptions, canonical, OG image, JSON-LD, hreflang URLs,
-      sitemap, robots `Sitemap:` line, cross-links
-- [ ] `site_views.py`, URLs under `/school/`, templates, `site-school.css`
-- [ ] `LoginCheckMiddleWare` allow-list `/school/` + test
-- [ ] Enquiry form → `RegistrationLead` (honeypot, throttle, consent)
-- [ ] UZ/RU/EN copy; placeholders from owner filled
-- [ ] Tests from section 8
+**Phase 4 — School website** → in the iceberglc.com codebase; checklist 4a–4e lives in
+[`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](ICEBERG_SCHOOL_WEBSITE_PLAN.md) section 10. Only **4a** happens in
+this repo:
+- [ ] Lead receiver refuses requests when `REGISTRATION_LEADS_API_TOKEN` is unset in production (+ test)
+- [ ] School branch created in the ERP; exact name shared with the website (`SCHOOL_BRANCH_NAME`)
 
 **Phase 5 — Flutter**
 - [ ] Assets + `brand.dart` + `IceTokens`/`AppTheme` brand parameter
@@ -702,8 +709,8 @@ Tick boxes as you finish. One PR per phase.
 ## 12. Open questions for the owner (ask before the phase that needs them)
 
 1. ~~Will the School use its own domain?~~ **Answered 2026-10-23: no — same domain as the Learning
-   Center.** Still open: build the School pages in the `iceberglc.com` website (option A) or in
-   this ERP at `app.iceberglc.com/school/` (option B)? See 8.1 point 11. (Before Phase 4)
+   Center.** ~~Where do the School pages live?~~ **Answered 2026-10-23: in the existing iceberglc.com
+   codebase** (owner runs it), at `iceberglc.com/school`. Remaining website questions: `ICEBERG_SCHOOL_WEBSITE_PLAN.md` section 11.
 2. Same database/organization as the Learning Center (one ERP, School = branch with `brand=school`)?
    This plan assumes **yes**.
 3. One mobile app for both brands (brand chosen by login, as planned) or a separate School app in
@@ -747,3 +754,20 @@ what's next. Newest at the bottom.
   (Installed Playwright + Chromium and its apt dependencies in the codespace for this — not in the repo.)
   Not committed yet. Next: merge order Phase 1 → 2 → 3 (expect only trivial conflicts in this plan file
   and `settings.py`); then Phase 4 once the owner picks hosting option A or B (8.1 point 11).
+- **2026-10-23 — Claude (Opus 5.5) — Website decision (planning only).** Owner asked: new repo for the
+  website, or this repo? Checked: the LC public site (iceberglc.com, Namangan, Cloudflare, server-rendered)
+  comes from a codebase not visible in the owner's GitHub accounts; this repo is only the ERP
+  (app.iceberglc.com). Decision documented: **new repo `iceberg-website`**, School at
+  `iceberglc.com/school/` through a Cloudflare Worker route, enquiry form → existing ERP lead endpoint
+  server-side. Added `docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md` and `docs/brand/iceberg-school/tokens.json`
+  (brand tokens as JSON for the website). Section 8 marked superseded; Phase 4 checklist moved;
+  "Tashkent" placeholders corrected to [Namangan]. Found: the lead endpoint accepts posts when its token
+  is unset — fix listed as 4a. No code changed. Next: owner answers website plan section 11.
+- **2026-10-23 — Claude (Opus 5.5) — Website decision revised.** Owner runs iceberglc.com and its code
+  and is happy to change its design/code to fit this plan. Website plan rewritten: School pages go into
+  that codebase at `iceberglc.com/school` (new-repo idea kept only as appendix A), the site moves onto
+  the shared design system (`data-brand` + `tokens.json`, real CSS build, real languages), and the School
+  form reuses its `/api/register`. Found from the live site: its form sends branch codes (`main`,
+  `gayrat`), which won't match ERP branch names → branch admins can't see website leads; fix listed in
+  4b. Open owner decision: which Learning Center palette is canonical (website navy+blue vs ERP
+  teal+lime). Waiting for access to the website code.

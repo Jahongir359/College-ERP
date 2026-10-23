@@ -8,7 +8,13 @@ Read this first, then the plan for whatever you are working on in `docs/plans/`.
 crest) while the Iceberg Learning Center stays exactly as it is.
 Full spec, architecture, phases, checklist and progress log:
 **[`docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md`](docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md)**.
-Brand assets: `docs/brand/iceberg-school/`. Update that plan's Progress log at the end of each session.
+Brand assets: `docs/brand/iceberg-school/` (colours as JSON in `tokens.json`). Update that plan's
+Progress log at the end of each session.
+
+The public websites (Learning Center at `iceberglc.com`, School at `iceberglc.com/school`) live in the
+**iceberglc.com website codebase**, not here — see
+[`docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md`](docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md). This repo
+only provides the lead endpoint, the brand source of truth (`docs/brand/`) and the School-branded portal.
 
 ## Repo layout
 

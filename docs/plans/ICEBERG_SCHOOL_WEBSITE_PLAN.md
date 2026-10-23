@@ -1,0 +1,337 @@
+# Iceberg School Website — Decision and Build Plan
+
+Document date: 2026-10-23 (revised the same day — see section 1)
+Status: **Decided — build the School pages inside the existing iceberglc.com website codebase, and
+move that site onto the shared Iceberg design system (owner OK'd changing its design and code).
+Waiting for the codebase to be shared with the agent (section 11).**
+Owner: Jahongir
+Related: [`ICEBERG_SCHOOL_BRAND_PLAN.md`](ICEBERG_SCHOOL_BRAND_PLAN.md) (ERP side, Phases 1–6). This
+document defines **Phase 4** and replaces that plan's section 8 (Django-hosted site — not built).
+Design reference (canvas, private to the owner): https://claude.ai/artifact/9KE5AjoJ59UQJu22Z656gB
+
+Written so any AI agent or developer can execute it without prior context. Sections 4–10 are meant
+to be copied into the website repo's `AGENTS.md` / docs when work starts there.
+
+---
+
+## 1. Decision
+
+**Where does the Iceberg School public website live?**
+→ **In the existing iceberglc.com website codebase**, under the URL prefix **`/school/`**.
+
+History: the first version of this plan recommended a brand-new repo (`iceberg-website`) routed in
+with a Cloudflare Worker, because we could not find the iceberglc.com code. The owner then confirmed
+(2026-10-23) that **they run the iceberglc.com domain and its code**. With that, adding the School to
+the existing site is clearly better:
+
+| | **Add to the existing iceberglc.com code** (chosen) | New separate repo (fallback, appendix A) | Inside this ERP repo (rejected) |
+|---|---|---|---|
+| URL | `iceberglc.com/school/…` | `iceberglc.com/school/…` via a Worker | `app.iceberglc.com/school/…` |
+| Extra infrastructure | **None** | Cloudflare Pages project + Worker route | None |
+| Search | Best: same site, internal links from the LC pages, one sitemap | Good, but the LC site still has to link in | Weakest (app subdomain) |
+| Lead form | **Reuse the site's existing `/api/register` flow** (Turnstile, UTM, Telegram fallback) | Rebuild the same thing | Direct DB |
+| Deploys | One website deploy for both brands | Two website deploys | Every text change = ERP deploy |
+| Risk to the ERP | None | None | High |
+
+Rejected for the ERP repo: wrong subdomain for search, couples marketing edits to ERP deploys, and
+adds public pages to the app holding student data.
+
+## 2. What we know about the existing site (observed from the live site, 2026-10-23)
+
+These are observations from outside. **Verify each against the real code before building.**
+
+| Observation | Detail |
+|---|---|
+| Domain / proxy | `iceberglc.com`, Cloudflare in front (`server: cloudflare`) |
+| Pages | `/`, `/about`, `/our_programs`, `/news`, `/questions`, `/contact`, `/register`; custom Uzbek 404 page (`Sahifa topilmadi \| ICEBERG`, `noindex`) |
+| Rendering | Server-rendered HTML, `lang="uz"`; assets under `/static/` (`/static/css/style.css`, `/static/img/logo2.png`) |
+| CSS / icons | Tailwind via `https://cdn.tailwindcss.com` (the CDN "play" build), Font Awesome 6.4 from cdnjs |
+| Languages | UZ/RU/EN switcher uses the **Google Translate widget** — only the Uzbek HTML exists for search engines |
+| SEO | `<title>`, description, `robots: index, follow`, canonical, OG/Twitter, JSON-LD `WebSite`, `robots.txt` (disallows `/admin`, `/portal`, `/students`, `/contacts_list`; `Sitemap: https://iceberglc.com/sitemap.xml`), `sitemap.xml` with the 7 pages |
+| Brand on the LC site | theme-color `#0d2a50`, OG name "ICEBERG O'quv Markazi", **Namangan** |
+| Lead form | `/register`: `<form action="/api/register" method="post" data-static-lead-form="register" data-turnstile-sitekey="…" data-telegram-url="https://t.me/iceberg_qabulxona">` with fields `student_name`, `student_phone`, `course` (ielts, english, sat, mathematics, chemistry, biology), `preferred_branch` (`main` "Asosiy filial", `gayrat` "G'ayrat filiali", `unknown`), `utm_source`, `utm_medium`, `utm_campaign`. `GET /api/register` → 405 (POST only). |
+| Other paths | `/admin`, `/portal`, `/students`, `/contacts_list` exist behind robots disallow (the site has its own admin) |
+
+Likely (to confirm in code): `/api/register` is a server route or Cloudflare function that verifies
+Turnstile and forwards to the ERP's `POST https://app.iceberglc.com/public/registration-leads/`
+with `REGISTRATION_LEADS_API_TOKEN` (the ERP's CORS/env config names iceberglc.com as the lead source).
+
+### ⚠ Check this now (affects the Learning Center today)
+
+The ERP shows a lead to a **branch admin** only when `lead.branch` equals one of their branch
+**names** (case-insensitive; `branching.filter_registration_leads_for_user`). The form sends codes
+(`main`, `gayrat`, `unknown`). Unless `/api/register` translates them into the exact ERP branch names,
+**branch admins never see website leads — only super admins do.** Fix in the website handler: map each
+code to the exact ERP branch name (keep the map in one config object), and send `unknown` as empty.
+
+## 3. Target shape
+
+```
+iceberglc.com/                 Learning Center pages (unchanged, + a link to the School)
+iceberglc.com/school/          Iceberg School home
+iceberglc.com/school/about     About
+iceberglc.com/school/programs  Primary / Middle / High
+iceberglc.com/school/admissions        4 steps + enquiry form + tuition + FAQ
+iceberglc.com/school/admissions/thanks after a successful enquiry
+iceberglc.com/school/news      (optional at launch)
+iceberglc.com/school/contact   address, map, phone, Telegram
+
+POST iceberglc.com/api/register   (existing) — accepts the School form too (section 6)
+        └─▶ app.iceberglc.com/public/registration-leads/  (ERP, existing)
+              └─▶ RegistrationLead(source="school-website", branch="<ERP School branch name>")
+
+"Portal login" on School pages ─▶ https://app.iceberglc.com/login/?brand=school   (ERP Phase 3, done)
+```
+
+Follow the site's existing URL style (it uses no trailing slash: `/about`, `/our_programs`). Use
+`/school` + `/school/<page>` in the same style; make `/school/` redirect to `/school` (or the
+reverse) so only one URL is indexed.
+
+## 4. How to build it inside the existing codebase
+
+**Owner direction (2026-10-23): the iceberglc.com design and code may be changed to fit this plan.**
+So the website does not just bolt School pages on — it moves to the **same Iceberg design system as
+the ERP**: one set of components and layouts, Inter, the shared radii, and a brand layer chosen by
+`<html data-brand="center|school">` exactly like the ERP (`brand-school.css` pattern). Learning Center
+pages render with `data-brand="center"`, School pages with `data-brand="school"`.
+
+### 4.0 Website foundation (do first, before School pages)
+
+1. **Real CSS build.** Replace the Tailwind CDN "play" script with either a proper Tailwind build
+   (config `theme.extend.colors` generated from `tokens.json`, colours referenced as CSS variables so
+   `data-brand` can switch them) or plain CSS with custom properties. Same visual result, faster pages.
+2. **Tokens.** One `/static/brand/tokens.css` generated from `tokens.json`:
+   `html[data-brand="center"] { --brand-primary: …; … }` and
+   `html[data-brand="school"] { --brand-primary: #4C0909; … }`. Components use only `var(--brand-*)`.
+3. **Shared layout + components.** One base layout that takes `brand` (name, logos, nav, footer,
+   theme-color, JSON-LD, Portal-login URL); shared header, footer, buttons, cards, form fields, FAQ,
+   steps, news cards. LC and School pages differ only in content and brand.
+4. **Real languages.** Replace the Google Translate widget with real `/ru/…` and `/en/…` pages (or
+   `?lang=` only if the framework can't route) plus `hreflang` — for both brands. Uzbek stays the
+   default. Can ship Uzbek-only first and add translations page by page.
+5. **Font.** Inter on all pages (matches the ERP and the app).
+6. **Keep URLs.** Existing LC URLs (`/about`, `/our_programs`, …) must not change; if a page moves,
+   add a 301 redirect. Keep `/register` and `/api/register` working throughout.
+
+### 4.0.1 Learning Center palette — owner decision needed
+
+The Learning Center has three palettes today: the website (navy `#0d2a50`, blue `#3ba3ff`), the ERP's
+`iceberg.css` (teal `#06343A`, lime `#DFFF2F` — what `tokens.json` "center" holds), and many ERP
+templates (navy `#0C1F45`, cyan `#06B6D4`). Pick **one** for "center":
+- **Teal + lime** (ERP design-system tokens; the canvas "One system, two brands" board), or
+- **Navy + blue** (what website visitors know today) — then update `tokens.json` "center" and the ERP
+  follows during Phase 2-style cleanup.
+Until decided, the website keeps its current LC colours and only the School uses the new tokens.
+
+### 4.1 School pages
+
+Adapt to the real framework once the code is visible.
+
+1. **Separate layout for the School.** A `school` base template/layout that does **not** inherit
+   the LC header, footer, colours or theme-color, but reuses the site's plumbing (static files,
+   analytics, Turnstile script, 404 handling). Put School templates/pages in their own folder
+   (e.g. `templates/school/` or `pages/school/`) and School CSS in `/static/school/css/school.css`.
+2. **Brand values from `tokens.json`.** Copy `docs/brand/iceberg-school/tokens.json` and the logo
+   crops from `docs/brand/iceberg-school/web/` (this ERP repo is the source of truth) into
+   `/static/school/`. Define the colours as CSS custom properties in `school.css`
+   (`--brand-primary: #4C0909;` …) — never hard-code hexes in templates.
+3. **Typography.** The canvas design uses **Inter** (the ERP's font). Load Inter only on School pages.
+4. **Tailwind.** The LC site uses the Tailwind CDN "play" script, which Tailwind says is not meant for
+   production (it builds CSS in the browser, slowing first paint). For School pages either write
+   plain CSS in `school.css` (recommended: the design is small) or add a proper Tailwind build step for
+   the whole site. Don't add a second CDN copy.
+5. **Pages and content** — from the canvas design:
+   - *Header:* maroon bar, `logo-h-white.png`, nav (About, Programs, Admissions, News, Contact),
+     language switcher, **Portal login** → `https://app.iceberglc.com/login/?brand=school`.
+   - *Home:* hero "What you see is the tip. We build what lies beneath." (translate to Uzbek
+     first), Apply + Book a tour; three pillars from the crest (Aim high — mountain, Grow whole —
+     child, Read deeply — book); Primary / Middle / High cards; key numbers (placeholders until the
+     owner confirms); "School life in your pocket" app section (link to
+     `https://app.iceberglc.com/download/`); news; admissions CTA band.
+   - *Admissions:* 4 steps (Enquiry → Visit → Assessment → Offer), enquiry form (section 6), tuition
+     panel, FAQ.
+   - *Footer:* address, phone, Telegram/Instagram, links, "Part of the Iceberg family · Iceberg
+     Learning Center" → `/`.
+   - Any `[BRACKETED]` text in the design is a placeholder. **Never invent** grades, prices, numbers
+     or results — leave visible placeholders until the owner supplies them.
+6. **Link the brands together.** Add an "Iceberg School" link to the LC header or footer (this
+   internal link matters for search) and "Iceberg Learning Center" on School pages. No automatic
+   redirects between brands.
+7. **Languages.** The LC site translates with the Google Translate widget, so search engines only see
+   Uzbek. For the School, launch with **real Uzbek pages**; add real Russian/English pages
+   (`/school/ru/…`, `/school/en/…` with `hreflang`) when the translations exist. Until then the same
+   widget can be reused for visitors. Owner to confirm (section 11).
+
+## 5. Search setup (people searching "Iceberg School" land on School pages)
+
+On every School page:
+- `<title>` and `<meta name="description">` unique per page and School-specific, e.g.
+  `Iceberg School — xususiy maktab, Namangan | [1–11]-sinflar` (confirm wording with the owner).
+- One `<h1>` containing "Iceberg School".
+- `<link rel="canonical" href="https://iceberglc.com/school/…">`.
+- OG/Twitter tags: `og:site_name` "Iceberg School", School `og:image` (1200×630, white horizontal logo
+  on `#4C0909`; save as `/static/school/img/og-image.png`), theme-color `#4C0909`, crest favicon.
+- JSON-LD:
+  ```json
+  {"@context":"https://schema.org","@type":"School","name":"Iceberg School",
+   "url":"https://iceberglc.com/school","logo":"https://iceberglc.com/static/school/img/logo-v-maroon.png",
+   "address":{"@type":"PostalAddress","streetAddress":"[ADDRESS]","addressLocality":"Namangan","addressCountry":"UZ"},
+   "telephone":"[PHONE]","sameAs":["[INSTAGRAM]","[TELEGRAM]"],
+   "parentOrganization":{"@type":"Organization","name":"ICEBERG","url":"https://iceberglc.com"}}
+  ```
+  (Optionally give the LC home page its own `EducationalOrganization` block alongside the existing
+  `WebSite` block, so the two institutions are clearly separate entities.)
+
+Site-wide:
+- Add every public School URL to `sitemap.xml` (the existing `robots.txt` already points to it).
+- Keep School admin/private paths out of the sitemap and under the existing robots disallows.
+- Owner: in Google Search Console, re-submit the sitemap and use URL Inspection on `/school`;
+  create a separate **Google Business Profile** for Iceberg School with website
+  `https://iceberglc.com/school`; use that URL in School social bios and ads.
+
+## 6. Enquiry form → ERP (reuse `/api/register`)
+
+Reuse the existing handler instead of building a second one — it already has Turnstile, UTM capture
+and the Telegram fallback. Add a form type:
+
+- School form markup: same `action="/api/register"`, same Turnstile sitekey, but
+  `data-static-lead-form="school-enquiry"` and a hidden `form_type=school-enquiry` field.
+- Fields: `parent_name` (required), `parent_phone` (required, `+998…`), `child_name`,
+  `child_birth_date`, `grade` (1–11 select), `language` (uz/ru/en), `message`, `consent` (required
+  checkbox), honeypot (hidden, must stay empty), `utm_*` (existing hidden fields).
+- In the handler, when `form_type == "school-enquiry"` build this JSON for the ERP:
+
+| JSON key → ERP | Value |
+|---|---|
+| `full_name` | parent's name |
+| `phone` | parent's phone (normalised `+998XXXXXXXXX`) |
+| `program` | `"Grade " + grade` |
+| `branch` | **exact ERP School branch name** from config (`SCHOOL_BRANCH_NAME`) |
+| `source` | `"school-website"` |
+| `message` | `"Child: <name> · DOB: <date> · Language: <uz/ru/en>\n<message>"` |
+| `utm_source`, `utm_medium`, `utm_campaign` | pass through |
+| `referrer` | the School page URL |
+
+- Headers: `Authorization: Bearer <REGISTRATION_LEADS_API_TOKEN>` (server-side secret only — never in
+  page JavaScript).
+- ERP replies `201 {"status":"ok","lead_id":n}` → redirect to `/school/admissions/thanks`; `400` → show
+  form errors; `401`/5xx/network → log, keep the visitor's input, show the phone + Telegram fallback
+  (the existing `data-telegram-url` pattern). Rate-limit the endpoint with a Cloudflare rule
+  (e.g. 5 POSTs / 10 min / IP) if it isn't already.
+- Result in the ERP: the lead appears in **Registration leads** with source `school-website`, visible to
+  super admins and to admins of the School branch.
+
+## 7. ERP-side work (this repo) — Phase 4a
+
+1. **Harden the lead receiver.** Today, if `REGISTRATION_LEADS_API_TOKEN` is empty, the endpoint
+   accepts unauthenticated posts. When `DEBUG` is off and the token is empty → respond `503` and log an
+   error. Add a test. Confirm production has a strong token (owner).
+2. **Create the School branch** in the ERP (Manage Branches → brand "Iceberg School"). Its exact
+   name is the website's `SCHOOL_BRANCH_NAME`.
+3. **Confirm LC branch names** match what the website sends (section 2 warning) — list the ERP
+   branch names so the website's code→name map can be written.
+4. No `/school/` routes in the ERP and no `LoginCheckMiddleWare` change.
+
+## 8. Shared brand between the two repos
+
+| Asset | Source of truth (this repo) | Copy in the website |
+|---|---|---|
+| Colours, font, radii | `docs/brand/iceberg-school/tokens.json` | `/static/school/tokens.json` → CSS variables in `school.css` |
+| Logos | `docs/brand/iceberg-school/web/*.png` (originals in `original/`) | `/static/school/img/` |
+| Design | canvas (link at top), ERP brand plan section 5 | — |
+
+When a brand value changes: update `tokens.json` here, then copy it to the website.
+
+## 9. Verification before launch
+
+- Every School page: 200, one `<h1>`, unique title/description, canonical, OG, JSON-LD validates in
+  Google's Rich Results Test.
+- Lighthouse (mobile) on `/school` and `/school/admissions`: Performance ≥ 90, SEO = 100,
+  Accessibility ≥ 95.
+- Enquiry end-to-end on staging/preview: submit → lead in ERP with `source = school-website`, correct
+  `program`, visible to a School branch admin; failure path shows the phone/Telegram fallback.
+- LC pages unchanged except the added School link; `/register` still works and LC leads still arrive.
+- `sitemap.xml` lists School URLs; `robots.txt` unchanged.
+- Phone width (390 px) and desktop checked; no horizontal scroll.
+
+## 10. Phases and checklist (Phase 4 of the brand plan)
+
+**4a — ERP (this repo)**
+- [ ] Lead receiver refuses requests when the token is unset in production (+ test)
+- [ ] School branch created; exact name → `SCHOOL_BRANCH_NAME`
+- [ ] LC branch names listed for the website's code→name map
+
+**4b — Website: foundations (iceberglc.com repo)**
+- [ ] Read the code; confirm section 2 observations; record the framework/hosting in the repo's
+      `AGENTS.md`
+- [ ] Fix the LC branch code→name mapping in `/api/register` (section 2 warning)
+- [ ] Owner picks the Learning Center palette (4.0.1); update `tokens.json` if needed
+- [ ] 4.0 foundation: real CSS build, `tokens.css` with `data-brand`, shared layout/components,
+      Inter — LC pages re-skinned with no URL changes (screenshot each LC page before/after)
+- [ ] Real `/ru/`, `/en/` pages + `hreflang` (can follow launch)
+- [ ] School logos/favicons/OG image in `/static/school/`
+
+**4c — Website: School pages**
+- [ ] Home, About, Programs, Admissions (+ thanks), Contact; News optional
+- [ ] Uzbek copy first; placeholders for unknown facts
+- [ ] Links: LC → School and School → LC; Portal login → `app.iceberglc.com/login/?brand=school`
+
+**4d — Website: enquiry**
+- [ ] `school-enquiry` form + handler branch in `/api/register` (section 6)
+- [ ] `SCHOOL_BRANCH_NAME` in the website's config/secrets
+- [ ] End-to-end test into the ERP
+
+**4e — Search + launch**
+- [ ] Section 5 on every page; sitemap updated
+- [ ] Section 9 checks pass
+- [ ] Deploy; Search Console + Google Business Profile (owner)
+- [ ] ERP `SCHOOL_BRAND_ENABLED=True` once Phases 2–3 are merged (so "Portal login" shows the School look)
+
+## 11. What the agent needs from the owner
+
+1. **Access to the iceberglc.com code** — the GitHub repo URL (and add the agent's account), or clone
+   it into this codespace next to `College-ERP` (e.g. `/workspaces/iceberglc-website`).
+2. How it is hosted/deployed (Cloudflare Pages? a server?) and where its secrets live
+   (`REGISTRATION_LEADS_API_TOKEN`, Turnstile secret).
+3. School facts: address (Namangan?), grades, phone, Telegram/Instagram, tuition, founding year,
+   photos.
+4. Languages at launch: Uzbek only first, then real Russian/English pages (recommended), or keep the
+   Google Translate widget for now?
+6. Learning Center palette for the shared design system: teal + lime, or the website's navy + blue
+   (section 4.0.1)?
+5. Exact ERP branch names (LC branches + the new School branch).
+
+## 12. Agent rules for working in the website repo
+
+- The ERP is `College-ERP` (app.iceberglc.com). Never add ERP logic to the website and never call the
+  ERP from browser JavaScript — only from the server-side form handler.
+- Don't change Learning Center pages beyond the School link and the branch-name fix.
+- School styles stay in `/static/school/`; brand files there are copies — change them in the ERP repo.
+- Every School page has the section 5 tags; every new string is in Uzbek first.
+- Never invent facts; use `[PLACEHOLDER]` until the owner provides them.
+- Secrets only in the hosting provider's settings, never in the repo.
+- Commit/push only when the owner asks; branch first; messages `type(scope): summary`.
+
+---
+
+## Appendix A — Fallback: a separate `iceberg-website` repo
+
+Use only if the School must be deployed independently of the LC site.
+
+- Astro (static), Cloudflare Pages project `iceberg-website`, `base: "/school"`.
+- Cloudflare Worker `school-router` on `iceberglc.com/school*` and `www.iceberglc.com/school*`:
+  ```ts
+  export default {
+    async fetch(request: Request): Promise<Response> {
+      const url = new URL(request.url);
+      const upstream = new URL(url.pathname + url.search, "https://iceberg-website.pages.dev");
+      const response = await fetch(new Request(upstream, request));
+      return new Response(response.body, response);
+    },
+  };
+  ```
+- `*.pages.dev` responses send `X-Robots-Tag: noindex`; canonicals point to `iceberglc.com/school/…`.
+- Enquiry via a Pages Function `functions/school/api/enquiry.ts` doing section 6's mapping with the ERP
+  token as a Pages secret, Turnstile + honeypot + rate-limit rule.
+- LC site still needs the School link and a sitemap entry (`Sitemap:` line for
+  `/school/sitemap-index.xml`).
