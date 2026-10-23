@@ -396,8 +396,9 @@ class RegistrationLeadReceiverTests(TestCase):
         self.assertEqual(lead.program, "General English")
         self.assertEqual(lead.raw_payload["apiKey"], "[redacted]")
 
-    @override_settings(**_BASE_OVERRIDES, REGISTRATION_LEADS_API_TOKEN="")
+    @override_settings(**_BASE_OVERRIDES, REGISTRATION_LEADS_API_TOKEN="", DEBUG=True)
     def test_receiver_accepts_form_encoded_payload_when_token_not_configured(self):
+        # Local development (DEBUG) only — production refuses, see the test below.
         response = self.client.post(
             reverse("public_registration_leads"),
             data={
@@ -414,6 +415,24 @@ class RegistrationLeadReceiverTests(TestCase):
         self.assertEqual(lead.phone, "+998900000001")
         self.assertEqual(lead.parent_phone, "+998991111111")
         self.assertEqual(lead.program, "General English")
+
+    @override_settings(**_BASE_OVERRIDES, REGISTRATION_LEADS_API_TOKEN="", DEBUG=False)
+    def test_receiver_refuses_leads_in_production_without_token(self):
+        with self.assertLogs("main_app.public_views", level="ERROR"):
+            response = self.client.post(
+                reverse("public_registration_leads"),
+                data={"full_name": "No Token", "phone": "+998900000002"},
+            )
+        self.assertEqual(response.status_code, 503)
+        self.assertFalse(RegistrationLead.objects.exists())
+
+    @override_settings(REGISTRATION_LEADS_API_TOKEN="", DEBUG=False)
+    def test_deploy_check_warns_when_token_missing(self):
+        from main_app.checks import check_registration_leads_token
+
+        self.assertEqual([w.id for w in check_registration_leads_token(None)], ["main_app.W002"])
+        with override_settings(REGISTRATION_LEADS_API_TOKEN="set"):
+            self.assertEqual(check_registration_leads_token(None), [])
 
     @override_settings(**_BASE_OVERRIDES)
     def test_admin_can_view_registration_leads(self):

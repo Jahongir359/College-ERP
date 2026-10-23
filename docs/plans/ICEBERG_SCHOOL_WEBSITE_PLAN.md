@@ -257,7 +257,10 @@ When a brand value changes: update `tokens.json` here, then copy it to the websi
 ## 10. Phases and checklist (Phase 4 of the brand plan)
 
 **4a — ERP (this repo)**
-- [ ] Lead receiver refuses requests when the token is unset in production (+ test)
+- [x] Lead receiver refuses requests (503 + error log) when the token is unset outside DEBUG; deploy
+      check `main_app.W002`; tests (branch `feat/school-brand-phase-4a`).
+      **Before deploying it: confirm production has `REGISTRATION_LEADS_API_TOKEN` set** (otherwise
+      Learning Center website leads would start failing).
 - [ ] School branch created; exact name → `SCHOOL_BRANCH_NAME`
 - [ ] LC branch names listed for the website's code→name map
 

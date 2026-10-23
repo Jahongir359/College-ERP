@@ -691,7 +691,8 @@ Tick boxes as you finish. One PR per phase.
 **Phase 4 — School website** → in the iceberglc.com codebase; checklist 4a–4e lives in
 [`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](ICEBERG_SCHOOL_WEBSITE_PLAN.md) section 10. Only **4a** happens in
 this repo:
-- [ ] Lead receiver refuses requests when `REGISTRATION_LEADS_API_TOKEN` is unset in production (+ test)
+- [x] Lead receiver refuses requests when `REGISTRATION_LEADS_API_TOKEN` is unset in production (+ test,
+      deploy check W002) — confirm the production token before deploying
 - [ ] School branch created in the ERP; exact name shared with the website (`SCHOOL_BRANCH_NAME`)
 
 **Phase 5 — Flutter**
@@ -771,3 +772,14 @@ what's next. Newest at the bottom.
   `gayrat`), which won't match ERP branch names → branch admins can't see website leads; fix listed in
   4b. Open owner decision: which Learning Center palette is canonical (website navy+blue vs ERP
   teal+lime). Waiting for access to the website code.
+
+- **2026-10-23 — Claude (Opus 5.5) — Phase 4a + merge note.** Branch `feat/school-brand-phase-4a`
+  (from phase-3). `public_views.registration_leads_receiver` now returns 503 + logs an error when
+  `REGISTRATION_LEADS_API_TOKEN` is empty and `DEBUG` is off; new deploy check `main_app.W002`; existing
+  empty-token test now runs with `DEBUG=True`; 2 new tests. **171 tests OK.** Deploy prerequisite:
+  production must have the token set. **Merge note:** `feat/school-brand-phase-2` also edited
+  `main_app/login.html` and `registration/erpnext_base.html` (and adds `brand.mark` /
+  `brand.display_name`), so merging Phase 2 and Phase 3 will conflict in those two templates. Resolve by
+  keeping Phase 3's School-only `{% if brand.key == "school" %}` blocks and `brand-school-auth.css` link,
+  and Phase 2's new `BrandConfig` fields where they don't change Learning Center output; re-run
+  `tests_brand_auth.py` and `tests_brand_web.py` after resolving.
