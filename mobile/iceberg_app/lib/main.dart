@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/router/app_router.dart';
 import 'core/settings/app_settings.dart';
+import 'core/theme/brand_provider.dart';
 import 'core/theme/ice_tokens.dart';
 
 final sharedPrefsProvider = Provider<SharedPreferences>(
@@ -36,6 +37,12 @@ class IcebergApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
     final router = ref.watch(appRouterProvider);
+    final brand = ref.watch(brandProvider);
+    // Remember the brand so the splash/login keep it after sign-out.
+    ref.listen(
+      brandProvider,
+      (_, next) => ref.read(lastBrandProvider.notifier).remember(next),
+    );
 
     // Apply the ICEBERG design system (underline-free textTheme + the user's
     // chosen accent) as the GLOBAL theme so every screen is themed — including
@@ -43,9 +50,17 @@ class IcebergApp extends ConsumerWidget {
     // live outside the role shells and therefore never reach the shell-local
     // Theme wrappers.
     return MaterialApp.router(
-      title: 'Iceberg Study Center',
-      theme: buildIceTheme(dark: false, accent: settings.accentColor),
-      darkTheme: buildIceTheme(dark: true, accent: settings.accentColor),
+      title: brand.appTitle,
+      theme: buildIceTheme(
+        dark: false,
+        accent: settings.accentColor,
+        brand: brand,
+      ),
+      darkTheme: buildIceTheme(
+        dark: true,
+        accent: settings.accentColor,
+        brand: brand,
+      ),
       themeMode: settings.themeMode,
       routerConfig: router,
       debugShowCheckedModeBanner: false,

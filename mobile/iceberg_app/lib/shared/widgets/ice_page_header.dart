@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/brand.dart';
 
 /// Clean white page header. Used at the top of scrollable pages.
 /// Pass [gradient] = true for the dark teal gradient variant (e.g. leaderboard).
@@ -146,7 +147,7 @@ class IceHeaderChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: dark
               ? Colors.white.withAlpha(18)
-              : IceColors.navyDeep.withAlpha(12),
+              : context.brandPrimary.withAlpha(12),
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
             color: dark ? Colors.white.withAlpha(30) : IceColors.border,
@@ -158,13 +159,13 @@ class IceHeaderChip extends StatelessWidget {
             Icon(
               icon,
               size: 13,
-              color: dark ? IceColors.lime : IceColors.navyDeep,
+              color: dark ? context.brandHighlight : context.brandPrimary,
             ),
             const SizedBox(width: 5),
             Text(
               label,
               style: TextStyle(
-                color: dark ? Colors.white : IceColors.navyDeep,
+                color: dark ? Colors.white : context.brandPrimary,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -195,12 +196,12 @@ class IceAvatar extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(color: IceColors.lime, shape: BoxShape.circle),
+      decoration: BoxDecoration(color: context.brandHighlight, shape: BoxShape.circle),
       alignment: Alignment.center,
       child: Text(
         _initials,
         style: TextStyle(
-          color: IceColors.navy,
+          color: context.brandDeep,
           fontSize: size * 0.34,
           fontWeight: FontWeight.w900,
           letterSpacing: -0.5,
@@ -244,10 +245,10 @@ class IceSectionHeader extends StatelessWidget {
               onTap: onAction,
               child: Text(
                 actionLabel!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: IceColors.navyDeep,
+                  color: context.brandPrimary,
                 ),
               ),
             ),

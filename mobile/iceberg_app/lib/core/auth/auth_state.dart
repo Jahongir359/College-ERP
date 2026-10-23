@@ -15,6 +15,7 @@ class IceUser {
   final String? profilePicUrl;
   final String avatar; // emoji avatar ('' when unset)
   final Map<String, dynamic>? roleProfile;
+  final String brand; // "center" or "school" — server-decided, see IceBrand
 
   const IceUser({
     required this.id,
@@ -26,6 +27,7 @@ class IceUser {
     this.profilePicUrl,
     this.avatar = '',
     this.roleProfile,
+    this.brand = 'center',
   });
 
   String get fullName => '$firstName $lastName'.trim();
@@ -46,6 +48,8 @@ class IceUser {
     profilePicUrl: j['profile_pic_url'],
     avatar: j['avatar'] ?? '',
     roleProfile: j['role_profile'],
+    // Older servers and cached users have no brand → Learning Center.
+    brand: j['brand'] ?? 'center',
   );
 
   Map<String, dynamic> toJson() => {
@@ -58,6 +62,7 @@ class IceUser {
     'profile_pic_url': profilePicUrl,
     'avatar': avatar,
     'role_profile': roleProfile,
+    'brand': brand,
   };
 }
 

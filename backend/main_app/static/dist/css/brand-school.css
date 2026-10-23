@@ -1,0 +1,438 @@
+/* ============================================================================
+   Iceberg School brand layer
+   ----------------------------------------------------------------------------
+   Loaded ONLY when the request resolves to the School brand, after every other
+   stylesheet and after base.html's inline <style>. See
+   docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md (sections 5.2 and 7.2).
+
+   SAFETY RULE: every selector in this file starts with
+       html[data-brand="school"]
+   so Learning Center pages (data-brand="center") can never match it, even if
+   the file were loaded by mistake. Do not add a selector without that prefix.
+
+   Order: 1. light tokens · 2. dark tokens · 3. component overrides (rules that
+   hard-code Learning Center hexes) · 4. login (Phase 3).
+
+   Contrast (WCAG, checked 2026-10-23): text/bg 16.8, muted/bg 8.1,
+   muted-2/white 5.5, accent/white 6.5, dark text/bg 16.5, dark muted/surface
+   8.1, dark ink/surface 10.9, white on dark primary 8.4 — all ≥ 4.5:1.
+   ========================================================================== */
+
+
+/* ── 1. Light tokens ─────────────────────────────────────────────────────── */
+
+html[data-brand="school"] {
+  /* New brand tokens (plan 5.2) */
+  --brand-primary: #4C0909;
+  --brand-primary-hover: #7A1F1F;
+  --brand-primary-deep: #2E0505;
+  --brand-on-primary: #FFFFFF;
+  --brand-on-primary-soft: #F2D9D6;
+  --brand-accent: #4C0909;
+  --brand-accent-ink: #FFFFFF;
+  --brand-tint: #F8F1F0;
+  --brand-bg: #FBF7F6;
+  --brand-auth-bg: #F6EFEE;
+  --brand-border: #E8DCDA;
+  --brand-input-bg: #FBF8F7;
+  --brand-text: #1F1515;
+  --brand-muted: #5A4747;
+  --brand-glow: rgba(76, 9, 9, .25);
+  /* Extra shades used by the overrides below */
+  --brand-accent-2: #A33A3A;       /* secondary maroon: icons, chart accent */
+  --brand-accent-3: #D9A5A0;       /* soft maroon: third chart series */
+  --brand-border-strong: #D9C7C4;
+  --brand-muted-2: #7A6363;
+  --brand-focus: rgba(76, 9, 9, .35);
+  --brand-primary-ink: #F2B8B0;    /* light ink on maroon/dark surfaces (sidebar) */
+
+  /* Re-point iceberg.css aliases so existing var() rules turn maroon. */
+  --navy: var(--brand-primary);
+  --navy-mid: var(--brand-primary-hover);
+  --navy-light: var(--brand-primary-hover);
+  --navy-deep: var(--brand-primary-deep);
+  --lime: var(--brand-accent);
+  --lime-deep: var(--brand-primary-hover);
+  --lime-text: var(--brand-primary);
+  --cyan: var(--brand-accent-2);
+  --cyan-dk: var(--brand-primary-hover);
+  --cyan-light: var(--brand-tint);
+  --cyan-glow: var(--brand-accent-3);
+  --bg: var(--brand-bg);
+  --bg-blue: var(--brand-auth-bg);
+  --surface-2: var(--brand-tint);
+  --border: var(--brand-border);
+  --border-dk: var(--brand-border-strong);
+  --text: var(--brand-text);
+  --text-muted: var(--brand-muted);
+  --text-sub: var(--brand-muted);
+  --text-light: var(--brand-muted-2);
+  --text-faint: var(--brand-muted-2);
+  --shadow-sm: 0 1px 3px rgba(76, 9, 9, .08), 0 1px 2px rgba(76, 9, 9, .04);
+  --shadow-md: 0 4px 14px rgba(76, 9, 9, .10), 0 2px 4px rgba(76, 9, 9, .05);
+  --shadow-lg: 0 10px 40px rgba(76, 9, 9, .14), 0 4px 10px rgba(76, 9, 9, .07);
+  --shadow-cyan: 0 4px 14px rgba(76, 9, 9, .30);
+  --shadow-navy: 0 4px 12px rgba(76, 9, 9, .30);
+
+  /* erpnext-style.css + storefront-ui.css */
+  --primary-color: var(--brand-primary);
+  --secondary-color: var(--brand-muted);
+  --dark-color: var(--brand-text);
+  --light-color: var(--brand-bg);
+  --border-color: var(--brand-border);
+  --app-primary: var(--brand-primary);
+  --app-primary-dark: var(--brand-primary-deep);
+  --app-sidebar: var(--brand-primary);
+  --app-sidebar-2: var(--brand-primary-hover);
+
+  /* --ice-* family (iceberg.css, mobile-adaptive.css) */
+  --ice-navy: var(--brand-primary);
+  --ice-navy-mid: var(--brand-primary-hover);
+  --ice-navy-dk: var(--brand-primary-deep);
+  --ice-deep-navy: var(--brand-primary-deep);
+  --ice-navy-soft: var(--brand-primary-hover);
+  --ice-cyan: var(--brand-accent-2);
+  --ice-cyan-dk: var(--brand-primary-hover);
+  --ice-cyan-soft: var(--brand-tint);
+  --ice-lime: var(--brand-accent);
+  --ice-lime-deep: var(--brand-primary-hover);
+  --ice-surface2: var(--brand-tint);
+  --ice-border: var(--brand-border);
+  --ice-text: var(--brand-text);
+  --ice-muted: var(--brand-muted);
+  --ice-bg: var(--brand-bg);
+  --ice-page-bg: var(--brand-bg);
+  --ice-page-bg-2: #FFFCFB;
+  --ice-silver: var(--brand-border);
+  --ice-focus: var(--brand-focus);
+  --ice-accent: var(--brand-accent-2);
+  --ice-accent-ink: var(--brand-primary-hover);
+  --ice-icon-primary: var(--brand-primary);
+  --ice-icon-active: var(--brand-primary-hover);
+  --ice-bottom-nav-active-bg: rgba(76, 9, 9, .10);
+  --ice-bottom-nav-active-ring: rgba(76, 9, 9, .18);
+  --ice-app-shadow: 0 14px 40px rgba(76, 9, 9, .10), 0 2px 8px rgba(76, 9, 9, .05);
+  --ice-card-shadow: 0 8px 24px rgba(76, 9, 9, .08), 0 1px 3px rgba(76, 9, 9, .04);
+}
+
+/* mobile-adaptive.css re-declares icon/body colours under data-theme="bright";
+   the extra attribute keeps this block ahead on specificity. */
+html[data-brand="school"][data-theme="bright"],
+html[data-brand="school"].bright-mode {
+  --ice-icon-fg: var(--brand-text);
+  --ice-icon-active: var(--brand-primary-hover);
+  --ice-body-text: var(--brand-text);
+  --ice-body-muted: var(--brand-muted);
+}
+
+/* admin-dashboard-2026.css scopes its palette to .admin-dashboard. */
+html[data-brand="school"] .admin-dashboard {
+  --ib-navy: var(--brand-primary);
+  --ib-ocean: var(--brand-primary-hover);
+  --ib-cyan: var(--brand-accent-2);
+  --ib-ice: var(--brand-tint);
+  --ib-text: var(--brand-text);
+  --ib-muted: var(--brand-muted);
+  --ib-border: rgba(76, 9, 9, .10);
+  --ib-shadow: 0 18px 60px rgba(76, 9, 9, .12);
+  --ib-shadow-soft: 0 12px 32px rgba(76, 9, 9, .09);
+}
+
+/* profile-hub.css keeps its own --brand-navy/ocean/cyan/ice palette on
+   .profile-hub (names don't collide with the --brand-* tokens above). */
+html[data-brand="school"] .profile-hub {
+  --brand-navy: var(--brand-primary);
+  --brand-ocean: var(--brand-primary-hover);
+  --brand-cyan: var(--brand-accent-2);
+  --brand-ice: var(--brand-tint);
+  --profile-text: var(--brand-text);
+  --profile-muted: var(--brand-muted);
+  --profile-border: rgba(76, 9, 9, .10);
+}
+
+/* Apple / Android platform skins (mobile-adaptive.css) */
+html[data-brand="school"] .platform-apple,
+html[data-brand="school"].platform-apple {
+  --glass-edge: rgba(76, 9, 9, .13);
+  --glass-inner-low: rgba(76, 9, 9, .05);
+  --glass-shadow: 0 12px 30px rgba(76, 9, 9, .12), 0 2px 8px rgba(76, 9, 9, .06);
+  --glass-shadow-soft: 0 6px 18px rgba(76, 9, 9, .09), 0 1px 3px rgba(76, 9, 9, .05);
+  --apple-page-bg: var(--brand-bg);
+  --apple-page-bg-2: var(--brand-tint);
+  --apple-text: var(--brand-text);
+  --apple-muted: var(--brand-muted);
+}
+
+
+/* ── 2. Dark tokens ──────────────────────────────────────────────────────── */
+/* Base.html puts data-theme + .dark-mode on <html> AND .dark-mode on <body>;
+   iceberg.css re-declares tokens on every .dark-mode element, so the body
+   must be targeted too or it would shadow the html values. */
+
+html[data-brand="school"][data-theme="dark"],
+html[data-brand="school"].dark-mode,
+html[data-brand="school"] .dark-mode {
+  --brand-primary: #8E2A2A;           /* fills */
+  --brand-primary-hover: #A33A3A;
+  --brand-primary-deep: #2E0505;
+  --brand-primary-ink: #F2B8B0;       /* links / icons / active states on dark */
+  --brand-tint: #2A1414;
+  --brand-bg: #140808;
+  --brand-auth-bg: #140808;
+  --brand-border: #3A1E1E;
+  --brand-border-strong: #4A2828;
+  --brand-input-bg: #1D0E0E;
+  --brand-text: #F4E9E7;
+  --brand-muted: #BFA5A2;
+  --brand-muted-2: #9C8380;
+  --brand-focus: rgba(242, 184, 176, .28);
+
+  --bg: var(--brand-bg);
+  --surface: #1D0E0E;
+  --surface-2: #251212;
+  --border: var(--brand-border);
+  --border-dk: var(--brand-border-strong);
+  --text: var(--brand-text);
+  --text-muted: var(--brand-muted);
+  --text-sub: var(--brand-muted);
+  --text-faint: var(--brand-muted-2);
+  --bg-blue: var(--brand-bg);
+  --light-color: var(--brand-bg);
+  --border-color: var(--brand-border);
+  --primary-color: var(--brand-primary);
+  --dark-color: var(--brand-text);
+  --ice-surface: #1D0E0E;
+  --ice-surface2: #251212;
+  --ice-border: var(--brand-border);
+  --ice-text: var(--brand-text);
+  --ice-muted: var(--brand-muted);
+  --ice-bg: var(--brand-bg);
+  --ice-page-bg: var(--brand-bg);
+  --ice-page-bg-2: #1A0B0B;
+  --ice-cyan-soft: rgba(242, 184, 176, .12);
+  --ice-silver: #3A1E1E;
+  --ice-focus: var(--brand-focus);
+  --ice-icon-fg: var(--brand-text);
+  --ice-icon-muted: #D4BEBB;
+  --ice-icon-soft: var(--brand-muted);
+  --ice-icon-active: var(--brand-primary-ink);
+  --ice-icon-primary: #E6D3D0;
+  --ice-body-text: var(--brand-text);
+  --ice-body-muted: var(--brand-muted);
+  --ice-bottom-nav-active-bg: rgba(242, 184, 176, .14);
+  --ice-bottom-nav-active-ring: rgba(242, 184, 176, .22);
+  --app-bg: var(--brand-bg);
+  --app-bg-soft: #1D0E0E;
+  --app-surface: #1D0E0E;
+  --app-surface-muted: #251212;
+  --app-border: var(--brand-border);
+  --app-border-strong: var(--brand-border-strong);
+  --app-text: var(--brand-text);
+  --app-muted: var(--brand-muted);
+}
+
+html[data-brand="school"][data-theme="dark"] .admin-dashboard,
+html[data-brand="school"] .dark-mode .admin-dashboard {
+  --ib-text: var(--brand-text);
+  --ib-muted: var(--brand-muted);
+  --ib-border: rgba(244, 233, 231, .12);
+  --ib-surface: rgba(29, 14, 14, .78);
+  --ib-surface-strong: rgba(37, 18, 18, .92);
+}
+
+html[data-brand="school"].platform-apple.dark-mode,
+html[data-brand="school"].platform-apple[data-theme="dark"] {
+  --glass-fill: rgba(29, 14, 14, .86);
+  --glass-fill-strong: rgba(29, 14, 14, .93);
+  --glass-tint: linear-gradient(180deg, rgba(242, 184, 176, .05), rgba(255, 255, 255, .012));
+  --apple-page-bg: #140808;
+  --apple-page-bg-2: #1A0B0B;
+  --apple-text: var(--brand-text);
+  --apple-muted: var(--brand-muted);
+  --apple-control-fill: rgba(37, 18, 18, .96);
+}
+
+
+/* ── 3. Component overrides ──────────────────────────────────────────────── */
+/* Rules below replace Learning Center colours that existing CSS hard-codes
+   (so re-pointing variables alone can't reach them). Keep them grouped by
+   the surface they style. */
+
+/* Sidebar (base.html inline <style> + iceberg.css, both !important) */
+html[data-brand="school"] .erpnext-sidebar,
+html[data-brand="school"] .platform-apple .erpnext-sidebar,
+html[data-brand="school"].platform-apple .erpnext-sidebar {
+  background: linear-gradient(180deg, #4C0909 0%, #3E0707 60%, #2E0505 100%) !important;
+}
+html[data-brand="school"] .dark-mode .erpnext-sidebar,
+html[data-brand="school"].dark-mode .erpnext-sidebar {
+  background: linear-gradient(180deg, #1D0E0E 0%, #2A1010 60%, #3A1414 100%) !important;
+}
+html[data-brand="school"] .erpnext-sidebar .nav-link.active .nav-icon,
+html[data-brand="school"] .nav-link.active .nav-icon,
+html[data-brand="school"] .sidebar-role-badge.role-admin {
+  color: #F2B8B0 !important;
+}
+html[data-brand="school"] .nav-link.active {
+  border-left-color: #F2B8B0;
+}
+html[data-brand="school"] .nav-submenu .nav-link.active {
+  color: var(--brand-primary-hover) !important;
+}
+html[data-brand="school"] .dark-mode .nav-submenu .nav-link.active,
+html[data-brand="school"].dark-mode .nav-submenu .nav-link.active {
+  color: var(--brand-primary-ink) !important;
+}
+html[data-brand="school"] .sidebar-user-avatar {
+  background: linear-gradient(135deg, #4C0909, #7A1F1F);
+}
+
+/* Navbar brand badge: base.html shows brand.logo_tile (the white crest for
+   the School) in a 40px circle; give it the maroon tile + ~18% padding. */
+html[data-brand="school"] .erpnext-navbar .navbar-user-avatar {
+  background: var(--brand-primary) !important;
+  padding: 7px !important;
+}
+html[data-brand="school"] .erpnext-navbar .navbar-user-avatar img {
+  object-fit: contain !important;
+  border-radius: 0 !important;
+}
+
+/* Top navbar */
+html[data-brand="school"] .navbar-brand span,
+html[data-brand="school"] .navbar-logo-text,
+html[data-brand="school"] .navbar-notification:hover,
+html[data-brand="school"] .erpnext-navbar .navbar-center-name {
+  color: var(--brand-primary) !important;
+}
+html[data-brand="school"].dark-mode .erpnext-navbar .navbar-center-name,
+html[data-brand="school"][data-theme="dark"] .erpnext-navbar .navbar-center-name {
+  color: var(--brand-text) !important;
+}
+
+/* Buttons */
+html[data-brand="school"] .btn-primary,
+html[data-brand="school"] button[type="submit"].btn-primary,
+html[data-brand="school"] .pf-submit,
+html[data-brand="school"] .teacher-hero-action,
+html[data-brand="school"] .admin-hero-action,
+html[data-brand="school"] .platform-apple .btn-primary,
+html[data-brand="school"].platform-apple .btn-primary {
+  background: var(--brand-primary) !important;
+  background-image: none !important;
+  border-color: var(--brand-primary) !important;
+  color: var(--brand-on-primary) !important;
+  box-shadow: 0 6px 18px rgba(76, 9, 9, .22) !important;
+}
+html[data-brand="school"] .btn-primary:hover,
+html[data-brand="school"] .pf-submit:hover {
+  background: var(--brand-primary-hover) !important;
+  border-color: var(--brand-primary-hover) !important;
+}
+html[data-brand="school"] .ice-btn-primary,
+html[data-brand="school"] .st-btn-primary,
+html[data-brand="school"] .sf-btn-primary,
+html[data-brand="school"] .avatar-save-btn {
+  background: var(--brand-primary);
+  box-shadow: 0 6px 18px rgba(76, 9, 9, .22);
+}
+
+/* Focus, badges, small accents */
+html[data-brand="school"] *:focus-visible {
+  outline-color: var(--brand-primary-hover);
+}
+html[data-brand="school"] .notif-badge,
+html[data-brand="school"] .notif-dot {
+  background: var(--brand-accent-2);
+}
+html[data-brand="school"] .avatar-option.selected {
+  border-color: var(--brand-primary);
+}
+html[data-brand="school"] .trend-card-title i,
+html[data-brand="school"] .trend-meta,
+html[data-brand="school"] .sf-kpi-icon.cyan,
+html[data-brand="school"] .sf-group-room,
+html[data-brand="school"] .sf-badge-replied,
+html[data-brand="school"] .sf-notif-cat {
+  color: var(--brand-accent-2);
+}
+html[data-brand="school"] .dark-mode .trend-meta,
+html[data-brand="school"] .dark-mode .st-alert-info,
+html[data-brand="school"] .dark-mode .st-notif-cat.result,
+html[data-brand="school"] .dark-mode .st-notif-cat.general,
+html[data-brand="school"] .dark-mode .st-notif-cat.default,
+html[data-brand="school"] .dark-mode .bottom-nav-item.active,
+html[data-brand="school"] .dark-mode .admin-metric-card__icon,
+html[data-brand="school"] .dark-mode .admin-activity-item__icon,
+html[data-brand="school"] .dark-mode .admin-quick-action span,
+html[data-brand="school"] .dark-mode .admin-link,
+html[data-brand="school"] .dark-mode .admin-soft-badge,
+html[data-brand="school"][data-theme="dark"] .admin-metric-card__icon,
+html[data-brand="school"][data-theme="dark"] .admin-activity-item__icon,
+html[data-brand="school"][data-theme="dark"] .admin-quick-action span,
+html[data-brand="school"][data-theme="dark"] .admin-link,
+html[data-brand="school"][data-theme="dark"] .admin-soft-badge,
+html[data-brand="school"] .dark-mode .glow-bottom-nav__link.is-active .glow-bottom-nav__icon,
+html[data-brand="school"][data-theme="dark"] .glow-bottom-nav__link.is-active .glow-bottom-nav__icon {
+  color: var(--brand-primary-ink) !important;
+}
+
+/* Icon tiles with brand gradients */
+html[data-brand="school"] .st-notif-icon.result,
+html[data-brand="school"] .sf-notif-icon.result {
+  background: linear-gradient(135deg, #A33A3A, #7A1F1F);
+}
+html[data-brand="school"] .st-notif-icon.general,
+html[data-brand="school"] .st-notif-icon.default,
+html[data-brand="school"] .sf-group-avatar {
+  background: linear-gradient(135deg, #7A1F1F, #4C0909);
+}
+
+/* Hero / cover banners */
+html[data-brand="school"] .ice-hero,
+html[data-brand="school"] .teacher-hero,
+html[data-brand="school"] .admin-hero {
+  background:
+    radial-gradient(circle at 92% 0%, rgba(242, 184, 176, .20), transparent 22rem),
+    linear-gradient(135deg, #2E0505 0%, #4C0909 54%, #7A1F1F 100%);
+  box-shadow: 0 18px 46px rgba(76, 9, 9, .22);
+}
+html[data-brand="school"] .admin-command {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(242, 184, 176, .22), transparent 22rem),
+    linear-gradient(135deg, #2E0505 0%, #4C0909 58%, #3E0707 100%);
+  box-shadow: 0 26px 80px rgba(76, 9, 9, .28);
+}
+html[data-brand="school"] .profile-cover {
+  background:
+    radial-gradient(circle at 82% 16%, rgba(242, 184, 176, .22), transparent 12rem),
+    linear-gradient(135deg, #3E0707 0%, #7A1F1F 58%, #2E0505 100%);
+}
+
+/* Theme-picker previews (profile hub) show the school's own dark palette */
+html[data-brand="school"] .theme-preview--bright span:first-child,
+html[data-brand="school"] .theme-preview--dark {
+  background: #4C0909;
+}
+html[data-brand="school"] .theme-preview--dark span:first-child {
+  background: #F2B8B0;
+}
+html[data-brand="school"] .theme-preview--system {
+  background: linear-gradient(135deg, #FBF7F6 0 50%, #4C0909 50% 100%);
+}
+
+/* Loaders and page progress */
+html[data-brand="school"] .page-progress {
+  background: linear-gradient(90deg, #4C0909 0%, #A33A3A 60%, #D9A5A0 100%);
+}
+html[data-brand="school"] .app-loader__spinner {
+  border-top-color: var(--brand-primary);
+}
+html[data-brand="school"] .app-loader__text {
+  color: var(--brand-primary);
+}
+
+
+/* ── 4. Login page ───────────────────────────────────────────────────────── */
+/* Phase 3: logo tile, glow, button and focus overrides for main_app/login.html
+   go here (plan 7.2 point 4). */

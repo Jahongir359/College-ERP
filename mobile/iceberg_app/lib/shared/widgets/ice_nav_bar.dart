@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/brand.dart';
 
 class IceNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -42,7 +43,7 @@ class IceNavBar extends StatelessWidget {
                     selected ? items[i].activeIcon : items[i].icon,
                     key: ValueKey(selected),
                     size: 22,
-                    color: selected ? IceColors.navyDeep : IceColors.muted,
+                    color: selected ? context.brandPrimary : IceColors.muted,
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -52,7 +53,7 @@ class IceNavBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                    color: selected ? IceColors.navyDeep : IceColors.muted,
+                    color: selected ? context.brandPrimary : IceColors.muted,
                   ),
                   child: Text(
                     items[i].label,
@@ -67,7 +68,7 @@ class IceNavBar extends StatelessWidget {
                   width: selected ? 6 : 0,
                   height: selected ? 6 : 0,
                   decoration: BoxDecoration(
-                    color: IceColors.lime,
+                    color: context.brandHighlight,
                     shape: BoxShape.circle,
                   ),
                 ),

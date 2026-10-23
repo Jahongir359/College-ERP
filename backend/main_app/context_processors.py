@@ -20,6 +20,13 @@ def notification_count(request):
     return {"unread_notification_count": count, "unread_message_count": message_count}
 
 
+def brand(request):
+    """Expose the resolved Iceberg brand (BrandConfig) as ``brand`` to every template."""
+    from .branding import get_brand, resolve_brand_key
+
+    return {"brand": get_brand(resolve_brand_key(request))}
+
+
 def student_theme(request):
     """Expose the student's saved theme preference to every template."""
     theme = "system"

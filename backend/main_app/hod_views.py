@@ -1748,7 +1748,7 @@ def add_branch(request):
     if not branching.is_super_admin(request.user):
         messages.error(request, "Only a super admin can create branches.")
         return redirect(reverse("manage_branch"))
-    form = BranchForm(request.POST or None)
+    form = BranchForm(request.POST or None, can_set_brand=True)
     if request.method == "POST":
         if form.is_valid():
             form.save()
@@ -1770,7 +1770,11 @@ def edit_branch(request, branch_id):
     if not branching.user_can_access_branch(request.user, branch):
         messages.error(request, "You don't have access to this branch.")
         return redirect(reverse("manage_branch"))
-    form = BranchForm(request.POST or None, instance=branch)
+    form = BranchForm(
+        request.POST or None,
+        instance=branch,
+        can_set_brand=branching.is_super_admin(request.user),
+    )
     if request.method == "POST":
         if form.is_valid():
             form.save()

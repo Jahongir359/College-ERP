@@ -616,9 +616,17 @@ class EditResultForm(FormSettings):
 
 
 class BranchForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        # Only super admins may switch a branch between Learning Center and School.
+        can_set_brand = kwargs.pop("can_set_brand", False)
+        super().__init__(*args, **kwargs)
+        self.fields["brand"].label = "Brand"
+        if not can_set_brand:
+            self.fields["brand"].disabled = True
+
     class Meta:
         model = Branch
-        fields = ["name", "address"]
+        fields = ["name", "address", "brand"]
         widgets = {
             "address": forms.TextInput(
                 attrs={"placeholder": "e.g. Chilonzor 9, Tashkent", "class": "form-control"}

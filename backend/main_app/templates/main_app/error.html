@@ -1,12 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{{ error_code }} · Iceberg Study Center</title>
+  <title>{{ error_code }} · {{ brand.name|default:"Iceberg Study Center" }}</title>
   <link rel="shortcut icon" href="{% static 'image/favicon1.ico' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap">
@@ -179,7 +179,8 @@
         backdrop-filter: none !important;
       }
     }
-  </style>
+  </style>{% if brand.key == "school" %}
+  <link rel="stylesheet" href="{% static 'dist/css/brand-school.css' %}">{% endif %}
 </head>
 <body>
   <div class="card" role="alert">
@@ -218,7 +219,7 @@
       </a>
     </div>
 
-    <div class="brand"><span>ICEBERG</span> &middot; Study Center</div>
+    <div class="brand"><span>ICEBERG</span> &middot; {% if brand.key == "school" %}{{ brand.short_name }}{% else %}Study Center{% endif %}</div>
   </div>
 </body>
 </html>
