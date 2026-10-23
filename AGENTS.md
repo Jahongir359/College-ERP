@@ -4,12 +4,17 @@ Read this first, then the plan for whatever you are working on in `docs/plans/`.
 
 ## Active initiative
 
-**Iceberg School brand** — run the new Iceberg School on this same ERP with its own brand (maroon
-crest) while the Iceberg Learning Center stays exactly as it is.
-Full spec, architecture, phases, checklist and progress log:
-**[`docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md`](docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md)**.
-Brand assets: `docs/brand/iceberg-school/` (colours as JSON in `tokens.json`). Update that plan's
-Progress log at the end of each session.
+**Iceberg School app** — make the ERP and the one Flutter app (Iceberg School + Iceberg Study Center,
+chosen on the first screen) work for the school: classes, timetable, register, grades, parents, and
+release on Google Play and the App Store.
+Phases, task checklist with done-marks, decisions and progress log:
+**[`docs/plans/ICEBERG_SCHOOL_APP_PLAN.md`](docs/plans/ICEBERG_SCHOOL_APP_PLAN.md)**. Follow its
+section 0: trust `[x]` tasks (don't re-check them), claim a task before starting, tick it in the PR
+that finishes it, and add a Progress log line.
+
+The brand layer it builds on (how School looks: `Branch.brand`, brand CSS, School login, app theme) is
+in [`docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md`](docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md) (phases 1–5
+done). Brand assets: `docs/brand/iceberg-school/` (colours as JSON in `tokens.json`).
 
 The public website `iceberglc.com` (Iceberg School, with the Learning Center as its "Iceberg Courses"
 section) is a **separate repo, [`Jahongir359/ICEBERG_WEB`](https://github.com/Jahongir359/ICEBERG_WEB)**, which owns its own plan, design
