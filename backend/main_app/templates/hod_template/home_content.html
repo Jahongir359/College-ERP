@@ -2,7 +2,7 @@
 {% load json_tags %}
 {% load static %}
 
-{% block title %}Admin Dashboard — Iceberg Study Center{% endblock %}
+{% block title %}Admin Dashboard — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}Admin Dashboard{% endblock %}
 {% block breadcrumb %}<li class="breadcrumb-item active">Dashboard</li>{% endblock %}
 
@@ -390,6 +390,17 @@ document.addEventListener('DOMContentLoaded', function () {
   var monthly  = {{ monthly_chart_json|js_json }};
   var branchCh = {{ branch_chart_json|js_json }};
 
+  // Iceberg School brand: chart accents follow the --brand-* CSS tokens. They
+  // are unset on Learning Center pages, so the original colours are used.
+  function brandColor(token, fallback, alpha) {
+    var v = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+    if (!v) return fallback;
+    if (alpha == null) return v;
+    var h = v.replace('#', '');
+    return 'rgba(' + parseInt(h.substr(0, 2), 16) + ',' + parseInt(h.substr(2, 2), 16) + ','
+      + parseInt(h.substr(4, 2), 16) + ',' + alpha + ')';
+  }
+
   function isDark() {
     return document.documentElement.getAttribute('data-theme') === 'dark' ||
       document.body.classList.contains('dark-mode');
@@ -401,8 +412,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function tooltipOpts(multi) {
     return {
-      backgroundColor: isDark() ? 'rgba(7,15,28,.96)' : 'rgba(7,26,82,.95)',
-      titleColor: '#fff', bodyColor: '#67E8F9',
+      backgroundColor: isDark() ? 'rgba(7,15,28,.96)' : brandColor('--brand-primary-deep', 'rgba(7,26,82,.95)', .95),
+      titleColor: '#fff', bodyColor: brandColor('--brand-primary-ink', '#67E8F9'),
       borderColor: 'rgba(6,182,212,.30)', borderWidth: 1,
       cornerRadius: 12, padding: 12,
       displayColors: !!multi,
@@ -531,8 +542,8 @@ document.addEventListener('DOMContentLoaded', function () {
         type: 'line',
         data: {
           labels: monthly.labels,
-          datasets: [lineDS('Attendance %', monthly.att_rate, '#06B6D4',
-            'rgba(6,182,212,.28)', 'rgba(6,182,212,.02)')]
+          datasets: [lineDS('Attendance %', monthly.att_rate, brandColor('--brand-accent-2', '#06B6D4'),
+            brandColor('--brand-accent-2', 'rgba(6,182,212,.28)', .28), brandColor('--brand-accent-2', 'rgba(6,182,212,.02)', .02))]
         },
         options: Object.assign({}, lineBase, {
           scales: Object.assign({}, lineBase.scales, {
@@ -584,8 +595,8 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
           labels: monthly.labels,
           datasets: [
-            lineDS('Attendance %', monthly.att_rate, '#06B6D4',
-              'rgba(6,182,212,.18)', 'rgba(6,182,212,.01)'),
+            lineDS('Attendance %', monthly.att_rate, brandColor('--brand-accent-2', '#06B6D4'),
+              brandColor('--brand-accent-2', 'rgba(6,182,212,.18)', .18), brandColor('--brand-accent-2', 'rgba(6,182,212,.01)', .01)),
             lineDS('Sessions', monthly.sessions, '#0E3E94',
               'rgba(14,62,148,.15)', 'rgba(14,62,148,.01)')
           ]

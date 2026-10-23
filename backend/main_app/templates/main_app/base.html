@@ -1,13 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>{% block title %}Iceberg Study Center{% endblock title %}</title>
+    <title>{% block title %}{{ brand.name|default:"Iceberg Study Center" }}{% endblock title %}</title>
 
     <!-- ── Favicons ─────────────────────────────────────────────────────── -->
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -15,26 +15,26 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#06343A">
-    <meta name="msapplication-TileColor" content="#06343A">
+    <meta name="theme-color" content="{% if brand.key == "school" %}{{ brand.theme_color }}{% else %}#06343A{% endif %}">
+    <meta name="msapplication-TileColor" content="{% if brand.key == "school" %}{{ brand.theme_color }}{% else %}#06343A{% endif %}">
 
     <!-- ── Open Graph (Google Search, Facebook, WhatsApp, Telegram) ─────── -->
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="ICEBERG Study Center">
-    <meta property="og:title" content="{% block og_title %}ICEBERG Study Center{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Online learning and student management platform for Iceberg Study Center.{% endblock %}">
+    <meta property="og:site_name" content="{{ brand.display_name|default:"ICEBERG Study Center" }}">
+    <meta property="og:title" content="{% block og_title %}{{ brand.display_name|default:"ICEBERG Study Center" }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Online learning and student management platform for {{ brand.name|default:"Iceberg Study Center" }}.{% endblock %}">
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="ICEBERG Study Center">
+    <meta property="og:image:alt" content="{{ brand.display_name|default:"ICEBERG Study Center" }}">
     <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 
     <!-- ── Twitter / X card ─────────────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{% block twitter_title %}ICEBERG Study Center{% endblock %}">
-    <meta name="twitter:description" content="{% block twitter_description %}Online learning and student management platform for Iceberg Study Center.{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ brand.display_name|default:"ICEBERG Study Center" }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Online learning and student management platform for {{ brand.name|default:"Iceberg Study Center" }}.{% endblock %}">
     <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}/og-image.png">
-    <meta name="twitter:image:alt" content="ICEBERG Study Center">
+    <meta name="twitter:image:alt" content="{{ brand.display_name|default:"ICEBERG Study Center" }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Non-blocking font load: swap keeps system font visible until Inter arrives -->
@@ -148,23 +148,24 @@
    wins by document order). */
 .erpnext-sidebar,
 .platform-apple .erpnext-sidebar {
-  background: linear-gradient(180deg, #0C1F45 0%, #0E2547 60%, #0A2040 100%) !important;
+  background: linear-gradient(180deg, var(--brand-primary, #0C1F45) 0%, var(--brand-primary, #0E2547) 60%, var(--brand-primary-deep, #0A2040) 100%) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
 .dark-mode .erpnext-sidebar,
 .dark-mode.platform-apple .erpnext-sidebar {
-  background: linear-gradient(180deg, #03181C 0%, #06343A 60%, #0A4A52 100%) !important;
+  background: linear-gradient(180deg, var(--brand-primary-deep, #03181C) 0%, var(--brand-primary, #06343A) 60%, var(--brand-primary-hover, #0A4A52) 100%) !important;
 }
 .erpnext-sidebar .nav-link { color: rgba(255,255,255,.74) !important; }
 .erpnext-sidebar .nav-link:hover { color: #fff !important; background: rgba(255,255,255,.07) !important; }
 .erpnext-sidebar .nav-link.active { color: #fff !important; }
 .erpnext-sidebar .nav-icon { color: rgba(255,255,255,.55) !important; }
-.erpnext-sidebar .nav-link.active .nav-icon { color: #67E8F9 !important; }
+.erpnext-sidebar .nav-link.active .nav-icon { color: var(--brand-primary-ink, #67E8F9) !important; }
 .erpnext-sidebar .nav-section-title { color: rgba(255,255,255,.40) !important; }
 .erpnext-sidebar .sidebar-user-info h6 { color: #fff !important; }
 .erpnext-sidebar .sidebar-user-info small { color: rgba(255,255,255,.55) !important; }
-    </style>
+    </style>{% if brand.key == "school" %}
+    <link rel="stylesheet" href="{% static 'dist/css/brand-school.css' %}">{% endif %}
     {% block custom_css %}{% endblock custom_css %}
     <script>
     /* Apply theme before paint to prevent flash */
@@ -253,9 +254,9 @@
                  user's editable profile picture), so it can't be changed by any
                  of the four roles. Still links to the profile hub for settings. -->
             {% url 'profile_hub' as profile_url %}
-            <span class="navbar-center-name">ICEBERG STUDY CENTER</span>
+            <span class="navbar-center-name">{{ brand.display_name|default:"ICEBERG Study Center"|upper }}</span>
             <a href="{{ profile_url }}" class="navbar-user-avatar" title="My profile" id="navbar-avatar-link" aria-label="Open my profile and settings">
-                <img src="{% static 'dist/img/logo.png' %}" alt="ICEBERG">
+                <img src="{% static brand.logo_tile|default:'dist/img/logo.png' %}" alt="{{ brand.mark|default:"ICEBERG" }}">
             </a>
 
             <!-- Logout (animated, POST + CSRF, JS-optional) -->

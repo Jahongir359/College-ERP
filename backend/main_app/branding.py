@@ -45,6 +45,10 @@ class BrandConfig:
     logo_on_dark: str  # static path: lockup for dark backgrounds
     logo_on_light: str  # static path: lockup for light backgrounds
     theme_color: str  # <meta name="theme-color">
+    # Exact strings the Learning Center templates already render, so swapping a
+    # literal for these fields leaves center pages byte-for-byte unchanged.
+    display_name: str = ""  # og:/twitter: titles, navbar wordmark (upper-cased)
+    mark: str = ""  # short logo alt text
 
 
 BRANDS = {
@@ -60,6 +64,8 @@ BRANDS = {
         logo_on_dark="dist/img/iceberg-wordmark.png",
         logo_on_light="dist/img/logo.png",
         theme_color="#0C1F45",
+        display_name="ICEBERG Study Center",
+        mark="ICEBERG",
     ),
     SCHOOL: BrandConfig(
         key=SCHOOL,
@@ -72,6 +78,8 @@ BRANDS = {
         logo_on_dark="dist/img/brand/school/logo-h-white.png",
         logo_on_light="dist/img/brand/school/logo-h-maroon.png",
         theme_color="#4C0909",
+        display_name="Iceberg School",
+        mark="Iceberg School",
     ),
 }
 
