@@ -2379,3 +2379,21 @@ class CollectionsViewTests(TestCase):
         # Attention list holds the overdue/partial student, not the fully-paid one.
         self.assertEqual(len(ctx["attention"]), 1)
         self.assertTrue(ctx["attention"][0].is_overdue)
+
+
+class StaticReferenceTests(TestCase):
+    def test_every_static_file_named_in_a_template_exists(self):
+        # Production uses manifest static storage, where a missing file is a 500
+        # (the APK download page broke this way).
+        from pathlib import Path
+
+        from django.contrib.staticfiles import finders
+
+        templates = Path(__file__).resolve().parent / "templates"
+        missing = []
+        for template in templates.rglob("*.html"):
+            text = template.read_text(encoding="utf-8")
+            for name in re.findall(r"\{%\s*static\s+['\"]([^'\"]+)['\"]", text):
+                if not finders.find(name):
+                    missing.append(f"{template.relative_to(templates)}: {name}")
+        self.assertEqual(missing, [])

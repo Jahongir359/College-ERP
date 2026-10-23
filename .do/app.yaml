@@ -7,14 +7,9 @@ services:
       repo: Jahongir359/College-ERP
       branch: main
       deploy_on_push: true
-    # Build runs from the repo root. Root-level symlinks (manage.py,
-    # requirements.txt, runtime.txt, college_management_system/, main_app/)
-    # point into backend/, so these commands resolve the Django project there
-    # without a source_dir override — meaning the live app spec does not need
-    # to be re-applied after the mono-repo restructure.
-    build_command: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    run_command: gunicorn college_management_system.wsgi --workers 3 --timeout 120 --bind 0.0.0.0:${PORT}
-    environment_slug: python
+    # Built from the Dockerfile, which also compiles the Flutter web app served at /app/
+    # (its output is no longer committed). The image starts Gunicorn on $PORT (8080).
+    dockerfile_path: Dockerfile
     instance_size_slug: basic-xxs
     instance_count: 1
     http_port: 8080
@@ -71,8 +66,8 @@ jobs:
     github:
       repo: Jahongir359/College-ERP
       branch: main
-    run_command: python manage.py migrate --noinput
-    environment_slug: python
+    dockerfile_path: Dockerfile
+    run_command: sh -c "cd backend && python manage.py migrate --noinput"
     instance_size_slug: basic-xxs
     envs:
       - key: DJANGO_SECRET_KEY
