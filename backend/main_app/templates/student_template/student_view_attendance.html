@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load json_tags %}
 {% load static %}
 {% block title %}Attendance — Iceberg Study Center{% endblock %}
 {% block page_title %}{% endblock %}
@@ -598,7 +599,7 @@ select.att-control {
   });
 
   /* Trend chart */
-  var trend = {{ trend_json|safe }};
+  var trend = {{ trend_json|js_json }};
   var hasData = (trend.values||[]).some(function(v){return v!==null;});
   if (hasData && window.IcebergTrend) {
     IcebergTrend.line({canvas:'attTrendChart',labels:trend.labels,series:[{name:'Attendance',data:trend.values,color:'#00CFE8'}],suffix:'%',yMax:100});

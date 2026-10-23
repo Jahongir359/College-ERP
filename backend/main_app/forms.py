@@ -1,6 +1,7 @@
 from datetime import date
 
 from django import forms
+from django.contrib.auth.password_validation import validate_password
 from django.forms.widgets import DateInput, TextInput
 
 from .models import *
@@ -83,6 +84,17 @@ def _validate_birthday(value):
     return value
 
 
+def _clean_new_password(password):
+    """Run AUTH_PASSWORD_VALIDATORS on a non-blank new password.
+
+    Blank means "keep the current password" on the edit/profile forms, so it
+    passes through untouched; required-ness is enforced by the field itself.
+    """
+    if password:
+        validate_password(password)
+    return password
+
+
 class CustomUserForm(FormSettings):
     gender = forms.ChoiceField(choices=[("M", "Male"), ("F", "Female")])
     first_name = forms.CharField(required=True)
@@ -127,6 +139,9 @@ class CustomUserForm(FormSettings):
 
     def clean_date_of_birth(self):
         return _validate_birthday(self.cleaned_data.get("date_of_birth"))
+
+    def clean_password(self):
+        return _clean_new_password(self.cleaned_data.get("password"))
 
     class Meta:
         model = CustomUser
@@ -521,6 +536,9 @@ class StudentProfileForm(forms.Form):
             self.fields["date_of_birth"].initial = instance.admin.date_of_birth
             self.fields["phone"].initial = instance.phone
 
+    def clean_password(self):
+        return _clean_new_password(self.cleaned_data.get("password"))
+
     def clean_date_of_birth(self):
         return _validate_birthday(self.cleaned_data.get("date_of_birth"))
 
@@ -577,6 +595,9 @@ class StaffProfileForm(forms.Form):
             self.fields["date_of_birth"].initial = instance.admin.date_of_birth
             self.fields["phone"].initial = instance.phone
             self.fields["specialization"].initial = instance.specialization
+
+    def clean_password(self):
+        return _clean_new_password(self.cleaned_data.get("password"))
 
     def clean_date_of_birth(self):
         return _validate_birthday(self.cleaned_data.get("date_of_birth"))

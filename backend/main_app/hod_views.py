@@ -1,8 +1,6 @@
 import json
-import os
 import re
 import logging
-import requests
 from datetime import timedelta, date as date_type
 from django.contrib import messages
 from django.core.files.storage import default_storage
@@ -10,13 +8,14 @@ from django.db import IntegrityError, OperationalError, ProgrammingError, models
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect, render
-from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
 
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
-from .decorators import admin_only
+from .decorators import admin_only, super_admin_only
 from .forms import *
 from .models import *
 from . import branching
@@ -748,7 +747,7 @@ def manage_registration_leads(request):
     )
 
 
-@admin_only
+@super_admin_only
 def add_course(request):
     form = CourseForm(request.POST or None)
     context = {"form": form, "page_title": "Add Course"}
@@ -770,7 +769,7 @@ def add_course(request):
     return render(request, "hod_template/add_course_template.html", context)
 
 
-@admin_only
+@super_admin_only
 def add_subject(request):
     form = SubjectForm(request.POST or None)
     context = {"form": form, "page_title": "Add Subject"}
@@ -961,7 +960,7 @@ def edit_student(request, student_id):
     return render(request, "hod_template/edit_student_template.html", context)
 
 
-@admin_only
+@super_admin_only
 def edit_course(request, course_id):
     instance = get_object_or_404(Course, id=course_id)
     form = CourseForm(request.POST or None, instance=instance)
@@ -983,7 +982,7 @@ def edit_course(request, course_id):
     return render(request, "hod_template/edit_course_template.html", context)
 
 
-@admin_only
+@super_admin_only
 def edit_subject(request, subject_id):
     instance = get_object_or_404(Subject, id=subject_id)
     form = SubjectForm(request.POST or None, instance=instance)
@@ -1008,7 +1007,7 @@ def edit_subject(request, subject_id):
     return render(request, "hod_template/edit_subject_template.html", context)
 
 
-@admin_only
+@super_admin_only
 def add_session(request):
     form = SessionForm(request.POST or None)
     context = {"form": form, "page_title": "Add Session"}
@@ -1032,7 +1031,7 @@ def manage_session(request):
     return render(request, "hod_template/manage_session.html", context)
 
 
-@admin_only
+@super_admin_only
 def edit_session(request, session_id):
     instance = get_object_or_404(Session, id=session_id)
     form = SessionForm(request.POST or None, instance=instance)
@@ -1214,76 +1213,36 @@ def admin_notify_student(request):
     return redirect(reverse("messages"))
 
 
+def _notify_user(recipient, message):
+    """Create an in-app announcement for ``recipient``.
+
+    The old code also POSTed to the legacy FCM ``/fcm/send`` endpoint, which
+    Google shut down in 2024, so no push was ever delivered. Mobile push needs
+    the FCM HTTP v1 API (service-account credentials) — tracked separately.
+    """
+    message = (message or "").strip()
+    if not message:
+        return HttpResponse("False", status=400)
+    Notification.objects.create(
+        recipient=recipient, category=Notification.ANNOUNCEMENT, message=message
+    )
+    return HttpResponse("True")
+
+
 @admin_only
+@require_POST
 def send_student_notification(request):
-    id = request.POST.get("id")
-    message = request.POST.get("message")
-    student = get_object_or_404(Student, admin_id=id)
-    try:
-        notification = Notification(
-            recipient=student.admin, category=Notification.ANNOUNCEMENT, message=message
-        )
-        notification.save()
-
-        fcm_server_key = os.environ.get("FCM_SERVER_KEY", "")
-        url = "https://fcm.googleapis.com/fcm/send"
-        body = {
-            "notification": {
-                "title": "Student Management System",
-                "body": message,
-                "click_action": reverse("student_view_notification"),
-                "icon": static("dist/img/AdminLTELogo.png"),
-            },
-            "to": student.admin.fcm_token,
-        }
-        headers = {
-            "Authorization": "key=" + fcm_server_key,
-            "Content-Type": "application/json",
-        }
-        try:
-            requests.post(url, data=json.dumps(body), headers=headers, timeout=10)
-        except requests.RequestException:
-            logger.exception("Failed to send student notification push for student_id=%s", id)
-        return HttpResponse("True")
-    except Exception as e:
-        logger.exception("send_student_notification failed (%s)", e)
-        return HttpResponse("False")
+    allowed = branching.filter_students_for_user(request.user, Student.objects.all())
+    student = get_object_or_404(allowed, admin_id=request.POST.get("id"))
+    return _notify_user(student.admin, request.POST.get("message"))
 
 
 @admin_only
+@require_POST
 def send_staff_notification(request):
-    id = request.POST.get("id")
-    message = request.POST.get("message")
-    staff = get_object_or_404(Staff, admin_id=id)
-    try:
-        notification = Notification(
-            recipient=staff.admin, category=Notification.ANNOUNCEMENT, message=message
-        )
-        notification.save()
-
-        fcm_server_key = os.environ.get("FCM_SERVER_KEY", "")
-        url = "https://fcm.googleapis.com/fcm/send"
-        body = {
-            "notification": {
-                "title": "Student Management System",
-                "body": message,
-                "click_action": reverse("staff_view_notification"),
-                "icon": static("dist/img/AdminLTELogo.png"),
-            },
-            "to": staff.admin.fcm_token,
-        }
-        headers = {
-            "Authorization": "key=" + fcm_server_key,
-            "Content-Type": "application/json",
-        }
-        try:
-            requests.post(url, data=json.dumps(body), headers=headers, timeout=10)
-        except requests.RequestException:
-            logger.exception("Failed to send staff notification push for staff_id=%s", id)
-        return HttpResponse("True")
-    except Exception as e:
-        logger.exception("send_staff_notification failed (%s)", e)
-        return HttpResponse("False")
+    allowed = branching.filter_staff_for_user(request.user, Staff.objects.all())
+    staff = get_object_or_404(allowed, admin_id=request.POST.get("id"))
+    return _notify_user(staff.admin, request.POST.get("message"))
 
 
 @admin_only
@@ -1324,7 +1283,7 @@ def delete_student(request, student_id):
     return redirect(reverse("manage_student"))
 
 
-@admin_only
+@super_admin_only
 @require_POST
 def delete_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
@@ -1343,7 +1302,8 @@ def delete_course(request, course_id):
     return redirect(reverse("manage_course"))
 
 
-@admin_only
+@super_admin_only
+@require_POST
 def toggle_course_active(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     course.is_active = not course.is_active
@@ -1353,7 +1313,7 @@ def toggle_course_active(request, course_id):
     return redirect(reverse("manage_course"))
 
 
-@admin_only
+@super_admin_only
 @require_POST
 def delete_subject(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
@@ -1367,7 +1327,7 @@ def delete_subject(request, subject_id):
     return redirect(reverse("manage_subject"))
 
 
-@admin_only
+@super_admin_only
 @require_POST
 def delete_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)
@@ -1458,8 +1418,11 @@ def add_admin(request):
             errors.append("An account with this email already exists.")
         if not password:
             errors.append("Password is required.")
-        if len(password) < 6:
-            errors.append("Password must be at least 6 characters.")
+        else:
+            try:
+                validate_password(password)
+            except ValidationError as exc:
+                errors.extend(exc.messages)
         if not branch_ids:
             errors.append("Assign at least one branch to this admin.")
 
@@ -1565,8 +1528,11 @@ def edit_admin(request, admin_id):
             errors.append("Email address is required.")
         elif CustomUser.objects.filter(email__iexact=email).exclude(pk=target.pk).exists():
             errors.append("Another account already uses this email.")
-        if password and len(password) < 6:
-            errors.append("Password must be at least 6 characters.")
+        if password:
+            try:
+                validate_password(password, target)
+            except ValidationError as exc:
+                errors.extend(exc.messages)
 
         if errors:
             for e in errors:
@@ -1831,11 +1797,26 @@ def delete_branch(request, branch_id):
         return redirect(reverse("manage_branch"))
     branch = get_object_or_404(Branch, id=branch_id)
     branch_name = branch.name
+    # Students/staff/groups use SET_NULL, so deleting a populated branch would
+    # silently orphan them (invisible to every branch admin). Same rule as the
+    # API's BranchDetailView.delete.
+    if (
+        Student.objects.filter(branch=branch).exists()
+        or Staff.objects.filter(branch=branch).exists()
+        or Group.objects.filter(branch=branch).exists()
+    ):
+        messages.error(
+            request,
+            f"Branch “{branch_name}” still has students, staff or groups. "
+            "Move them to another branch first.",
+        )
+        return redirect(reverse("manage_branch"))
     try:
         branch.delete()
         messages.success(request, f"Branch “{branch_name}” deleted.")
-    except Exception as exc:
-        messages.error(request, f"Could not delete branch — {exc}")
+    except Exception:
+        logger.exception("delete_branch failed for branch_id=%s", branch_id)
+        messages.error(request, "Could not delete branch due to an unexpected error.")
     return redirect(reverse("manage_branch"))
 
 
@@ -2232,37 +2213,32 @@ def manage_stories(request):
 _story_storage_ok = branching.story_storage_ok
 
 
-def _user_can_modify_story(user, story):
-    """Branch admins may only edit/delete stories they authored or stories
-    whose every target group lies within their accessible branches. Global
-    stories (no target groups) belong to whoever authored them; other branch
-    admins cannot touch them. Super admins can modify anything."""
-    if branching.is_super_admin(user):
-        return True
-    if story.created_by_id == user.id:
-        return True
-    target_ids = set(story.target_groups.values_list("id", flat=True))
-    if not target_ids:
-        return False
-    accessible_ids = set(
-        branching.filter_groups_for_user(user, Group.objects.all()).values_list("id", flat=True)
+_user_can_modify_story = branching.user_can_modify_story
+
+
+def _story_form(user, *args, **kwargs):
+    """DashboardStoryForm with target groups limited to the admin's branches."""
+    form = DashboardStoryForm(*args, **kwargs)
+    form.fields["target_groups"].queryset = branching.filter_groups_for_user(
+        user, Group.objects.all()
     )
-    return target_ids <= accessible_ids
+    return form
 
 
 @admin_only
 def add_story(request):
     if request.method == "POST":
-        form = DashboardStoryForm(request.POST, request.FILES)
+        form = _story_form(request.user, request.POST, request.FILES)
         if form.is_valid():
             story = form.save(commit=False)
             story.created_by = request.user
             story.save()
             form.save_m2m()
+            branching.scope_story_target_groups(request.user, story)
             messages.success(request, "Story published.")
             return redirect(reverse("manage_stories"))
     else:
-        form = DashboardStoryForm()
+        form = _story_form(request.user)
     return render(
         request,
         "hod_template/story_form.html",
@@ -2282,13 +2258,14 @@ def edit_story(request, story_id):
         messages.error(request, "You don't have access to modify this story.")
         return redirect(reverse("manage_stories"))
     if request.method == "POST":
-        form = DashboardStoryForm(request.POST, request.FILES, instance=story)
+        form = _story_form(request.user, request.POST, request.FILES, instance=story)
         if form.is_valid():
             form.save()
+            branching.scope_story_target_groups(request.user, story)
             messages.success(request, "Story updated.")
             return redirect(reverse("manage_stories"))
     else:
-        form = DashboardStoryForm(instance=story)
+        form = _story_form(request.user, instance=story)
     return render(
         request,
         "hod_template/story_form.html",
@@ -2317,7 +2294,7 @@ def delete_story(request, story_id):
 # ── Leaderboard Admin ────────────────────────────────────────────────────────
 
 
-@admin_only
+@super_admin_only
 def admin_leaderboard_settings(request):
     """Admin form for tuning ranking weights and toggling metrics."""
     settings = LeaderboardSettings.get()
@@ -2338,7 +2315,7 @@ def admin_leaderboard_settings(request):
     )
 
 
-@admin_only
+@super_admin_only
 def admin_manage_seasons(request):
     """List, create and end leaderboard seasons. Capture snapshots on demand."""
     if request.method == "POST":

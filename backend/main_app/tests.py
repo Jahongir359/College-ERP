@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from main_app.hod_views import _generate_login_id
 from main_app.messaging import unread_message_count
@@ -1487,8 +1488,15 @@ class ApiObjectAuthTests(TestCase):
     def _make_user(self, email, user_type, login_id):
         UserModel = get_user_model()
         return UserModel.objects.create_user(
-            email=email, password="Pass123!", first_name="T", last_name="U",
-            user_type=user_type, gender="M", address="", profile_pic="", login_id=login_id,
+            email=email,
+            password="Pass123!",
+            first_name="T",
+            last_name="U",
+            user_type=user_type,
+            gender="M",
+            address="",
+            profile_pic="",
+            login_id=login_id,
         )
 
     def setUp(self):
@@ -1496,15 +1504,27 @@ class ApiObjectAuthTests(TestCase):
 
         self.course = Course.objects.create(name="English")
         # Teacher A owns group A (with an enrolled student); teacher B owns group B.
-        self.teacher_a = Staff.objects.get(admin=self._make_user("ta@iceberg.internal", "2", "TC80001"))
-        self.teacher_b = Staff.objects.get(admin=self._make_user("tb@iceberg.internal", "2", "TC80002"))
-        self.group_a = Group.objects.create(name="Group A", course=self.course, teacher=self.teacher_a)
-        self.group_b = Group.objects.create(name="Group B", course=self.course, teacher=self.teacher_b)
+        self.teacher_a = Staff.objects.get(
+            admin=self._make_user("ta@iceberg.internal", "2", "TC80001")
+        )
+        self.teacher_b = Staff.objects.get(
+            admin=self._make_user("tb@iceberg.internal", "2", "TC80002")
+        )
+        self.group_a = Group.objects.create(
+            name="Group A", course=self.course, teacher=self.teacher_a
+        )
+        self.group_b = Group.objects.create(
+            name="Group B", course=self.course, teacher=self.teacher_b
+        )
 
-        self.student_a = Student.objects.get(admin=self._make_user("ic80001@iceberg.internal", "3", "IC80001"))
+        self.student_a = Student.objects.get(
+            admin=self._make_user("ic80001@iceberg.internal", "3", "IC80001")
+        )
         Enrollment.objects.create(student=self.student_a, group=self.group_a, is_active=True)
         # A student enrolled only in teacher B's group.
-        self.student_b = Student.objects.get(admin=self._make_user("ic80002@iceberg.internal", "3", "IC80002"))
+        self.student_b = Student.objects.get(
+            admin=self._make_user("ic80002@iceberg.internal", "3", "IC80002")
+        )
         Enrollment.objects.create(student=self.student_b, group=self.group_b, is_active=True)
 
         self.api = APIClient()
@@ -1563,8 +1583,15 @@ class AttendanceIntegrityTests(TestCase):
     def _make_user(self, email, user_type, login_id):
         UserModel = get_user_model()
         return UserModel.objects.create_user(
-            email=email, password="Pass123!", first_name="T", last_name="U",
-            user_type=user_type, gender="M", address="", profile_pic="", login_id=login_id,
+            email=email,
+            password="Pass123!",
+            first_name="T",
+            last_name="U",
+            user_type=user_type,
+            gender="M",
+            address="",
+            profile_pic="",
+            login_id=login_id,
         )
 
     def test_duplicate_attendance_report_rejected(self):
@@ -1574,9 +1601,13 @@ class AttendanceIntegrityTests(TestCase):
         course = Course.objects.create(name="English")
         teacher = Staff.objects.get(admin=self._make_user("at@iceberg.internal", "2", "TC60001"))
         group = Group.objects.create(name="G", course=course, teacher=teacher)
-        student = Student.objects.get(admin=self._make_user("ic60001@iceberg.internal", "3", "IC60001"))
+        student = Student.objects.get(
+            admin=self._make_user("ic60001@iceberg.internal", "3", "IC60001")
+        )
         att = Attendance.objects.create(group=group, date=date(2026, 1, 10))
-        AttendanceReport.objects.create(attendance=att, student=student, status=AttendanceReport.PRESENT)
+        AttendanceReport.objects.create(
+            attendance=att, student=student, status=AttendanceReport.PRESENT
+        )
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
                 AttendanceReport.objects.create(
@@ -1592,8 +1623,15 @@ class MediaProtectionTests(TestCase):
     def _make_user(self, email, user_type, login_id):
         UserModel = get_user_model()
         return UserModel.objects.create_user(
-            email=email, password="Pass123!", first_name="T", last_name="U",
-            user_type=user_type, gender="M", address="", profile_pic="", login_id=login_id,
+            email=email,
+            password="Pass123!",
+            first_name="T",
+            last_name="U",
+            user_type=user_type,
+            gender="M",
+            address="",
+            profile_pic="",
+            login_id=login_id,
         )
 
     def setUp(self):
@@ -1601,7 +1639,9 @@ class MediaProtectionTests(TestCase):
         from main_app.models import ResultFile
 
         self.course = Course.objects.create(name="English")
-        self.teacher = Staff.objects.get(admin=self._make_user("mt@iceberg.internal", "2", "TC70001"))
+        self.teacher = Staff.objects.get(
+            admin=self._make_user("mt@iceberg.internal", "2", "TC70001")
+        )
         self.group = Group.objects.create(name="G", course=self.course, teacher=self.teacher)
         self.enrolled_user = self._make_user("ic70001@iceberg.internal", "3", "IC70001")
         self.enrolled = Student.objects.get(admin=self.enrolled_user)
@@ -1609,7 +1649,9 @@ class MediaProtectionTests(TestCase):
         self.outsider_user = self._make_user("ic70002@iceberg.internal", "3", "IC70002")
 
         self.rf = ResultFile.objects.create(
-            group=self.group, title="Midterm", uploaded_by=self.teacher,
+            group=self.group,
+            title="Midterm",
+            uploaded_by=self.teacher,
             file=SimpleUploadedFile("midterm.pdf", b"PDF-DATA"),
         )
         self.media_path = "/media/" + self.rf.file.name
@@ -1931,9 +1973,7 @@ class StudentMobileApiTests(TestCase):
                 name=f"Trend Group {i}", course=self.course, teacher=self.teacher
             )
             Enrollment.objects.create(student=self.student, group=grp, is_active=True)
-            StudentResult.objects.create(
-                student=self.student, group=grp, test=30, exam=50
-            )
+            StudentResult.objects.create(student=self.student, group=grp, test=30, exam=50)
 
         res = self.api.get("/api/v1/student/home/")
         self.assertEqual(res.status_code, 200)
@@ -2088,14 +2128,14 @@ class AdminManagementTests(TestCase):
                 "first_name": "Rec",
                 "last_name": "Overy",
                 "email": "new-recovery@example.com",
-                "password": "FreshRecovery1",
+                "password": "Tundra-Lantern-42",
             },
         )
         self.assertRedirects(response, reverse("manage_admin"), fetch_redirect_response=False)
         self.recovery_user.refresh_from_db()
         # Email/password changed on the one account; old credentials no longer work.
         self.assertEqual(self.recovery_user.email, "new-recovery@example.com")
-        self.assertTrue(self.recovery_user.check_password("FreshRecovery1"))
+        self.assertTrue(self.recovery_user.check_password("Tundra-Lantern-42"))
         self.assertFalse(self.recovery_user.check_password("RecoveryPass123!"))
         # No duplicate account was created at the old address.
         self.assertFalse(
@@ -2119,7 +2159,7 @@ class AdminManagementTests(TestCase):
                 "first_name": "Rec",
                 "last_name": "Overy",
                 "email": "moved-recovery@example.com",
-                "password": "FreshRecovery1",
+                "password": "Tundra-Lantern-42",
             },
         )
         self.client.logout()
@@ -2137,7 +2177,7 @@ class AdminManagementTests(TestCase):
         # NEW credentials work.
         self.client.post(
             reverse("user_login"),
-            {"identifier": "moved-recovery@example.com", "password": "FreshRecovery1"},
+            {"identifier": "moved-recovery@example.com", "password": "Tundra-Lantern-42"},
         )
         self.assertEqual(str(self.client.session.get("_auth_user_id")), str(self.recovery_user.pk))
 
@@ -2379,3 +2419,291 @@ class CollectionsViewTests(TestCase):
         # Attention list holds the overdue/partial student, not the fully-paid one.
         self.assertEqual(len(ctx["attention"]), 1)
         self.assertTrue(ctx["attention"][0].is_overdue)
+
+
+@override_settings(**_BASE_OVERRIDES)
+class AuditSecurityFixTests(TestCase):
+    """Regression tests for the 2026-10 code-audit fixes (XSS, quiz scores,
+    private media, branch scoping, shared settings, passwords)."""
+
+    def _make_user(self, email, user_type, login_id=None):
+        return get_user_model().objects.create_user(
+            email=email,
+            password="Pass123!",
+            first_name="T",
+            last_name="U",
+            user_type=user_type,
+            gender="M",
+            address="",
+            profile_pic="",
+            login_id=login_id,
+        )
+
+    def setUp(self):
+        from rest_framework.test import APIClient
+
+        self.branch_a = Branch.objects.create(name="Audit A")
+        self.branch_b = Branch.objects.create(name="Audit B")
+        self.course = Course.objects.create(name="Audit English")
+
+        self.super_user = self._make_user("asuper@iceberg.internal", "1")
+        self.ba_user = self._make_user("aba@iceberg.internal", "1")
+        self.ba_user.admin.is_super_admin = False
+        self.ba_user.admin.save()
+        self.ba_user.admin.branches.add(self.branch_a)
+
+        self.teacher_a = Staff.objects.get(admin=self._make_user("ata@x.internal", "2", "TC60001"))
+        self.teacher_a.branch = self.branch_a
+        self.teacher_a.save()
+        self.teacher_b = Staff.objects.get(admin=self._make_user("atb@x.internal", "2", "TC60002"))
+        self.teacher_b.branch = self.branch_b
+        self.teacher_b.save()
+        self.group_a = Group.objects.create(
+            name="AG", course=self.course, teacher=self.teacher_a, branch=self.branch_a
+        )
+        self.group_b = Group.objects.create(
+            name="BG", course=self.course, teacher=self.teacher_b, branch=self.branch_b
+        )
+
+        self.student_a_user = self._make_user("asa@x.internal", "3", "IC60001")
+        self.student_a = Student.objects.get(admin=self.student_a_user)
+        self.student_a.branch = self.branch_a
+        self.student_a.save()
+        self.student_b_user = self._make_user("asb@x.internal", "3", "IC60002")
+        self.student_b = Student.objects.get(admin=self.student_b_user)
+        self.student_b.branch = self.branch_b
+        self.student_b.save()
+        Enrollment.objects.create(student=self.student_a, group=self.group_a, is_active=True)
+        Enrollment.objects.create(student=self.student_b, group=self.group_b, is_active=True)
+
+        self.api = APIClient()
+
+    # ── S1: script-context JSON escaping ────────────────────────────────────
+    def test_js_json_filter_cannot_close_script_tag(self):
+        from main_app.templatetags.json_tags import js_json
+
+        out = js_json(json.dumps({"name": "</script><script>alert(1)</script>"}))
+        self.assertNotIn("<", out)
+        self.assertNotIn(">", out)
+        self.assertEqual(json.loads(out)["name"], "</script><script>alert(1)</script>")
+
+    def test_leaderboard_page_escapes_student_name(self):
+        self.student_a_user.first_name = "</script><b>x"
+        self.student_a_user.save()
+        self.client.force_login(self.student_a_user)
+        res = self.client.get(reverse("student_leaderboard"))
+        self.assertEqual(res.status_code, 200)
+        self.assertNotIn(b"</script><b>x", res.content)
+
+    # ── S2: quiz score tampering ────────────────────────────────────────────
+    def _vocab_day(self, group):
+        from main_app.models import VocabularyDay, VocabularyDayWord
+
+        day = VocabularyDay.objects.create(
+            group=group,
+            day_number=1,
+            release_at=timezone.now() - timedelta(days=1),
+            created_by=group.teacher,
+        )
+        for i in range(4):
+            VocabularyDayWord.objects.create(day=day, word=f"w{i}", meaning=f"m{i}")
+        return day
+
+    def test_quiz_result_rejects_inflated_score(self):
+        from main_app.models import VocabularyQuizResult
+
+        day = self._vocab_day(self.group_a)
+        self.api.force_authenticate(user=self.student_a_user)
+        url = f"/api/v1/vocabulary/{day.id}/quiz-result/"
+        self.assertEqual(self.api.post(url, {"correct": 1000, "total": 1}).status_code, 400)
+        self.assertEqual(self.api.post(url, {"correct": 5, "total": 4}).status_code, 400)
+        self.assertFalse(VocabularyQuizResult.objects.exists())
+        res = self.api.post(url, {"correct": 3, "total": 4})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data["score"], 75.0)
+
+    def test_quiz_result_requires_enrollment(self):
+        day = self._vocab_day(self.group_b)
+        self.api.force_authenticate(user=self.student_a_user)
+        res = self.api.post(f"/api/v1/vocabulary/{day.id}/quiz-result/", {"correct": 4, "total": 4})
+        self.assertEqual(res.status_code, 403)
+
+    # ── S3: private media ───────────────────────────────────────────────────
+    def test_submission_and_chat_files_are_not_public(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from main_app.models import Submission
+        from rest_framework_simplejwt.tokens import AccessToken
+
+        assignment = Assignment.objects.create(
+            title="HW", group=self.group_a, due_date=date.today(), created_by=self.teacher_a
+        )
+        sub = Submission.objects.create(
+            assignment=assignment,
+            student=self.student_a,
+            file=SimpleUploadedFile("essay.txt", b"secret homework"),
+        )
+        msg = ChatMessage.objects.create(
+            thread=ChatThread.objects.get(group=self.group_a),
+            sender=self.student_a_user,
+            attachment=SimpleUploadedFile("photo.png", b"PNGDATA"),
+        )
+        sub_path = "/media/" + sub.file.name
+        chat_path = "/media/" + msg.attachment.name
+
+        # Anonymous → not served.
+        self.assertEqual(self.client.get(sub_path).status_code, 404)
+        self.assertEqual(self.client.get(chat_path).status_code, 404)
+        # Another branch's student → not served.
+        self.client.force_login(self.student_b_user)
+        self.assertEqual(self.client.get(sub_path).status_code, 404)
+        self.assertEqual(self.client.get(chat_path).status_code, 404)
+        # Owner (session) and the group's teacher → served.
+        self.client.force_login(self.student_a_user)
+        self.assertEqual(self.client.get(sub_path).status_code, 200)
+        self.assertEqual(self.client.get(chat_path).status_code, 200)
+        self.client.logout()
+        # Mobile app: JWT bearer token, no session.
+        token = str(AccessToken.for_user(self.teacher_a.admin))
+        res = self.client.get(sub_path, HTTP_AUTHORIZATION=f"Bearer {token}")
+        self.assertEqual(res.status_code, 200)
+
+    # ── S4: branch-admin scope in the API and notifications ─────────────────
+    def test_branch_admin_cannot_read_other_branch_lead(self):
+        lead_b = RegistrationLead.objects.create(full_name="Lead B", branch="Audit B")
+        lead_a = RegistrationLead.objects.create(full_name="Lead A", branch="Audit A")
+        self.api.force_authenticate(user=self.ba_user)
+        self.assertEqual(self.api.get(f"/api/v1/admin/leads/{lead_b.id}/").status_code, 404)
+        self.assertEqual(self.api.get(f"/api/v1/admin/leads/{lead_a.id}/").status_code, 200)
+        names = [row["full_name"] for row in self.api.get("/api/v1/admin/leads/").data["results"]]
+        self.assertEqual(names, ["Lead A"])
+
+    def test_branch_admin_cannot_create_student_in_other_branch(self):
+        self.api.force_authenticate(user=self.ba_user)
+        payload = {"first_name": "New", "password": "Str0ng-Passw0rd", "branch": self.branch_b.id}
+        res = self.api.post("/api/v1/admin/students/", payload, format="json")
+        self.assertEqual(res.status_code, 403)
+        res = self.api.patch(
+            f"/api/v1/admin/students/{self.student_a.id}/",
+            {"branch": self.branch_b.id},
+            format="json",
+        )
+        self.assertEqual(res.status_code, 400)
+        self.student_a.refresh_from_db()
+        self.assertEqual(self.student_a.branch, self.branch_a)
+
+    def test_branch_admin_cannot_delete_other_branch_story(self):
+        from main_app.models import DashboardStory
+
+        story = DashboardStory.objects.create(title="B only", created_by=self.super_user)
+        story.target_groups.set([self.group_b])
+        self.api.force_authenticate(user=self.ba_user)
+        self.assertEqual(self.api.delete(f"/api/v1/stories/{story.id}/").status_code, 403)
+        self.assertTrue(DashboardStory.objects.filter(id=story.id).exists())
+
+    def test_teacher_story_never_becomes_school_wide(self):
+        from main_app.models import DashboardStory
+
+        self.api.force_authenticate(user=self.teacher_a.admin)
+        res = self.api.post(
+            "/api/v1/stories/create/",
+            {"title": "Hi", "target_group_ids": [self.group_b.id]},
+            format="json",
+        )
+        self.assertEqual(res.status_code, 201)
+        story = DashboardStory.objects.get(id=res.data["id"])
+        self.assertEqual(list(story.target_groups.all()), [self.group_a])
+
+    def test_branch_admin_cannot_notify_other_branch_student(self):
+        from main_app.models import Notification
+
+        self.client.force_login(self.ba_user)
+        res = self.client.post(
+            reverse("send_student_notification"),
+            {"id": self.student_b_user.id, "message": "hello"},
+        )
+        self.assertEqual(res.status_code, 404)
+        self.assertFalse(Notification.objects.filter(recipient=self.student_b_user).exists())
+
+    def test_admin_result_upload_scoped_and_no_crash(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from main_app.models import ResultFile
+
+        self.api.force_authenticate(user=self.ba_user)
+        res = self.api.post(
+            "/api/v1/upload/",
+            {"file": SimpleUploadedFile("r.pdf", b"PDF"), "group_id": self.group_b.id},
+            format="multipart",
+        )
+        self.assertEqual(res.status_code, 404)
+        res = self.api.post(
+            "/api/v1/upload/",
+            {"file": SimpleUploadedFile("r.pdf", b"PDF"), "group_id": self.group_a.id},
+            format="multipart",
+        )
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(ResultFile.objects.get(id=res.data["id"]).uploaded_by, self.teacher_a)
+
+    def test_api_group_delete_does_not_crash(self):
+        empty = Group.objects.create(name="Empty", course=self.course, branch=self.branch_a)
+        self.api.force_authenticate(user=self.ba_user)
+        res = self.api.delete(f"/api/v1/admin/groups-manage/{self.group_a.id}/")
+        self.assertEqual(res.status_code, 400)  # has an enrolled student
+        res = self.api.delete(f"/api/v1/admin/groups-manage/{empty.id}/")
+        self.assertEqual(res.status_code, 204)
+
+    # ── S5: web attendance limited to enrolled students ─────────────────────
+    def test_web_attendance_drops_foreign_student(self):
+        self.client.force_login(self.teacher_a.admin)
+        rows = [
+            {"id": self.student_a.id, "status": AttendanceReport.ABSENT},
+            {"id": self.student_b.id, "status": AttendanceReport.ABSENT},
+        ]
+        res = self.client.post(
+            reverse("save_attendance"),
+            {"group": self.group_a.id, "date": "2026-01-10", "student_ids": json.dumps(rows)},
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(AttendanceReport.objects.filter(student=self.student_a).exists())
+        self.assertFalse(AttendanceReport.objects.filter(student=self.student_b).exists())
+
+    # ── S6: shared settings are super-admin only ────────────────────────────
+    def test_branch_admin_cannot_change_shared_settings(self):
+        self.client.force_login(self.ba_user)
+        self.client.post(reverse("add_course"), {"name": "Sneaky"})
+        self.assertFalse(Course.objects.filter(name="Sneaky").exists())
+        self.client.post(reverse("toggle_course_active", args=[self.course.id]))
+        self.course.refresh_from_db()
+        self.assertTrue(self.course.is_active)
+
+        self.api.force_authenticate(user=self.ba_user)
+        res = self.api.post("/api/v1/admin/courses/", {"name": "Sneaky"}, format="json")
+        self.assertEqual(res.status_code, 403)
+
+    def test_toggle_course_requires_post(self):
+        self.client.force_login(self.super_user)
+        self.assertEqual(
+            self.client.get(reverse("toggle_course_active", args=[self.course.id])).status_code,
+            405,
+        )
+
+    # ── S7: password strength ───────────────────────────────────────────────
+    def test_api_change_password_rejects_weak_password(self):
+        self.api.force_authenticate(user=self.student_a_user)
+        res = self.api.post(
+            "/api/v1/me/change-password/",
+            {
+                "old_password": "Pass123!",
+                "new_password": "12345678",
+                "confirm_password": "12345678",
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 400)
+        self.student_a_user.refresh_from_db()
+        self.assertTrue(self.student_a_user.check_password("Pass123!"))
+
+    # ── Bug: deleting a populated branch orphaned its records ───────────────
+    def test_cannot_delete_branch_with_students(self):
+        self.client.force_login(self.super_user)
+        self.client.post(reverse("delete_branch", args=[self.branch_b.id]))
+        self.assertTrue(Branch.objects.filter(id=self.branch_b.id).exists())

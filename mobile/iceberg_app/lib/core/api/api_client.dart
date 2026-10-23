@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const String kBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
@@ -161,6 +162,22 @@ class ApiClient {
     _access = null;
     _refresh = null;
     await _storage.deleteAll();
+    await _clearUserCaches();
+  }
+
+  /// Drop data that belongs to the signed-out user (cached dashboard JSON,
+  /// per-word vocab progress) so the next person on this device never sees
+  /// it. Runs on explicit logout and when a dead session is cleared.
+  /// Device-level UI preferences (`ice_*`: theme, language…) are kept.
+  Future<void> _clearUserCaches() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      for (final key in prefs.getKeys().toList()) {
+        if (key.startsWith('cache_') || key.startsWith('vocab_known_')) {
+          await prefs.remove(key);
+        }
+      }
+    } catch (_) {}
   }
 
   Future<String?> get accessToken async => _access ??= await _storage.read(key: 'access_token');

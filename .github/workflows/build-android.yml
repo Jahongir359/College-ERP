@@ -32,11 +32,11 @@ jobs:
       # Decode the base64-encoded keystore from GitHub Secrets
       - name: Decode keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > twa/iceberg-lc.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > infra/twa/iceberg-lc.keystore
 
       # Build the APK and AAB using the pre-configured twa-manifest.json
       - name: Build TWA with Bubblewrap
-        working-directory: twa
+        working-directory: infra/twa
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -52,14 +52,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: iceberg-lc-apk
-          path: twa/app-release-signed.apk
+          path: infra/twa/app-release-signed.apk
           retention-days: 30
 
       - name: Upload AAB artifact (Play Store)
         uses: actions/upload-artifact@v4
         with:
           name: iceberg-lc-aab
-          path: twa/app-release.aab
+          path: infra/twa/app-release.aab
           retention-days: 30
 
       # Automatically create a GitHub Release on version tags
@@ -68,8 +68,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            twa/app-release-signed.apk
-            twa/app-release.aab
+            infra/twa/app-release-signed.apk
+            infra/twa/app-release.aab
           body: |
             ## ICEBERG LC ${{ github.ref_name }}
 

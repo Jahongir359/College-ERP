@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load json_tags %}
 {% load static %}
 {% block title %}Flashcards Day {{ day.day_number }} — Iceberg{% endblock %}
 {% block page_title %}Flashcards — Day {{ day.day_number }}{% endblock %}
@@ -143,7 +144,7 @@
 
 {% block custom_js %}
 <script>
-var cards = {{ words_json|safe }};
+var cards = {{ words_json|js_json }};
 var idx = 0;
 var completed = {{ completed|yesno:"true,false" }};
 

@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from ... import branching
 from ...models import Enrollment, Group, Notification, ResultFile, Staff, Student
 from ..permissions import IsAdminOrTeacher
 
@@ -37,7 +38,17 @@ class FileUploadView(APIView):
                     status=status.HTTP_403_FORBIDDEN,
                 )
         else:
-            staff = None
+            # Admin upload: branch-scoped, and attributed to the group's teacher
+            # because ResultFile.uploaded_by is a required FK to Staff (passing
+            # None here used to crash with an IntegrityError → 500).
+            if not branching.user_can_access_group(request.user, group):
+                return Response({"detail": "Group not found."}, status=status.HTTP_404_NOT_FOUND)
+            staff = group.teacher
+            if staff is None:
+                return Response(
+                    {"detail": "Assign a teacher to this group before uploading result files."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         student_id = request.data.get("student_id")
         student = None

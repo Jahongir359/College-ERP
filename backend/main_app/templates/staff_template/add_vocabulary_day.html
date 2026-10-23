@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load json_tags %}
 {% load static %}
 {% block title %}{% if editing %}Edit{% else %}Create{% endif %} Vocabulary Day — Iceberg{% endblock %}
 {% block page_title %}{{ page_title }}{% endblock %}
@@ -196,7 +197,7 @@
   var rowIdx = 0;
 
   // Pre-populate existing words (edit mode)
-  var existing = {{ existing_words_json|default:"[]"|safe }};
+  var existing = {{ existing_words_json|default:"[]"|js_json }};
   if (existing && existing.length) {
     existing.forEach(function (w) { addRow(w); });
   } else {

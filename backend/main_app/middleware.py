@@ -73,6 +73,9 @@ class LoginCheckMiddleWare(MiddlewareMixin):
                 or request.path.startswith("/app")
                 # Public APK download and install guide — no login required.
                 or request.path.startswith("/download/")
+                # media_views.protected_media enforces its own per-prefix
+                # access checks (session or mobile JWT) for private files.
+                or request.path.startswith("/media/")
             ):
                 pass
             else:
