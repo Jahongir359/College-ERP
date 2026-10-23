@@ -1,0 +1,39 @@
+name: Flutter CI
+
+# Runs only when the Flutter app changes; the Django side has its own workflow (django.yml).
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "mobile/iceberg_app/**"
+      - ".github/workflows/flutter.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "mobile/iceberg_app/**"
+      - ".github/workflows/flutter.yml"
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile/iceberg_app
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.7"
+          channel: stable
+          cache: true
+      - name: Install packages
+        run: flutter pub get
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+      - name: Test
+        run: flutter test
+      # Same flags as build_web.sh and the Dockerfile: Django serves the bundle under /app/.
+      - name: Build web
+        run: flutter build web --release --base-href /app/

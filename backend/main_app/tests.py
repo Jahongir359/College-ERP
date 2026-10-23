@@ -2726,3 +2726,21 @@ class AuditSecurityFixTests(TestCase):
         self.client.force_login(self.super_user)
         self.client.post(reverse("delete_branch", args=[self.branch_b.id]))
         self.assertTrue(Branch.objects.filter(id=self.branch_b.id).exists())
+
+
+class StaticReferenceTests(TestCase):
+    def test_every_static_file_named_in_a_template_exists(self):
+        # Production uses manifest static storage, where a missing file is a 500
+        # (the APK download page broke this way).
+        from pathlib import Path
+
+        from django.contrib.staticfiles import finders
+
+        templates = Path(__file__).resolve().parent / "templates"
+        missing = []
+        for template in templates.rglob("*.html"):
+            text = template.read_text(encoding="utf-8")
+            for name in re.findall(r"\{%\s*static\s+['\"]([^'\"]+)['\"]", text):
+                if not finders.find(name):
+                    missing.append(f"{template.relative_to(templates)}: {name}")
+        self.assertEqual(missing, [])

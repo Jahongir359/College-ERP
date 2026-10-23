@@ -27,9 +27,8 @@ flutter build web --release --dart-define=API_BASE_URL=https://app.iceberglc.com
 
 ## Django Serving
 
-Django serves the built Flutter bundle from `../flutter_web/` at `/app/`.
-After building Flutter, copy or sync `build/web/` into that directory before
-deploying the Django app.
+Django serves the built Flutter bundle from `web/flutter_web/` at `/app/`. Deploys build it in
+the `Dockerfile`; locally, run `./build_web.sh` (it uses the required `--base-href /app/`).
 
 ## Current Parity Notes
 

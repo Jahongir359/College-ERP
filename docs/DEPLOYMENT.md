@@ -10,12 +10,13 @@ The primary deployment uses DigitalOcean App Platform, configured in `.do/app.ya
 
 ### How it works
 
-- **Service** (`web`): builds the Django app from `backend/`, installs
-  requirements, runs `collectstatic`, and starts Gunicorn.
-- **Pre-deploy job** (`db-migrate`): runs `manage.py migrate` before traffic is
+- **Service** (`web`): built from the repo's `Dockerfile`, which compiles the Flutter web app,
+  installs the Python requirements, runs `collectstatic` and starts Gunicorn on port 8080.
+- **Pre-deploy job** (`db-migrate`): the same image runs `manage.py migrate` before traffic is
   switched to the new release, guaranteeing zero-downtime schema changes.
-- `source_dir: /backend` tells App Platform that the Django root is `backend/`,
-  so `requirements.txt` and `manage.py` are found there automatically.
+
+The same `Dockerfile` runs on any container host. Where there is no pre-deploy step, set
+`MIGRATE_ON_START=1` so the container migrates before Gunicorn starts.
 
 ### Required environment variables (set in App Platform dashboard)
 
@@ -121,17 +122,12 @@ python manage.py migrate
 
 ## 5. Flutter web rebuild
 
-To update the web app served at `/app/`:
+The web app served at `/app/` is built during the deploy: the `Dockerfile` compiles it with
+`flutter build web --release --base-href /app/` and copies it into the image, so the build output
+is not committed. Push Flutter changes to `main` and the next deploy serves them.
 
-```bash
-cd mobile/iceberg_app
-flutter build web --release --output ../../web/flutter_web
-git add ../../web/flutter_web/
-git commit -m "chore: rebuild flutter web"
-git push
-```
-
-The next DigitalOcean deploy will serve the updated build.
+For local development, `mobile/iceberg_app/build_web.sh` builds with the same flags into
+`web/flutter_web/` (git-ignored).
 
 ---
 
