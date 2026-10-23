@@ -37,3 +37,29 @@ jobs:
       # Same flags as build_web.sh and the Dockerfile: Django serves the bundle under /app/.
       - name: Build web
         run: flutter build web --release --base-href /app/
+
+  # Builds a debug APK so Android build-tool problems (Gradle, AGP, Kotlin versions) show up on the
+  # PR instead of in the release workflow after merge. No signing or upload.
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: mobile/iceberg_app
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.7"
+          channel: stable
+          cache: true
+      - name: Install packages
+        run: flutter pub get
+      - name: Build debug APK
+        run: flutter build apk --debug

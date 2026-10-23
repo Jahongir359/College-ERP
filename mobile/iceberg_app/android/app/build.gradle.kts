@@ -25,10 +25,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-
     signingConfigs {
         if (keyPropertiesFile.exists()) {
             create("release") {
@@ -60,6 +56,14 @@ android {
                 signingConfigs.getByName("debug")
             }
         }
+    }
+}
+
+// Kotlin compiles to the same JVM target as the Java code above (kotlinOptions is deprecated in
+// Kotlin Gradle Plugin 2.2+; this is the form Flutter's own app template uses).
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
     }
 }
 
