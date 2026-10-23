@@ -185,9 +185,18 @@ def save_attendance(request):
     staff = get_object_or_404(Staff, admin=request.user)
     if group.teacher_id != staff.id:
         return HttpResponse("You do not own this group", status=403)
-    student_ids = {int(r["id"]) for r in rows if "id" in r}
-    if not student_ids:
-        return HttpResponse("No student IDs supplied", status=400)
+    # Object-level auth: keep only students actively enrolled in this group,
+    # mirroring the API endpoint — otherwise a crafted payload could write
+    # attendance (and send notifications) to any student in the system.
+    enrolled_ids = set(
+        Enrollment.objects.filter(group=group, is_active=True).values_list("student_id", flat=True)
+    )
+    try:
+        rows = [r for r in rows if "id" in r and int(r["id"]) in enrolled_ids]
+    except (TypeError, ValueError):
+        return HttpResponse("Invalid student data", status=400)
+    if not rows:
+        return HttpResponse("No enrolled students supplied", status=400)
 
     try:
         with transaction.atomic():

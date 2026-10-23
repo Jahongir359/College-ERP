@@ -856,6 +856,16 @@ class VocabularyDay(models.Model):
     def word_count(self):
         return self.words.count()
 
+    def student_can_view(self, student):
+        """Released, and either school-wide or the student is enrolled in the group."""
+        if not self.is_released:
+            return False
+        if self.release_scope == self.SCOPE_ALL:
+            return True
+        return Enrollment.objects.filter(
+            student=student, group_id=self.group_id, is_active=True
+        ).exists()
+
 
 class VocabularyDayWord(models.Model):
     """One vocabulary item inside a VocabularyDay."""
@@ -910,6 +920,23 @@ class VocabularyQuizResult(models.Model):
 
     def __str__(self):
         return f"{self.student} — {self.score:.0f}% ({self.taken_at.date()})"
+
+    @staticmethod
+    def score_submission(day, correct, total):
+        """Validate client-reported quiz counts and return (correct, total, score).
+
+        The quiz asks one question per word, so ``total`` must equal the day's
+        word count and ``correct`` must lie in [0, total]. Without this a client
+        could post correct=1000,total=1 and inflate the leaderboard. Raises
+        ValueError on anything out of range.
+        """
+        correct = int(correct)
+        total = int(total)
+        if total <= 0 or total != day.words.count():
+            raise ValueError("total must equal the number of quiz questions.")
+        if not 0 <= correct <= total:
+            raise ValueError("correct must be between 0 and total.")
+        return correct, total, round(correct / total * 100, 1)
 
 
 # ── Leaderboard configuration & history ─────────────────────────────────────

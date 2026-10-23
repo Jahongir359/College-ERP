@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load json_tags %}
 {% load static %}
 {% block title %}Quiz Day {{ day.day_number }} — Iceberg{% endblock %}
 {% block page_title %}Quiz — Day {{ day.day_number }}{% endblock %}
@@ -127,7 +128,7 @@
 
 {% block custom_js %}
 <script>
-var questions = {{ questions_json|safe }};
+var questions = {{ questions_json|js_json }};
 var qIdx = 0;
 var correctCount = 0;
 var answered = false;

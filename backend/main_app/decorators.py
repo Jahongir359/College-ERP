@@ -43,3 +43,26 @@ def _role_required(required_type):
 admin_only = _role_required("1")
 staff_only = _role_required("2")
 student_only = _role_required("3")
+
+
+def super_admin_only(view_func):
+    """Admin view restricted to super admins.
+
+    Courses, subjects, sessions and leaderboard settings are shared by every
+    branch, so a branch admin editing them would change other branches' data.
+    Branch admins are bounced back with a message instead of a 403 page.
+    """
+
+    @admin_only
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        from django.contrib import messages
+
+        from . import branching
+
+        if not branching.is_super_admin(request.user):
+            messages.error(request, "Only a super admin can change shared settings.")
+            return redirect(reverse("admin_home"))
+        return view_func(request, *args, **kwargs)
+
+    return wrapper

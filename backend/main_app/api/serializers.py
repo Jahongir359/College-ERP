@@ -170,6 +170,13 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True, min_length=8)
     confirm_password = serializers.CharField(write_only=True)
 
+    def validate_new_password(self, value):
+        from django.contrib.auth.password_validation import validate_password
+
+        request = self.context.get("request")
+        validate_password(value, getattr(request, "user", None))
+        return value
+
     def validate(self, attrs):
         if attrs["new_password"] != attrs["confirm_password"]:
             raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
@@ -728,7 +735,24 @@ class StaffStatsSerializer(serializers.Serializer):
 # ---------------------------------------------------------------------------
 
 
-class AdminStudentSerializer(serializers.ModelSerializer):
+class _BranchScopedMixin:
+    """Reject moving a record into a branch the requesting admin can't access."""
+
+    def validate_branch(self, branch):
+        from .. import branching
+
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if branch is None:
+            if user is not None and not branching.is_super_admin(user):
+                raise serializers.ValidationError("branch is required.")
+            return branch
+        if user is None or not branching.user_can_access_branch(user, branch):
+            raise serializers.ValidationError("You don't have access to that branch.")
+        return branch
+
+
+class AdminStudentSerializer(_BranchScopedMixin, serializers.ModelSerializer):
     """Full student record for admin CRUD."""
 
     first_name = serializers.CharField(source="admin.first_name")
@@ -793,7 +817,7 @@ class AdminStudentSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class AdminStaffSerializer(serializers.ModelSerializer):
+class AdminStaffSerializer(_BranchScopedMixin, serializers.ModelSerializer):
     """Full staff record for admin CRUD."""
 
     first_name = serializers.CharField(source="admin.first_name")

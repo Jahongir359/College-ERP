@@ -42,13 +42,13 @@ dmypy.json
 # Android signing keystore (store in GitHub Secrets, never commit)
 *.keystore
 *.jks
-twa/iceberg-lc.keystore.b64
+infra/twa/iceberg-lc.keystore.b64
 
 # Bubblewrap build output
-twa/app-*.apk
-twa/app-*.aab
-twa/output-metadata.json
-twa/android/
+infra/twa/app-*.apk
+infra/twa/app-*.aab
+infra/twa/output-metadata.json
+infra/twa/android/
 iceberg-student.apk
 
 # Build artifacts — regenerate with flutter build web

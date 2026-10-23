@@ -102,10 +102,7 @@ class VocabularyDayCompleteView(APIView):
             day = VocabularyDay.objects.get(pk=pk)
         except VocabularyDay.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-        enrolled = Group.objects.filter(
-            enrollment__student=student, enrollment__is_active=True, pk=day.group_id
-        ).exists()
-        if not enrolled:
+        if not day.student_can_view(student):
             return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
         VocabularyDayCompletion.objects.get_or_create(student=student, day=day)
         return Response({"status": "completed"})
@@ -197,6 +194,9 @@ class VocabularyQuizResultView(APIView):
         except VocabularyDay.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
+        if not day.student_can_view(student):
+            return Response({"detail": "Access denied."}, status=status.HTTP_403_FORBIDDEN)
+
         correct = request.data.get("correct")
         total = request.data.get("total")
         if correct is None or total is None:
@@ -205,15 +205,9 @@ class VocabularyQuizResultView(APIView):
             )
 
         try:
-            correct = int(correct)
-            total = int(total)
-        except (ValueError, TypeError):
-            return Response(
-                {"detail": "correct and total must be integers."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        score = round((correct / total) * 100, 1) if total else 0.0
+            correct, total, score = VocabularyQuizResult.score_submission(day, correct, total)
+        except (ValueError, TypeError) as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
         VocabularyQuizResult.objects.create(
             student=student,
@@ -504,13 +498,10 @@ class StoryCreateView(APIView):
         )
 
         if target_group_ids:
-            # Object-level auth: restrict targeting to groups the caller may access
-            # (a teacher's own groups, a branch admin's branches). Otherwise a
-            # teacher could broadcast a story to groups they don't teach.
-            groups = branching.filter_groups_for_user(
-                user, Group.objects.filter(id__in=target_group_ids)
-            )
-            story.target_groups.set(groups)
+            story.target_groups.set(Group.objects.filter(id__in=target_group_ids))
+        # Object-level auth: trim targets to groups the caller may access, and
+        # never let a teacher/branch admin publish a school-wide story.
+        branching.scope_story_target_groups(user, story)
 
         serializer = StorySerializer(story, context={"request": request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -530,8 +521,12 @@ class StoryDetailView(APIView):
         user = request.user
         user_type = str(user.user_type)
 
-        # Admin can delete any; staff can only delete their own
-        if user_type != "1" and story.created_by_id != user.id:
+        # Staff can only delete their own; admins follow the branch rules.
+        if user_type == "1":
+            allowed = branching.user_can_modify_story(user, story)
+        else:
+            allowed = story.created_by_id == user.id
+        if not allowed:
             return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
         story.delete()
