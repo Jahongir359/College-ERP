@@ -90,7 +90,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | Open — 0/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Open — 0/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
-| PD | Design: rules, mockups, owner approval (before P3/P4 code) | Open — 0/8 |
+| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins and teachers | Open — 0/6 |
 | P4 | App: choice screen, parent role, School screens | Open — 0/12 |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
@@ -247,9 +247,53 @@ Existing endpoints that parents also need (`assignments/`, `invoices/`, `notific
 ## 6. Design and experience
 
 The visual rules in [`ICEBERG_SCHOOL_BRAND_PLAN.md`](ICEBERG_SCHOOL_BRAND_PLAN.md) section 5 stay in
-force (Inter, radii, maroon tokens and School dark mode, logo rules, wording "Class / Grade").
-**One change:** that plan's section 9 step 5 says users cannot choose the brand. The choice screen
-(5.1) now lets people pick **before login only**; after login the account still decides.
+force (radii, maroon tokens and School dark mode, logo rules, wording "Class / Grade"), with **two
+changes** for the app:
+
+1. That plan's section 9 step 5 says users cannot choose the brand. The choice screen (5.1) now lets
+   people pick **before login only**; after login the account still decides.
+2. **School display headings use Fraunces** (the website's serif) so the app and iceberglc.com feel
+   like one school: the choice-screen title, greetings, screen titles and big numbers (time, quarter
+   grade, amount due). Everything else stays **Inter**. The ERP web pages keep Inter; the Study Center
+   keeps its current app look (Inter, navy/ice-blue, lime) unchanged.
+
+### 6.0 Reference mockups (the picture every build PR must match)
+
+Rendered from the brand tokens and the real logo files by
+[`school-app-mockups/build_mockups.py`](school-app-mockups/build_mockups.py) (edit the script and re-run
+to change a screen; never edit the PNGs by hand). Sample names, times and data are **fictional**;
+money is shown as `[summa]` because prices are not decided.
+
+![All app screens](school-app-mockups/overview.png)
+
+| # | Screen | File | Built in |
+|---|---|---|---|
+| 1 | Choice: School or Study Center | [01-choice.png](school-app-mockups/01-choice.png) | P4.2 |
+| 2 | Login — School | [02-login-school.png](school-app-mockups/02-login-school.png) | P4.2 |
+| 3 | Login — Study Center (its existing look) | [03-login-study-center.png](school-app-mockups/03-login-study-center.png) | P4.2 |
+| 4 | Parent home with child switcher | [04-parent-home.png](school-app-mockups/04-parent-home.png) | P4.4 |
+| 5 | Parent home — dark mode | [05-parent-home-dark.png](school-app-mockups/05-parent-home-dark.png) | P4.4 |
+| 6 | Timetable (week tabs, current lesson, homework marks) | [06-timetable.png](school-app-mockups/06-timetable.png) | P4.5 |
+| 7 | Attendance calendar + quarter totals | [07-attendance.png](school-app-mockups/07-attendance.png) | P4.4 |
+| 8 | Homework by due date | [08-homework.png](school-app-mockups/08-homework.png) | P4.8 |
+| 9 | Payments (amount due + history) | [09-payments.png](school-app-mockups/09-payments.png) | P4.8 |
+| 10 | Teacher ↔ parent messages | [10-messages.png](school-app-mockups/10-messages.png) | P4.8 |
+| 11 | Teacher home (register reminder, today's lessons) | [11-teacher-home.png](school-app-mockups/11-teacher-home.png) | P4.6 |
+| 12 | Daily register (everyone present by default) | [12-register.png](school-app-mockups/12-register.png) | P4.6 |
+| 13 | Register — "late" arrival time sheet | [13-register-late.png](school-app-mockups/13-register-late.png) | P4.6 |
+| 14 | Grades — Release 2 | [14-grades-r2.png](school-app-mockups/14-grades-r2.png) | P4.7 |
+| 15 | Empty, error, loading and offline states | [15-states.png](school-app-mockups/15-states.png) | P4.10, P4.11 |
+| 16 | Web — classes list (admin) | [16-web-classes.png](school-app-mockups/16-web-classes.png) | P3.1 |
+| 17 | Web — timetable editor with clash | [17-web-timetable.png](school-app-mockups/17-web-timetable.png) | P3.2 |
+
+Navigation per role (bottom tabs, at most five):
+
+| Role | Tabs |
+|---|---|
+| Parent (School) | Asosiy · Jadval · Vazifalar · Xabarlar · Profil — attendance and payments open from Home cards and Profil |
+| Student (School) | Asosiy · Jadval · Vazifalar · Baholar (Release 2) · Profil |
+| Teacher (School) | Bugun · Sinflarim · Davomat · Xabarlar · Profil |
+| Study Center users | Unchanged (existing app navigation, incl. vocabulary and leaderboard — D11) |
 
 ### 6.1 Principles
 
@@ -271,8 +315,19 @@ force (Inter, radii, maroon tokens and School dark mode, logo rules, wording "Cl
 - **Colours:** brand tokens (brand plan 5.2). School adds one highlight colour, **gold `#C9973F`**
   (the website's gold), for achievements, top grades and the active child chip only — never for text
   on white (fails contrast). Semantic colours (success, warning, danger, info) are shared.
-- **Type:** Inter only. Sizes on phone: 28/22/18/16/14/12 sp (display, title, heading, body, label,
-  caption); line height 1.3–1.5; numbers in tables use tabular figures.
+- **Type:** Fraunces 600 (bundled, SIL Open Font License) for School display text only (see the
+  change above); Inter for everything else. Sizes on phone: 28/22/18/16/14/12 sp (display, title,
+  heading, body, label, caption); line height 1.3–1.5; numbers in tables use tabular figures.
+- **Logos:** School — white crest (`assets/images/brand/school/crest-white.png`) and white horizontal
+  logo (`logo-h-white.png`) on maroon headers; the maroon crest/logo (`docs/brand/iceberg-school/web/`)
+  on light screens (choice screen, web sidebar, empty states as a 14% watermark). Study Center — its
+  existing `assets/images/logo.png` tile. Never recolour or stretch a logo; never maroon on maroon.
+  **Known defect:** `assets/images/iceberg-wordmark.png` (and its ERP copy `static/dist/img/`) is an
+  opaque black image with leftover screenshot text — not used on any screen today; replace it before
+  anything uses it (PD.7).
+- **Surfaces:** School screens use a maroon gradient header (deep maroon → maroon with a soft brick
+  glow and the crest at 7% as a watermark), cards in white on the warm `bg #FBF7F6`, 1 px warm border
+  and a soft maroon-tinted shadow, exactly as in the mockups.
 - **Shapes:** cards radius 24, chips/inputs 14, bottom sheets 32 (`IceTokens` `r`, `rSm`, `rLg`).
 - **Touch:** every tappable target at least 48 × 48 dp; primary action at the bottom, in thumb reach.
 - **Icons:** one outline icon set at one stroke width; the crest only as a brand mark, never as an icon.
@@ -308,8 +363,8 @@ because teachers will use them on their phones as well.
 
 ### 6.5 Design workflow (how design gets done before code)
 
-1. For each screen in 6.3/6.4 an HTML or Flutter **mockup** is made from these rules (task PD.x), in
-   Uzbek, at phone size (360 × 800 and 430 × 932) and desktop for web, light and dark.
+1. For each screen in 6.3/6.4 a **mockup** is made from these rules with `build_mockups.py` (section
+   6.0), in Uzbek, at phone size (390 × 844) and desktop (1280 × 800) for web.
 2. The owner approves the mockups (PD.8). Code starts only for approved screens.
 3. Each build PR includes screenshots of the real screens at the same sizes, in uz and ru, light and
    dark, next to the approved mockup.
@@ -437,17 +492,24 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### PD — Design (before P3/P4 code for each screen)
 
-- [ ] **PD.1** Design rules in code: School gold highlight token, type scale and spacing constants in
+- [ ] **PD.1** Design rules in code: bundle Fraunces (School display text), School gold highlight token, type scale and spacing constants in
       `IceTokens` (app) and brand CSS (web) per section 6.2; a small "component sheet" screen in debug
       builds showing buttons, chips, cards, status pills, empty/error states in both brands, light/dark.
-- [ ] **PD.2** Mockups: choice screen and login (both brands, uz/ru/en, light/dark). Needs: D7.
-- [ ] **PD.3** Mockups: parent home with child switcher, attendance calendar, payments, messages.
-- [ ] **PD.4** Mockups: timetable (student/parent/teacher), teacher home and the register.
-- [ ] **PD.5** Mockups: grades for parent/student and teacher entry. (Release 2.)
-- [ ] **PD.6** Mockups: web "Maktab" section — classes, timetable editor, parents and CSV import,
-      register report; teacher register page on phone.
-- [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en).
-- [ ] **PD.8** **Owner** approves PD.2–PD.7 (record the date per screen here). Code tasks for a screen
+- [x] **PD.2** Mockups: choice screen and login (both brands) — done 2026-10-23, PR #27; screens 1–3 in
+      section 6.0 (Uzbek; ru/en and dark are checked with real screenshots in the build PR, 0.1).
+- [x] **PD.3** Mockups: parent home with child switcher (light and dark), attendance calendar, homework,
+      payments, messages — done 2026-10-23, PR #27; screens 4–10.
+- [x] **PD.4** Mockups: timetable, teacher home, register and the late-arrival sheet, plus empty/error/
+      loading/offline states — done 2026-10-23, PR #27; screens 6, 11–13, 15.
+- [~] **PD.5** Mockups: grades for parent/student (screen 14 done 2026-10-23, PR #27); **teacher grade
+      entry still to draw**. (Release 2.)
+- [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
+      2026-10-23, PR #27; screens 16–17.
+- [ ] **PD.9** Mockups still to draw: web parents list + CSV import preview, register report, and the
+      teacher register page on a phone (same layout as screen 12).
+- [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en); a clean
+      transparent Study Center wordmark replacing the defective `iceberg-wordmark.png`.
+- [ ] **PD.8** **Owner** approves the mockups in section 6.0 (and later PD.5, PD.7, PD.9; record the date per screen here). Code tasks for a screen
       need its approval.
 
 ### P3 — Web screens (admins and teachers)
@@ -572,6 +634,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-10-23 — PD.2, PD.3, PD.4, PD.6 done (PD.5 half): 17 reference mockups in
+  `docs/plans/school-app-mockups/` (script + PNGs), shown in section 6.0 with navigation per role;
+  design rules tightened (Fraunces for School display text, logo usage, surfaces); found the
+  defective `iceberg-wordmark.png` (PD.7). Next: owner approval PD.8.
 - 2026-10-23 — owner decided D4 (one parent login for all children, School and Study Center) and D11
   (vocabulary, flashcards, leaderboard: Study Center only). Still open: D9, D10, D12–D14. Next: P0.2.
 - 2026-10-23 — owner decided D2 (daily register), D3 (marks 2–5, quarter and year grades), D7 ("Iceberg
