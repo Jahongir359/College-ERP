@@ -858,4 +858,14 @@ what's next. Newest at the bottom.
   `/questions`, School enquiry through `/api/register` → Sheets → ERP (`source=school-website`,
   `program="Grade N"`, branch `SCHOOL_BRANCH_NAME`). Flask 18 tests OK, Node 25 OK, static build check OK;
   every page checked at 390 px and 1280 px. Next: owner fills School facts and reviews copy; deploy.
+- **2026-10-23 — Claude (Opus 5.5) — Website design pass (website repo).** Owner asked for more warmth:
+  cream/paper backgrounds, gold accents (new `tokens.json` school keys `gold`, `goldInk`, `goldSoft`,
+  `cream`, `paper`), Fraunces serif headings on the website only, light heroes with curved edges, team
+  and leader photos, word-rise headline, card hover, course marquee, page view transitions. Home hero
+  shows the owner's school poster uncropped ("ICEBERG MAKTABI"); About page has the leader's welcome
+  (name/role/message placeholders in `config/school.json`). Programs hero: the crest mountain drawing
+  itself with the grade stages as the way up. Website PRs opened stacked: `feat/erp-lead-forwarding` →
+  `feat/design-system-foundation` → `feat/school-site`. Open owner items: School facts and leader text in
+  `config/school.json`, "Iceberg Maktabi" vs "Iceberg School" naming in Uzbek copy, Cloudflare secrets,
+  Apps Script redeploy, ERP branch names; Phase 5 (Flutter) still needs `flutter analyze`/`test`.
 
