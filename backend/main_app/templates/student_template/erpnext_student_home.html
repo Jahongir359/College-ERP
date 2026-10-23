@@ -25,10 +25,10 @@
   --sh-soft:     0 2px 10px rgba(12,31,69,.05);
   --sh-card:     0 4px 20px rgba(12,31,69,.09);
   --sh-elevated: 0 8px 36px rgba(12,31,69,.14);
-  --navy:        #0C1F45;
-  --navy-mid:    #1B3F7A;
-  --cyan:        #06B6D4;
-  --bg-page:     #EEF3FB;
+  --navy:        var(--brand-primary, #0C1F45);
+  --navy-mid:    var(--brand-primary-hover, #1B3F7A);
+  --cyan:        var(--brand-accent-2, #06B6D4);
+  --bg-page:     var(--brand-tint, #EEF3FB);
   --surface:     #ffffff;
   --border:      #E2EAF4;
   --text:        #0C1A36;
@@ -99,13 +99,13 @@
 }
 .dash-avatar-ring-bg {
   position: absolute; inset: 0; border-radius: 50%;
-  background: linear-gradient(135deg, #06B6D4 0%, #1B3F7A 50%, #0C1F45 100%);
+  background: linear-gradient(135deg, var(--brand-accent-2, #06B6D4) 0%, var(--brand-primary-hover, #1B3F7A) 50%, var(--brand-primary, #0C1F45) 100%);
   box-shadow: 0 0 0 1px rgba(6,182,212,.4);
 }
 .dash-avatar {
   position: absolute; inset: 3px;
   border-radius: 50%;
-  background: #1B3F7A;
+  background: var(--brand-primary-hover, #1B3F7A);
   color: #fff; font-size: 18px; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden; z-index: 1;
@@ -137,15 +137,15 @@
   display: inline-flex; align-items: center; gap: 5px; margin-top: 6px;
   padding: 3px 10px; border-radius: var(--r-pill);
   background: rgba(6,182,212,.18); border: 1px solid rgba(6,182,212,.32);
-  color: #67E8F9; font-size: 10.5px; font-weight: 700;
+  color: var(--brand-primary-ink, #67E8F9); font-size: 10.5px; font-weight: 700;
 }
 /* ── Hero rank badge (replaces the old notification bell) ──────── */
 .dash-rankbadge {
   --rb-glow:  rgba(6,182,212,.45);
   --rb-edge:  rgba(6,182,212,.5);
-  --rb-tone1: #06B6D4;
-  --rb-tone2: #1B3F7A;
-  --rb-text:  #67E8F9;
+  --rb-tone1: var(--brand-accent-2, #06B6D4);
+  --rb-tone2: var(--brand-primary-hover, #1B3F7A);
+  --rb-text:  var(--brand-primary-ink, #67E8F9);
 
   flex-shrink: 0;
   position: relative;
@@ -303,8 +303,8 @@
   display: flex; align-items: flex-start; gap: 10px;
 }
 .dark-mode .dash-notif-card { background: rgba(27,63,122,.2); border-color: rgba(6,182,212,.18); }
-.dash-notif-card i { color: #1B3F7A; flex-shrink: 0; font-size: 13px; margin-top: 2px; }
-.dark-mode .dash-notif-card i { color: #67E8F9; }
+.dash-notif-card i { color: var(--brand-primary-hover, #1B3F7A); flex-shrink: 0; font-size: 13px; margin-top: 2px; }
+.dark-mode .dash-notif-card i { color: var(--brand-primary-ink, #67E8F9); }
 .dash-notif-msg { font-size: 13px; font-weight: 600; color: #1E3A8A; flex: 1; line-height: 1.45; }
 .dark-mode .dash-notif-msg { color: #93C5FD; }
 .dash-notif-date { font-size: 11px; color: #64748B; white-space: nowrap; margin-top: 1px; }
@@ -331,7 +331,7 @@
 }
 .dash-story-ring {
   width: 68px; height: 68px; border-radius: 50%; padding: 3px;
-  background: linear-gradient(135deg, #06B6D4, #1B3F7A);
+  background: linear-gradient(135deg, var(--brand-accent-2, #06B6D4), var(--brand-primary-hover, #1B3F7A));
   box-shadow: 0 4px 14px rgba(6,182,212,.28);
   transition: transform .15s;
 }
@@ -390,7 +390,7 @@
 .story-modal-body { padding: 20px 20px 24px; }
 .story-modal-type {
   display: inline-block; padding: 3px 10px; border-radius: var(--r-pill);
-  background: rgba(6,182,212,.18); color: #67E8F9;
+  background: rgba(6,182,212,.18); color: var(--brand-primary-ink, #67E8F9);
   font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
   margin-bottom: 8px;
 }
@@ -408,7 +408,7 @@
   height: 3px; background: rgba(255,255,255,.15); position: relative; overflow: hidden;
 }
 .story-progress-fill {
-  height: 100%; background: #06B6D4;
+  height: 100%; background: var(--brand-accent-2, #06B6D4);
   animation: dProgress 5s linear forwards;
 }
 @keyframes dProgress { from { width: 0%; } to { width: 100%; } }
@@ -566,7 +566,7 @@
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.08); }
 }
-.dash-qa-badge.cyan  { background: #06B6D4; box-shadow: 0 3px 10px rgba(6,182,212,.5); }
+.dash-qa-badge.cyan  { background: var(--brand-accent-2, #06B6D4); box-shadow: 0 3px 10px rgba(6,182,212,.5); }
 .dash-qa-badge.green { background: #10B981; box-shadow: 0 3px 10px rgba(16,185,129,.5); }
 .dash-qa-badge.amber { background: #F59E0B; box-shadow: 0 3px 10px rgba(245,158,11,.5); }
 
@@ -641,7 +641,7 @@
 .dash-teacher-chip { display: inline-flex; align-items: center; gap: 7px; flex: 1; min-width: 0; }
 .dash-teacher-av {
   width: 28px; height: 28px; border-radius: 50%;
-  background: linear-gradient(135deg, #0C1F45, #1B3F7A);
+  background: linear-gradient(135deg, var(--brand-primary, #0C1F45), var(--brand-primary-hover, #1B3F7A));
   color: #fff; font-size: 11px; font-weight: 800;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
@@ -828,7 +828,7 @@
       {% for s in stories %}
       <div class="dash-story-card" onclick="openStory({{ forloop.counter0 }})">
         <div class="dash-story-ring">
-          <div class="dash-story-inner" style="background:{{ s.bg_color|default:'#0C1F45' }};">
+          <div class="dash-story-inner" style="background:{{ s.bg_color|default:'var(--brand-primary, #0C1F45)' }};">
             <span class="dash-story-emoji">{{ s.emoji|default:'📢' }}</span>
             {% if s.safe_image_url %}
             <img class="dash-story-img" src="{{ s.safe_image_url }}" alt="{{ s.title }}"
@@ -904,7 +904,7 @@
 
     {% if is_english %}
     <a href="{% url 'vocabulary_day_list' %}" class="dash-qa"
-       style="--qa-bg:linear-gradient(135deg,#06B6D4,#0891B2); --qa-shadow:rgba(6,182,212,.32); --qa-tint:rgba(6,182,212,.35); --qa-line:#06B6D4;">
+       style="--qa-bg:linear-gradient(135deg,var(--brand-accent-2, #06B6D4),var(--brand-accent-2, #0891B2)); --qa-shadow:rgba(6,182,212,.32); --qa-tint:rgba(6,182,212,.35); --qa-line:var(--brand-accent-2, #06B6D4);">
       <div class="dash-qa-icon">
         <i class="fas fa-language"></i>
         {% if qa_new_vocab_days %}<span class="dash-qa-badge cyan">{{ qa_new_vocab_days }}</span>{% endif %}
@@ -932,7 +932,7 @@
     </a>
 
     <a href="{% url 'profile_hub' %}" class="dash-qa"
-       style="--qa-bg:linear-gradient(135deg,#1B3F7A,#0C1F45); --qa-shadow:rgba(27,63,122,.32); --qa-tint:rgba(27,63,122,.35); --qa-line:#1B3F7A;">
+       style="--qa-bg:linear-gradient(135deg,var(--brand-primary-hover, #1B3F7A),var(--brand-primary, #0C1F45)); --qa-shadow:rgba(27,63,122,.32); --qa-tint:rgba(27,63,122,.35); --qa-line:var(--brand-primary-hover, #1B3F7A);">
       <div class="dash-qa-icon"><i class="fas fa-user-circle"></i></div>
       <div class="dash-qa-title">Profile</div>
     </a>
@@ -951,7 +951,7 @@
   {% with idx=forloop.counter0 %}
   <div class="dash-lesson">
     <div class="dash-lesson-accent"
-         style="background:{% cycle '#3B82F6' '#10B981' '#8B5CF6' '#F59E0B' '#EF4444' '#06B6D4' %};">
+         style="background:{% cycle '#3B82F6' '#10B981' '#8B5CF6' '#F59E0B' '#EF4444' 'var(--brand-accent-2, #06B6D4)' %};">
     </div>
     <div class="dash-lesson-body">
       <div class="dash-lesson-top">
@@ -1030,7 +1030,7 @@
       {% with idx=forloop.counter0 %}
       <a href="{% url 'submit_assignment' a.id %}" class="dash-task-row">
         <div class="dash-task-icon"
-             style="background:{% cycle '#0C1F45' '#0D9488' '#D97706' '#7C3AED' %};">
+             style="background:{% cycle 'var(--brand-primary, #0C1F45)' '#0D9488' '#D97706' '#7C3AED' %};">
           {{ a.title|first|upper }}
         </div>
         <div class="dash-task-body">
@@ -1085,7 +1085,7 @@
   </div>
   <div class="dash-vocab-grid">
     <a href="{% url 'vocabulary_day_list' %}" class="dash-vocab-tile">
-      <div class="dash-vocab-icon" style="background:#0C1F45;"><i class="fas fa-layer-group"></i></div>
+      <div class="dash-vocab-icon" style="background:var(--brand-primary, #0C1F45);"><i class="fas fa-layer-group"></i></div>
       <div class="dash-vocab-name">Daily Words</div>
       <div class="dash-vocab-desc">Study today's vocabulary list</div>
     </a>
@@ -1220,7 +1220,7 @@
       series: [{
         name: 'Performance',
         data: trend.values,
-        color: '#00CFE8',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--brand-accent-2').trim() || '#00CFE8',
       }],
       suffix: '%',
       yMax: 100,
