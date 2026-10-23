@@ -703,9 +703,9 @@ this repo:
 - [ ] School branch created in the ERP; exact name shared with the website (`SCHOOL_BRANCH_NAME`)
 
 **Phase 5 — Flutter**
-- [ ] Assets + `brand.dart` + `IceTokens`/`AppTheme` brand parameter
-- [ ] `brandProvider` from `/api/me/`, persisted
-- [ ] Wording + logos by brand
+- [x] Assets + `brand.dart` + `IceTokens`/`AppTheme` brand parameter
+- [x] `brandProvider` from `/api/me/`, persisted
+- [x] Wording + logos by brand
 - [x] `flutter analyze` (no errors or warnings; 13 deprecation infos in older screens), `flutter test`, `flutter build web --release` — verified 2026-10-23 with Flutter 3.47.7 / Dart 3.13.5
 
 **Phase 6 — Rollout**
