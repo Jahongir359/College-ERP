@@ -9,8 +9,9 @@ Related: [`ICEBERG_SCHOOL_BRAND_PLAN.md`](ICEBERG_SCHOOL_BRAND_PLAN.md) (ERP sid
 document defines **Phase 4** and replaces that plan's section 8 (Django-hosted site — not built).
 Design reference (canvas, private to the owner): https://claude.ai/artifact/9KE5AjoJ59UQJu22Z656gB
 
-Written so any AI agent or developer can execute it without prior context. Sections 4–10 are meant
-to be copied into the website repo's `AGENTS.md` / docs when work starts there.
+Written so any AI agent or developer can execute it without prior context. When work starts in the
+website repo, copy [`ICEBERG_WEBSITE_AGENTS.md`](ICEBERG_WEBSITE_AGENTS.md) into it as its `AGENTS.md`
+(and this plan into its `docs/`) — that file is the website agent's short guide and points back here.
 
 ---
 
@@ -125,21 +126,23 @@ Until decided, the website keeps its current LC colours and only the School uses
 
 ### 4.1 School pages
 
-Adapt to the real framework once the code is visible.
+Adapt to the real framework once the code is visible. Build these on top of the 4.0 foundation.
 
-1. **Separate layout for the School.** A `school` base template/layout that does **not** inherit
-   the LC header, footer, colours or theme-color, but reuses the site's plumbing (static files,
-   analytics, Turnstile script, 404 handling). Put School templates/pages in their own folder
-   (e.g. `templates/school/` or `pages/school/`) and School CSS in `/static/school/css/school.css`.
-2. **Brand values from `tokens.json`.** Copy `docs/brand/iceberg-school/tokens.json` and the logo
-   crops from `docs/brand/iceberg-school/web/` (this ERP repo is the source of truth) into
-   `/static/school/`. Define the colours as CSS custom properties in `school.css`
-   (`--brand-primary: #4C0909;` …) — never hard-code hexes in templates.
-3. **Typography.** The canvas design uses **Inter** (the ERP's font). Load Inter only on School pages.
-4. **Tailwind.** The LC site uses the Tailwind CDN "play" script, which Tailwind says is not meant for
-   production (it builds CSS in the browser, slowing first paint). For School pages either write
-   plain CSS in `school.css` (recommended: the design is small) or add a proper Tailwind build step for
-   the whole site. Don't add a second CDN copy.
+1. **Shared layout, School brand.** School pages use the shared base layout from 4.0 with
+   `brand = school` (`<html data-brand="school">`): School name, logos, nav, footer, theme-color
+   `#4C0909`, JSON-LD and Portal-login URL come from the brand object, never from LC values. Put
+   School page templates in their own folder (e.g. `templates/school/` or `pages/school/`).
+   *If the owner wants the School live before 4.0 is finished:* a temporary `school` layout that
+   reuses only the plumbing (static files, analytics, Turnstile, 404) is acceptable, but it must use
+   the same component markup and `var(--brand-*)` names so it folds into the shared layout later.
+2. **Brand values from `tokens.json`.** Copy `docs/brand/iceberg-school/tokens.json` (this ERP repo
+   is the source of truth) to `/static/brand/tokens.json` and generate `/static/brand/tokens.css` from
+   it (4.0 step 2). Copy the logo crops from `docs/brand/iceberg-school/web/` into
+   `/static/school/img/`. Never hard-code hexes in templates or page CSS — only `var(--brand-*)`.
+3. **Typography.** **Inter** on every page (4.0 step 5), self-hosted or from Google Fonts with
+   `display=swap`.
+4. **CSS.** Use the 4.0 build. School-only styles (if any) go in `/static/school/css/school.css` and
+   still use only `var(--brand-*)`. Never add a second Tailwind CDN script.
 5. **Pages and content** — from the canvas design:
    - *Header:* maroon bar, `logo-h-white.png`, nav (About, Programs, Admissions, News, Contact),
      language switcher, **Portal login** → `https://app.iceberglc.com/login/?brand=school`.
@@ -157,10 +160,10 @@ Adapt to the real framework once the code is visible.
 6. **Link the brands together.** Add an "Iceberg School" link to the LC header or footer (this
    internal link matters for search) and "Iceberg Learning Center" on School pages. No automatic
    redirects between brands.
-7. **Languages.** The LC site translates with the Google Translate widget, so search engines only see
-   Uzbek. For the School, launch with **real Uzbek pages**; add real Russian/English pages
-   (`/school/ru/…`, `/school/en/…` with `hreflang`) when the translations exist. Until then the same
-   widget can be reused for visitors. Owner to confirm (section 11).
+7. **Languages.** Same scheme as 4.0 step 4. Launch with **real Uzbek pages**; add real Russian and
+   English pages with `hreflang` when the translations exist (use the same URL pattern as the LC pages,
+   e.g. `/ru/school/…` if LC uses `/ru/about`). Until then the Google Translate widget may stay for
+   visitors. Owner to confirm (section 11).
 
 ## 5. Search setup (people searching "Iceberg School" land on School pages)
 
@@ -236,8 +239,8 @@ and the Telegram fallback. Add a form type:
 
 | Asset | Source of truth (this repo) | Copy in the website |
 |---|---|---|
-| Colours, font, radii | `docs/brand/iceberg-school/tokens.json` | `/static/school/tokens.json` → CSS variables in `school.css` |
-| Logos | `docs/brand/iceberg-school/web/*.png` (originals in `original/`) | `/static/school/img/` |
+| Colours, font, radii (both brands) | `docs/brand/iceberg-school/tokens.json` | `/static/brand/tokens.json` → generated `/static/brand/tokens.css` |
+| School logos | `docs/brand/iceberg-school/web/*.png` (originals in `original/`) | `/static/school/img/` |
 | Design | canvas (link at top), ERP brand plan section 5 | — |
 
 When a brand value changes: update `tokens.json` here, then copy it to the website.
@@ -250,7 +253,9 @@ When a brand value changes: update `tokens.json` here, then copy it to the websi
   Accessibility ≥ 95.
 - Enquiry end-to-end on staging/preview: submit → lead in ERP with `source = school-website`, correct
   `program`, visible to a School branch admin; failure path shows the phone/Telegram fallback.
-- LC pages unchanged except the added School link; `/register` still works and LC leads still arrive.
+- LC pages: same URLs, same copy, same SEO tags (title, description, canonical, JSON-LD); visual
+  changes only from the agreed re-skin (before/after screenshots of every LC page, desktop + 390 px,
+  shown to the owner). `/register` still works and LC leads still arrive.
 - `sitemap.xml` lists School URLs; `robots.txt` unchanged.
 - Phone width (390 px) and desktop checked; no horizontal scroll.
 
@@ -300,16 +305,19 @@ When a brand value changes: update `tokens.json` here, then copy it to the websi
    photos.
 4. Languages at launch: Uzbek only first, then real Russian/English pages (recommended), or keep the
    Google Translate widget for now?
+5. Exact ERP branch names (LC branches + the new School branch).
 6. Learning Center palette for the shared design system: teal + lime, or the website's navy + blue
    (section 4.0.1)?
-5. Exact ERP branch names (LC branches + the new School branch).
+7. Order: re-skin the LC site first and then add the School (recommended — one design system from day
+   one), or ship the School first on a temporary layout (4.1 point 1)?
 
 ## 12. Agent rules for working in the website repo
 
 - The ERP is `College-ERP` (app.iceberglc.com). Never add ERP logic to the website and never call the
   ERP from browser JavaScript — only from the server-side form handler.
-- Don't change Learning Center pages beyond the School link and the branch-name fix.
-- School styles stay in `/static/school/`; brand files there are copies — change them in the ERP repo.
+- Learning Center pages may be re-skinned onto the shared design system (4.0), but their URLs, copy
+  and SEO tags stay; any moved URL gets a 301. Screenshot before/after and show the owner.
+- Brand files in `/static/brand/` and `/static/school/img/` are copies — change them in the ERP repo.
 - Every School page has the section 5 tags; every new string is in Uzbek first.
 - Never invent facts; use `[PLACEHOLDER]` until the owner provides them.
 - Secrets only in the hosting provider's settings, never in the repo.

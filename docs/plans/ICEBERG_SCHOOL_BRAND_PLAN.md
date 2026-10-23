@@ -783,3 +783,15 @@ what's next. Newest at the bottom.
   keeping Phase 3's School-only `{% if brand.key == "school" %}` blocks and `brand-school-auth.css` link,
   and Phase 2's new `BrandConfig` fields where they don't change Learning Center output; re-run
   `tests_brand_auth.py` and `tests_brand_web.py` after resolving.
+- **2026-10-23 — Claude (Opus 5.5) — Phase 5 (in progress) + website guide.** Branch
+  `feat/school-brand-phase-5`. Flutter brand layer committed as work in progress: new
+  `lib/core/theme/brand.dart` (`IceBrand`, `SchoolColors`, brand-aware colour getters) and
+  `brand_provider.dart` (brand from the signed-in user's `brand`, last brand persisted for
+  splash/login), `IceUser.brand`, `buildIceTheme(brand:)`, app title by brand, "Class"/"My Class"
+  strings, shells/widgets switched from fixed `IceColors` to brand getters, School logo assets.
+  **Not yet verified:** `flutter analyze` / `flutter test` / build (Flutter isn't installed in the
+  codespace) — Phase 5 checklist stays open until they pass. Website plan finished: sections 4.1, 8, 9,
+  11, 12 reconciled with the owner's "re-skin the LC site onto the shared design system" decision
+  (shared layout + `/static/brand/tokens.css` instead of a School-only layout; LC URLs/copy/SEO kept),
+  question 7 (order: re-skin first or School first) added, and a ready-to-copy website `AGENTS.md`
+  template added as `docs/plans/ICEBERG_WEBSITE_AGENTS.md`. No backend code changed.

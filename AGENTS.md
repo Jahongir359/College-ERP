@@ -15,6 +15,8 @@ The public websites (Learning Center at `iceberglc.com`, School at `iceberglc.co
 **iceberglc.com website codebase**, not here — see
 [`docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md`](docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md). This repo
 only provides the lead endpoint, the brand source of truth (`docs/brand/`) and the School-branded portal.
+The ready-to-copy agent guide for that website repo is
+[`docs/plans/ICEBERG_WEBSITE_AGENTS.md`](docs/plans/ICEBERG_WEBSITE_AGENTS.md).
 
 ## Repo layout
 
