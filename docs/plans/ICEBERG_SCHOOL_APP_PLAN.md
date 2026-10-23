@@ -41,7 +41,7 @@ A task is done only when **all** of these hold:
       `flutter build web --release --base-href /app/`.
 - [ ] **Tests added** for the new behaviour, including **access tests** for every new endpoint or
       page: the right role gets it, every other role and another branch's user gets 403/404, and a
-      parent never sees another family's child (section 6.2).
+      parent never sees another family's child (section 8.2).
 - [ ] Branch scoping goes through `backend/main_app/branching.py` only (new `filter_*`/`user_can_*`
       helpers there). No inline branch filters in views, serializers or forms.
 - [ ] Migrations are **additive** and generated with `makemigrations` (new models, new nullable or
@@ -50,6 +50,8 @@ A task is done only when **all** of these hold:
       screens, wording or fields.
 - [ ] Every new user-facing string exists in **Uzbek, Russian and English** (web templates and
       `mobile/iceberg_app/lib/core/i18n/strings.dart`).
+- [ ] Screens (app or web) match the owner-approved mockup (PD.8) and the rules in section 6; the PR
+      shows screenshots at phone size in uz and ru, light and dark.
 - [ ] Docs updated where behaviour changed (this plan; `docs/DEPLOYMENT.md` for env vars;
       `.env.example` for new settings).
 - [ ] CI green on the PR (Django CI and Flutter CI). The "Workers Builds: college-erp" check is a
@@ -67,7 +69,7 @@ In the PR that completes the task, change the line to:
 - Name the PR and the test classes or commands that prove it.
 - Update the phase line in the Status board (`3/6 done`) and, when the last task of a phase is ticked,
   set the phase to **Done** with the date.
-- Add one line to the Progress log (section 9): date, task IDs, PR, anything the next agent must know.
+- Add one line to the Progress log (section 11): date, task IDs, PR, anything the next agent must know.
 
 ### 0.3 If a done task turns out broken
 
@@ -85,17 +87,20 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 
 | Phase | What | Status |
 |---|---|---|
-| P0 | Foundations: hosting, domain, open PRs merged, staging | Open — 0/7 |
+| P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | Open — 0/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Open — 0/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
+| PD | Design: rules, mockups, owner approval (before P3/P4 code) | Open — 0/8 |
 | P3 | Web screens for admins and teachers | Open — 0/6 |
-| P4 | App: choice screen, parent role, School screens | Open — 0/10 |
+| P4 | App: choice screen, parent role, School screens | Open — 0/12 |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
+| PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 0/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 
-**Release 1 (first store version)** = P0, P1, P2.1–P2.3 + P2.6–P2.8, P3.1–P3.4, P4 (without P4.7),
-P5, P6, P7. **Release 2 (store update)** = gradebook (P2.4–P2.5, P3.5, P4.7) and report cards.
+**Release 1 (first store version)** = P0, P1, P2.1–P2.3 + P2.6–P2.8, PD (without PD.5), P3.1–P3.4 + P3.6,
+P4 (without P4.7), P5, PL, P6, P7. **Release 2 (store update)** = gradebook (P2.4–P2.5, PD.5, P3.5,
+P4.7) and report cards.
 Owner decision D2 may move the gradebook into Release 1.
 
 ---
@@ -115,6 +120,9 @@ Owner decision D2 may move the gradebook into Release 1.
 | D9 | Hosting for the ERP (DigitalOcean is stopped): Cloudflare Containers + Neon + R2, a VPS, or other. | **Open — ask owner** |
 | D10 | Target date when parents start using the app (sets what moves to Release 2). | **Open — ask owner** |
 | D11 | Who sees the leaderboard, vocabulary and flashcards: Study Center only (proposed), or School too? | Proposed — confirm with owner |
+| D12 | Where the data may be hosted under Uzbekistan's personal-data rules (affects D9) — check with a local lawyer. | **Open — owner** |
+| D13 | Parent password resets: SMS codes (provider + cost) or reset by the school office. | **Open — ask owner** |
+| D14 | How parents receive logins: printed letter with QR, SMS, or both. | **Open — ask owner** |
 
 Record each answer here with the date before starting the task that depends on it.
 
@@ -236,26 +244,117 @@ Existing endpoints that parents also need (`assignments/`, `invoices/`, `notific
 
 ---
 
-## 6. Quality rules ("little to no errors")
+## 6. Design and experience
 
-### 6.1 Every PR
+The visual rules in [`ICEBERG_SCHOOL_BRAND_PLAN.md`](ICEBERG_SCHOOL_BRAND_PLAN.md) section 5 stay in
+force (Inter, radii, maroon tokens and School dark mode, logo rules, wording "Class / Grade").
+**One change:** that plan's section 9 step 5 says users cannot choose the brand. The choice screen
+(5.1) now lets people pick **before login only**; after login the account still decides.
+
+### 6.1 Principles
+
+1. **Parents first.** Most School users are parents of grades 1–4 who open the app for 20 seconds:
+   "Did my child arrive? What's the homework? Do I owe anything?" Home answers all three without a tap.
+2. **Two taps to anything used daily.** Bottom navigation with at most 5 tabs; no feature deeper than
+   two levels.
+3. **Teachers are busy.** The register for 30 students takes under 30 seconds: everyone is present by
+   default, one tap changes a child.
+4. **Calm, warm, school-like.** Maroon primary, white and soft-tint surfaces, generous spacing, the
+   crest used sparingly (headers, empty states). No neon, no clutter, no stock photos of strangers.
+5. **Meaning never by colour alone.** Status always has a word and an icon too (✓ Keldi 08:12,
+   ⏱ Kechikdi, ✕ Kelmadi).
+6. **Uzbek and Russian are long.** Every layout must hold text 40% longer than English, and survive
+   font size up to 130% without clipping.
+
+### 6.2 Visual language (app and School web pages)
+
+- **Colours:** brand tokens (brand plan 5.2). School adds one highlight colour, **gold `#C9973F`**
+  (the website's gold), for achievements, top grades and the active child chip only — never for text
+  on white (fails contrast). Semantic colours (success, warning, danger, info) are shared.
+- **Type:** Inter only. Sizes on phone: 28/22/18/16/14/12 sp (display, title, heading, body, label,
+  caption); line height 1.3–1.5; numbers in tables use tabular figures.
+- **Shapes:** cards radius 24, chips/inputs 14, bottom sheets 32 (`IceTokens` `r`, `rSm`, `rLg`).
+- **Touch:** every tappable target at least 48 × 48 dp; primary action at the bottom, in thumb reach.
+- **Icons:** one outline icon set at one stroke width; the crest only as a brand mark, never as an icon.
+- **Motion:** 200–300 ms, standard ease-out; skeleton shimmer while loading (already used);
+  list items fade/slide in once; everything off when the phone asks for reduced motion.
+- **Dark mode:** both brands, using the School dark tokens; check 4.5:1 contrast for body text.
+
+### 6.3 Key screens (content and order)
+
+| Screen | Content, top to bottom |
+|---|---|
+| **Choice** (first launch) | Language switch (UZ/RU/EN) at top · two large cards: Iceberg School (maroon, crest, "1–11-sinflar") and Study Center (teal, logo, "Kurslar: IELTS, CEFR, SAT…", wording per D7) · nothing else |
+| **Login** | Brand from the choice · login ID + password · "Parolni unutdingizmi?" (explains: ask the school office, or SMS per PL.2) · small "Boshqa tanlash" link back |
+| **Parent home** | Child chips (photo/initial, name, class) · **Today** card: arrival status + time, current/next lesson · Homework due (count + next item) · Payments (amount due + due date + "To'lash") · Latest announcement · Unread messages |
+| **Timetable** | Day tabs Mon–Sat, today selected · lessons with period, time, subject, teacher, room · current lesson highlighted · swipe for next week |
+| **Attendance** (parent/student) | Month calendar with status dots + legend · totals for the quarter (present, late, absent) |
+| **Teacher home** | Today's lessons · banner "7-B register not taken" until it is · unread parent messages |
+| **Register** | Class + date header · all students listed Present · tap → Late (asks arrival time, default now) → Absent → Present · note per child · one Save button · works offline (P4.11) · confirmation with counts |
+| **Grades** (Release 2) | Student/parent: per subject latest marks + quarter grade · Teacher: one lesson's list with 2·3·4·5 pill buttons |
+| **Messages** | Threads per child × teacher · teacher sees the parent's name and child's class |
+| **Payments** | Invoices by month, status chips, pay button (existing flow) |
+| **Notifications** | Grouped by child, newest first, each opens the related screen |
+
+Every screen has designed **loading** (skeleton), **empty** (crest watermark + one helpful sentence +
+action) and **error** (what happened + "Qayta urinish") states, and an **offline** banner.
+
+### 6.4 Web screens for admins and teachers
+
+Same layout as today's ERP (256 px sidebar, 60 px top bar). A new sidebar section **"Maktab"** for
+School branches only: Classes, Timetable, Register report, Gradebook (R2), Parents. Tables with search,
+filters by class and date, CSV export. Teacher pages (register, gradebook) are designed **phone first**
+because teachers will use them on their phones as well.
+
+### 6.5 Design workflow (how design gets done before code)
+
+1. For each screen in 6.3/6.4 an HTML or Flutter **mockup** is made from these rules (task PD.x), in
+   Uzbek, at phone size (360 × 800 and 430 × 932) and desktop for web, light and dark.
+2. The owner approves the mockups (PD.8). Code starts only for approved screens.
+3. Each build PR includes screenshots of the real screens at the same sizes, in uz and ru, light and
+   dark, next to the approved mockup.
+
+## 7. Beyond the code (launch readiness)
+
+Things that decide whether the launch goes smoothly, tracked as phase **PL**:
+
+- **Getting parents in:** how parents receive their login (printed letter with login ID and QR code to
+  the store page, or SMS), first-login password change, and a one-page guide in uz/ru.
+- **Password resets:** parents forget passwords; decide SMS codes (needs an SMS provider and budget)
+  or reset by the school office (no cost, slower).
+- **Teacher training:** a 30-minute session and a short illustrated guide (register, timetable,
+  messages); a staff "help" contact.
+- **Support:** one channel (e.g. a Telegram account) named in the app and the store listing.
+- **Personal data and consent:** parental consent text at first login; a privacy policy (P5.5).
+  **Check Uzbekistan's personal-data rules on where data of Uzbek citizens must be stored before
+  choosing hosting (D9 / D12) — ask a local lawyer; this plan does not decide it.**
+- **Old app versions:** the API stays backwards-compatible (only add fields/endpoints); the app checks a
+  minimum supported version and asks to update when it is too old (P4.12).
+- **Poor networks:** the register and messages keep working offline and send when back online (P4.11).
+- **Monitoring:** uptime alert for the API and the website, error alerts, daily backup check (P0.8).
+
+---
+
+## 8. Quality rules ("little to no errors")
+
+### 8.1 Every PR
 
 - Small and single-purpose; never mix a feature with refactors elsewhere.
 - Full checks of 0.1; screenshots of changed screens (phone width first) in the PR.
 
-### 6.2 Access matrix tests (required for every new endpoint/page)
+### 8.2 Access matrix tests (required for every new endpoint/page)
 
 For each endpoint: admin (own branch) 200, admin (other branch) 403/404, teacher (own class) 200,
 teacher (other class) 403/404, student (self) 200, student (other) 403/404, **parent (own child) 200,
 parent (other child) 403/404**, anonymous 401. Write them as one table-driven test class per endpoint.
 
-### 6.3 Data integrity
+### 8.3 Data integrity
 
 - DB constraints for: one active class per student per session; one register per class per date; one
   mark value 2–5; one term grade per student/subject/term; parent ↔ child unique.
 - All dates in `Asia/Tashkent`; never compare naive datetimes.
 
-### 6.4 App
+### 8.4 App
 
 - No screen without loading, empty and error states.
 - Widget tests for every new screen and for the router redirects (choice → login → role shell).
@@ -263,7 +362,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ---
 
-## 7. Phases and task checklist
+## 9. Phases and task checklist
 
 ### P0 — Foundations
 
@@ -285,6 +384,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       Needs: P1.1–P1.6 (write it at the end of P1; tick it then).
 - [ ] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
       Needs: P0.4.
+- [ ] **P0.8** Monitoring: uptime checks for `app.iceberglc.com` and `iceberglc.com`, error alerts (e.g.
+      Sentry or the host's alerts) to the owner's Telegram or email; documented. Needs: P0.4.
 
 ### P1 — ERP school data model
 
@@ -302,7 +403,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P1.5** Parent role everywhere it is checked: `LoginCheckMiddleWare` (parent allowed only on
       parent pages and the API), `api/permissions.py` `IsParent`, `branching.py` helpers
       (`children_for_parent`, `user_can_access_student`), login redirect. Done when: a parent can log
-      in on web and API without being logged out; access tests (6.2) for existing student endpoints
+      in on web and API without being logged out; access tests (8.2) for existing student endpoints
       with `?student=`.
 - [ ] **P1.6** `me/` and login response include `role` and `children` (id, name, class, branch brand).
       Done when: serializer + tests; Study Center responses unchanged except the new keys.
@@ -334,6 +435,21 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       committed): send for notifications, absence, new message. Done when: unit tests with the sender
       mocked; a real push received on a test phone on staging; documented in `docs/DEPLOYMENT.md`.
 
+### PD — Design (before P3/P4 code for each screen)
+
+- [ ] **PD.1** Design rules in code: School gold highlight token, type scale and spacing constants in
+      `IceTokens` (app) and brand CSS (web) per section 6.2; a small "component sheet" screen in debug
+      builds showing buttons, chips, cards, status pills, empty/error states in both brands, light/dark.
+- [ ] **PD.2** Mockups: choice screen and login (both brands, uz/ru/en, light/dark). Needs: D7.
+- [ ] **PD.3** Mockups: parent home with child switcher, attendance calendar, payments, messages.
+- [ ] **PD.4** Mockups: timetable (student/parent/teacher), teacher home and the register.
+- [ ] **PD.5** Mockups: grades for parent/student and teacher entry. (Release 2.)
+- [ ] **PD.6** Mockups: web "Maktab" section — classes, timetable editor, parents and CSV import,
+      register report; teacher register page on phone.
+- [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en).
+- [ ] **PD.8** **Owner** approves PD.2–PD.7 (record the date per screen here). Code tasks for a screen
+      need its approval.
+
 ### P3 — Web screens (admins and teachers)
 
 - [ ] **P3.1** Admin: classes (create 7-B, homeroom teacher, students), subjects per class, current
@@ -364,6 +480,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P4.9** Hide Study Center-only features for School users per D11 (navigation by brand).
 - [ ] **P4.10** Strings for every new screen in uz/ru/en; empty, loading and error states; widget tests
       for each new screen.
+- [ ] **P4.11** Offline: the register and outgoing messages are queued on the phone when offline and
+      sent when the connection returns (no duplicates: client-generated IDs); offline banner. Tests.
+- [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
+      with store links when older. Tests.
 
 ### P5 — Store readiness
 
@@ -390,6 +510,20 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P5.9** Push setup on devices: Android notification permission (13+), iOS APNs key in Firebase.
       Needs: P2.8.
 
+### PL — Launch readiness (non-code and support)
+
+- [ ] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
+      pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3.
+- [ ] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
+      with an audit log). Tests.
+- [ ] **PL.3** One-page guides in uz/ru: for parents (install, log in, what each tab shows) and for
+      teachers (register, timetable, messages). In `docs/guides/` and as printable PDFs.
+- [ ] **PL.4** Teacher training session held (owner); questions collected into the guides.
+- [ ] **PL.5** Support channel chosen and shown in the app (Profile → Yordam) and the store listing.
+- [ ] **PL.6** Parental consent text shown once at first login (uz/ru/en), stored with date; privacy
+      policy linked. Needs: P5.5.
+- [ ] **PL.7** **Owner** — personal-data hosting check done (D12) and recorded.
+
 ### P6 — Pilot and quality
 
 - [ ] **P6.1** Written test scripts for admin, homeroom teacher, subject teacher, parent, student
@@ -415,21 +549,28 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ---
 
-## 8. Risks and how this plan handles them
+## 10. Risks and how this plan handles them
 
 | Risk | Handling |
 |---|---|
-| Parent sees another family's data | Access-matrix tests on every endpoint (6.2); all scoping in `branching.py` |
+| Parent sees another family's data | Access-matrix tests on every endpoint (8.2); all scoping in `branching.py` |
 | New role logged out or blocked by old code | P1.5 updates middleware, permissions and redirects first, with tests |
 | Learning Center breaks | Additive migrations; `kind="course"` default; full suite on every PR |
 | Store rejection | Demo accounts, privacy policy, deletion path, complete listings (P5) before submitting |
 | Server down during review or pilot | Hosting first (P0), backups (P0.7), staging separate from production |
 | Two agents doing the same task | Claim protocol (section 0, step 4) |
+| Screens built that the owner doesn't like | Mockups approved first (PD.8, section 6.5) |
+| Parents can't log in or forget passwords | Login letters, forced first change, reset flow, guides (PL.1–PL.3) |
+| Old app versions break after an update | Backwards-compatible API + minimum-version screen (P4.12) |
+| Teachers lose the register on bad signal | Offline queue (P4.11) |
+| Data stored where the law doesn't allow | Legal check before hosting (D12, PL.7) |
 
 ---
 
-## 9. Progress log
+## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-23 — plan written (no tasks started). Next: owner answers D2–D4, D7–D11; then P0.2.
+- 2026-10-23 — added section 6 (design), section 7 (launch readiness), phases PD and PL, tasks P0.8,
+  P4.11, P4.12, decisions D12–D14. Next: owner answers D2–D4, D7–D14; then P0.2.
+- 2026-10-23 — plan written (no tasks started).
