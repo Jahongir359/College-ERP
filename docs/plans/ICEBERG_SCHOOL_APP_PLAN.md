@@ -110,13 +110,13 @@ Owner decision D2 may move the gradebook into Release 1.
 | # | Decision | Status |
 |---|---|---|
 | D1 | **One app** for both. First screen asks: Iceberg School or Iceberg Study Center. The account's branch decides after login (section 5.1). | Decided 2026-10-23 (owner) |
-| D2 | Attendance: **daily register** by the homeroom teacher in Release 1 (with arrival time); marks per lesson later. | Proposed — confirm with owner |
-| D3 | Grades: marks **2–5** per subject per date, **quarter** (chorak) and **year** grades; report card later. | Proposed — confirm with owner |
+| D2 | Attendance: **daily register** by the homeroom teacher in Release 1 (with arrival time); marks per lesson later. | **Decided 2026-10-23 (owner)** |
+| D3 | Grades: marks **2–5** per subject per date, **quarter** (chorak) and **year** grades; report card later. | **Decided 2026-10-23 (owner)** |
 | D4 | Parent is a **new role** `user_type "4"`, linked to one or more children; one login sees all their children (School and Study Center). | Proposed — confirm with owner |
 | D5 | A school **class** (7-B) is a `Group` with `kind="class"`, so attendance, homework, chat and invoices keep working. | Proposed (technical) |
 | D6 | The academic year reuses the existing `Session` model (add `name`, `is_current`); quarters are a new `Term` model. | Proposed (technical) |
-| D7 | Choice-screen label for the Learning Center: "Iceberg Study Center" or "ICEBERG o'quv markazi"? | **Open — ask owner** |
-| D8 | Store accounts: organisation (needs a free D-U-N-S number, 1–2 weeks) or personal? | **Open — ask owner** (recommend organisation) |
+| D7 | Choice-screen label for the Learning Center: **"Iceberg Study Center"** (same in uz/ru/en; the logo carries the brand). | **Decided 2026-10-23 (owner)** |
+| D8 | Store accounts: **organisation** for both Google Play and Apple (seller shown as the organisation; Play skips the 12-tester/14-day rule for new personal accounts). Needs a free **D-U-N-S number** (1–2 weeks) — apply first. | **Decided 2026-10-23 (owner)** |
 | D9 | Hosting for the ERP (DigitalOcean is stopped): Cloudflare Containers + Neon + R2, a VPS, or other. | **Open — ask owner** |
 | D10 | Target date when parents start using the app (sets what moves to Release 2). | **Open — ask owner** |
 | D11 | Who sees the leaderboard, vocabulary and flashcards: Study Center only (proposed), or School too? | Proposed — confirm with owner |
@@ -487,7 +487,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P5 — Store readiness
 
-- [ ] **P5.1** **Owner** — Google Play developer account and Apple Developer Program (per D8);
+- [ ] **P5.1** **Owner** — D-U-N-S number for the organisation, then Google Play developer account (organisation)
+      and Apple Developer Program (organisation) per D8;
       invite the build account; create the App Store Connect API key and Play service account.
 - [ ] **P5.2** App identity: store name, final icons (School and Study Center both recognisable in one
       icon), splash, version scheme (`pubspec.yaml` `version`), bundle IDs kept
@@ -571,6 +572,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-10-23 — owner decided D2 (daily register), D3 (marks 2–5, quarter and year grades), D7 ("Iceberg
+  Study Center"), D8 (organisation accounts; D-U-N-S to apply for). Still open: D4, D9–D14. Next: P0.2.
 - 2026-10-23 — added section 6 (design), section 7 (launch readiness), phases PD and PL, tasks P0.8,
   P4.11, P4.12, decisions D12–D14. Next: owner answers D2–D4, D7–D14; then P0.2.
 - 2026-10-23 — plan written (no tasks started).
