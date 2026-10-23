@@ -628,12 +628,12 @@ Tick boxes as you finish. One PR per phase.
 
 **Phase 2 — Web brand layer**
 - [x] Copy web crops to `static/dist/img/brand/school/` (done in Phase 1)
-- [ ] `data-brand` on the six root templates
-- [ ] `static/dist/css/brand-school.css` (tokens, dark tokens, overrides)
-- [ ] Conditional `<link>` in the six root templates, after base.html's inline `<style>`
-- [ ] Logos / titles / theme-color via `brand`
-- [ ] Hard-coded colors converted in priority templates (7.3 list), one per commit
-- [ ] Visual regression 10.2 passed
+- [x] `data-brand` on the six root templates
+- [x] `static/dist/css/brand-school.css` (tokens, dark tokens, overrides)
+- [x] Conditional `<link>` in the six root templates, after base.html's inline `<style>`
+- [x] Logos / titles / theme-color via `brand`
+- [ ] Hard-coded colors converted in priority templates (7.3 list), one per commit — base, admin/staff/student home done; `login.html` left for Phase 3; rgba() literals not yet
+- [ ] Visual regression 10.2 passed — HTML-level check done (center byte-identical on 19 pages); screenshots pending (no browser in codespace)
 
 **Phase 3 — Login and auth pages**
 - [ ] School login look (tile, glow, button, focus) via `brand-school.css`
@@ -698,3 +698,28 @@ what's next. Newest at the bottom.
   No template uses `brand` yet, so with the flag off or on, Learning Center pages render as before.
   Not committed yet (owner to approve). Next: Phase 2 (web brand layer) after the owner answers
   open question 1 (only needed before Phase 4).
+- **2026-10-23 — Claude (Opus 5.5) — Phase 2 (web brand layer).** Branch `feat/school-brand-phase-2`
+  (off `feat/school-brand-phase-1`), worktree `/workspaces/College-ERP-phase2`. Changed:
+  new `static/dist/css/brand-school.css` (every selector `html[data-brand="school"]`; light + dark
+  tokens re-point `--navy/--cyan/--lime/--ice-*/--ib-*/--app-*` and profile-hub's
+  `--brand-navy/ocean/cyan/ice`; overrides for sidebar, navbar badge, buttons, focus, badges,
+  hero/cover banners, loaders; login section reserved for Phase 3). `branding.py`: added
+  `display_name` / `mark` fields holding the exact strings center templates already render.
+  Six root templates (`base`, `login`, `entry`, `error`, `download`, `registration/erpnext_base`):
+  `data-brand`, conditional school `<link>` after the last inline `<style>`, title / og / twitter /
+  theme-color / logo / footer via `brand` with `|default:"<old text>"`. 26 child `{% block title %}`
+  "— Iceberg Study Center" → `brand.name`. Colors wrapped as `var(--brand-*, <old hex>)` in
+  `base.html`, `staff_template/erpnext_staff_home.html`, `student_template/erpnext_student_home.html`;
+  chart colors in admin/staff/student dashboards read `--brand-*` at runtime with the old value as
+  fallback. Note: base.html's theme-color stays `#06343A` for center (BrandConfig center value is
+  login's `#0C1F45`), so it's switched with `{% if %}`. New tests `tests_brand_assets.py` (5: every
+  selector scoped, tokens, logos) and `tests_brand_web.py` (10: center unchanged flag on/off, school
+  student/teacher/admin, mixed admin → center, login / recovery / 404 / download hooks).
+  Verification: rendered 19 pages (login, recovery, download, 404, 8 branch-admin, 3 teacher,
+  4 student) before and after with flag off and on for a center branch — identical apart from
+  `data-brand="center"` and the behaviour-neutral `var()` / `brandColor()` fallbacks. ruff, check,
+  makemigrations --check, collectstatic dry-run clean; **168 tests OK**. Committed on
+  `feat/school-brand-phase-2` (stylesheet, template hooks, then one commit per colour-converted
+  template; suite green after each); not pushed. Next: screenshots for 10.2 (needs a browser), remaining color conversion in other
+  templates (incl. rgba literals), then Phase 3 — which another session has started
+  (`BrandCookieMiddleware`), so coordinate edits to `login.html` and `registration/*`.
