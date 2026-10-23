@@ -11,12 +11,11 @@ Full spec, architecture, phases, checklist and progress log:
 Brand assets: `docs/brand/iceberg-school/` (colours as JSON in `tokens.json`). Update that plan's
 Progress log at the end of each session.
 
-The public website `iceberglc.com` — mainly Iceberg School, with the Learning Center as its "Iceberg
-Courses" section at `/courses` — lives in the **iceberglc.com website codebase** (`Jahongir359/ICEBERG_WEB`), not here — see
-[`docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md`](docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md). This repo
-only provides the lead endpoint, the brand source of truth (`docs/brand/`) and the School-branded portal.
-The ready-to-copy agent guide for that website repo is
-[`docs/plans/ICEBERG_WEBSITE_AGENTS.md`](docs/plans/ICEBERG_WEBSITE_AGENTS.md).
+The public website `iceberglc.com` (Iceberg School, with the Learning Center as its "Iceberg Courses"
+section) is a **separate repo, [`Jahongir359/ICEBERG_WEB`](https://github.com/Jahongir359/ICEBERG_WEB)**, which owns its own plan, design
+tokens and pages. This repo only provides the lead endpoint (`/public/registration-leads/`), the
+School-branded portal and app, and the shared brand basics in `docs/brand/iceberg-school/` (core
+colours and logo originals).
 
 ## Repo layout
 

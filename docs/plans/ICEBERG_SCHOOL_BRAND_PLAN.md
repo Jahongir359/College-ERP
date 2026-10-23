@@ -137,13 +137,8 @@ overwritten for the Learning Center.
 | `--brand-text` | `#06343A` | `#1F1515` |
 | `--brand-muted` | `#5A7A7E` | `#5A4747` |
 | `--brand-glow` (logo tile shadow) | `rgba(6,182,212,.22)` | `rgba(76,9,9,.25)` |
-| `--brand-gold` (warm accent: icons, rules, text on maroon only) | — | `#C9973F` |
-| `--brand-gold-ink` (gold text on cream/white, 5.5:1) | — | `#8A5A12` |
-| `--brand-gold-soft` (gold on dark maroon) | — | `#E9C77E` |
-| `--brand-cream` / `--brand-paper` (website page / section backgrounds) | — | `#FBF6EE` / `#F5ECDF` |
-
-Warm tokens added 2026-10-23 for the public website (maroon + gold, cream paper). The website's
-headings use the Fraunces serif; the ERP and the app keep Inter everywhere.
+The public website adds its own warm tokens (gold, cream, paper) and the Fraunces heading font in
+ICEBERG_WEB's `static/brand/tokens.json`; the ERP and the app keep the values above and Inter.
 
 School **dark mode** (`html[data-brand="school"][data-theme="dark"]`):
 `--brand-bg #140808`, surface `#1D0E0E`, surface-2 `#251212`, border `#3A1E1E`, text `#F4E9E7`,
@@ -481,7 +476,7 @@ together with translations.
 > **Superseded (2026-10-23).** The School website will live in the **existing iceberglc.com website
 > codebase** (owned by the owner) at `iceberglc.com/school`, connected to this ERP through the existing
 > lead endpoint; that site also moves onto the shared Iceberg design system. The full plan is
-> [`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](ICEBERG_SCHOOL_WEBSITE_PLAN.md). The Django-hosted design below
+> [`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](https://github.com/Jahongir359/ICEBERG_WEB/blob/main/docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md). The Django-hosted design below
 > is kept for reference only — **do not build it**, and do not add `/school/` to
 > `LoginCheckMiddleWare`. Section 8.1 (search) still applies, in the website repo.
 
@@ -591,7 +586,7 @@ needs its own URLs with its own clearly different signals. Do all of the followi
       to the login rather than next to the Learning Center's public site.
     - **Decided 2026-10-23:** option **A** — the owner runs iceberglc.com and its code, so the School
       pages go into that codebase at `iceberglc.com/school`, and the site adopts the shared design
-      system — see [`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](ICEBERG_SCHOOL_WEBSITE_PLAN.md). Option B is dropped.
+      system — see [`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](https://github.com/Jahongir359/ICEBERG_WEB/blob/main/docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md). Option B is dropped.
 
 ## 9. Flutter app (Phase 5)
 
@@ -696,7 +691,7 @@ Tick boxes as you finish. One PR per phase.
 - [x] Tests `tests_brand_auth.py` (16); screenshots checked (light, dark, phone)
 
 **Phase 4 — School website** → in the iceberglc.com codebase; checklist 4a–4e lives in
-[`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](ICEBERG_SCHOOL_WEBSITE_PLAN.md) section 10. Only **4a** happens in
+[`ICEBERG_SCHOOL_WEBSITE_PLAN.md`](https://github.com/Jahongir359/ICEBERG_WEB/blob/main/docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md) section 10. Only **4a** happens in
 this repo:
 - [x] Lead receiver refuses requests when `REGISTRATION_LEADS_API_TOKEN` is unset in production (+ test,
       deploy check W002) — confirm the production token before deploying
@@ -718,7 +713,7 @@ this repo:
 
 1. ~~Will the School use its own domain?~~ **Answered 2026-10-23: no — same domain as the Learning
    Center.** ~~Where do the School pages live?~~ **Answered 2026-10-23: in the existing iceberglc.com
-   codebase** (owner runs it), at `iceberglc.com/school`. Remaining website questions: `ICEBERG_SCHOOL_WEBSITE_PLAN.md` section 11.
+   codebase** (owner runs it), at `iceberglc.com/school`. Remaining website questions: [website plan](https://github.com/Jahongir359/ICEBERG_WEB/blob/main/docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md) section 11 (in ICEBERG_WEB).
 2. Same database/organization as the Learning Center (one ERP, School = branch with `brand=school`)?
    This plan assumes **yes**.
 3. One mobile app for both brands (brand chosen by login, as planned) or a separate School app in
@@ -873,4 +868,10 @@ what's next. Newest at the bottom.
   infos in pre-existing screens: `cacheExtent`, `value`), `flutter test` OK (only a placeholder test exists),
   `flutter build web --release` compiles. Django CI suite: ruff/format clean, `check` clean, no pending
   migrations, collectstatic OK, **186 tests OK**. No code changed.
+- **2026-10-23 — Claude (Opus 5.5) — Website material moved out of this repo.** Owner: website designs
+  belong in the website repo. Removed `docs/plans/ICEBERG_SCHOOL_WEBSITE_PLAN.md`,
+  `docs/plans/ICEBERG_WEBSITE_AGENTS.md` and the website-only tokens (gold, goldInk, goldSoft, cream,
+  paper, Fraunces) from `docs/brand/iceberg-school/tokens.json`. They now live only in
+  [ICEBERG_WEB](https://github.com/Jahongir359/ICEBERG_WEB) (`docs/plans/`, `AGENTS.md`, `static/brand/tokens.json`). Older log entries
+  above mention those files by their former paths here.
 
