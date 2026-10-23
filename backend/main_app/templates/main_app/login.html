@@ -1,21 +1,21 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>ICEBERG — Sign In</title>
+  <title>{% if brand.key == "school" %}Iceberg School — Sign In{% else %}ICEBERG — Sign In{% endif %}</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0C1F45">
+  <meta name="theme-color" content="{{ brand.theme_color|default:'#0C1F45' }}">
   <!-- OG / Twitter -->
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="ICEBERG Study Center">
-  <meta property="og:title" content="Sign In — ICEBERG Study Center">
+  <meta property="og:site_name" content="{% if brand.key == "school" %}Iceberg School{% else %}ICEBERG Study Center{% endif %}">
+  <meta property="og:title" content="{% if brand.key == "school" %}Sign In — Iceberg School{% else %}Sign In — ICEBERG Study Center{% endif %}">
   <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -631,6 +631,7 @@
       .card { max-width: none; width: 100%; }
     }
   </style>
+  {% if brand.key == "school" %}<link rel="stylesheet" href="{% static 'dist/css/brand-school-auth.css' %}">{% endif %}
 </head>
 <body>
 
@@ -638,7 +639,7 @@
   <div class="logo-hero">
     <div class="logo-float">
       <div class="logo-card">
-        <img src="{% static 'dist/img/logo.png' %}" alt="ICEBERG Study Center">
+        {% if brand.key == "school" %}<img src="{% static brand.logo_tile %}" alt="Iceberg School">{% else %}<img src="{% static 'dist/img/logo.png' %}" alt="ICEBERG Study Center">{% endif %}
       </div>
     </div>
   </div>
@@ -646,7 +647,7 @@
   <!-- ── Login Card ── -->
   <div class="card">
     <h1 class="card-title">Welcome back</h1>
-    <p class="card-sub">Sign in to continue</p>
+    <p class="card-sub">{% if brand.key == "school" %}Sign in to Iceberg School{% else %}Sign in to continue{% endif %}</p>
 
     {% if request.GET.inactive %}
       <div class="alert alert-info">
@@ -736,7 +737,11 @@
     </form>
   </div>
 
+  {% if brand.key == "school" %}
+  <p class="footer">&copy; {% now "Y" %} Iceberg School · <a class="footer-link" href="{% url 'login_page' %}?brand=center">Iceberg Learning Center sign-in</a></p>
+  {% else %}
   <p class="footer">&copy; {% now "Y" %} Iceberg Study Center</p>
+  {% endif %}
 
   {% if captcha_enabled %}
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>

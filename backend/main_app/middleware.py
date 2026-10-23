@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.contrib.auth import logout
 from django.utils.deprecation import MiddlewareMixin
 from django.urls import reverse
@@ -80,3 +83,57 @@ class LoginCheckMiddleWare(MiddlewareMixin):
                 pass
             else:
                 return redirect(reverse("login_page"))
+
+
+class BrandCookieMiddleware:
+    """Remember which Iceberg brand (Learning Center / School) a browser uses.
+
+    Sets the ``iceberg_brand`` cookie when a visitor arrives with ``?brand=``
+    or on a /school/ page, and when a signed-in user's branch decides the
+    brand — so the sign-in and password-recovery pages keep the right look
+    after logout. Presentation only; does nothing while SCHOOL_BRAND_ENABLED
+    is off. See docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md (Phase 3).
+    """
+
+    SKIP_PREFIXES = ("/api/", "/static/", "/media/", "/app", "/admin/", "/download/")
+    MAX_AGE = 365 * 24 * 60 * 60
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if not getattr(settings, "SCHOOL_BRAND_ENABLED", False):
+            return response
+        if request.path.startswith(self.SKIP_PREFIXES):
+            return response
+        try:
+            self._remember_brand(request, response)
+        except Exception:  # presentation must never break a response
+            logging.getLogger(__name__).exception("Could not set the brand cookie")
+        return response
+
+    def _remember_brand(self, request, response):
+        from . import branding
+
+        user = getattr(request, "user", None)
+        signed_in = bool(user is not None and user.is_authenticated)
+        explicit = request.path.startswith(branding.SCHOOL_PATH_PREFIX) or branding.is_valid_brand(
+            request.GET.get("brand", "")
+        )
+        if not (signed_in or explicit):
+            return
+        # The view may have signed the user in or out during this request, so
+        # don't trust a brand cached before that happened.
+        request.__dict__.pop("_iceberg_brand", None)
+        key = branding.resolve_brand_key(request)
+        if request.COOKIES.get(branding.BRAND_COOKIE) == key:
+            return
+        response.set_cookie(
+            branding.BRAND_COOKIE,
+            key,
+            max_age=self.MAX_AGE,
+            secure=getattr(settings, "SESSION_COOKIE_SECURE", False),
+            httponly=True,
+            samesite="Lax",
+        )

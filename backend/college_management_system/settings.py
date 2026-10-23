@@ -111,6 +111,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "main_app.middleware.LoginCheckMiddleWare",
+    # Remembers the Iceberg brand in a cookie (no-op while SCHOOL_BRAND_ENABLED is off).
+    "main_app.middleware.BrandCookieMiddleware",
     # Axes must come AFTER AuthenticationMiddleware so request.user is set.
     "axes.middleware.AxesMiddleware",
 ]

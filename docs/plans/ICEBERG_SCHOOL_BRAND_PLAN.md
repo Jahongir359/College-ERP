@@ -1,7 +1,15 @@
 # Iceberg School Brand — Build Plan and Agent Guide
 
 Document date: 2026-10-23
-Status: **Phase 1 done (backend plumbing, flag off by default) — Phase 2 next.** See section 13.
+Status: **Phase 1 done and committed. Phase 2 in progress on `feat/school-brand-phase-2` (worktree
+`/workspaces/College-ERP-phase2`). Phase 3 done on `feat/school-brand-phase-3`.** See section 13.
+
+> **Ownership split (avoid merge conflicts):** Phase 3 owns the sign-in and account-recovery pages —
+> `main_app/login.html`, `registration/*.html`, `password_recovery.py` and
+> `static/dist/css/brand-school-auth.css`. Phase 2 owns everything else in the ERP (`base.html`,
+> `entry.html`, `error.html`, `download.html`, the ERP templates and `brand-school.css`). Phase 2
+> must **not** add `data-brand` or a stylesheet link to `login.html` / `erpnext_base.html` — Phase 3
+> already did — and should leave `brand-school.css` section 4 ("login") empty or delete it.
 Decision (owner, 2026-10-23): **one shared domain** for the Learning Center and the School — no
 separate School domain. Section 8.1 explains how visitors still land on the right brand's pages.
 Owner: Jahongir
@@ -356,8 +364,8 @@ request (`request._iceberg_brand`) if you call it more than once per request.
 ### 7.1 Hook the brand onto `<html>`
 
 In each of these files add `data-brand="{{ brand.key|default:'center' }}"` to the `<html>` tag:
-`main_app/base.html`, `main_app/login.html`, `main_app/entry.html`, `main_app/error.html`,
-`main_app/download.html`, `registration/erpnext_base.html`. (Templates that `extends` these get it
+`main_app/base.html`, `main_app/entry.html`, `main_app/error.html`, `main_app/download.html`.
+(`main_app/login.html` and `registration/erpnext_base.html` were done in Phase 3 — see 7.6.) (Templates that `extends` these get it
 for free.) For center the attribute is `center`, and no stylesheet targets `center`, so nothing changes.
 
 ### 7.2 New stylesheet `backend/main_app/static/dist/css/brand-school.css`
@@ -433,6 +441,33 @@ one template per commit**, never with a repo-wide sed:
 Replace literal "Group"/"Groups" in **labels only** (never in URLs, model names, form field names or
 API keys) with `{{ brand.group_noun }}` / `{{ brand.group_noun_plural }}`. Do this screen by screen
 together with translations.
+
+
+### 7.6 Sign-in and account recovery (Phase 3 — done)
+
+- `main_app/login.html` and `registration/erpnext_base.html` carry
+  `data-brand="{{ brand.key|default:'center' }}"` and, **only for School**, link
+  `static/dist/css/brand-school-auth.css` right before `</head>` (after the inline `<style>`).
+- All School-specific markup is inside `{% if brand.key == "school" %}…{% else %}<original>{% endif %}`,
+  so Learning Center output is unchanged apart from the `data-brand="center"` attribute.
+  School differences: title "Iceberg School — Sign In", `theme-color` `#4C0909`, `og:site_name`/`og:title`,
+  crest tile (`brand.logo_tile`), "Sign in to Iceberg School", footer "© Iceberg School · Iceberg
+  Learning Center sign-in" (link to `/login/?brand=center`), recovery header "ICEBERG / SCHOOL" with the
+  crest in the brand mark.
+- `brand-school-auth.css`: every selector starts with `html[data-brand="school"]`; tokens use
+  `var(--brand-*, <School hex>)` so it works with or without Phase 2's `brand-school.css`. It re-points the
+  recovery template's `:root` variables (`--primary`, `--secondary`, `--cyan`, …) and overrides the login
+  page's hard-coded cyan/blue (logo glow, focus ring, button gradient, links), including the
+  `platform-apple` / `platform-other` variants and `prefers-color-scheme: dark`.
+- `main_app/middleware.py` → `BrandCookieMiddleware` (registered after `LoginCheckMiddleWare`): when the
+  flag is on, sets `iceberg_brand` (1 year, HttpOnly, SameSite=Lax, Secure like the session cookie) if a
+  visitor used `?brand=`, is on `/school/`, or is signed in (their branch's brand). It never touches
+  `/api/`, `/static/`, `/media/`, `/app`, `/admin/`, `/download/`, never raises, and does nothing when the
+  flag is off. Effect: a School user who logs out sees the School sign-in next time.
+- `password_recovery.py`: `_send_code_email(..., brand_name)`; subject is
+  "Iceberg School — Password Reset Code" for School users (unchanged for the Learning Center).
+- Not changed: Django's built-in `accounts/password_reset/` email (`registration/password_reset_email.html`)
+  still says "College ERP" — legacy, separate from the code-based flow; fix when convenient.
 
 ## 8. School public website (Phase 4)
 
@@ -635,11 +670,13 @@ Tick boxes as you finish. One PR per phase.
 - [ ] Hard-coded colors converted in priority templates (7.3 list), one per commit
 - [ ] Visual regression 10.2 passed
 
-**Phase 3 — Login and auth pages**
-- [ ] School login look (tile, glow, button, focus) via `brand-school.css`
+**Phase 3 — Login and auth pages** ✅ (branch `feat/school-brand-phase-3`, see 7.6)
+- [x] School login look (tile, glow, button, focus, dark mode) via its own `brand-school-auth.css`
 - [x] `?brand=school` + cookie resolution for anonymous pages (resolver done in Phase 1)
-- [ ] Set the `iceberg_brand` cookie when `?brand=school` is used, so the password-reset pages keep it
-- [ ] Password reset flow (`registration/*`) branded
+- [x] `BrandCookieMiddleware` sets/refreshes the `iceberg_brand` cookie (?brand=, /school/, signed-in users)
+- [x] Password-recovery pages (`registration/erpnext_base.html` and children) branded
+- [x] Reset-code email subject uses the user's brand name
+- [x] Tests `tests_brand_auth.py` (16); screenshots checked (light, dark, phone)
 
 **Phase 4 — School website** (owner picks hosting option A or B in 8.1 point 11 first)
 - [ ] Search setup from 8.1: titles, descriptions, canonical, OG image, JSON-LD, hreflang URLs,
@@ -696,5 +733,17 @@ what's next. Newest at the bottom.
   `static/dist/img/brand/school/*.png`. Results: ruff check/format clean, `check` clean,
   `makemigrations --check` clean, collectstatic dry-run OK, **153 tests OK** (133 old + 20 new).
   No template uses `brand` yet, so with the flag off or on, Learning Center pages render as before.
-  Not committed yet (owner to approve). Next: Phase 2 (web brand layer) after the owner answers
-  open question 1 (only needed before Phase 4).
+  Committed as `26a9d46` (docs) and `7d91fb9` (code). Phase 2 then started in a separate worktree.
+- **2026-10-23 — Claude (Opus 5.5) — Phase 3.** Owner: Phase 2 is being done in parallel on
+  `feat/school-brand-phase-2` (worktree `/workspaces/College-ERP-phase2`); do Phase 3. Branch
+  `feat/school-brand-phase-3` from `feat/school-brand-phase-1`. To avoid conflicts with Phase 2's
+  uncommitted `brand-school.css`, Phase 3 uses its own `brand-school-auth.css` and owns the auth
+  templates (ownership note at the top). Changed: `templates/main_app/login.html`,
+  `templates/registration/erpnext_base.html`, new `static/dist/css/brand-school-auth.css`,
+  `middleware.py` (`BrandCookieMiddleware`), `settings.py` (register it), `password_recovery.py`
+  (email subject), new `tests_brand_auth.py`, this plan (7.1, 7.6, checklist). Results: ruff/format
+  clean, `check` clean, no migrations, collectstatic OK, **169 tests OK** (153 + 16). Screenshots via
+  Playwright of School/Center login and School recovery in light, dark and phone width look right.
+  (Installed Playwright + Chromium and its apt dependencies in the codespace for this — not in the repo.)
+  Not committed yet. Next: merge order Phase 1 → 2 → 3 (expect only trivial conflicts in this plan file
+  and `settings.py`); then Phase 4 once the owner picks hosting option A or B (8.1 point 11).

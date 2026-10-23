@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
@@ -287,19 +287,20 @@
       }
     }
   </style>
+  {% if brand.key == "school" %}<link rel="stylesheet" href="{% static 'dist/css/brand-school-auth.css' %}">{% endif %}
 </head>
 <body>
   <div class="card">
     <div class="brand-hero">
       <div class="brand-mark" aria-hidden="true"></div>
       <div class="brand-name">ICEBERG</div>
-      <div class="brand-sub">STUDY CENTER</div>
+      <div class="brand-sub">{% if brand.key == "school" %}SCHOOL{% else %}STUDY CENTER{% endif %}</div>
     </div>
 
     {% block content %}{% endblock %}
 
     <div class="card-footer">
-      &copy; {% now "Y" %} Iceberg Study Center
+      &copy; {% now "Y" %} {% if brand.key == "school" %}Iceberg School{% else %}Iceberg Study Center{% endif %}
     </div>
   </div>
 </body>
