@@ -137,6 +137,13 @@ overwritten for the Learning Center.
 | `--brand-text` | `#06343A` | `#1F1515` |
 | `--brand-muted` | `#5A7A7E` | `#5A4747` |
 | `--brand-glow` (logo tile shadow) | `rgba(6,182,212,.22)` | `rgba(76,9,9,.25)` |
+| `--brand-gold` (warm accent: icons, rules, text on maroon only) | — | `#C9973F` |
+| `--brand-gold-ink` (gold text on cream/white, 5.5:1) | — | `#8A5A12` |
+| `--brand-gold-soft` (gold on dark maroon) | — | `#E9C77E` |
+| `--brand-cream` / `--brand-paper` (website page / section backgrounds) | — | `#FBF6EE` / `#F5ECDF` |
+
+Warm tokens added 2026-10-23 for the public website (maroon + gold, cream paper). The website's
+headings use the Fraunces serif; the ERP and the app keep Inter everywhere.
 
 School **dark mode** (`html[data-brand="school"][data-theme="dark"]`):
 `--brand-bg #140808`, surface `#1D0E0E`, surface-2 `#251212`, border `#3A1E1E`, text `#F4E9E7`,
