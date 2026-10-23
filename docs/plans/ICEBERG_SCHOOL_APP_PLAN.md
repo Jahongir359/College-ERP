@@ -119,7 +119,7 @@ Owner decision D2 may move the gradebook into Release 1.
 | D8 | Store accounts: **organisation** for both Google Play and Apple (seller shown as the organisation; Play skips the 12-tester/14-day rule for new personal accounts). Needs a free **D-U-N-S number** (1–2 weeks) — apply first. | **Decided 2026-10-23 (owner)** |
 | D9 | Hosting for the ERP (DigitalOcean is stopped): Cloudflare Containers + Neon + R2, a VPS, or other. | **Open — ask owner** |
 | D10 | Target date when parents start using the app (sets what moves to Release 2). | **Open — ask owner** |
-| D11 | Who sees the leaderboard, vocabulary and flashcards: Study Center only (proposed), or School too? | **Decided 2026-10-23 (owner)** |
+| D11 | Leaderboard, vocabulary and flashcards are **Study Center only**; School users never see them. | **Decided 2026-10-23 (owner)** |
 | D12 | Where the data may be hosted under Uzbekistan's personal-data rules (affects D9) — check with a local lawyer. | **Open — owner** |
 | D13 | Parent password resets: SMS codes (provider + cost) or reset by the school office. | **Open — ask owner** |
 | D14 | How parents receive logins: printed letter with QR, SMS, or both. | **Open — ask owner** |
