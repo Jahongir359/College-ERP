@@ -3,7 +3,8 @@
 Document date: 2026-10-23 (revised the same day — see section 1)
 Status: **Decided — build the School pages inside the existing iceberglc.com website codebase, and
 move that site onto the shared Iceberg design system (owner OK'd changing its design and code).
-Waiting for the codebase to be shared with the agent (section 11).**
+Codebase found: **`Jahongir359/ICEBERG_WEB`** (Flask templates rendered to static HTML on Cloudflare
+Pages). Phase 4b started there on 2026-10-23 — see section 2.1 and the checklist.**
 Owner: Jahongir
 Related: [`ICEBERG_SCHOOL_BRAND_PLAN.md`](ICEBERG_SCHOOL_BRAND_PLAN.md) (ERP side, Phases 1–6). This
 document defines **Phase 4** and replaces that plan's section 8 (Django-hosted site — not built).
@@ -53,9 +54,23 @@ These are observations from outside. **Verify each against the real code before 
 | Lead form | `/register`: `<form action="/api/register" method="post" data-static-lead-form="register" data-turnstile-sitekey="…" data-telegram-url="https://t.me/iceberg_qabulxona">` with fields `student_name`, `student_phone`, `course` (ielts, english, sat, mathematics, chemistry, biology), `preferred_branch` (`main` "Asosiy filial", `gayrat` "G'ayrat filiali", `unknown`), `utm_source`, `utm_medium`, `utm_campaign`. `GET /api/register` → 405 (POST only). |
 | Other paths | `/admin`, `/portal`, `/students`, `/contacts_list` exist behind robots disallow (the site has its own admin) |
 
-Likely (to confirm in code): `/api/register` is a server route or Cloudflare function that verifies
-Turnstile and forwards to the ERP's `POST https://app.iceberglc.com/public/registration-leads/`
-with `REGISTRATION_LEADS_API_TOKEN` (the ERP's CORS/env config names iceberglc.com as the lead source).
+### 2.1 Confirmed from the code (`Jahongir359/ICEBERG_WEB`, 2026-10-23)
+
+- **Framework:** Flask (`app.py`) + Jinja templates. The live site is **static HTML** rendered from those
+  templates by `scripts/build_firebase.py` and served by **Cloudflare Pages** (`wrangler.toml`, build
+  `scripts/build_cloudflare.sh`). Flask itself (SQLite admin, Telegram) runs only on an alternative host,
+  if at all — Railway/Render/DigitalOcean/Firebase recipes all exist; the owner must confirm.
+- **`/api/register` is a Cloudflare Pages Function** (`functions/api/register.js`): Turnstile → **Google
+  Sheets via Apps Script** (`google-apps-script/Code.gs`). It did **not** call the ERP at all — the
+  earlier guess was wrong. Only the Flask `/register` route posts to the ERP (`REGISTRATION_LEADS_API_URL`).
+  So Learning Center website leads have not been reaching the ERP from the live site.
+- **Fixed in 4b (branch `feat/erp-lead-forwarding` in ICEBERG_WEB):** after Sheets stores a lead, the
+  function also posts it to the ERP receiver when the Cloudflare secrets `REGISTRATION_LEADS_API_URL` and
+  `REGISTRATION_LEADS_API_TOKEN` are set (best-effort, 8 s timeout, no redirects, never fails the
+  visitor; Sheets duplicates are not re-sent). Branch codes map to ERP names through `erp_branch_name` in
+  `config/registration.json` (empty until the owner supplies the names → the code is sent;
+  `unknown` → empty). The Flask route uses the same mapping.
+- Programs/branches live in `config/registration.json`; the site's guide is its root `AGENTS.md`.
 
 ### ⚠ Check this now (affects the Learning Center today)
 
@@ -270,9 +285,11 @@ When a brand value changes: update `tokens.json` here, then copy it to the websi
 - [ ] LC branch names listed for the website's code→name map
 
 **4b — Website: foundations (iceberglc.com repo)**
-- [ ] Read the code; confirm section 2 observations; record the framework/hosting in the repo's
-      `AGENTS.md`
-- [ ] Fix the LC branch code→name mapping in `/api/register` (section 2 warning)
+- [x] Read the code; confirm section 2 observations; record the framework/hosting in the repo's
+      `AGENTS.md` (section 2.1; ICEBERG_WEB `AGENTS.md` + `CLAUDE.md` + copy of this plan)
+- [x] `/api/register` copies leads to the ERP + branch code→name mapping (section 2.1)
+- [ ] Owner: set the two Cloudflare secrets, fill `erp_branch_name`, redeploy Apps Script
+      (receiver `2026-10-23.1` reports duplicates)
 - [ ] Owner picks the Learning Center palette (4.0.1); update `tokens.json` if needed
 - [ ] 4.0 foundation: real CSS build, `tokens.css` with `data-brand`, shared layout/components,
       Inter — LC pages re-skinned with no URL changes (screenshot each LC page before/after)
@@ -297,9 +314,10 @@ When a brand value changes: update `tokens.json` here, then copy it to the websi
 
 ## 11. What the agent needs from the owner
 
-1. **Access to the iceberglc.com code** — the GitHub repo URL (and add the agent's account), or clone
+1. ~~**Access to the iceberglc.com code**~~ **Found: `Jahongir359/ICEBERG_WEB`.** — the GitHub repo URL (and add the agent's account), or clone
    it into this codespace next to `College-ERP` (e.g. `/workspaces/iceberglc-website`).
-2. How it is hosted/deployed (Cloudflare Pages? a server?) and where its secrets live
+2. ~~How it is hosted~~ **Cloudflare Pages; secrets in Pages settings (section 2.1).** Still open: is any
+   Flask host (Railway/Render/DigitalOcean) live, or can those recipes be retired? Where its secrets live
    (`REGISTRATION_LEADS_API_TOKEN`, Turnstile secret).
 3. School facts: address (Namangan?), grades, phone, Telegram/Instagram, tuition, founding year,
    photos.

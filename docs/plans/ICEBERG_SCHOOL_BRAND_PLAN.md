@@ -825,3 +825,12 @@ what's next. Newest at the bottom.
   `registration/erpnext_base.html` and this log; resolved per the Phase 4a merge note (Phase 3's
   School-only blocks and `brand-school-auth.css` link kept on the auth pages; Phase 2's other changes,
   e.g. `brand.mark` in the recovery title, kept).
+- **2026-10-23 — Claude (Opus 5.5) — Phase 4b started (website repo).** The iceberglc.com code is
+  `Jahongir359/ICEBERG_WEB` (Flask templates → static HTML on Cloudflare Pages). Finding: its live
+  `/api/register` (Cloudflare Pages Function) stored leads only in Google Sheets and never called the
+  ERP. ICEBERG_WEB branch `feat/erp-lead-forwarding`: best-effort ERP copy after Sheets succeeds (off
+  until the Cloudflare secrets are set), `erp_branch_name` mapping (Flask route too), Apps Script reports
+  duplicates, root `AGENTS.md`/`CLAUDE.md` filled from the template, website plan copied to its
+  `docs/plans/`. Tests there: Flask 8 OK, Node 19 OK, static build check OK. Website plan sections 2.1,
+  10 and 11 updated. No ERP code changed. Next: owner supplies ERP branch names + Cloudflare secrets,
+  answers website plan questions 6–7 (palette, order); Phase 5 still needs a Flutter machine.
