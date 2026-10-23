@@ -7,6 +7,7 @@ import '../../core/api/api_providers.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/theme/app_theme.dart';
 import '../widgets/ice_page_header.dart';
+import '../../core/theme/brand.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -37,7 +38,7 @@ class _State extends ConsumerState<NotificationsScreen> {
       backgroundColor: IceColors.bg,
       body: RefreshIndicator(
         onRefresh: () => ref.refresh(notificationsProvider.future),
-        color: IceColors.navyDeep,
+        color: context.brandPrimary,
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
@@ -92,7 +93,7 @@ class _NotifCard extends StatelessWidget {
     required this.onTap,
   });
 
-  Color _categoryColor(String? cat) {
+  Color _categoryColor(BuildContext context, String? cat) {
     switch (cat) {
       case 'RESULT':
         return IceColors.success;
@@ -103,7 +104,7 @@ class _NotifCard extends StatelessWidget {
       case 'ATTENDANCE':
         return IceColors.danger;
       default:
-        return IceColors.navyDeep;
+        return context.brandPrimary;
     }
   }
 
@@ -126,7 +127,7 @@ class _NotifCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isRead = item['is_read'] == true;
     final cat = item['category']?.toString();
-    final color = _categoryColor(cat);
+    final color = _categoryColor(context, cat);
 
     return GestureDetector(
           onTap: onTap,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/theme/app_theme.dart';
 import 'ice_nav_bar.dart';
+import '../../core/theme/brand.dart';
 
 /// Renders a bottom nav bar on phones (< 600px) and a side rail on tablets/desktop.
 class AdaptiveShell extends StatelessWidget {
@@ -62,17 +62,17 @@ class _SidebarLayout extends StatelessWidget {
               i,
               initialLocation: i == navigationShell.currentIndex,
             ),
-            backgroundColor: IceColors.navy,
-            selectedIconTheme: const IconThemeData(
-              color: IceColors.lime,
+            backgroundColor: context.brandDeep,
+            selectedIconTheme: IconThemeData(
+              color: context.brandHighlight,
               size: 24,
             ),
             unselectedIconTheme: IconThemeData(
               color: Colors.white.withAlpha(120),
               size: 22,
             ),
-            selectedLabelTextStyle: const TextStyle(
-              color: IceColors.lime,
+            selectedLabelTextStyle: TextStyle(
+              color: context.brandHighlight,
               fontSize: 11,
               fontWeight: FontWeight.w700,
             ),
@@ -84,10 +84,9 @@ class _SidebarLayout extends StatelessWidget {
             indicatorColor: Colors.white.withAlpha(15),
             leading: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 36,
-                height: 36,
+              child: IceBrandLogo(
+                size: 36,
+                radius: 10,
                 errorBuilder: (_, __, ___) => const Icon(
                   Icons.school_rounded,
                   color: Colors.white,

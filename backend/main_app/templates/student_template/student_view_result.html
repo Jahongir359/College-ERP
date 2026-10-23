@@ -1,6 +1,7 @@
 {% extends 'main_app/base.html' %}
+{% load json_tags %}
 {% load static %}
-{% block title %}Results — Iceberg Study Center{% endblock %}
+{% block title %}Results — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}{% endblock %}
 {% block breadcrumb %}{% endblock %}
 
@@ -510,7 +511,7 @@
       if (typeof Chart === 'undefined') {
         showState('scoresChart', 'Score overview chart is unavailable right now.');
       } else {
-        var bars = compact({{ chart_labels|safe }}, {{ chart_test|safe }}, {{ chart_exam|safe }}, {{ chart_total|safe }});
+        var bars = compact({{ chart_labels|js_json }}, {{ chart_test|js_json }}, {{ chart_exam|js_json }}, {{ chart_total|js_json }});
         function areaGrad(context, top, bottom) {
           var chart = context.chart; var ctx2 = chart.ctx; var area = chart.chartArea;
           if (!area) return top;
@@ -553,7 +554,7 @@
       }
     }
 
-    var trend = {{ trend_json|safe }};
+    var trend = {{ trend_json|js_json }};
     if (trend.labels && trend.labels.length && window.IcebergTrend) {
       IcebergTrend.line({
         canvas: 'scoresTrendChart', labels: trend.labels,

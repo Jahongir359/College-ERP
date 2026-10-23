@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/brand.dart';
 
 class StudentMoreScreen extends ConsumerWidget {
   const StudentMoreScreen({super.key});
@@ -90,7 +91,7 @@ class _MoreTileWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(stringsProvider);
-    final iconColor = tile.isLogout ? IceColors.danger : IceColors.navyDeep;
+    final iconColor = tile.isLogout ? IceColors.danger : context.brandPrimary;
     final bgColor = tile.isLogout ? IceColors.danger.withAlpha(20) : IceColors.surface2;
 
     return Material(

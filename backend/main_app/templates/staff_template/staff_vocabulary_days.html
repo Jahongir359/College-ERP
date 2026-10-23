@@ -1,6 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block title %}Vocabulary Days - Iceberg Study Center{% endblock %}
+{% block title %}Vocabulary Days - {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}Vocabulary Days{% endblock %}
 {% block breadcrumb %}<li class="breadcrumb-item active">Vocabulary Days</li>{% endblock %}
 

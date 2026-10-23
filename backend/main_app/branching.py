@@ -18,7 +18,7 @@ rules live in exactly one place. Do not re-implement branch filtering inline.
 
 from django.db.models import Q
 
-from .models import Admin, Branch, Enrollment, Staff, Student
+from .models import Admin, Branch, Enrollment, Group, Staff, Student
 
 
 # ── Identity helpers ─────────────────────────────────────────────────────────
@@ -305,6 +305,45 @@ def user_can_access_group(user, group):
         return Enrollment.objects.filter(student=student, group=group, is_active=True).exists()
 
     return False
+
+
+# ── Dashboard stories ────────────────────────────────────────────────────────
+
+
+def scope_story_target_groups(user, story):
+    """Keep a story's audience inside what ``user`` may reach.
+
+    A story with no target groups is shown to *every* student, so only super
+    admins may publish one. For anyone else, targets are trimmed to their
+    accessible groups, and an empty result falls back to all of their own
+    active groups (a teacher's classes, a branch admin's branches) instead of
+    silently becoming school-wide.
+    """
+    if is_super_admin(user):
+        return
+    allowed = filter_groups_for_user(user, Group.objects.all())
+    kept = list(allowed.filter(id__in=story.target_groups.values_list("id", flat=True)))
+    if not kept:
+        kept = list(allowed.filter(is_archived=False))
+    story.target_groups.set(kept)
+
+
+def user_can_modify_story(user, story):
+    """Branch admins may only edit/delete stories they authored or stories
+    whose every target group lies within their accessible branches. Global
+    stories (no target groups) belong to whoever authored them; other branch
+    admins cannot touch them. Super admins can modify anything."""
+    if is_super_admin(user):
+        return True
+    if story.created_by_id == user.id:
+        return True
+    target_ids = set(story.target_groups.values_list("id", flat=True))
+    if not target_ids:
+        return False
+    accessible_ids = set(
+        filter_groups_for_user(user, Group.objects.all()).values_list("id", flat=True)
+    )
+    return target_ids <= accessible_ids
 
 
 # ── Deployment utilities ─────────────────────────────────────────────────────

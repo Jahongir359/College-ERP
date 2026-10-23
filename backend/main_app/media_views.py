@@ -7,10 +7,15 @@ student **result PDFs** under ``results/``.
 
 This view keeps public assets (profile pictures, story images) freely
 accessible — the Flutter app loads those with plain image requests that carry
-no auth header — while gating the sensitive ``results/`` prefix behind login
-*and* an object-level access check that mirrors the API download endpoint
-(`/api/v1/result-files/<id>/download/`). Result files in the mobile app are
-fetched through that authenticated API, so gating the raw path breaks nothing.
+no auth header — while gating the private prefixes behind login *and* an
+object-level access check:
+
+  * ``results/``          student result PDFs (mirrors the result-file API)
+  * ``submissions/``      homework uploads (student, assignment teacher, admins)
+  * ``chat_attachments/`` group chat files (members of that group's chat)
+
+Login is accepted either as a web session or as a mobile-app JWT bearer token
+(the app downloads submissions through its authenticated Dio client).
 
 Note: when DigitalOcean Spaces is configured, files are served from the CDN
 (``MEDIA_URL`` points there) and this view is bypassed. Making those objects
@@ -23,8 +28,8 @@ from django.core.files.storage import default_storage
 from django.http import FileResponse, Http404
 from django.views.static import serve as static_serve
 
-from . import branching
-from .models import Enrollment, Group, ResultFile
+from . import branching, messaging
+from .models import ChatMessage, Enrollment, ResultFile, Submission
 
 
 def _can_access_result_file(user, path):
@@ -69,22 +74,77 @@ def _can_access_result_file(user, path):
     return False
 
 
-def protected_media(request, path):
-    """Serve MEDIA_ROOT files, enforcing access control on sensitive prefixes.
+def _can_access_submission(user, path):
+    sub = Submission.objects.filter(file=path).select_related("assignment__group").first()
+    if sub is None:
+        return False
+    user_type = str(getattr(user, "user_type", "") or "")
+    if user_type == "3":
+        student = getattr(user, "student", None)
+        return student is not None and sub.student_id == student.id
+    if user_type == "2":
+        staff = getattr(user, "staff", None)
+        if staff is None:
+            return False
+        group = sub.assignment.group
+        return sub.assignment.created_by_id == staff.id or (
+            group is not None and group.teacher_id == staff.id
+        )
+    if user_type == "1":
+        if branching.is_super_admin(user):
+            return True
+        return branching.user_can_access_group(user, sub.assignment.group)
+    return False
 
-    Only ``results/`` is gated today (student grade documents). Everything else
-    — profile pictures, story images — is served publicly, exactly as before,
-    so the mobile app's unauthenticated image loading keeps working.
+
+def _can_access_chat_attachment(user, path):
+    msg = ChatMessage.objects.filter(attachment=path).select_related("thread__group").first()
+    if msg is None:
+        return False
+    return messaging.can_access_group(user, msg.thread.group)
+
+
+# prefix → (object-level check, serve as download?)
+_PROTECTED_PREFIXES = {
+    "results/": (_can_access_result_file, True),
+    "submissions/": (_can_access_submission, True),
+    "chat_attachments/": (_can_access_chat_attachment, False),
+}
+
+
+def _request_user(request):
+    """Session user, falling back to a mobile-app JWT bearer token."""
+    if request.user.is_authenticated:
+        return request.user
+    from rest_framework.exceptions import AuthenticationFailed
+    from rest_framework_simplejwt.authentication import JWTAuthentication
+
+    try:
+        result = JWTAuthentication().authenticate(request)
+    except AuthenticationFailed:
+        return None
+    return result[0] if result else None
+
+
+def protected_media(request, path):
+    """Serve MEDIA_ROOT files, enforcing access control on private prefixes.
+
+    Everything outside ``_PROTECTED_PREFIXES`` — profile pictures, story
+    images — is served publicly so the mobile app's unauthenticated image
+    loading keeps working.
     """
-    if path.startswith("results/"):
-        if not _can_access_result_file(request.user, path):
+    for prefix, (can_access, as_attachment) in _PROTECTED_PREFIXES.items():
+        if not path.startswith(prefix):
+            continue
+        user = _request_user(request)
+        if user is None or not user.is_authenticated or not can_access(user, path):
             # 404 (not 403) so we don't confirm the file exists to a probe.
             raise Http404
         # Serve through the storage backend so it works for local and remote
         # (Spaces) storage alike.
         if not default_storage.exists(path):
             raise Http404
-        return FileResponse(default_storage.open(path, "rb"), as_attachment=True)
+        return FileResponse(default_storage.open(path, "rb"), as_attachment=as_attachment)
 
     # Public assets — unchanged behaviour.
     from django.conf import settings

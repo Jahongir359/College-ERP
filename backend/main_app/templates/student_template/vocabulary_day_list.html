@@ -1,6 +1,7 @@
 {% extends 'main_app/base.html' %}
+{% load json_tags %}
 {% load static %}
-{% block title %}Daily Vocabulary — Iceberg Study Center{% endblock %}
+{% block title %}Daily Vocabulary — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}{% endblock %}
 {% block breadcrumb %}{% endblock %}
 
@@ -332,7 +333,7 @@
   if (fill) setTimeout(function(){ fill.style.width = '{{ completion_pct }}%'; }, 200);
 
   /* Quiz trend chart */
-  var trend = {{ trend_json|safe }};
+  var trend = {{ trend_json|js_json }};
   if (trend.labels && trend.labels.length && window.IcebergTrend) {
     IcebergTrend.line({
       canvas: 'vocabTrendChart', labels: trend.labels,

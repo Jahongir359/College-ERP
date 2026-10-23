@@ -1,12 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Iceberg Study Center</title>
+  <title>{{ brand.name|default:"Iceberg Study Center" }}</title>
   <link rel="shortcut icon" href="{% static 'image/favicon1.ico' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
@@ -128,7 +128,8 @@
       font-size: 11px;
       color: #94a3b8;
     }
-  </style>
+  </style>{% if brand.key == "school" %}
+  <link rel="stylesheet" href="{% static 'dist/css/brand-school.css' %}">{% endif %}
 </head>
 <body>
 
@@ -137,10 +138,10 @@
     <div class="card">
       <div class="card-logo">
         <div class="card-logo-img">
-          <img src="{% static 'dist/img/logo.png' %}" alt="">
+          <img src="{% static brand.logo_tile|default:'dist/img/logo.png' %}" alt="">
         </div>
         <div class="card-logo-text">
-          <strong>Iceberg Study Center</strong>
+          <strong>{{ brand.name|default:"Iceberg Study Center" }}</strong>
           <span>Student Portal</span>
         </div>
       </div>
@@ -163,7 +164,7 @@
         </svg>
       </a>
 
-      <p class="card-footer">Iceberg Study Center · Private access only</p>
+      <p class="card-footer">{{ brand.name|default:"Iceberg Study Center" }} · Private access only</p>
     </div>
   </div>
 

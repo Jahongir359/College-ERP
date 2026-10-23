@@ -54,6 +54,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/images/brand/school/
   fonts:
     - family: Inter
       fonts:

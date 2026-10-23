@@ -1,6 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block title %}Library Loans — Iceberg Study Center{% endblock %}
+{% block title %}Library Loans — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}Library{% endblock page_title %}
 {% block breadcrumb %}<li class="breadcrumb-item active">Loans</li>{% endblock %}
 

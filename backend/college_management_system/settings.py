@@ -59,6 +59,9 @@ elif DEBUG or _ALLOW_INSECURE_CONFIG_DEFAULTS:
 else:
     raise ImproperlyConfigured("DJANGO_ALLOWED_HOSTS must be set when DJANGO_DEBUG is False.")
 
+# Required so CSRF accepts POSTs arriving via the HTTPS load-balancer, whose
+# Origin (e.g. https://app.iceberglc.com) can differ from the internal Host.
+# Set CSRF_TRUSTED_ORIGINS=https://app.iceberglc.com,https://iceberglc.com
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
@@ -108,6 +111,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "main_app.middleware.LoginCheckMiddleWare",
+    # Remembers the Iceberg brand in a cookie (no-op while SCHOOL_BRAND_ENABLED is off).
+    "main_app.middleware.BrandCookieMiddleware",
     # Axes must come AFTER AuthenticationMiddleware so request.user is set.
     "axes.middleware.AxesMiddleware",
 ]
@@ -128,6 +133,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "main_app.context_processors.notification_count",
                 "main_app.context_processors.student_theme",
+                "main_app.context_processors.brand",
             ],
         },
     },
@@ -193,6 +199,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# The default PBKDF2 hasher is deliberately slow; in the test runner that cost
+# dominates the suite. Never applies outside `manage.py test`.
+if "test" in sys.argv:
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
 # ---------------------------------------------------------------------------
 # Internationalisation
 # ---------------------------------------------------------------------------
@@ -213,7 +224,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Files in public/ are served by WhiteNoise at the site root (no /static/ prefix).
 # This makes /favicon.ico, /manifest.json, /robots.txt, etc. publicly accessible
 # at the paths browsers and crawlers expect to find them.
-WHITENOISE_ROOT = BASE_DIR / "public"
+WHITENOISE_ROOT = BASE_DIR.parent / "infra" / "public"
 
 MEDIA_URL = "/media/"
 # Uploads must survive redeploys. On a VPS, set DJANGO_MEDIA_ROOT to a
@@ -309,9 +320,10 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # ── Login brute-force protection (django-axes) ────────────────────────────────
-# 5 failed attempts on the (username, IP) pair triggers a 15-minute lockout.
-# AxesStandaloneBackend lets us scope by username (so one attacker's IP storm
-# does not lock out the real user — both signals together gate the lockout).
+# 5 failed attempts trigger a 15-minute lockout. Each list entry is tracked
+# independently, so this locks a *username* after 5 failures from any IPs, and
+# separately locks an *IP* after 5 failures across any usernames. (Use
+# [["username", "ip_address"]] instead to lock only the exact pair.)
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(minutes=15)
 AXES_LOCK_OUT_AT_FAILURE = True
@@ -359,6 +371,14 @@ CAPTCHA_SECRET_KEY = os.environ.get("CAPTCHA_SECRET_KEY", "")
 # Token expected by the public lead receiver. The external website should send:
 # Authorization: Bearer <REGISTRATION_LEADS_API_TOKEN>
 REGISTRATION_LEADS_API_TOKEN = os.environ.get("REGISTRATION_LEADS_API_TOKEN", "").strip()
+
+# Iceberg School brand (see docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md). While off,
+# every request resolves to the Learning Center brand, so nothing changes.
+SCHOOL_BRAND_ENABLED = os.environ.get("SCHOOL_BRAND_ENABLED", "False").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+)
 
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     # Full SMTP — used in production when credentials are configured.
@@ -474,20 +494,6 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
 }
-
-# ---------------------------------------------------------------------------
-# CSRF trusted origins (Django 4.0+)
-# ---------------------------------------------------------------------------
-# Required so Django's CSRF middleware accepts POST requests that arrive via
-# DigitalOcean's HTTPS load-balancer. Without this, the Origin header
-# (https://app.iceberglc.com) can mismatch the Host header Django sees
-# internally, producing 403 on every form submission.
-# Set CSRF_TRUSTED_ORIGINS=https://app.iceberglc.com,https://iceberglc.com
-_csrf_trusted_env = os.environ.get("CSRF_TRUSTED_ORIGINS", "").strip()
-if _csrf_trusted_env:
-    CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_trusted_env.split(",") if o.strip()]
-elif DEBUG:
-    CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
 # ---------------------------------------------------------------------------
 # CORS — allow Flutter apps on mobile and web clients

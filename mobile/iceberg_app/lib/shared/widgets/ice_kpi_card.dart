@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/brand.dart';
 
 class IceKpiCard extends StatelessWidget {
   final String label;
@@ -21,8 +22,8 @@ class IceKpiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = iconColor ?? IceColors.navyDeep;
-    final bg = iconBg ?? IceColors.navyDeep.withValues(alpha: 0.1);
+    final fg = iconColor ?? context.brandPrimary;
+    final bg = iconBg ?? context.brandPrimary.withValues(alpha: 0.1);
     return GestureDetector(
       onTap: onTap,
       child: Container(

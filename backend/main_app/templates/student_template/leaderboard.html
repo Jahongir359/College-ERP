@@ -1,6 +1,7 @@
 {% extends 'main_app/base.html' %}
+{% load json_tags %}
 {% load static %}
-{% block title %}Leaderboard — Iceberg Study Center{% endblock %}
+{% block title %}Leaderboard — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}{% endblock %}
 {% block breadcrumb %}{% endblock %}
 
@@ -911,7 +912,7 @@
   confetti();
 
   /* ── Detail modal ─────────────────────────────────────────── */
-  var RANKINGS = {{ rankings_json|safe }};
+  var RANKINGS = {{ rankings_json|js_json }};
   var byId = {};
   RANKINGS.forEach(function (r) { byId[r.id] = r; });
 

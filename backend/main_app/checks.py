@@ -47,3 +47,25 @@ def check_media_storage_persistence(app_configs, **kwargs):
             )
         )
     return errors
+
+
+@register(deploy=True)
+def check_registration_leads_token(app_configs, **kwargs):
+    """Warn when the public lead endpoint has no token in production.
+
+    Without REGISTRATION_LEADS_API_TOKEN the endpoint refuses every lead
+    (503) outside DEBUG, so website enquiries would be lost.
+    """
+    if settings.DEBUG or getattr(settings, "REGISTRATION_LEADS_API_TOKEN", "").strip():
+        return []
+    return [
+        Warning(
+            "REGISTRATION_LEADS_API_TOKEN is not set, so /public/registration-leads/ "
+            "rejects every website lead with HTTP 503.",
+            hint=(
+                "Set REGISTRATION_LEADS_API_TOKEN to a long random value and give the same "
+                "value to the iceberglc.com website. See .env.example."
+            ),
+            id="main_app.W002",
+        )
+    ]

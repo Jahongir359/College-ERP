@@ -1,6 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block title %}Edit Result — Iceberg Study Center{% endblock %}
+{% block title %}Edit Result — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}{% endblock %}
 {% block breadcrumb %}{% endblock %}
 

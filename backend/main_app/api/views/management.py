@@ -1,5 +1,7 @@
 import datetime
 
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Q
 from rest_framework import generics, status
@@ -10,6 +12,29 @@ from ... import branching
 from ...models import Branch, CustomUser, RegistrationLead, Staff, Student
 from ..permissions import IsAdmin
 from ..serializers import AdminStaffSerializer, AdminStudentSerializer, RegistrationLeadSerializer
+
+
+def _resolve_branch(user, branch_id):
+    """Return (branch, error_response) for a branch the admin may assign.
+
+    Branch admins must pick one of their own branches — otherwise they could
+    create accounts inside another branch (or with no branch, invisible to
+    them afterwards). Super admins may leave it blank.
+    """
+    if not branch_id:
+        if branching.is_super_admin(user):
+            return None, None
+        return None, Response({"detail": "branch is required."}, status=status.HTTP_400_BAD_REQUEST)
+    branch = Branch.objects.filter(pk=branch_id).first()
+    if branch is None or not branching.user_can_access_branch(user, branch):
+        return None, Response(
+            {"detail": "You don't have access to that branch."}, status=status.HTTP_403_FORBIDDEN
+        )
+    return branch, None
+
+
+def _scoped_leads(user):
+    return branching.filter_registration_leads_for_user(user, RegistrationLead.objects.all())
 
 
 # ---------------------------------------------------------------------------
@@ -23,7 +48,7 @@ class AdminLeadListView(APIView):
     def get(self, request):
         from rest_framework.pagination import PageNumberPagination
 
-        qs = RegistrationLead.objects.order_by("-created_at")
+        qs = _scoped_leads(request.user).order_by("-created_at")
         status_filter = request.query_params.get("status")
         search = request.query_params.get("search")
         if status_filter:
@@ -54,14 +79,14 @@ class AdminLeadDetailView(APIView):
 
     def get(self, request, pk):
         try:
-            lead = RegistrationLead.objects.get(pk=pk)
+            lead = _scoped_leads(request.user).get(pk=pk)
         except RegistrationLead.DoesNotExist:
             return Response({"detail": "Lead not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(RegistrationLeadSerializer(lead).data)
 
     def patch(self, request, pk):
         try:
-            lead = RegistrationLead.objects.get(pk=pk)
+            lead = _scoped_leads(request.user).get(pk=pk)
         except RegistrationLead.DoesNotExist:
             return Response({"detail": "Lead not found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = RegistrationLeadSerializer(lead, data=request.data, partial=True)
@@ -120,6 +145,10 @@ class AdminStudentListView(generics.ListAPIView):
                 {"detail": "first_name and password are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        try:
+            validate_password(password)
+        except DjangoValidationError as exc:
+            return Response({"password": exc.messages}, status=status.HTTP_400_BAD_REQUEST)
 
         dob = None
         if dob_str:
@@ -130,6 +159,10 @@ class AdminStudentListView(generics.ListAPIView):
                     {"detail": "Invalid date_of_birth format. Use YYYY-MM-DD."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+        branch, error = _resolve_branch(request.user, branch_id)
+        if error:
+            return error
 
         login_id = _generate_login_id("IC", dob)
         email = f"{login_id.lower()}@iceberg.internal"
@@ -155,11 +188,7 @@ class AdminStudentListView(generics.ListAPIView):
                 student.course = CourseModel.objects.get(pk=course_id)
             except CourseModel.DoesNotExist:
                 pass
-        if branch_id:
-            try:
-                student.branch = Branch.objects.get(pk=branch_id)
-            except Branch.DoesNotExist:
-                pass
+        student.branch = branch
         student.phone = phone
         student.status = status_val
         student.level = int(level) if level else None
@@ -263,6 +292,10 @@ class AdminStaffListView(generics.ListAPIView):
                 {"detail": "first_name and password are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        try:
+            validate_password(password)
+        except DjangoValidationError as exc:
+            return Response({"password": exc.messages}, status=status.HTTP_400_BAD_REQUEST)
 
         dob = None
         if dob_str:
@@ -273,6 +306,10 @@ class AdminStaffListView(generics.ListAPIView):
                     {"detail": "Invalid date_of_birth format. Use YYYY-MM-DD."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+        branch, error = _resolve_branch(request.user, branch_id)
+        if error:
+            return error
 
         login_id = _generate_login_id("TC", dob)
         email = f"{login_id.lower()}@iceberg.internal"
@@ -297,11 +334,7 @@ class AdminStaffListView(generics.ListAPIView):
                 staff.course = CourseModel.objects.get(pk=course_id)
             except CourseModel.DoesNotExist:
                 pass
-        if branch_id:
-            try:
-                staff.branch = Branch.objects.get(pk=branch_id)
-            except Branch.DoesNotExist:
-                pass
+        staff.branch = branch
         staff.phone = phone
         staff.specialization = specialization
         staff.save()

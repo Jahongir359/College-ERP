@@ -118,6 +118,11 @@ def registration_leads_receiver(request):
         return JsonResponse({"detail": "Payload must be an object."}, status=400)
 
     expected_token = getattr(settings, "REGISTRATION_LEADS_API_TOKEN", "").strip()
+    if not expected_token and not settings.DEBUG:
+        # Without a token anyone could create leads, so production refuses
+        # them until REGISTRATION_LEADS_API_TOKEN is set (see checks.W002).
+        logger.error("Registration lead rejected: REGISTRATION_LEADS_API_TOKEN is not configured.")
+        return JsonResponse({"detail": "Lead intake is not configured."}, status=503)
     if expected_token and not secrets.compare_digest(
         _request_token(request, payload), expected_token
     ):

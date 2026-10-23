@@ -56,10 +56,10 @@ def _codes_match(submitted: str, stored_hash: str) -> bool:
     return hmac.compare_digest(_hash_code(submitted), stored_hash)
 
 
-def _send_code_email(to_email: str, code: str) -> None:
+def _send_code_email(to_email: str, code: str, brand_name: str = "Iceberg Study Center") -> None:
     logger.info("[PRC] Sending reset code to %s", to_email)
     send_mail(
-        subject="Iceberg Study Center — Password Reset Code",
+        subject=f"{brand_name} — Password Reset Code",
         message=(
             f"Your verification code is: {code}\n\n"
             f"This code expires in {_EXPIRY_MINUTES} minutes.\n\n"
@@ -70,6 +70,13 @@ def _send_code_email(to_email: str, code: str) -> None:
         fail_silently=False,
     )
     logger.info("[PRC] Code email sent to %s", to_email)
+
+
+def _brand_name(user) -> str:
+    """The user's Iceberg brand name for the email subject (School or Learning Center)."""
+    from .branding import brand_key_for_user, get_brand
+
+    return get_brand(brand_key_for_user(user)).name
 
 
 def _clear_reset_session(request) -> None:
@@ -123,7 +130,7 @@ def forgot_password(request):
             logger.info("[PRC] Code created: id=%s expires=%s", obj.id, expires_at)
 
             try:
-                _send_code_email(user.email, code)
+                _send_code_email(user.email, code, _brand_name(user))
             except Exception as exc:
                 logger.error("[PRC] Email send failed for %s: %s", email, exc, exc_info=True)
                 obj.delete()  # Don't count a failed send against the rate limit.
@@ -333,7 +340,7 @@ def resend_code(request):
                 expires_at=expires_at,
             )
             try:
-                _send_code_email(user.email, code)
+                _send_code_email(user.email, code, _brand_name(user))
             except Exception as exc:
                 logger.error("[PRC] Resend email failed for %s: %s", email, exc, exc_info=True)
                 obj.delete()

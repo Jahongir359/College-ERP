@@ -1535,17 +1535,16 @@ def save_quiz_result(request, day_id):
         return JsonResponse({"error": "POST required"}, status=405)
     student = get_object_or_404(Student, admin=request.user)
     day = get_object_or_404(VocabularyDay, id=day_id)
-    enrolled = Enrollment.objects.filter(student=student, group=day.group, is_active=True).exists()
-    if day.release_scope != VocabularyDay.SCOPE_ALL and not enrolled:
+    if not day.student_can_view(student):
         return JsonResponse({"error": "Not enrolled in this group."}, status=403)
     try:
         if request.content_type and "application/json" in request.content_type:
             data = json.loads(request.body)
         else:
             data = request.POST
-        correct = int(data.get("correct", 0))
-        total = int(data.get("total", 1))
-        score = round((correct / total) * 100, 1) if total else 0
+        correct, total, score = VocabularyQuizResult.score_submission(
+            day, data.get("correct", 0), data.get("total", 0)
+        )
         VocabularyQuizResult.objects.create(
             student=student,
             day=day,

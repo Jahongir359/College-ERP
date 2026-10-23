@@ -7,6 +7,7 @@ import '../../../core/auth/auth_state.dart';
 import '../../../core/i18n/strings.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
+import '../../../core/theme/brand.dart';
 
 /// ICEBERG login — dark navy/teal hero with the lime accent, shared by all
 /// roles (the API routes each role to its own shell after sign-in).
@@ -81,10 +82,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           alignment: Alignment.center,
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            width: 60,
-                            height: 60,
+                          child: IceBrandLogo(
+                            size: 60,
+                            radius: 16,
                             errorBuilder: (_, __, ___) => Text(
                               'ICE',
                               style: TextStyle(

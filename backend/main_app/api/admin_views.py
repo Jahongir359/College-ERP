@@ -7,6 +7,8 @@ All views in this module:
     only see their own branch, while super admins see everything.
 """
 
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Q
 from rest_framework import status
@@ -55,6 +57,23 @@ def _require_admin(request):
     return True, None
 
 
+def _super_admin_error(request):
+    """403 Response unless the user is a super admin, else None.
+
+    Branches, courses, sessions and subjects are shared across branches, so
+    only super admins may create/change/delete them (matches the web UI).
+    """
+    ok, err = _require_admin(request)
+    if not ok:
+        return err
+    if not branching.is_super_admin(request.user):
+        return Response(
+            {"detail": "Only a super admin can change shared settings."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+    return None
+
+
 # ---------------------------------------------------------------------------
 # 1 & 2.  Branches
 # ---------------------------------------------------------------------------
@@ -84,6 +103,7 @@ class BranchListView(APIView):
                     "id": branch.id,
                     "name": branch.name,
                     "address": branch.address,
+                    "brand": branch.brand,
                     "student_count": student_count,
                     "staff_count": staff_count,
                 }
@@ -91,6 +111,9 @@ class BranchListView(APIView):
         return Response(data)
 
     def post(self, request):
+        err = _super_admin_error(request)
+        if err:
+            return err
         ok, err = _require_admin(request)
         if not ok:
             return err
@@ -100,9 +123,17 @@ class BranchListView(APIView):
             return Response({"detail": "name is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         address = request.data.get("address", "")
-        branch = Branch.objects.create(name=name, address=address)
+        brand = request.data.get("brand", Branch.BRAND_CENTER)
+        if brand not in dict(Branch.BRAND_CHOICES):
+            return Response({"detail": "Invalid brand."}, status=status.HTTP_400_BAD_REQUEST)
+        branch = Branch.objects.create(name=name, address=address, brand=brand)
         return Response(
-            {"id": branch.id, "name": branch.name, "address": branch.address},
+            {
+                "id": branch.id,
+                "name": branch.name,
+                "address": branch.address,
+                "brand": branch.brand,
+            },
             status=status.HTTP_201_CREATED,
         )
 
@@ -137,6 +168,7 @@ class BranchDetailView(APIView):
                 "id": branch.id,
                 "name": branch.name,
                 "address": branch.address,
+                "brand": branch.brand,
                 "student_count": student_count,
                 "staff_count": staff_count,
             }
@@ -150,10 +182,23 @@ class BranchDetailView(APIView):
             branch.name = request.data["name"]
         if "address" in request.data:
             branch.address = request.data["address"]
+        if "brand" in request.data:
+            # Only super admins may switch a branch between Learning Center and School.
+            err = _super_admin_error(request)
+            if err:
+                return err
+            if request.data["brand"] not in dict(Branch.BRAND_CHOICES):
+                return Response({"detail": "Invalid brand."}, status=status.HTTP_400_BAD_REQUEST)
+            branch.brand = request.data["brand"]
         branch.save()
-        return Response({"id": branch.id, "name": branch.name, "address": branch.address})
+        return Response(
+            {"id": branch.id, "name": branch.name, "address": branch.address, "brand": branch.brand}
+        )
 
     def delete(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return err
         branch, err = self._get_branch(request, pk)
         if err:
             return err
@@ -207,6 +252,9 @@ class CourseListView(APIView):
         return Response(data)
 
     def post(self, request):
+        err = _super_admin_error(request)
+        if err:
+            return err
         ok, err = _require_admin(request)
         if not ok:
             return err
@@ -257,6 +305,9 @@ class CourseDetailView(APIView):
         )
 
     def patch(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return err
         course, err = self._get_course(request, pk)
         if err:
             return err
@@ -273,6 +324,9 @@ class CourseDetailView(APIView):
         )
 
     def delete(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return err
         course, err = self._get_course(request, pk)
         if err:
             return err
@@ -323,6 +377,9 @@ class SessionListView(APIView):
         return Response(data)
 
     def post(self, request):
+        err = _super_admin_error(request)
+        if err:
+            return err
         ok, err = _require_admin(request)
         if not ok:
             return err
@@ -376,6 +433,9 @@ class SessionDetailView(APIView):
         )
 
     def patch(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return err
         session, err = self._get_session(request, pk)
         if err:
             return err
@@ -393,6 +453,9 @@ class SessionDetailView(APIView):
         )
 
     def delete(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return err
         session, err = self._get_session(request, pk)
         if err:
             return err
@@ -439,6 +502,9 @@ class SubjectListView(APIView):
         return Response(data)
 
     def post(self, request):
+        err = _super_admin_error(request)
+        if err:
+            return err
         ok, err = _require_admin(request)
         if not ok:
             return err
@@ -497,6 +563,9 @@ class SubjectDetailView(APIView):
         )
 
     def patch(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return err
         subject, err = self._get_subject(request, pk)
         if err:
             return err
@@ -522,6 +591,9 @@ class SubjectDetailView(APIView):
         )
 
     def delete(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return err
         subject, err = self._get_subject(request, pk)
         if err:
             return err
@@ -980,11 +1052,9 @@ class AdminStoriesListView(APIView):
         )
 
         if target_group_id:
-            try:
-                group = Group.objects.get(pk=target_group_id)
-                story.target_groups.add(group)
-            except Group.DoesNotExist:
-                pass  # Non-fatal: story created without target group
+            story.target_groups.set(Group.objects.filter(pk=target_group_id))
+        # Trim to the admin's branches; branch admins can't post school-wide.
+        branching.scope_story_target_groups(request.user, story)
 
         return Response(
             {
@@ -997,23 +1067,7 @@ class AdminStoriesListView(APIView):
         )
 
 
-def _user_can_modify_story(user, story):
-    """Mirror of hod_views._user_can_modify_story: branch admins may only
-    modify stories they authored or stories whose every target group lies
-    within their accessible branches. Global stories (no targets) can only
-    be modified by their author or a super admin."""
-    if branching.is_super_admin(user):
-        return True
-    if story.created_by_id == user.id:
-        return True
-    target_ids = set(story.target_groups.values_list("id", flat=True))
-    if not target_ids:
-        return False
-    accessible_branches = branching.get_accessible_branches(user)
-    accessible_group_ids = set(
-        Group.objects.filter(branch__in=accessible_branches).values_list("id", flat=True)
-    )
-    return target_ids <= accessible_group_ids
+_user_can_modify_story = branching.user_can_modify_story
 
 
 class AdminStoriesDetailView(APIView):
@@ -1365,6 +1419,10 @@ class AdminGroupListView(APIView):
                     )
             except Branch.DoesNotExist:
                 return Response({"branch": ["Not found."]}, status=status.HTTP_400_BAD_REQUEST)
+        elif not branching.is_super_admin(request.user):
+            return Response(
+                {"branch": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         group = Group.objects.create(
             name=d["name"],
@@ -1463,10 +1521,12 @@ class AdminGroupDetailView(APIView):
                 return Response({"course": ["Not found."]}, status=status.HTTP_400_BAD_REQUEST)
         if "teacher" in d:
             if d["teacher"]:
-                try:
-                    g.teacher = Staff.objects.get(pk=d["teacher"])
-                except Staff.DoesNotExist:
+                teacher = branching.filter_staff_for_user(
+                    request.user, Staff.objects.filter(pk=d["teacher"])
+                ).first()
+                if teacher is None:
                     return Response({"teacher": ["Not found."]}, status=status.HTTP_400_BAD_REQUEST)
+                g.teacher = teacher
             else:
                 g.teacher = None
         if "branch" in d:
@@ -1480,8 +1540,14 @@ class AdminGroupDetailView(APIView):
                     g.branch = b
                 except Branch.DoesNotExist:
                     return Response({"branch": ["Not found."]}, status=status.HTTP_400_BAD_REQUEST)
-            else:
+            elif branching.is_super_admin(request.user):
                 g.branch = None
+            else:
+                # Clearing the branch would move the group out of every branch
+                # admin's scope (including this one's).
+                return Response(
+                    {"branch": ["Branch is required."]}, status=status.HTTP_400_BAD_REQUEST
+                )
         g.save()
         return Response({"id": g.id, "name": g.name, "is_archived": g.is_archived})
 
@@ -1489,10 +1555,11 @@ class AdminGroupDetailView(APIView):
         g, err = self._get_group(request, pk)
         if err:
             return err
-        if g.enrollments.exists():
+        enrolled = g.enrollment_set.count()
+        if enrolled:
             return Response(
                 {
-                    "detail": f"Cannot delete group '{g.name}': {g.enrollments.count()} student(s) enrolled. Archive it instead."
+                    "detail": f"Cannot delete group '{g.name}': {enrolled} student(s) enrolled. Archive it instead."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -1578,6 +1645,10 @@ class AdminAdminListView(APIView):
                 {"detail": "email and password are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        try:
+            validate_password(password)
+        except DjangoValidationError as exc:
+            return Response({"password": exc.messages}, status=status.HTTP_400_BAD_REQUEST)
         if CustomUser.objects.filter(email=email).exists():
             return Response(
                 {"detail": "An account with this email already exists."},
@@ -1660,6 +1731,10 @@ class AdminAdminDetailView(APIView):
         if "is_active" in d:
             target.is_active = bool(d["is_active"])
         if "password" in d and d["password"]:
+            try:
+                validate_password(d["password"], target)
+            except DjangoValidationError as exc:
+                return Response({"password": exc.messages}, status=status.HTTP_400_BAD_REQUEST)
             target.set_password(d["password"])
         target.save()
 

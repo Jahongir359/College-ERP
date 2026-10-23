@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/settings/app_settings.dart';
+import '../../../core/theme/brand_provider.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_shell.dart';
 
@@ -24,7 +25,11 @@ class StudentThemeScope extends ConsumerWidget {
       ThemeMode.light => false,
       ThemeMode.system => platformDark,
     };
-    final theme = buildIceTheme(dark: dark, accent: settings.accentColor);
+    final theme = buildIceTheme(
+      dark: dark,
+      accent: settings.accentColor,
+      brand: ref.watch(brandProvider),
+    );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
