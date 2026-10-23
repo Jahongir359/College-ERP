@@ -706,7 +706,7 @@ this repo:
 - [ ] Assets + `brand.dart` + `IceTokens`/`AppTheme` brand parameter
 - [ ] `brandProvider` from `/api/me/`, persisted
 - [ ] Wording + logos by brand
-- [ ] `flutter analyze`, `flutter test`, build
+- [x] `flutter analyze` (no errors or warnings; 13 deprecation infos in older screens), `flutter test`, `flutter build web --release` — verified 2026-10-23 with Flutter 3.47.7 / Dart 3.13.5
 
 **Phase 6 — Rollout**
 - [ ] Staging: `SCHOOL_BRAND_ENABLED=True`, create "Iceberg School" branch with `brand=school`,
@@ -868,4 +868,9 @@ what's next. Newest at the bottom.
   `feat/design-system-foundation` → `feat/school-site`. Open owner items: School facts and leader text in
   `config/school.json`, "Iceberg Maktabi" vs "Iceberg School" naming in Uzbek copy, Cloudflare secrets,
   Apps Script redeploy, ERP branch names; Phase 5 (Flutter) still needs `flutter analyze`/`test`.
+- **2026-10-23 — Claude (Opus 5.5) — Phase 5 verified.** Installed Flutter 3.47.7 in the session container
+  (not the repo). On `feat/school-brand-phase-5`: `flutter analyze` 0 errors/warnings (13 `deprecated_member_use`
+  infos in pre-existing screens: `cacheExtent`, `value`), `flutter test` OK (only a placeholder test exists),
+  `flutter build web --release` compiles. Django CI suite: ruff/format clean, `check` clean, no pending
+  migrations, collectstatic OK, **186 tests OK**. No code changed.
 
