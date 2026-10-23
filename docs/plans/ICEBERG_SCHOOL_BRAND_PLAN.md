@@ -842,4 +842,13 @@ what's next. Newest at the bottom.
   All 7 LC pages: same URLs, copy and layout; before/after screenshots at 1280 px and 390 px checked.
   Build check now fails on the Tailwind CDN, missing `data-brand` or stale `tokens.css`. Flask tests OK,
   Node tests OK, static build check OK. Next: 4c School pages on the shared layout.
+- **2026-10-23 — Claude (Opus 5.5) — Phase 4c/4d: one School-first website.** Owner: the site is mainly
+  for Iceberg School; the Learning Center becomes a courses section. Website plan section 0 records the
+  new URL structure. ICEBERG_WEB branch `feat/school-site` (stacked on `feat/design-system-foundation`):
+  new `templates/site/*` (home with animated iceberg hero, about, programs, admissions + thanks, courses,
+  news, contact, register), `static/css/site.css` (brand tokens only, mobile first), `site.js` (menu,
+  dock, reveal), crest favicons/OG image, `config/school.json` placeholders, 301s for `/our_programs` and
+  `/questions`, School enquiry through `/api/register` → Sheets → ERP (`source=school-website`,
+  `program="Grade N"`, branch `SCHOOL_BRANCH_NAME`). Flask 18 tests OK, Node 25 OK, static build check OK;
+  every page checked at 390 px and 1280 px. Next: owner fills School facts and reviews copy; deploy.
 

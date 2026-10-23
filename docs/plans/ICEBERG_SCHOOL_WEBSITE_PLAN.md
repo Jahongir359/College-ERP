@@ -16,7 +16,30 @@ website repo, copy [`ICEBERG_WEBSITE_AGENTS.md`](ICEBERG_WEBSITE_AGENTS.md) into
 
 ---
 
-## 1. Decision
+## 0. Current structure — one School-first site (owner decision, 2026-10-23, supersedes 1, 3, 4.1)
+
+The owner decided that **iceberglc.com is mainly the Iceberg School website**, with the Learning Center
+as one section of it ("Iceberg Courses") instead of a separate site or a `/school/` prefix. Sections 1,
+3 and 4.1 below describe the earlier "LC at `/`, School under `/school/`" idea and are kept for history
+only; where they disagree with this section, this section wins. Sections 2, 5, 6, 8 and 9 still apply.
+
+| URL | Page |
+|---|---|
+| `/` | Iceberg School home (canvas "School website — Home") |
+| `/about` | School + the Iceberg family (crest meaning, values, team) |
+| `/programs` | Grade stages 1–4 / 5–9 / 10–11 |
+| `/admissions`, `/admissions/thanks` | Steps, School enquiry form, tuition, FAQ (canvas "Admissions") |
+| `/courses` | **Iceberg Courses — ICEBERG o'quv markazi**: IELTS, CEFR, SAT, maths, chemistry, biology, method, branches, FAQ |
+| `/register` | Course registration (unchanged form fields and `/api/register` contract) |
+| `/news`, `/contact` | Shared |
+| `/our_programs`, `/questions` | **301** → `/courses`, `/courses#savollar` |
+
+Decisions: whole site `data-brand="school"` (maroon); the courses keep "ICEBERG o'quv markazi" in
+titles for existing search traffic; JSON-LD is one `School` with the courses as `subOrganization`;
+School facts live in the website's `config/school.json` (empty → visible `[placeholder]`, omitted from
+JSON-LD); grade stages default to the standard Uzbek 1–4 / 5–9 / 10–11 split.
+
+## 1. Decision (earlier version — see section 0)
 
 **Where does the Iceberg School public website live?**
 → **In the existing iceberglc.com website codebase**, under the URL prefix **`/school/`**.
@@ -297,23 +320,26 @@ When a brand value changes: update `tokens.json` here, then copy it to the websi
       generated `tokens.css` with `data-brand`, Inter, all 7 LC pages on the teal + lime tokens with
       no URL/copy/layout change (before/after screenshots, desktop + 390 px) — ICEBERG_WEB
       `feat/design-system-foundation`
-- [ ] 4.0 foundation, components part: brand object in the base layout (name, logos, nav, footer,
-      JSON-LD, Portal URL) so School pages reuse it — do with 4c
-- [ ] Real `/ru/`, `/en/` pages + `hreflang` (can follow launch)
-- [ ] School logos/favicons/OG image in `/static/school/`
+- [x] 4.0 foundation, components part: shared `templates/site/base.html` (logos, nav, mobile menu,
+      footer, JSON-LD, Portal URL) — ICEBERG_WEB `feat/school-site`
+- [ ] Real `/ru/`, `/en/` pages + `hreflang` (can follow launch; Google Translate select for now)
+- [x] School logos, crest favicons/app icons, OG image (`/static/school/img/`, `/static/*.png`)
 
-**4c — Website: School pages**
-- [ ] Home, About, Programs, Admissions (+ thanks), Contact; News optional
-- [ ] Uzbek copy first; placeholders for unknown facts
-- [ ] Links: LC → School and School → LC; Portal login → `app.iceberglc.com/login/?brand=school`
+**4c — Website: School pages** (section 0 structure; ICEBERG_WEB `feat/school-site`)
+- [x] Home, About, Programs, Admissions (+ thanks), Courses, News, Contact, Register
+- [x] Uzbek copy first; placeholders for unknown facts (`config/school.json`)
+- [x] Courses section links; Portal login → `app.iceberglc.com/login/?brand=school`; 301s from old LC URLs
+- [ ] Owner fills `config/school.json`: phone, address, hours, academic year, tuition, Telegram/Instagram
 
 **4d — Website: enquiry**
-- [ ] `school-enquiry` form + handler branch in `/api/register` (section 6)
-- [ ] `SCHOOL_BRANCH_NAME` in the website's config/secrets
+- [x] `school-enquiry` form + handler branch in `/api/register` (section 6) + Flask `/admissions`;
+      Sheets receiver `2026-10-23.2` adds Form Type / Child / Language / Message columns
+- [ ] `SCHOOL_BRANCH_NAME` as a Cloudflare variable (defaults to "Iceberg School")
 - [ ] End-to-end test into the ERP
 
 **4e — Search + launch**
-- [ ] Section 5 on every page; sitemap updated
+- [x] Section 5 on every page (title, description, canonical, OG, JSON-LD); sitemap updated
+- [ ] Owner review of the copy and placeholders before deploy
 - [ ] Section 9 checks pass
 - [ ] Deploy; Search Console + Google Business Profile (owner)
 - [ ] ERP `SCHOOL_BRAND_ENABLED=True` once Phases 2–3 are merged (so "Portal login" shows the School look)
