@@ -2,7 +2,7 @@
 {% load json_tags %}
 {% load static %}
 
-{% block title %}Teacher Dashboard — Iceberg Study Center{% endblock %}
+{% block title %}Teacher Dashboard — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}{% endblock %}
 {% block breadcrumb %}{% endblock %}
 

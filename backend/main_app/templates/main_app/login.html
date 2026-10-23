@@ -1,21 +1,21 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>ICEBERG — Sign In</title>
+  <title>{{ brand.mark|default:"ICEBERG" }} — Sign In</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0C1F45">
+  <meta name="theme-color" content="{{ brand.theme_color|default:"#0C1F45" }}">
   <!-- OG / Twitter -->
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="ICEBERG Study Center">
-  <meta property="og:title" content="Sign In — ICEBERG Study Center">
+  <meta property="og:site_name" content="{{ brand.display_name|default:"ICEBERG Study Center" }}">
+  <meta property="og:title" content="Sign In — {{ brand.display_name|default:"ICEBERG Study Center" }}">
   <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -630,7 +630,8 @@
       .logo-hero { margin-top: 4px; margin-bottom: 16px; }
       .card { max-width: none; width: 100%; }
     }
-  </style>
+  </style>{% if brand.key == "school" %}
+  <link rel="stylesheet" href="{% static 'dist/css/brand-school.css' %}">{% endif %}
 </head>
 <body>
 
@@ -638,7 +639,7 @@
   <div class="logo-hero">
     <div class="logo-float">
       <div class="logo-card">
-        <img src="{% static 'dist/img/logo.png' %}" alt="ICEBERG Study Center">
+        <img src="{% static brand.logo_tile|default:'dist/img/logo.png' %}" alt="{{ brand.display_name|default:"ICEBERG Study Center" }}">
       </div>
     </div>
   </div>
@@ -736,7 +737,7 @@
     </form>
   </div>
 
-  <p class="footer">&copy; {% now "Y" %} Iceberg Study Center</p>
+  <p class="footer">&copy; {% now "Y" %} {{ brand.name|default:"Iceberg Study Center" }}</p>
 
   {% if captcha_enabled %}
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>

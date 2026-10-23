@@ -1,12 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>ICEBERG - Account Recovery</title>
+  <title>{{ brand.mark|default:"ICEBERG" }} - Account Recovery</title>
   <link rel="shortcut icon" href="{% static 'image/favicon1.ico' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
@@ -286,20 +286,21 @@
         scroll-behavior: auto !important;
       }
     }
-  </style>
+  </style>{% if brand.key == "school" %}
+  <link rel="stylesheet" href="{% static 'dist/css/brand-school.css' %}">{% endif %}
 </head>
 <body>
   <div class="card">
     <div class="brand-hero">
       <div class="brand-mark" aria-hidden="true"></div>
       <div class="brand-name">ICEBERG</div>
-      <div class="brand-sub">STUDY CENTER</div>
+      <div class="brand-sub">{% if brand.key == "school" %}{{ brand.short_name|upper }}{% else %}STUDY CENTER{% endif %}</div>
     </div>
 
     {% block content %}{% endblock %}
 
     <div class="card-footer">
-      &copy; {% now "Y" %} Iceberg Study Center
+      &copy; {% now "Y" %} {{ brand.name|default:"Iceberg Study Center" }}
     </div>
   </div>
 </body>

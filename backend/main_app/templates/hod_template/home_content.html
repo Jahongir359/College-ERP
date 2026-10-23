@@ -2,7 +2,7 @@
 {% load json_tags %}
 {% load static %}
 
-{% block title %}Admin Dashboard — Iceberg Study Center{% endblock %}
+{% block title %}Admin Dashboard — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
 {% block page_title %}Admin Dashboard{% endblock %}
 {% block breadcrumb %}<li class="breadcrumb-item active">Dashboard</li>{% endblock %}
 
