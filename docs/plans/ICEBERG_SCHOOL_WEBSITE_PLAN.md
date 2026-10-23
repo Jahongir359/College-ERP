@@ -129,7 +129,7 @@ pages render with `data-brand="center"`, School pages with `data-brand="school"`
 6. **Keep URLs.** Existing LC URLs (`/about`, `/our_programs`, …) must not change; if a page moves,
    add a 301 redirect. Keep `/register` and `/api/register` working throughout.
 
-### 4.0.1 Learning Center palette — owner decision needed
+### 4.0.1 Learning Center palette — decided 2026-10-23: teal + lime
 
 The Learning Center has three palettes today: the website (navy `#0d2a50`, blue `#3ba3ff`), the ERP's
 `iceberg.css` (teal `#06343A`, lime `#DFFF2F` — what `tokens.json` "center" holds), and many ERP
@@ -137,7 +137,9 @@ templates (navy `#0C1F45`, cyan `#06B6D4`). Pick **one** for "center":
 - **Teal + lime** (ERP design-system tokens; the canvas "One system, two brands" board), or
 - **Navy + blue** (what website visitors know today) — then update `tokens.json` "center" and the ERP
   follows during Phase 2-style cleanup.
-Until decided, the website keeps its current LC colours and only the School uses the new tokens.
+**Decided (owner, 2026-10-23): teal + lime**, the `tokens.json` "center" values, as on the canvas. The
+School accent stays solid maroon with white text (section 5.2 of the brand plan); the canvas's blush
+"Add student" button is not used.
 
 ### 4.1 School pages
 
@@ -290,9 +292,13 @@ When a brand value changes: update `tokens.json` here, then copy it to the websi
 - [x] `/api/register` copies leads to the ERP + branch code→name mapping (section 2.1)
 - [ ] Owner: set the two Cloudflare secrets, fill `erp_branch_name`, redeploy Apps Script
       (receiver `2026-10-23.1` reports duplicates)
-- [ ] Owner picks the Learning Center palette (4.0.1); update `tokens.json` if needed
-- [ ] 4.0 foundation: real CSS build, `tokens.css` with `data-brand`, shared layout/components,
-      Inter — LC pages re-skinned with no URL changes (screenshot each LC page before/after)
+- [x] Owner picks the Learning Center palette (4.0.1): teal + lime; `tokens.json` unchanged
+- [x] 4.0 foundation, re-skin part: compiled Tailwind (`npm run build:css`) instead of the CDN,
+      generated `tokens.css` with `data-brand`, Inter, all 7 LC pages on the teal + lime tokens with
+      no URL/copy/layout change (before/after screenshots, desktop + 390 px) — ICEBERG_WEB
+      `feat/design-system-foundation`
+- [ ] 4.0 foundation, components part: brand object in the base layout (name, logos, nav, footer,
+      JSON-LD, Portal URL) so School pages reuse it — do with 4c
 - [ ] Real `/ru/`, `/en/` pages + `hreflang` (can follow launch)
 - [ ] School logos/favicons/OG image in `/static/school/`
 
@@ -324,10 +330,8 @@ When a brand value changes: update `tokens.json` here, then copy it to the websi
 4. Languages at launch: Uzbek only first, then real Russian/English pages (recommended), or keep the
    Google Translate widget for now?
 5. Exact ERP branch names (LC branches + the new School branch).
-6. Learning Center palette for the shared design system: teal + lime, or the website's navy + blue
-   (section 4.0.1)?
-7. Order: re-skin the LC site first and then add the School (recommended — one design system from day
-   one), or ship the School first on a temporary layout (4.1 point 1)?
+6. ~~Learning Center palette~~ **Answered 2026-10-23: teal + lime.**
+7. ~~Order~~ **Answered 2026-10-23: re-skin first, then the School pages.**
 
 ## 12. Agent rules for working in the website repo
 

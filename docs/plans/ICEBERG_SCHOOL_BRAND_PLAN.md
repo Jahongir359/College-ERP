@@ -834,3 +834,12 @@ what's next. Newest at the bottom.
   `docs/plans/`. Tests there: Flask 8 OK, Node 19 OK, static build check OK. Website plan sections 2.1,
   10 and 11 updated. No ERP code changed. Next: owner supplies ERP branch names + Cloudflare secrets,
   answers website plan questions 6–7 (palette, order); Phase 5 still needs a Flutter machine.
+- **2026-10-23 — Claude (Opus 5.5) — Phase 4b re-skin (website repo).** Owner agreed to the plan's
+  recommendations: Learning Center palette teal + lime, re-skin before School pages, School accent solid
+  maroon. ICEBERG_WEB branch `feat/design-system-foundation` (stacked on `feat/erp-lead-forwarding`):
+  `static/brand/tokens.json` + generated `tokens.css`, compiled Tailwind replaces the CDN script, Inter
+  replaces Sora/Fraunces, `style.css` and page styles use `--brand-*`, `<html data-brand="center">`.
+  All 7 LC pages: same URLs, copy and layout; before/after screenshots at 1280 px and 390 px checked.
+  Build check now fails on the Tailwind CDN, missing `data-brand` or stale `tokens.css`. Flask tests OK,
+  Node tests OK, static build check OK. Next: 4c School pages on the shared layout.
+
