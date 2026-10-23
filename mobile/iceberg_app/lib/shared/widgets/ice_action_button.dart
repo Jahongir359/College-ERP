@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/brand.dart';
 
 class IceActionButton extends StatelessWidget {
   final IconData icon;
@@ -22,23 +22,23 @@ class IceActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          color: (color ?? IceColors.cyan).withValues(alpha: 0.15),
+          color: (color ?? context.brandSecondary).withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: (color ?? IceColors.cyan).withValues(alpha: 0.4),
+            color: (color ?? context.brandSecondary).withValues(alpha: 0.4),
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: color ?? IceColors.cyan),
+            Icon(icon, size: 14, color: color ?? context.brandSecondary),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: color ?? IceColors.cyan,
+                color: color ?? context.brandSecondary,
               ),
             ),
           ],

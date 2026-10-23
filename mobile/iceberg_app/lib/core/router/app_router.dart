@@ -40,6 +40,7 @@ import '../../features/staff/screens/staff_profile_screen.dart';
 // Shared
 import '../../shared/screens/profile_hub_screen.dart';
 import '../../shared/screens/messages_screen.dart';
+import '../theme/brand.dart';
 
 /// Routing by role:
 ///   - Student (user_type 3) → full /student/* experience
@@ -558,12 +559,7 @@ class _SplashScreenState extends State<_SplashScreen>
                 height: 200,
                 child: Stack(
                   children: [
-                    Image.asset(
-                      'assets/images/logo.png',
-                      width: 200,
-                      height: 200,
-                      fit: BoxFit.contain,
-                    ),
+                    const IceBrandLogo(size: 200, radius: 30),
                     // Diagonal sheen sweep
                     Positioned.fill(
                       child: Transform.translate(

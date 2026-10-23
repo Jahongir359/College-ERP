@@ -6,6 +6,7 @@ import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
 import '../../../shared/widgets/ice_shell.dart';
+import '../../../core/theme/brand.dart';
 
 /// Leaderboard — scope tabs (Overall / Group / Branch), top-3 podium and the
 /// full ranking list with the current student highlighted.
@@ -58,7 +59,7 @@ class _StudentLeaderboardScreenState
       subtitle: 'Season standings',
       children: [
         IceChipTabs(
-          tabs: [s('Overall'), s('Group'), s('Branch')],
+          tabs: [s('Overall'), s(context.brand.groupKey), s('Branch')],
           index: _tab,
           onChanged: (i) => setState(() => _tab = i),
         ),
@@ -87,7 +88,7 @@ class _StudentLeaderboardScreenState
           ref.refresh(leaderboardScopedProvider(scope).future),
       children: [
         IceChipTabs(
-          tabs: [s('Overall'), s('My Group'), s('Branch')],
+          tabs: [s('Overall'), s(context.brand.myGroupKey), s('Branch')],
           index: _tab,
           onChanged: (i) => setState(() => _tab = i),
         ),

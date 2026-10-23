@@ -12,6 +12,7 @@ import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
 import '../../../shared/widgets/ice_shell.dart';
+import '../../../core/theme/brand.dart';
 
 String _uzs(num v) =>
     '${NumberFormat('#,###').format(v).replaceAll(',', ' ')} soʻm';
@@ -599,7 +600,7 @@ class _StudentEditProfileScreenState
         readOnly(user?.loginId ?? ''),
         label('Email'),
         readOnly(user?.email ?? ''),
-        label('Group'),
+        label(context.brand.groupKey),
         readOnly(((role['group_names'] as List?) ?? []).join(', ')),
         label('Branch'),
         readOnly((role['branch_name'] as String?) ?? ''),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/brand.dart';
 
 class IceHeroCard extends StatelessWidget {
   final String title;
@@ -26,7 +27,7 @@ class IceHeroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: IceColors.navyDeep.withValues(alpha: 0.28),
+            color: context.brandPrimary.withValues(alpha: 0.28),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -43,7 +44,7 @@ class IceHeroCard extends StatelessWidget {
               height: 160,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: IceColors.cyan.withValues(alpha: 0.12),
+                color: context.brandSecondary.withValues(alpha: 0.12),
               ),
             ),
           ),

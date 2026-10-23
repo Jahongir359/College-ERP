@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'brand.dart';
+
 /// ICEBERG dark design language — tokens sampled from the design reference
 /// screenshots (dark navy/teal surfaces, lime neon accent, mint secondary).
 ///
@@ -32,6 +34,10 @@ class IceTokens extends ThemeExtension<IceTokens> {
 
   final bool isDark;
 
+  /// Learning Center (default) or School — set from the signed-in user's
+  /// branch. Widgets read it via `context.brand` (brand.dart).
+  final IceBrand brand;
+
   const IceTokens({
     required this.bg,
     required this.card,
@@ -50,6 +56,7 @@ class IceTokens extends ThemeExtension<IceTokens> {
     required this.sky,
     required this.amber,
     required this.isDark,
+    this.brand = IceBrand.center,
   });
 
   /// Deepens a bright accent so it stays legible as text/icons on a light
@@ -63,7 +70,12 @@ class IceTokens extends ThemeExtension<IceTokens> {
         .toColor();
   }
 
-  factory IceTokens.dark({Color accent = IceAccents.ice}) => IceTokens(
+  factory IceTokens.dark({
+    Color accent = IceAccents.ice,
+    IceBrand brand = IceBrand.center,
+  }) => brand.isSchool
+      ? _schoolDark(accent)
+      : IceTokens(
     bg: const Color(0xFF071520), // deep glacier navy
     card: const Color(0xFF0E2233),
     cardHi: const Color(0xFF143A57), // hero cards — rich iceberg blue
@@ -83,7 +95,12 @@ class IceTokens extends ThemeExtension<IceTokens> {
     isDark: true,
   );
 
-  factory IceTokens.light({Color accent = IceAccents.ice}) => IceTokens(
+  factory IceTokens.light({
+    Color accent = IceAccents.ice,
+    IceBrand brand = IceBrand.center,
+  }) => brand.isSchool
+      ? _schoolLight(accent)
+      : IceTokens(
     bg: const Color(0xFFEDF3F9), // soft cool off-white with a blue cast
     card: Colors.white,
     cardHi: const Color(0xFF103A57), // hero cards stay deep iceberg blue
@@ -103,6 +120,58 @@ class IceTokens extends ThemeExtension<IceTokens> {
     isDark: false,
   );
 
+  // ── Iceberg School palette ───────────────────────────────────────────────
+  // Users who kept the default accent get the School maroon; anyone who picked
+  // another accent in Settings keeps it.
+
+  static IceTokens _schoolLight(Color accent) {
+    final branded = accent == IceAccents.ice;
+    return IceTokens(
+      bg: SchoolColors.bg,
+      card: Colors.white,
+      cardHi: SchoolColors.primary, // hero cards — crest maroon
+      cardLo: SchoolColors.primaryDeep,
+      inset: const Color(0xFFF4ECEB),
+      stroke: SchoolColors.border,
+      textHi: SchoolColors.text,
+      textMid: SchoolColors.muted,
+      textLow: const Color(0xFF8C7270),
+      accent: branded ? SchoolColors.primary : accent,
+      accentInk: branded ? SchoolColors.primary : _inkFor(accent),
+      onAccent: branded ? Colors.white : const Color(0xFF052033),
+      mint: SchoolColors.primaryHover,
+      coral: const Color(0xFFD64C3D),
+      sky: const Color(0xFF2487B5),
+      amber: const Color(0xFFC98A12),
+      isDark: false,
+      brand: IceBrand.school,
+    );
+  }
+
+  static IceTokens _schoolDark(Color accent) {
+    final branded = accent == IceAccents.ice;
+    return IceTokens(
+      bg: SchoolColors.darkBg,
+      card: SchoolColors.darkSurface,
+      cardHi: SchoolColors.primary,
+      cardLo: const Color(0xFF240707),
+      inset: SchoolColors.darkSurface2,
+      stroke: SchoolColors.darkBorder,
+      textHi: SchoolColors.darkText,
+      textMid: SchoolColors.darkMuted,
+      textLow: const Color(0xFF8C7270),
+      accent: branded ? SchoolColors.ink : accent,
+      accentInk: branded ? SchoolColors.ink : accent,
+      onAccent: branded ? SchoolColors.primaryDeep : const Color(0xFF052033),
+      mint: SchoolColors.onPrimarySoft,
+      coral: const Color(0xFFF2917F),
+      sky: const Color(0xFF93D2EC),
+      amber: const Color(0xFFF4C95D),
+      isDark: true,
+      brand: IceBrand.school,
+    );
+  }
+
   /// Slightly translucent accent for soft fills behind icons.
   Color get accentSoft => accent.withValues(alpha: 0.14);
   Color get coralSoft => coral.withValues(alpha: 0.14);
@@ -119,8 +188,8 @@ class IceTokens extends ThemeExtension<IceTokens> {
   IceTokens copyWith({Color? accent}) => accent == null
       ? this
       : (isDark
-            ? IceTokens.dark(accent: accent)
-            : IceTokens.light(accent: accent));
+            ? IceTokens.dark(accent: accent, brand: brand)
+            : IceTokens.light(accent: accent, brand: brand));
 
   @override
   IceTokens lerp(ThemeExtension<IceTokens>? other, double t) {
@@ -144,6 +213,7 @@ class IceTokens extends ThemeExtension<IceTokens> {
       sky: l(sky, other.sky),
       amber: l(amber, other.amber),
       isDark: t < 0.5 ? isDark : other.isDark,
+      brand: t < 0.5 ? brand : other.brand,
     );
   }
 }
@@ -252,10 +322,14 @@ TextTheme _noUnderlineTheme(TextTheme theme) => TextTheme(
 );
 
 /// Builds the student-app ThemeData carrying [IceTokens].
-ThemeData buildIceTheme({required bool dark, required Color accent}) {
+ThemeData buildIceTheme({
+  required bool dark,
+  required Color accent,
+  IceBrand brand = IceBrand.center,
+}) {
   final t = dark
-      ? IceTokens.dark(accent: accent)
-      : IceTokens.light(accent: accent);
+      ? IceTokens.dark(accent: accent, brand: brand)
+      : IceTokens.light(accent: accent, brand: brand);
   final base = dark
       ? ThemeData.dark(useMaterial3: true)
       : ThemeData.light(useMaterial3: true);
