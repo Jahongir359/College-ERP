@@ -148,19 +148,19 @@
    wins by document order). */
 .erpnext-sidebar,
 .platform-apple .erpnext-sidebar {
-  background: linear-gradient(180deg, #0C1F45 0%, #0E2547 60%, #0A2040 100%) !important;
+  background: linear-gradient(180deg, var(--brand-primary, #0C1F45) 0%, var(--brand-primary, #0E2547) 60%, var(--brand-primary-deep, #0A2040) 100%) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
 .dark-mode .erpnext-sidebar,
 .dark-mode.platform-apple .erpnext-sidebar {
-  background: linear-gradient(180deg, #03181C 0%, #06343A 60%, #0A4A52 100%) !important;
+  background: linear-gradient(180deg, var(--brand-primary-deep, #03181C) 0%, var(--brand-primary, #06343A) 60%, var(--brand-primary-hover, #0A4A52) 100%) !important;
 }
 .erpnext-sidebar .nav-link { color: rgba(255,255,255,.74) !important; }
 .erpnext-sidebar .nav-link:hover { color: #fff !important; background: rgba(255,255,255,.07) !important; }
 .erpnext-sidebar .nav-link.active { color: #fff !important; }
 .erpnext-sidebar .nav-icon { color: rgba(255,255,255,.55) !important; }
-.erpnext-sidebar .nav-link.active .nav-icon { color: #67E8F9 !important; }
+.erpnext-sidebar .nav-link.active .nav-icon { color: var(--brand-primary-ink, #67E8F9) !important; }
 .erpnext-sidebar .nav-section-title { color: rgba(255,255,255,.40) !important; }
 .erpnext-sidebar .sidebar-user-info h6 { color: #fff !important; }
 .erpnext-sidebar .sidebar-user-info small { color: rgba(255,255,255,.55) !important; }
