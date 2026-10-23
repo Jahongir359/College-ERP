@@ -59,7 +59,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
+          # Pinned like flutter.yml and the Dockerfile; a floating '3.x' broke the build when
+          # Flutter raised its minimum Gradle/AGP/Kotlin versions.
+          flutter-version: '3.47.7'
           channel: 'stable'
           cache: true
 
