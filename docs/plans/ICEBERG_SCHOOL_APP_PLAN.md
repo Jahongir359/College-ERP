@@ -112,14 +112,14 @@ Owner decision D2 may move the gradebook into Release 1.
 | D1 | **One app** for both. First screen asks: Iceberg School or Iceberg Study Center. The account's branch decides after login (section 5.1). | Decided 2026-10-23 (owner) |
 | D2 | Attendance: **daily register** by the homeroom teacher in Release 1 (with arrival time); marks per lesson later. | **Decided 2026-10-23 (owner)** |
 | D3 | Grades: marks **2–5** per subject per date, **quarter** (chorak) and **year** grades; report card later. | **Decided 2026-10-23 (owner)** |
-| D4 | Parent is a **new role** `user_type "4"`, linked to one or more children; one login sees all their children (School and Study Center). | Proposed — confirm with owner |
+| D4 | Parent is a **new role** `user_type "4"`, linked to one or more children; one login sees all their children (School and Study Center). | **Decided 2026-10-23 (owner)** |
 | D5 | A school **class** (7-B) is a `Group` with `kind="class"`, so attendance, homework, chat and invoices keep working. | Proposed (technical) |
 | D6 | The academic year reuses the existing `Session` model (add `name`, `is_current`); quarters are a new `Term` model. | Proposed (technical) |
 | D7 | Choice-screen label for the Learning Center: **"Iceberg Study Center"** (same in uz/ru/en; the logo carries the brand). | **Decided 2026-10-23 (owner)** |
 | D8 | Store accounts: **organisation** for both Google Play and Apple (seller shown as the organisation; Play skips the 12-tester/14-day rule for new personal accounts). Needs a free **D-U-N-S number** (1–2 weeks) — apply first. | **Decided 2026-10-23 (owner)** |
 | D9 | Hosting for the ERP (DigitalOcean is stopped): Cloudflare Containers + Neon + R2, a VPS, or other. | **Open — ask owner** |
 | D10 | Target date when parents start using the app (sets what moves to Release 2). | **Open — ask owner** |
-| D11 | Who sees the leaderboard, vocabulary and flashcards: Study Center only (proposed), or School too? | Proposed — confirm with owner |
+| D11 | Who sees the leaderboard, vocabulary and flashcards: Study Center only (proposed), or School too? | **Decided 2026-10-23 (owner)** |
 | D12 | Where the data may be hosted under Uzbekistan's personal-data rules (affects D9) — check with a local lawyer. | **Open — owner** |
 | D13 | Parent password resets: SMS codes (provider + cost) or reset by the school office. | **Open — ask owner** |
 | D14 | How parents receive logins: printed letter with QR, SMS, or both. | **Open — ask owner** |
@@ -572,6 +572,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-10-23 — owner decided D4 (one parent login for all children, School and Study Center) and D11
+  (vocabulary, flashcards, leaderboard: Study Center only). Still open: D9, D10, D12–D14. Next: P0.2.
 - 2026-10-23 — owner decided D2 (daily register), D3 (marks 2–5, quarter and year grades), D7 ("Iceberg
   Study Center"), D8 (organisation accounts; D-U-N-S to apply for). Still open: D4, D9–D14. Next: P0.2.
 - 2026-10-23 — added section 6 (design), section 7 (launch readiness), phases PD and PL, tasks P0.8,
