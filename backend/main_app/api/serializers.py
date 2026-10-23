@@ -117,6 +117,9 @@ class StudentRoleSerializer(serializers.ModelSerializer):
 class MeSerializer(serializers.ModelSerializer):
     profile_pic_url = serializers.SerializerMethodField()
     role_profile = serializers.SerializerMethodField()
+    # Iceberg brand the client should render ("center" or "school"); see branding.py.
+    brand = serializers.SerializerMethodField()
+    brand_name = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -133,8 +136,27 @@ class MeSerializer(serializers.ModelSerializer):
             "avatar",
             "address",
             "role_profile",
+            "brand",
+            "brand_name",
         ]
         read_only_fields = ["id", "email", "login_id", "user_type"]
+
+    def _brand_key(self, obj):
+        from ..branding import brand_key_for_user, resolve_brand_key
+
+        request = self.context.get("request")
+        if request is not None and getattr(request, "user", None) == obj:
+            return resolve_brand_key(request)
+        # e.g. the login response, where request.user is still anonymous.
+        return brand_key_for_user(obj)
+
+    def get_brand(self, obj):
+        return self._brand_key(obj)
+
+    def get_brand_name(self, obj):
+        from ..branding import get_brand
+
+        return get_brand(self._brand_key(obj)).name
 
     def get_profile_pic_url(self, obj):
         if not obj.profile_pic:
@@ -201,7 +223,7 @@ class CourseSerializer(serializers.ModelSerializer):
 class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
-        fields = ["id", "name", "address"]
+        fields = ["id", "name", "address", "brand"]
 
 
 # ---------------------------------------------------------------------------

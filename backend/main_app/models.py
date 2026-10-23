@@ -517,8 +517,23 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class Branch(models.Model):
+    # Which Iceberg brand this branch's users see. Presentation only — access
+    # is still decided by branching.py. See docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md.
+    BRAND_CENTER = "center"
+    BRAND_SCHOOL = "school"
+    BRAND_CHOICES = [
+        (BRAND_CENTER, "Iceberg Learning Center"),
+        (BRAND_SCHOOL, "Iceberg School"),
+    ]
+
     name = models.CharField(max_length=100)
     address = models.TextField(blank=True, default="")
+    brand = models.CharField(
+        max_length=20,
+        choices=BRAND_CHOICES,
+        default=BRAND_CENTER,
+        help_text="Which Iceberg brand this branch's users see.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -131,6 +131,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "main_app.context_processors.notification_count",
                 "main_app.context_processors.student_theme",
+                "main_app.context_processors.brand",
             ],
         },
     },
@@ -368,6 +369,14 @@ CAPTCHA_SECRET_KEY = os.environ.get("CAPTCHA_SECRET_KEY", "")
 # Token expected by the public lead receiver. The external website should send:
 # Authorization: Bearer <REGISTRATION_LEADS_API_TOKEN>
 REGISTRATION_LEADS_API_TOKEN = os.environ.get("REGISTRATION_LEADS_API_TOKEN", "").strip()
+
+# Iceberg School brand (see docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md). While off,
+# every request resolves to the Learning Center brand, so nothing changes.
+SCHOOL_BRAND_ENABLED = os.environ.get("SCHOOL_BRAND_ENABLED", "False").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+)
 
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     # Full SMTP — used in production when credentials are configured.

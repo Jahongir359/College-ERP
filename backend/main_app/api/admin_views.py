@@ -103,6 +103,7 @@ class BranchListView(APIView):
                     "id": branch.id,
                     "name": branch.name,
                     "address": branch.address,
+                    "brand": branch.brand,
                     "student_count": student_count,
                     "staff_count": staff_count,
                 }
@@ -122,9 +123,17 @@ class BranchListView(APIView):
             return Response({"detail": "name is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         address = request.data.get("address", "")
-        branch = Branch.objects.create(name=name, address=address)
+        brand = request.data.get("brand", Branch.BRAND_CENTER)
+        if brand not in dict(Branch.BRAND_CHOICES):
+            return Response({"detail": "Invalid brand."}, status=status.HTTP_400_BAD_REQUEST)
+        branch = Branch.objects.create(name=name, address=address, brand=brand)
         return Response(
-            {"id": branch.id, "name": branch.name, "address": branch.address},
+            {
+                "id": branch.id,
+                "name": branch.name,
+                "address": branch.address,
+                "brand": branch.brand,
+            },
             status=status.HTTP_201_CREATED,
         )
 
@@ -159,6 +168,7 @@ class BranchDetailView(APIView):
                 "id": branch.id,
                 "name": branch.name,
                 "address": branch.address,
+                "brand": branch.brand,
                 "student_count": student_count,
                 "staff_count": staff_count,
             }
@@ -172,8 +182,18 @@ class BranchDetailView(APIView):
             branch.name = request.data["name"]
         if "address" in request.data:
             branch.address = request.data["address"]
+        if "brand" in request.data:
+            # Only super admins may switch a branch between Learning Center and School.
+            err = _super_admin_error(request)
+            if err:
+                return err
+            if request.data["brand"] not in dict(Branch.BRAND_CHOICES):
+                return Response({"detail": "Invalid brand."}, status=status.HTTP_400_BAD_REQUEST)
+            branch.brand = request.data["brand"]
         branch.save()
-        return Response({"id": branch.id, "name": branch.name, "address": branch.address})
+        return Response(
+            {"id": branch.id, "name": branch.name, "address": branch.address, "brand": branch.brand}
+        )
 
     def delete(self, request, pk):
         err = _super_admin_error(request)
