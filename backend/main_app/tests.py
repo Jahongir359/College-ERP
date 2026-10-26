@@ -2744,3 +2744,18 @@ class StaticReferenceTests(TestCase):
                 if not finders.find(name):
                     missing.append(f"{template.relative_to(templates)}: {name}")
         self.assertEqual(missing, [])
+
+
+@override_settings(SECURE_SSL_REDIRECT=False)
+class RemovedLegacyRoutesTests(TestCase):
+    # The git-pull deploy webhook and the 2020 Firebase web push worker were removed.
+    def test_legacy_routes_are_gone(self):
+        for path in ("/api/deploy/flutter/", "/firebase-messaging-sw.js"):
+            res = self.client.post(path) if "deploy" in path else self.client.get(path)
+            self.assertIn(res.status_code, (302, 404), path)
+
+    def test_download_page_without_apk_has_no_download_link(self):
+        with patch("main_app.flutter_view.DOWNLOADS_DIR", "/nonexistent"):
+            res = self.client.get("/download/")
+        self.assertEqual(res.status_code, 200)
+        self.assertNotContains(res, "/download/app.apk")

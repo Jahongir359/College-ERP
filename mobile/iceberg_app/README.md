@@ -1,8 +1,8 @@
 # ICEBERG Flutter Web App
 
-Flutter web client for the College ERP Django API. It covers the student, staff,
-admin, and superadmin frontend surfaces that are mapped in
-`../FLUTTER_WEB_FRONTEND_PARITY_PLAN.md`.
+One Flutter app (Android, iOS, web) for Iceberg School and Iceberg Study Center, used by
+teachers, students and (soon) parents. Admins use the Django web ERP. The build plan is
+`docs/plans/ICEBERG_SCHOOL_APP_PLAN.md`.
 
 ## API Target
 

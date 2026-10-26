@@ -83,7 +83,6 @@ urlpatterns = [
     path("messages/", messaging_views.messages_home, name="messages"),
     path("messages/group/<int:group_id>/", messaging_views.messages_home, name="message_thread"),
     path("get_attendance", views.get_attendance, name="get_attendance"),
-    path("firebase-messaging-sw.js", views.showFirebaseJS, name="showFirebaseJS"),
     path("doLogin/", views.doLogin, name="user_login"),
     path("logout_user/", views.logout_user, name="user_logout"),
     path("profile/", views.profile_settings_hub, name="profile_hub"),
@@ -214,7 +213,6 @@ urlpatterns = [
     ),
     path("staff/attendance/save/", staff_views.save_attendance, name="save_attendance"),
     path("staff/attendance/update_save/", staff_views.update_attendance, name="update_attendance"),
-    path("staff/fcmtoken/", staff_views.staff_fcmtoken, name="staff_fcmtoken"),
     path(
         "staff/view/notification/",
         staff_views.staff_view_notification,
@@ -233,7 +231,6 @@ urlpatterns = [
     path("student/apply/leave/", student_views.student_apply_leave, name="student_apply_leave"),
     path("student/feedback/", student_views.student_feedback, name="student_feedback"),
     path("student/view/profile/", student_views.student_view_profile, name="student_view_profile"),
-    path("student/fcmtoken/", student_views.student_fcmtoken, name="student_fcmtoken"),
     path("student/save-theme/", student_views.student_save_theme, name="student_save_theme"),
     path("student/viewbooks/", student_views.view_books, name="view_books"),
     path(

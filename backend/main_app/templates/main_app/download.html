@@ -201,6 +201,7 @@
     <p class="subtitle en">For Android 7.0 and above</p>
     <p class="subtitle uz">Android 7.0 va undan yuqori versiyalar uchun</p>
 
+    {% if apk_size_mb %}
     <a href="/download/app.apk" class="download-btn" id="dl-btn">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -210,11 +211,12 @@
       <span class="en">Download APK</span>
       <span class="uz">APK yuklab olish</span>
     </a>
+    {% endif %}
     <p class="meta">
       <span class="en">Android only</span>
       <span class="uz">Faqat Android</span>
-      <span>•</span>
-      <span>~{{ apk_size_mb }} MB</span>
+      {% if apk_size_mb %}<span>•</span>
+      <span>~{{ apk_size_mb }} MB</span>{% endif %}
       <span>•</span>
       <span class="en">Works on all Android phones</span>
       <span class="uz">Barcha Android telefonlarda ishlaydi</span>
@@ -376,7 +378,7 @@
     <h2 class="uz" style="margin-bottom:1rem">Tizim talablari</h2>
     <ul class="req-list">
       <li><span class="en">Android 7.0 or higher</span><span class="uz">Android 7.0 yoki undan yuqori</span></li>
-      <li><span class="en">~{{ apk_size_mb }} MB free storage</span><span class="uz">~{{ apk_size_mb }} MB bo'sh xotira</span></li>
+      {% if apk_size_mb %}<li><span class="en">~{{ apk_size_mb }} MB free storage</span><span class="uz">~{{ apk_size_mb }} MB bo'sh xotira</span></li>{% endif %}
       <li><span class="en">Internet connection</span><span class="uz">Internet aloqasi</span></li>
     </ul>
     <div class="note" style="margin-top:1rem">

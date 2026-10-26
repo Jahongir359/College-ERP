@@ -435,21 +435,6 @@ def staff_view_profile(request):
 
 
 @staff_only
-def staff_fcmtoken(request):
-    token = request.POST.get("token")
-    if not token:
-        return HttpResponse("False")
-    try:
-        staff_user = get_object_or_404(CustomUser, id=request.user.id)
-        staff_user.fcm_token = token
-        staff_user.save()
-        return HttpResponse("True")
-    except Exception as e:
-        logger.exception("staff_fcmtoken save failed (%s)", e)
-        return HttpResponse("False")
-
-
-@staff_only
 def staff_view_notification(request):
     notifications = Notification.objects.filter(recipient=request.user).order_by("-created_at")
     notifications.filter(is_read=False).update(is_read=True)

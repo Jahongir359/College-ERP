@@ -336,10 +336,3 @@ class _NotifCard extends StatelessWidget {
         .fadeIn(duration: 300.ms);
   }
 }
-
-// Legacy, not used
-class StaffMoreScreen2 extends StatelessWidget {
-  const StaffMoreScreen2({super.key});
-  @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
-}

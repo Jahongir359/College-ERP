@@ -29,7 +29,6 @@ The same `Dockerfile` runs on any container host. Where there is no pre-deploy s
 | `CSRF_TRUSTED_ORIGINS` | `https://${APP_DOMAIN},https://app.iceberglc.com` |
 | `EMAIL_HOST_USER` | Gmail (or SMTP) sender address |
 | `EMAIL_HOST_PASSWORD` | Gmail App Password |
-| `FCM_SERVER_KEY` | Firebase server key for push notifications |
 | `RECOVERY_ADMIN_EMAIL` | Fallback admin email |
 | `RECOVERY_ADMIN_PASSWORD` | Fallback admin password |
 | `REGISTRATION_LEADS_API_TOKEN` | Shared secret for the public registration form |
@@ -47,7 +46,7 @@ Use `infra/deploy/setup.sh` to set up a fresh server.
 
 ```bash
 # As root on a fresh Ubuntu 22.04 server:
-curl -sSL https://raw.githubusercontent.com/iceberglc/College-ERP/main/infra/deploy/setup.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/Jahongir359/College-ERP/main/infra/deploy/setup.sh | sudo bash
 ```
 
 The script:
@@ -77,7 +76,7 @@ Logs: `sudo journalctl -u gunicorn-iceberg -f`
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/iceberglc/College-ERP.git
+git clone https://github.com/Jahongir359/College-ERP.git
 cd College-ERP
 
 # 2. Set up environment
@@ -145,7 +144,6 @@ See `/.env.example` for a complete, commented list of all environment variables.
 | `FLUTTER_WEB_DIR` | No | Override path to Flutter web build |
 | `EMAIL_HOST_USER` | No | SMTP sender email |
 | `EMAIL_HOST_PASSWORD` | No | SMTP password / App Password |
-| `FCM_SERVER_KEY` | No | Firebase server key for push notifications |
 | `CORS_ALLOWED_ORIGINS` | No | Comma-separated CORS origins |
 | `CSRF_TRUSTED_ORIGINS` | No | Comma-separated trusted origins |
 | `REGISTRATION_LEADS_API_TOKEN` | No | Token for public registration API |

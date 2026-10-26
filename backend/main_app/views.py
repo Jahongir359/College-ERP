@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 from urllib.parse import urlencode
@@ -924,64 +923,6 @@ def health(request):
         db_ok = False
     status = 200 if db_ok else 503
     return JsonResponse({"status": "ok" if db_ok else "db_unavailable", "db": db_ok}, status=status)
-
-
-_FIREBASE_CONFIG_KEYS = (
-    "FIREBASE_API_KEY",
-    "FIREBASE_AUTH_DOMAIN",
-    "FIREBASE_DATABASE_URL",
-    "FIREBASE_PROJECT_ID",
-    "FIREBASE_STORAGE_BUCKET",
-    "FIREBASE_MESSAGING_SENDER_ID",
-    "FIREBASE_APP_ID",
-    "FIREBASE_MEASUREMENT_ID",
-)
-
-
-def showFirebaseJS(request):
-    """Serve the FCM service-worker script with env-driven config.
-
-    Audit item #6: previously hardcoded the Firebase web config in the
-    response body, which forced a code push for key rotation. Web FCM
-    keys are intended to be public, but project/sender IDs and bucket
-    names belong in deployment config, not git.
-    """
-    cfg = {k: os.environ.get(k, "") for k in _FIREBASE_CONFIG_KEYS}
-    # If no Firebase env is configured, emit a no-op SW so the page does
-    # not 404 and the browser does not register a broken worker.
-    if not cfg["FIREBASE_API_KEY"]:
-        return HttpResponse(
-            "/* Firebase not configured. Set FIREBASE_* env vars to enable FCM. */\n",
-            content_type="application/javascript",
-        )
-
-    data = (
-        "importScripts('https://www.gstatic.com/firebasejs/7.22.1/firebase-app.js');\n"
-        "importScripts('https://www.gstatic.com/firebasejs/7.22.1/firebase-messaging.js');\n\n"
-        "firebase.initializeApp("
-        + json.dumps(
-            {
-                "apiKey": cfg["FIREBASE_API_KEY"],
-                "authDomain": cfg["FIREBASE_AUTH_DOMAIN"],
-                "databaseURL": cfg["FIREBASE_DATABASE_URL"],
-                "projectId": cfg["FIREBASE_PROJECT_ID"],
-                "storageBucket": cfg["FIREBASE_STORAGE_BUCKET"],
-                "messagingSenderId": cfg["FIREBASE_MESSAGING_SENDER_ID"],
-                "appId": cfg["FIREBASE_APP_ID"],
-                "measurementId": cfg["FIREBASE_MEASUREMENT_ID"],
-            }
-        )
-        + ");\n\n"
-        "const messaging = firebase.messaging();\n"
-        "messaging.setBackgroundMessageHandler(function (payload) {\n"
-        "    const notification = JSON.parse(payload);\n"
-        "    const notificationOption = { body: notification.body, icon: notification.icon };\n"
-        "    return self.registration.showNotification(\n"
-        "        payload.notification.title, notificationOption\n"
-        "    );\n"
-        "});\n"
-    )
-    return HttpResponse(data, content_type="application/javascript")
 
 
 # ── Branded error handlers (registered in college_management_system/urls.py) ──

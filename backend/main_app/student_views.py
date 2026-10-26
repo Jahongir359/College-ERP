@@ -4,7 +4,7 @@ import math
 from datetime import datetime
 
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -591,21 +591,6 @@ def student_save_theme(request):
         student.save(update_fields=["theme"])
         return JsonResponse({"status": "ok", "theme": theme})
     return JsonResponse({"status": "error"}, status=400)
-
-
-@student_only
-def student_fcmtoken(request):
-    token = request.POST.get("token")
-    if not token:
-        return HttpResponse("False")
-    student_user = get_object_or_404(CustomUser, id=request.user.id)
-    try:
-        student_user.fcm_token = token
-        student_user.save()
-        return HttpResponse("True")
-    except Exception as e:
-        logger.exception("student_fcmtoken save failed (%s)", e)
-        return HttpResponse("False")
 
 
 @student_only

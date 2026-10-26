@@ -6,7 +6,6 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from . import settings
 from main_app.flutter_view import (
     flutter_app,
-    deploy_flutter,
     download_apk,
     download_page,
 )
@@ -25,7 +24,6 @@ urlpatterns = [
     re_path(r"^app(?P<path>/.*)$", flutter_app, name="flutter_app"),
     path("app", RedirectView.as_view(url="/app/", permanent=False)),
     # Deploy webhook — triggers git pull on the VPS (HMAC-protected)
-    path("api/deploy/flutter/", deploy_flutter, name="deploy_flutter"),
     # APK download — single universal APK that installs on every Android device.
     path("download/app.apk", download_apk, name="download_apk"),
     path("download/", download_page, name="download_page"),

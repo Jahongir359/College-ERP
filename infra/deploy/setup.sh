@@ -9,7 +9,7 @@ set -euo pipefail
 DOMAIN="app.iceberglc.com"
 APP_USER="iceberg"
 APP_DIR="/home/$APP_USER/College-ERP"
-REPO="https://github.com/iceberglc/College-ERP.git"
+REPO="https://github.com/Jahongir359/College-ERP.git"
 PYTHON="python3.11"
 
 echo "▶  Updating system packages…"

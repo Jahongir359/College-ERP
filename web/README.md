@@ -3,7 +3,7 @@
 | Path | What |
 |---|---|
 | `flutter_web/` | The Flutter web app, served at `/app/` by `main_app/flutter_view.py` (override with `FLUTTER_WEB_DIR`). **Generated, not committed** (`.gitignore`). |
-| `downloads/iceberg.apk` | The Android APK offered at `/download/` (override with `DOWNLOADS_DIR`). |
+| `downloads/iceberg.apk` | Optional Android APK offered at `/download/` (override with `DOWNLOADS_DIR`). **Not committed**: put a build here (or on a volume) to offer it; without it the page shows the install guide but no download button. After the store release, `/download/` should point to the store pages. |
 
 ## Where `flutter_web/` comes from
 
