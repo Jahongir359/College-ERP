@@ -42,6 +42,39 @@ import '../../shared/screens/profile_hub_screen.dart';
 import '../../shared/screens/messages_screen.dart';
 import '../theme/brand.dart';
 
+/// Where the router sends [auth]'s user when they open [path]; null means stay.
+/// Kept as a plain function so the role rules can be unit-tested.
+String? roleRedirect(AuthState auth, String path) {
+  if (auth.status == AuthStatus.loading) return '/splash';
+
+  if (auth.status == AuthStatus.unauthenticated) {
+    return path == '/login' ? null : '/login';
+  }
+
+  final user = auth.user!;
+
+  // Admin → coming-soon wall (admin dashboard ships on the web portal).
+  if (user.isAdmin) {
+    return path == '/coming-soon' ? null : '/coming-soon';
+  }
+
+  // Staff (teachers) → teacher portal.
+  if (user.isStaff) {
+    if (path.startsWith('/staff')) return null;
+    return '/staff/home';
+  }
+
+  // Students → student app; bounce off auth/transitional routes.
+  if (path == '/login' ||
+      path == '/splash' ||
+      path == '/coming-soon' ||
+      path.startsWith('/staff')) {
+    return '/student/home';
+  }
+
+  return null;
+}
+
 /// Routing by role:
 ///   - Student (user_type 3) → full /student/* experience
 ///   - Staff   (user_type 2) → teacher portal /staff/*
@@ -54,39 +87,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     refreshListenable: authListenable,
-    redirect: (context, state) {
-      final auth = ref.read(authProvider);
-      final path = state.matchedLocation;
-
-      if (auth.status == AuthStatus.loading) return '/splash';
-
-      if (auth.status == AuthStatus.unauthenticated) {
-        return path == '/login' ? null : '/login';
-      }
-
-      final user = auth.user!;
-
-      // Admin → coming-soon wall (admin dashboard ships on the web portal).
-      if (user.isAdmin) {
-        return path == '/coming-soon' ? null : '/coming-soon';
-      }
-
-      // Staff (teachers) → teacher portal.
-      if (user.isStaff) {
-        if (path.startsWith('/staff')) return null;
-        return '/staff/home';
-      }
-
-      // Students → student app; bounce off auth/transitional routes.
-      if (path == '/login' ||
-          path == '/splash' ||
-          path == '/coming-soon' ||
-          path.startsWith('/staff')) {
-        return '/student/home';
-      }
-
-      return null;
-    },
+    redirect: (context, state) =>
+        roleRedirect(ref.read(authProvider), state.matchedLocation),
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const _SplashScreen()),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),

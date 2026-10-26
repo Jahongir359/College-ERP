@@ -640,7 +640,7 @@ Baseline 2026-10-23: 133 tests, all OK.
 3. Repeat for a user in a `school` branch → every brand surface is maroon; no teal/cyan/lime left
    on primary surfaces; text contrast ≥ 4.5:1; dark mode works.
 
-### 10.3 Required new tests (add to `backend/main_app/tests.py` or a new `tests_branding.py`)
+### 10.3 Required new tests (now in `backend/main_app/tests/test_branding.py` and its siblings)
 
 - `Branch.brand` defaults to `center`; migration applies.
 - Resolver: flag off → center for every user type; student/staff/admin/super-admin/anonymous cases

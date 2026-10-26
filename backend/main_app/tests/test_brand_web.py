@@ -7,7 +7,7 @@ See docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md sections 7 and 10.3.
 
 from django.test import TestCase, override_settings
 
-from .tests_branding import BrandFixtureMixin
+from .test_branding import BrandFixtureMixin
 
 SCHOOL_CSS = "dist/css/brand-school.css"
 # Sign-in and recovery pages are Phase 3's and use their own stylesheet.
