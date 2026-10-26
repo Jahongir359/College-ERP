@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | Open — 0/10 (P4.11 dropped, P4.12 Release 2) |
+| P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 0/6 |
@@ -548,8 +548,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P4 — App
 
-- [ ] **P4.1** Split oversized files before adding features (`staff_feature_screens.dart` and any file
-      over ~800 lines) — no behaviour change; analyze/test/build green. Do this first in P4.
+- [x] **P4.1** Split oversized files before adding features (`staff_feature_screens.dart` and any file
+      over ~800 lines) — no behaviour change; analyze/test/build green. Do this first in P4. — done
+      2026-10-26, PR #31; verified: screens moved into `part` files (line-for-line identical), flutter
+      analyze 0 warnings, flutter test 8 OK (`test/role_redirect_test.dart`), web build OK.
+      `strings.dart` (1,199 lines of translations) stays one file.
 - [ ] **P4.2** Choice screen `/choose` + router redirects (first launch → choose → login; change link
       on login) + widget tests for the redirects. Wording per D7.
 - [ ] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests.
@@ -666,6 +669,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-26 — P4.1 done (PR #31): big app screens split into `part` files; backend `tests.py` and
+  `tests_brand*.py` moved into the `main_app/tests/` package (one file per topic — add new tests there,
+  e.g. `tests/test_school_*.py`); router redirect logic is now `roleRedirect()` with unit tests (extend
+  them for `/choose` in P4.2). `hod_views.py` and `api/admin_views.py` stay as they are: put School
+  code in new modules (e.g. `school_views.py`, `api/school_views.py`). Next: P1.1, P1.2.
 
 - 2026-10-26 — owner decided D15 (admins on web, everyone else in the app) and D16 (simple app; payments with
   Payme/Click last as P8; no eMaktab). Dropped P3.4, P3.5, P4.11; moved CSV import and P4.12 to Release 2;

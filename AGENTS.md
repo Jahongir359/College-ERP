@@ -48,6 +48,10 @@ python manage.py collectstatic --noinput --dry-run -v 0
 python manage.py test               # 189 tests passing as of 2026-10-26
 ```
 
+Backend tests live in `backend/main_app/tests/` (one file per topic). App tests live in
+`mobile/iceberg_app/test/`. New School code goes in new modules (e.g. `school_views.py`), not in the
+already large `hod_views.py` or `api/admin_views.py`.
+
 All must pass before a commit. Django CI (`.github/workflows/django.yml`) runs them when backend files
 change. For the app, Flutter CI (`.github/workflows/flutter.yml`, Flutter 3.47.7) runs
 `flutter analyze --no-fatal-infos`, `flutter test` and `flutter build web --release --base-href /app/`
