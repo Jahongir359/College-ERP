@@ -64,9 +64,6 @@ test-results/
 
 # Large pre-built APKs (use GitHub Releases instead)
 *.apk
-# Allow the production download copies served by Django
-!web/downloads/iceberg.apk
-!web/downloads/iceberg-32bit.apk
 
 # Flutter web build: generated during the Docker build (see Dockerfile), never committed.
 web/flutter_web/

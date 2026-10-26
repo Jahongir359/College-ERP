@@ -91,17 +91,36 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Open — 0/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
-| P3 | Web screens for admins and teachers | Open — 0/6 |
-| P4 | App: choice screen, parent role, School screens | Open — 0/12 |
+| P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
+| P4 | App: choice screen, parent role, School screens | Open — 0/10 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 0/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
+| P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
 
-**Release 1 (first store version)** = P0, P1, P2.1–P2.3 + P2.6–P2.8, PD (without PD.5), P3.1–P3.4 + P3.6,
-P4 (without P4.7), P5, PL, P6, P7. **Release 2 (store update)** = gradebook (P2.4–P2.5, PD.5, P3.5,
-P4.7) and report cards.
-Owner decision D2 may move the gradebook into Release 1.
+**Release 1 (first store version)** = P0, P1 (P1.7 without CSV import), P2.1–P2.3 + P2.6–P2.8, PD
+(without PD.5), P3.1–P3.3 + P3.6, P4 (without P4.7, P4.11, P4.12), P5, PL, P6, P7. **Release 2 (store
+update)** = gradebook (P2.4–P2.5, PD.5, P4.7), report cards, CSV import of parents, minimum app version
+(P4.12), and online payments (P8).
+The owner may still move the gradebook into Release 1 (about 3–4 extra weeks).
+
+Scope rule (D16): this is a **simple tracking app** for admins, teachers, students and parents. Don't add
+integrations or extras that aren't in this plan without asking the owner.
+
+### 1.1 Target timeline (proposed 2026-10-26; confirm with D10)
+
+| When | What | Phases |
+|---|---|---|
+| Oct–Nov 2026 | **Owner, now:** D-U-N-S number → Google Play and Apple organisation accounts; hosting (D9) after the data-law check (D12); approve mockups (PD.8). Cleanup PR (dead code, archived old plans) | P0, PD.8, P5.1 |
+| Nov – mid Dec 2026 | School data model and parent role, demo data | P1, P0.6 |
+| mid Dec 2026 – Jan 2027 | Timetable, register, absence alerts, teacher–parent messages, invoices for parents, push | P2 (Release 1 parts) |
+| Jan – Feb 2027 | Admin web screens; app screens (choice, parent home, timetable, register, homework, payments view, messages) | P3, P4 |
+| Feb – Mar 2027 | Store readiness and launch readiness. **Owner:** Payme/Click merchant contract (for P8) | P5, PL |
+| Mar – Apr 2027 | Pilot with real teachers and parents, fix blockers | P6 |
+| late Apr – May 2027 | Store submission and release; parents start using the app | P7 |
+| after release | Release 2: gradebook, online payments (P8), CSV import, minimum version | P2.4–2.5, P4.7, P8 |
+
 
 ---
 
@@ -118,11 +137,13 @@ Owner decision D2 may move the gradebook into Release 1.
 | D7 | Choice-screen label for the Learning Center: **"Iceberg Study Center"** (same in uz/ru/en; the logo carries the brand). | **Decided 2026-10-23 (owner)** |
 | D8 | Store accounts: **organisation** for both Google Play and Apple (seller shown as the organisation; Play skips the 12-tester/14-day rule for new personal accounts). Needs a free **D-U-N-S number** (1–2 weeks) — apply first. | **Decided 2026-10-23 (owner)** |
 | D9 | Hosting for the ERP (DigitalOcean is stopped): Cloudflare Containers + Neon + R2, a VPS, or other. | **Open — ask owner** |
-| D10 | Target date when parents start using the app (sets what moves to Release 2). | **Open — ask owner** |
+| D10 | Target date when parents start using the app (sets what moves to Release 2). | **Open — ask owner** (proposed: early May 2027, see 1.1) |
 | D11 | Leaderboard, vocabulary and flashcards are **Study Center only**; School users never see them. | **Decided 2026-10-23 (owner)** |
 | D12 | Where the data may be hosted under Uzbekistan's personal-data rules (affects D9) — check with a local lawyer. | **Open — owner** |
-| D13 | Parent password resets: SMS codes (provider + cost) or reset by the school office. | **Open — ask owner** |
+| D13 | Parent password resets: SMS codes (provider + cost) or reset by the school office. Note: Eskiz SMS sending already exists in `main_app/payments.py` (payment reminders) and can be reused. | **Open — ask owner** |
 | D14 | How parents receive logins: printed letter with QR, SMS, or both. | **Open — ask owner** |
+| D15 | Where each role works: **admins on the Django web ERP; teachers, students and parents in the app** (phone, or browser at `/app/`). New School features are built once, in the API + app. The Django student/teacher pages are frozen (bug fixes only) and removed once the app covers them. Drops P3.4 and P3.5. | **Decided 2026-10-26 (owner)** |
+| D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
 
 Record each answer here with the date before starting the task that depends on it.
 
@@ -357,9 +378,9 @@ action) and **error** (what happened + "Qayta urinish") states, and an **offline
 ### 6.4 Web screens for admins and teachers
 
 Same layout as today's ERP (256 px sidebar, 60 px top bar). A new sidebar section **"Maktab"** for
-School branches only: Classes, Timetable, Register report, Gradebook (R2), Parents. Tables with search,
-filters by class and date, CSV export. Teacher pages (register, gradebook) are designed **phone first**
-because teachers will use them on their phones as well.
+School branches only: Classes, Timetable, Register report, Gradebook report (R2), Parents. Tables with
+search, filters by class and date, CSV export. These pages are for **admins only** (D15); teachers take the
+register and give marks in the app.
 
 ### 6.5 Design workflow (how design gets done before code)
 
@@ -462,8 +483,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       with `?student=`.
 - [ ] **P1.6** `me/` and login response include `role` and `children` (id, name, class, branch brand).
       Done when: serializer + tests; Study Center responses unchanged except the new keys.
-- [ ] **P1.7** Admin tools to create parents and link children: form + API + **CSV import** (parent
-      name, phone, child login ID, relation) with a dry-run preview. Done when: tests incl. bad rows.
+- [ ] **P1.7** Admin tools to create parents and link children: form + API. Done when: tests.
+      (**CSV import** with a dry-run preview moved to Release 2, D16.)
 - [ ] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
       of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code.
 
@@ -505,8 +526,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       entry still to draw**. (Release 2.)
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
-- [ ] **PD.9** Mockups still to draw: web parents list + CSV import preview, register report, and the
-      teacher register page on a phone (same layout as screen 12).
+- [ ] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
+      the web is no longer needed, D15; the CSV import preview waits for Release 2).
 - [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en); a clean
       transparent Study Center wordmark replacing the defective `iceberg-wordmark.png`.
 - [ ] **PD.8** **Owner** approves the mockups in section 6.0 (and later PD.5, PD.7, PD.9; record the date per screen here). Code tasks for a screen
@@ -519,9 +540,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
       Needs: P2.1.
 - [ ] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7.
-- [ ] **P3.4** Teacher: daily register page for homeroom classes (phone-friendly). Needs: P2.2.
-- [ ] **P3.5** Teacher: gradebook page (class × dates grid for one subject) and term grades. Needs:
-      P2.4, P2.5. (Release 2.)
+- [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
+- [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
+      P4.7).
 - [ ] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
       desktop in the PR.
 
@@ -539,13 +560,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P4.7** Grades screens (marks list, term grades) for student/parent; gradebook entry for
       teachers. Needs: P2.4, P2.5. (Release 2.)
 - [ ] **P4.8** Parent: homework, payments, messages with teachers, notifications. Needs: P2.6, P2.7.
-- [ ] **P4.9** Hide Study Center-only features for School users per D11 (navigation by brand).
+- [ ] **P4.9** Hide Study Center-only features for School users per D11 (navigation by brand). Also hide
+      library, leave requests and feedback for School users to keep the School app simple (D16).
 - [ ] **P4.10** Strings for every new screen in uz/ru/en; empty, loading and error states; widget tests
       for each new screen.
-- [ ] **P4.11** Offline: the register and outgoing messages are queued on the phone when offline and
-      sent when the connection returns (no duplicates: client-generated IDs); offline banner. Tests.
+- [-] **P4.11** Offline queue for the register and messages — dropped 2026-10-26 (D16, keep it simple). The
+      offline banner and a clear "not saved, try again" error stay in P4.10.
 - [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
-      with store links when older. Tests.
+      with store links when older. Tests. (Release 2, D16.)
 
 ### P5 — Store readiness
 
@@ -610,6 +632,17 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P7.5** First-week watch: crash-free rate, error logs, support messages; fixes released as
       updates.
 
+### P8 — Online payments (after the first release, D16)
+
+- [ ] **P8.1** **Owner** — Merchant contract with Payme or Click (business documents, bank account; allow a
+      few weeks). Start by March 2027.
+- [ ] **P8.2** Payme or Click checkout for existing `Invoice`s: payment link from the app, server callback
+      that verifies the provider signature and records a `Payment` (idempotent, no double payments).
+      Credentials via env vars only. Done when: tests with the provider mocked, incl. bad signatures and
+      repeated callbacks; a real test payment on staging.
+- [ ] **P8.3** App: "To'lash" button on Payments and Home opens checkout; status updates after return.
+      Needs: P8.2, P4.8.
+
 ---
 
 ## 10. Risks and how this plan handles them
@@ -625,7 +658,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 | Screens built that the owner doesn't like | Mockups approved first (PD.8, section 6.5) |
 | Parents can't log in or forget passwords | Login letters, forced first change, reset flow, guides (PL.1–PL.3) |
 | Old app versions break after an update | Backwards-compatible API + minimum-version screen (P4.12) |
-| Teachers lose the register on bad signal | Offline queue (P4.11) |
+| Teachers lose the register on bad signal | Clear "not saved, try again" error and offline banner (P4.10); offline queue dropped (D16) |
 | Data stored where the law doesn't allow | Legal check before hosting (D12, PL.7) |
 
 ---
@@ -633,6 +666,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-26 — owner decided D15 (admins on web, everyone else in the app) and D16 (simple app; payments with
+  Payme/Click last as P8; no eMaktab). Dropped P3.4, P3.5, P4.11; moved CSV import and P4.12 to Release 2;
+  added the timeline (1.1). Cleanup PR removed dead code (committed APK, TWA build, git-pull deploy webhook,
+  old web push, unused images/templates/Dart files) and moved the June plans to `docs/archive/`. Next:
+  owner D-U-N-S, D9, D12, PD.8; code P1.1, P1.2.
 
 - 2026-10-23 — P0.2 done: #26, #27, #28 merged into `main` (owner asked). The Flutter web build is now
   generated by the `Dockerfile`, CI is split (django.yml / flutter.yml). Next: P0.3 DNS + P0.4 hosting (D9, D12).

@@ -47,6 +47,7 @@ echo "==> Built:"
 ls -lh "$ARM64_APK" "$ARM32_APK"
 
 # Copy to web/downloads/ so the website stays in sync
+mkdir -p "$DOWNLOADS_DIR"
 cp "$ARM64_APK"  "$DOWNLOADS_DIR/iceberg.apk"
 cp "$ARM32_APK"  "$DOWNLOADS_DIR/iceberg-32bit.apk"
 echo "==> Copied APKs to web/downloads/"

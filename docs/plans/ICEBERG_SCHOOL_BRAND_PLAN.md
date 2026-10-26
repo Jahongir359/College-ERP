@@ -612,7 +612,7 @@ Flutter is **not installed in the codespace**; this phase needs a machine with F
 7. Logo widgets: wherever `assets/images/logo.png` or `iceberg-wordmark.png` is shown, pick by
    brand.
 8. Rebuild Flutter web into `web/flutter_web/` only via the existing deploy flow
-   (`api/deploy/flutter/` / CI) — don't hand-edit build output.
+   (the `Dockerfile` / CI) — don't hand-edit build output.
 9. `flutter analyze` and `flutter test` must pass.
 
 ## 10. Verification
@@ -635,7 +635,6 @@ Baseline 2026-10-23: 133 tests, all OK.
 1. Run `python manage.py runserver` with `SCHOOL_BRAND_ENABLED=False` and capture these pages as
    admin, staff and student: login, dashboard, manage students, group detail, attendance,
    invoices/payments, registration leads, profile, notifications, messages, password reset.
-   (`docs/archive/visual_sweep.py` and `docs/archive/smoke_ui.py` are older helpers you can adapt.)
 2. Repeat with `SCHOOL_BRAND_ENABLED=True` for a user in a `center` branch → screenshots must match
    step 1.
 3. Repeat for a user in a `school` branch → every brand surface is maroon; no teal/cyan/lime left

@@ -64,8 +64,6 @@ class LoginCheckMiddleWare(MiddlewareMixin):
                 or request.path.startswith("/admin/")
                 or request.path in ("/public/registration-leads", "/public/registration-leads/")
                 or request.path == "/health/"
-                # FCM service worker — browsers fetch this before login.
-                or request.path == "/firebase-messaging-sw.js"
                 # Custom code-based password recovery flow.
                 or modulename == "main_app.password_recovery"
                 or request.path.startswith("/forgot-password")
