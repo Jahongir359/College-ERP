@@ -40,6 +40,7 @@
       <thead>
         <tr>
           <th>#</th>
+          <th>Name</th>
           <th>Start Year</th>
           <th>End Year</th>
           <th>Actions</th>
@@ -48,8 +49,9 @@
       <tbody>
         {% for session in sessions %}
         <tr data-manage-search-item
-            data-manage-search-text="{{ session.start_year }} {{ session.end_year }}">
+            data-manage-search-text="{{ session.name }} {{ session.start_year }} {{ session.end_year }}">
           <td>{{ forloop.counter }}</td>
+          <td>{{ session.name|default:"—" }}{% if session.is_current %} <span class="admin-soft-badge">Current</span>{% endif %}</td>
           <td><strong>{{ session.start_year }}</strong></td>
           <td style="color:var(--ice-muted);">{{ session.end_year }}</td>
           <td>
@@ -66,7 +68,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="4">
+          <td colspan="5">
             <div class="ice-manage-empty">
               <i class="fas fa-calendar-alt" aria-hidden="true"></i>
               <strong>No sessions yet</strong>

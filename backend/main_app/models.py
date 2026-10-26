@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import UserManager
 from django.dispatch import receiver
@@ -46,11 +47,101 @@ class CustomUserManager(UserManager):
 
 
 class Session(models.Model):
+    """An academic year. School quarters hang off it as ``Term`` rows."""
+
     start_year = models.DateField()
     end_year = models.DateField()
+    name = models.CharField(max_length=20, blank=True, default="", help_text="e.g. 2026–2027")
+    # At most one session is marked current (DB constraint below); when none is
+    # marked, the session whose dates contain today counts as current.
+    is_current = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["is_current"],
+                condition=Q(is_current=True),
+                name="one_current_session",
+            )
+        ]
 
     def __str__(self):
+        if self.name:
+            return self.name
         return "From " + str(self.start_year) + " to " + str(self.end_year)
+
+    def clean(self):
+        if self.start_year and self.end_year and self.end_year <= self.start_year:
+            raise ValidationError({"end_year": "The end date must be after the start date."})
+
+    def validate_constraints(self, exclude=None):
+        # save() un-marks the previous current session, so "one current
+        # session" must not block marking a new one in forms and the API.
+        exclude = set(exclude or ())
+        exclude.add("is_current")
+        super().validate_constraints(exclude=exclude)
+
+    def save(self, *args, **kwargs):
+        # Marking this session current un-marks the previous one.
+        if self.is_current:
+            Session.objects.filter(is_current=True).exclude(pk=self.pk).update(is_current=False)
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def current(cls):
+        marked = cls.objects.filter(is_current=True).first()
+        if marked:
+            return marked
+        today = timezone.localdate()
+        return (
+            cls.objects.filter(start_year__lte=today, end_year__gte=today)
+            .order_by("-start_year")
+            .first()
+        )
+
+
+class Term(models.Model):
+    """A school quarter (chorak) inside an academic year."""
+
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name="terms")
+    number = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(4)]
+    )
+    name = models.CharField(max_length=40, blank=True, default="")
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    class Meta:
+        ordering = ["session", "number"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["session", "number"], name="one_term_number_per_session"
+            ),
+            models.CheckConstraint(
+                condition=Q(number__gte=1) & Q(number__lte=4), name="term_number_1_to_4"
+            ),
+        ]
+
+    def __str__(self):
+        return self.name or f"{self.session} · Q{self.number}"
+
+    def clean(self):
+        errors = {}
+        if self.start_date and self.end_date and self.end_date <= self.start_date:
+            errors["end_date"] = "The end date must be after the start date."
+        if self.session_id and self.start_date and self.end_date:
+            session = self.session
+            if self.start_date < session.start_year or self.end_date > session.end_year:
+                errors["start_date"] = "A quarter must fall inside its academic year."
+            overlapping = (
+                Term.objects.filter(session_id=self.session_id)
+                .exclude(pk=self.pk)
+                .filter(start_date__lte=self.end_date, end_date__gte=self.start_date)
+            )
+            if overlapping.exists():
+                errors["start_date"] = "Quarters in one academic year must not overlap."
+        if errors:
+            raise ValidationError(errors)
 
 
 class CustomUser(AbstractUser):
@@ -545,6 +636,12 @@ class Branch(models.Model):
 
 
 class Group(models.Model):
+    # A school class (7-B) is a Group with kind="class" so attendance, homework,
+    # chat and invoices keep working (plan decision D5). Courses are unchanged.
+    KIND_COURSE = "course"
+    KIND_CLASS = "class"
+    KIND_CHOICES = [(KIND_COURSE, "Course group"), (KIND_CLASS, "School class")]
+
     name = models.CharField(max_length=100)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True, blank=True)
@@ -567,6 +664,24 @@ class Group(models.Model):
         null=True, blank=True, help_text="The date when this group starts classes"
     )
     is_archived = models.BooleanField(default=False)
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES, default=KIND_COURSE)
+    grade_level = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(11)],
+        help_text="School classes only: grade 1–11.",
+    )
+    letter = models.CharField(
+        max_length=2, blank=True, default="", help_text="School classes only, e.g. B in 7-B."
+    )
+    session = models.ForeignKey(
+        Session,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="classes",
+        help_text="School classes only: the academic year.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -575,9 +690,41 @@ class Group(models.Model):
             models.Index(fields=["branch", "is_archived"]),
             models.Index(fields=["teacher", "is_archived"]),
         ]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(kind="course")
+                | (
+                    Q(kind="class")
+                    & Q(grade_level__isnull=False)
+                    & Q(grade_level__gte=1)
+                    & Q(grade_level__lte=11)
+                ),
+                name="class_grade_1_to_11",
+            ),
+        ]
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_class(self):
+        return self.kind == self.KIND_CLASS
+
+    def clean(self):
+        errors = {}
+        if self.is_class:
+            if self.grade_level is None or not 1 <= self.grade_level <= 11:
+                errors["grade_level"] = "A school class needs a grade from 1 to 11."
+            if not self.letter:
+                errors["letter"] = "A school class needs a letter, e.g. B."
+            if self.session_id is None:
+                errors["session"] = "A school class needs an academic year."
+            if self.branch_id and self.branch.brand != Branch.BRAND_SCHOOL:
+                errors["branch"] = "School classes belong to an Iceberg School branch."
+        elif self.grade_level is not None or self.letter or self.session_id:
+            errors["kind"] = "Grade, letter and academic year are only for school classes."
+        if errors:
+            raise ValidationError(errors)
 
     @property
     def effective_monthly_fee(self):
@@ -606,6 +753,34 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f"{self.student} → {self.group}"
+
+    def clean(self):
+        if self.is_active and self.student_id and self.group_id:
+            other = class_enrollment_conflict(self.student_id, self.group, exclude_pk=self.pk)
+            if other is not None:
+                raise ValidationError(
+                    {"group": f"This student is already in class {other.name} this academic year."}
+                )
+
+
+def class_enrollment_conflict(student_id, group, exclude_pk=None):
+    """The other active class this student is in for ``group``'s academic year, if any.
+
+    A student is in at most one active school class per academic year. Course
+    groups never conflict.
+    """
+    if group is None or group.kind != Group.KIND_CLASS:
+        return None
+    qs = Enrollment.objects.filter(
+        student_id=student_id,
+        is_active=True,
+        group__kind=Group.KIND_CLASS,
+        group__session_id=group.session_id,
+    ).exclude(group_id=group.pk)
+    if exclude_pk is not None:
+        qs = qs.exclude(pk=exclude_pk)
+    match = qs.select_related("group").first()
+    return match.group if match else None
 
 
 class ChatThread(models.Model):

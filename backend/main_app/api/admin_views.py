@@ -10,7 +10,7 @@ All views in this module:
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import ProtectedError, Q
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -36,6 +36,8 @@ from ..models import (
     Student,
     Subject,
     CustomUser,
+    Term,
+    class_enrollment_conflict,
 )
 
 
@@ -352,6 +354,39 @@ class CourseDetailView(APIView):
 # ---------------------------------------------------------------------------
 
 
+def _session_dict(session, current_id):
+    return {
+        "id": session.id,
+        "name": session.name,
+        "start_year": str(session.start_year),
+        "end_year": str(session.end_year),
+        # The marked session, or (when none is marked) the one covering today.
+        "is_current": session.id == current_id,
+        "is_marked_current": session.is_current,
+    }
+
+
+def _term_dict(term):
+    return {
+        "id": term.id,
+        "session": term.session_id,
+        "number": term.number,
+        "name": term.name,
+        "start_date": str(term.start_date),
+        "end_date": str(term.end_date),
+    }
+
+
+def _validation_response(exc):
+    detail = exc.message_dict if hasattr(exc, "message_dict") else {"detail": exc.messages}
+    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _current_session_id():
+    current = Session.current()
+    return current.id if current else None
+
+
 class SessionListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -359,22 +394,9 @@ class SessionListView(APIView):
         ok, err = _require_admin(request)
         if not ok:
             return err
-
-        from django.utils import timezone
-
-        today = timezone.now().date()
+        current_id = _current_session_id()
         sessions = Session.objects.all().order_by("-start_year")
-        data = [
-            {
-                "id": s.id,
-                "start_year": str(s.start_year),
-                "end_year": str(s.end_year),
-                # A session is "current" if today falls within its date range.
-                "is_current": s.start_year <= today <= s.end_year,
-            }
-            for s in sessions
-        ]
-        return Response(data)
+        return Response([_session_dict(s, current_id) for s in sessions])
 
     def post(self, request):
         err = _super_admin_error(request)
@@ -391,14 +413,19 @@ class SessionListView(APIView):
                 {"detail": "start_year and end_year are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        session = Session.objects.create(start_year=start_year, end_year=end_year)
+        session = Session(
+            start_year=start_year,
+            end_year=end_year,
+            name=request.data.get("name", "") or "",
+            is_current=bool(request.data.get("is_current", False)),
+        )
+        try:
+            session.full_clean()
+        except DjangoValidationError as exc:
+            return _validation_response(exc)
+        session.save()
         return Response(
-            {
-                "id": session.id,
-                "start_year": str(session.start_year),
-                "end_year": str(session.end_year),
-            },
-            status=status.HTTP_201_CREATED,
+            _session_dict(session, _current_session_id()), status=status.HTTP_201_CREATED
         )
 
 
@@ -420,17 +447,9 @@ class SessionDetailView(APIView):
         session, err = self._get_session(request, pk)
         if err:
             return err
-        from django.utils import timezone
-
-        today = timezone.now().date()
-        return Response(
-            {
-                "id": session.id,
-                "start_year": str(session.start_year),
-                "end_year": str(session.end_year),
-                "is_current": session.start_year <= today <= session.end_year,
-            }
-        )
+        data = _session_dict(session, _current_session_id())
+        data["terms"] = [_term_dict(t) for t in session.terms.all()]
+        return Response(data)
 
     def patch(self, request, pk):
         err = _super_admin_error(request)
@@ -439,18 +458,17 @@ class SessionDetailView(APIView):
         session, err = self._get_session(request, pk)
         if err:
             return err
-        if "start_year" in request.data:
-            session.start_year = request.data["start_year"]
-        if "end_year" in request.data:
-            session.end_year = request.data["end_year"]
+        for field in ("start_year", "end_year", "name"):
+            if field in request.data:
+                setattr(session, field, request.data[field])
+        if "is_current" in request.data:
+            session.is_current = bool(request.data["is_current"])
+        try:
+            session.full_clean()
+        except DjangoValidationError as exc:
+            return _validation_response(exc)
         session.save()
-        return Response(
-            {
-                "id": session.id,
-                "start_year": str(session.start_year),
-                "end_year": str(session.end_year),
-            }
-        )
+        return Response(_session_dict(session, _current_session_id()))
 
     def delete(self, request, pk):
         err = _super_admin_error(request)
@@ -459,7 +477,89 @@ class SessionDetailView(APIView):
         session, err = self._get_session(request, pk)
         if err:
             return err
-        session.delete()
+        try:
+            session.delete()
+        except ProtectedError:
+            return Response(
+                {"detail": "School classes use this academic year. Move them first."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SessionTermListView(APIView):
+    """Quarters of one academic year: admins read, super admins add."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        ok, err = _require_admin(request)
+        if not ok:
+            return err
+        session = Session.objects.filter(pk=pk).first()
+        if session is None:
+            return Response({"detail": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
+        return Response([_term_dict(t) for t in session.terms.all()])
+
+    def post(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return err
+        ok, err = _require_admin(request)
+        if not ok:
+            return err
+        session = Session.objects.filter(pk=pk).first()
+        if session is None:
+            return Response({"detail": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
+        term = Term(
+            session=session,
+            number=request.data.get("number"),
+            name=request.data.get("name", "") or "",
+            start_date=request.data.get("start_date"),
+            end_date=request.data.get("end_date"),
+        )
+        try:
+            term.full_clean()
+        except DjangoValidationError as exc:
+            return _validation_response(exc)
+        term.save()
+        return Response(_term_dict(term), status=status.HTTP_201_CREATED)
+
+
+class TermDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def _get_term(self, request, pk):
+        err = _super_admin_error(request)
+        if err:
+            return None, err
+        ok, err = _require_admin(request)
+        if not ok:
+            return None, err
+        term = Term.objects.select_related("session").filter(pk=pk).first()
+        if term is None:
+            return None, Response({"detail": "Term not found."}, status=status.HTTP_404_NOT_FOUND)
+        return term, None
+
+    def patch(self, request, pk):
+        term, err = self._get_term(request, pk)
+        if err:
+            return err
+        for field in ("number", "name", "start_date", "end_date"):
+            if field in request.data:
+                setattr(term, field, request.data[field])
+        try:
+            term.full_clean()
+        except DjangoValidationError as exc:
+            return _validation_response(exc)
+        term.save()
+        return Response(_term_dict(term))
+
+    def delete(self, request, pk):
+        term, err = self._get_term(request, pk)
+        if err:
+            return err
+        term.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -645,7 +745,7 @@ class GroupDetailView(APIView):
                 "id": group.id,
                 "name": group.name,
                 "course_name": group.course.name if group.course else None,
-                "session_name": None,  # Group model has no direct session FK
+                "session_name": str(group.session) if group.session_id else None,
                 "staff_name": staff_name,
                 "branch_name": group.branch.name if group.branch else None,
                 "is_archived": group.is_archived,
@@ -719,6 +819,12 @@ class EnrollmentView(APIView):
             return Response(
                 {"detail": "You don't have access to that group's branch."},
                 status=status.HTTP_403_FORBIDDEN,
+            )
+        other_class = class_enrollment_conflict(student.id, group)
+        if other_class is not None:
+            return Response(
+                {"detail": f"Student is already in class {other_class.name} this academic year."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         enrollment, created = Enrollment.objects.get_or_create(
@@ -1336,6 +1442,51 @@ class AdminRecordPaymentView(APIView):
 # ---------------------------------------------------------------------------
 
 
+def _class_fields(group):
+    """School-class keys on group responses (course groups: kind "course", rest null)."""
+    return {
+        "kind": group.kind,
+        "grade_level": group.grade_level,
+        "letter": group.letter,
+        "session": group.session_id,
+    }
+
+
+def _apply_class_fields(group, data):
+    """Set kind/grade_level/letter/session from request data and validate the group.
+
+    Returns a 400 Response on bad input, else None. Course groups sent without
+    these keys are unchanged.
+    """
+    if "kind" in data:
+        if data["kind"] not in (Group.KIND_COURSE, Group.KIND_CLASS):
+            return Response({"kind": ["Use course or class."]}, status=status.HTTP_400_BAD_REQUEST)
+        group.kind = data["kind"]
+    if "grade_level" in data:
+        try:
+            group.grade_level = int(data["grade_level"]) if data["grade_level"] else None
+        except (TypeError, ValueError):
+            return Response(
+                {"grade_level": ["A whole number is required."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    if "letter" in data:
+        group.letter = (data["letter"] or "").strip().upper()
+    if "session" in data:
+        if data["session"]:
+            session = Session.objects.filter(pk=data["session"]).first()
+            if session is None:
+                return Response({"session": ["Not found."]}, status=status.HTTP_400_BAD_REQUEST)
+            group.session = session
+        else:
+            group.session = None
+    try:
+        group.clean()
+    except DjangoValidationError as exc:
+        return _validation_response(exc)
+    return None
+
+
 class AdminGroupListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1353,7 +1504,7 @@ class AdminGroupListView(APIView):
             if g.teacher and g.teacher.admin:
                 u = g.teacher.admin
                 teacher_name = f"{u.first_name} {u.last_name}".strip()
-            enrolled = g.enrollments.count() if hasattr(g, "enrollments") else 0
+            enrolled = g.enrollment_set.count()
             data.append(
                 {
                     "id": g.id,
@@ -1371,6 +1522,7 @@ class AdminGroupListView(APIView):
                     "start_date": g.start_date.isoformat() if g.start_date else None,
                     "is_archived": g.is_archived,
                     "enrolled_count": enrolled,
+                    **_class_fields(g),
                 }
             )
         return Response(data)
@@ -1424,7 +1576,7 @@ class AdminGroupListView(APIView):
                 {"branch": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        group = Group.objects.create(
+        group = Group(
             name=d["name"],
             course=course,
             teacher=teacher,
@@ -1435,6 +1587,10 @@ class AdminGroupListView(APIView):
             monthly_fee=d.get("monthly_fee") or None,
             start_date=d.get("start_date") or None,
         )
+        err = _apply_class_fields(group, d)
+        if err:
+            return err
+        group.save()
         return Response({"id": group.id, "name": group.name}, status=status.HTTP_201_CREATED)
 
 
@@ -1458,7 +1614,7 @@ class AdminGroupDetailView(APIView):
         if err:
             return err
         students = []
-        for enr in g.enrollments.select_related("student__admin").all():
+        for enr in g.enrollment_set.select_related("student__admin").all():
             s = enr.student
             u = s.admin
             students.append(
@@ -1490,6 +1646,7 @@ class AdminGroupDetailView(APIView):
                 "monthly_fee": str(g.monthly_fee) if g.monthly_fee is not None else None,
                 "start_date": g.start_date.isoformat() if g.start_date else None,
                 "is_archived": g.is_archived,
+                **_class_fields(g),
                 "students": students,
                 "enrolled_count": len(students),
             }
@@ -1548,6 +1705,9 @@ class AdminGroupDetailView(APIView):
                 return Response(
                     {"branch": ["Branch is required."]}, status=status.HTTP_400_BAD_REQUEST
                 )
+        err = _apply_class_fields(g, d)
+        if err:
+            return err
         g.save()
         return Response({"id": g.id, "name": g.name, "is_archived": g.is_archived})
 
