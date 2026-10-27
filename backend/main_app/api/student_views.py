@@ -1,7 +1,8 @@
 """Student-only API endpoints added for the ICEBERG mobile app.
 
 Everything here is scoped to ``request.user.student`` — a student can never
-reach another student's data through these views.
+reach another student's data through these views. The attendance summary is
+also open to parents for a linked child (``?student=<id>``, see family.py).
 """
 
 import calendar
@@ -19,7 +20,8 @@ from ..models import (
     ResultFile,
     Student,
 )
-from .permissions import IsStudent
+from .family import student_for_request
+from .permissions import IsStudent, IsStudentOrParent
 
 
 def _get_student(request):
@@ -40,16 +42,14 @@ class StudentAttendanceSummaryView(APIView):
     GET /api/v1/student/attendance/summary/?month=YYYY-MM&group_id=N
     """
 
-    permission_classes = [IsStudent]
+    permission_classes = [IsStudentOrParent]
 
     def get(self, request):
         from django.utils import timezone as tz
 
-        student = _get_student(request)
-        if student is None:
-            return Response(
-                {"detail": "Student profile not found."}, status=status.HTTP_403_FORBIDDEN
-            )
+        student, error = student_for_request(request)
+        if error is not None:
+            return error
 
         today = tz.localdate()
         month_param = request.query_params.get("month", "")

@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ... import branching
-from ...models import Attendance, AttendanceReport, Enrollment, Group, Student
+from ...models import Attendance, AttendanceReport, Enrollment, Group
+from ..family import student_for_request
 from ..serializers import AttendanceSaveSerializer, AttendanceSerializer
 
 
@@ -19,11 +20,12 @@ class AttendanceView(APIView):
         group_id = request.query_params.get("group_id")
         date_str = request.query_params.get("date")
 
-        if user_type == "3":
-            try:
-                student = user.student
-            except Student.DoesNotExist:
-                return Response({"count": 0, "results": []})
+        if user_type in ("3", "4"):
+            student, error = student_for_request(request)
+            if error is not None:
+                if user_type == "3":
+                    return Response({"count": 0, "results": []})
+                return error
             reports = (
                 AttendanceReport.objects.filter(student=student)
                 .select_related("attendance__group")

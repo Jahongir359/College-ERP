@@ -54,7 +54,8 @@ String? roleRedirect(AuthState auth, String path) {
   final user = auth.user!;
 
   // Admin → coming-soon wall (admin dashboard ships on the web portal).
-  if (user.isAdmin) {
+  // Parents too, until the parent screens are built (plan phase P5).
+  if (user.isAdmin || user.isParent) {
     return path == '/coming-soon' ? null : '/coming-soon';
   }
 
@@ -79,6 +80,7 @@ String? roleRedirect(AuthState auth, String path) {
 ///   - Student (user_type 3) → full /student/* experience
 ///   - Staff   (user_type 2) → teacher portal /staff/*
 ///   - Admin   (user_type 1) → /coming-soon (admin web portal handles them)
+///   - Parent  (user_type 4) → /coming-soon until the parent screens ship
 ///
 /// Each role's sub-screens are nested inside the role's StatefulShellRoute
 /// branches so the bottom navigation bar persists and back-navigation works.

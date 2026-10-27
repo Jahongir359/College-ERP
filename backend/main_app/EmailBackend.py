@@ -8,7 +8,7 @@ class EmailBackend(ModelBackend):
     """Dual-mode authentication backend.
 
     - Admin (user_type='1'): authenticates by email address.
-    - Staff (user_type='2') and Student (user_type='3'): authenticates by login_id.
+    - Staff ('2'), Student ('3') and Parent ('4'): authenticate by login_id.
 
     The identifier field in the login form is named 'identifier'.  Django's
     authenticate() receives it as the 'username' keyword argument (set by the

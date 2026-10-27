@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from ...models import Student
+from ...models import Parent, Student
 from ..serializers import ChangePasswordSerializer, FcmTokenSerializer, MeSerializer
 
 
@@ -117,6 +117,13 @@ class MeView(APIView):
                     student.phone = str(request.data["phone"])[:20]
                     student.save(update_fields=["phone"])
                 except Student.DoesNotExist:
+                    pass
+            elif "phone" in request.data and str(user.user_type) == "4":
+                try:
+                    parent = user.parent
+                    parent.phone = str(request.data["phone"])[:20]
+                    parent.save(update_fields=["phone"])
+                except Parent.DoesNotExist:
                     pass
             return Response(MeSerializer(user, context={"request": request}).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

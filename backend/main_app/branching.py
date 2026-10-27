@@ -10,6 +10,7 @@ Iceberg is one organization with many branches. Access is scoped by branch:
                    of truth, NOT Staff.branch, so legacy teachers with a null
                    branch keep working.
   * Student      → only their own record and their own enrolled groups.
+  * Parent       → only their linked children (ParentChild), read-only.
   * Anyone else  → nothing (empty queryset), never "all".
 
 Views, forms, messaging and the API all route through these helpers so the
@@ -18,7 +19,7 @@ rules live in exactly one place. Do not re-implement branch filtering inline.
 
 from django.db.models import Q
 
-from .models import Admin, Branch, Enrollment, Group, Staff, Student
+from .models import Admin, Branch, Enrollment, Group, Parent, Staff, Student
 
 
 # ── Identity helpers ─────────────────────────────────────────────────────────
@@ -56,6 +57,23 @@ def _get_student(user):
         return user.student
     except (Student.DoesNotExist, AttributeError):
         return None
+
+
+def _get_parent(user):
+    if _user_type(user) != "4":
+        return None
+    try:
+        return user.parent
+    except (Parent.DoesNotExist, AttributeError):
+        return None
+
+
+def children_for_parent(user):
+    """Students linked to this parent user (empty for everyone else)."""
+    parent = _get_parent(user)
+    if parent is None:
+        return Student.objects.none()
+    return Student.objects.filter(parent_links__parent=parent).distinct()
 
 
 def is_super_admin(user):
@@ -107,6 +125,13 @@ def get_accessible_branches(user):
             Q(students=student) | Q(group__enrollment__student=student)
         ).distinct()
 
+    parent = _get_parent(user)
+    if parent is not None:
+        children = children_for_parent(user)
+        return Branch.objects.filter(
+            Q(students__in=children) | Q(group__enrollment__student__in=children)
+        ).distinct()
+
     return Branch.objects.none()
 
 
@@ -146,6 +171,9 @@ def filter_students_for_user(user, queryset):
     student = _get_student(user)
     if student is not None:
         return queryset.filter(pk=student.pk)
+
+    if _get_parent(user) is not None:
+        return queryset.filter(pk__in=children_for_parent(user).values("pk"))
 
     return queryset.none()
 
@@ -245,6 +273,9 @@ def filter_results_for_user(user, queryset):
     if student is not None:
         return queryset.filter(student=student)
 
+    if _get_parent(user) is not None:
+        return queryset.filter(student__in=children_for_parent(user).values("pk"))
+
     return queryset.none()
 
 
@@ -282,6 +313,18 @@ def user_can_access_branch(user, branch):
         return True
     branch_id = getattr(branch, "id", branch)
     return get_accessible_branches(user).filter(id=branch_id).exists()
+
+
+def user_can_access_student(user, student):
+    """True when this user may see this student's data.
+
+    Admins: students in their branches; teachers: students in groups they
+    teach; a student: themself; a parent: their linked children.
+    """
+    if student is None:
+        return False
+    student_id = getattr(student, "pk", student)
+    return filter_students_for_user(user, Student.objects.filter(pk=student_id)).exists()
 
 
 def user_can_access_group(user, group):

@@ -172,7 +172,31 @@ def brand_for_user(user, session=None):
         # One brand across all managed branches → that brand; mixed or none → center.
         return brands.pop() if len(brands) == 1 else CENTER
 
+    if user_type == "4":
+        from .branching import children_for_parent
+
+        brands = {_student_brand(child) for child in children_for_parent(user)}
+        # Same rule as branch admins: one brand across the children → that brand.
+        return brands.pop() if len(brands) == 1 else CENTER
+
     return CENTER
+
+
+def _student_brand(student):
+    branch = student.effective_branch
+    return branch.brand if branch else CENTER
+
+
+def brand_key_for_student(student):
+    """Brand of a student's branch (e.g. a parent's child card). Never raises."""
+    if not getattr(settings, "SCHOOL_BRAND_ENABLED", False):
+        return CENTER
+    try:
+        key = _student_brand(student)
+    except Exception:
+        logger.exception("Brand resolution failed; falling back to center")
+        return CENTER
+    return key if is_valid_brand(key) else CENTER
 
 
 def _profile_branch(user, attr):

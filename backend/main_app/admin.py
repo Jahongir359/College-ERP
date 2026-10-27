@@ -5,6 +5,8 @@ from .models import (
     CustomUser,
     Staff,
     Student,
+    Parent,
+    ParentChild,
     Course,
     Book,
     Loan,
@@ -152,6 +154,28 @@ class StudentAdmin(admin.ModelAdmin):
         return obj.admin.login_id or "—"
 
     ice_id.short_description = "ICE ID"
+
+    def full_name(self, obj):
+        return f"{obj.admin.first_name} {obj.admin.last_name}".strip() or obj.admin.email
+
+    full_name.short_description = "Name"
+
+
+class ParentChildInline(admin.TabularInline):
+    model = ParentChild
+    extra = 0
+    raw_id_fields = ("student",)
+
+
+@admin.register(Parent)
+class ParentAdmin(admin.ModelAdmin):
+    list_display = ("login", "full_name", "phone")
+    search_fields = ("admin__login_id", "admin__first_name", "admin__last_name", "phone")
+    raw_id_fields = ("admin",)
+    inlines = [ParentChildInline]
+
+    def login(self, obj):
+        return obj.admin.login_id or "—"
 
     def full_name(self, obj):
         return f"{obj.admin.first_name} {obj.admin.last_name}".strip() or obj.admin.email

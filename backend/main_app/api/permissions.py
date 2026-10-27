@@ -27,3 +27,17 @@ class IsAdminOrTeacher(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.is_authenticated and str(request.user.user_type) in ("1", "2")
+
+
+class IsParent(BasePermission):
+    """Parent / guardian users only."""
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and str(request.user.user_type) == "4"
+
+
+class IsStudentOrParent(BasePermission):
+    """A student (own data) or a parent (a linked child's data, see family.py)."""
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and str(request.user.user_type) in ("3", "4")
