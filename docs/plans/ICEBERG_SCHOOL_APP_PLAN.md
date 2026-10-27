@@ -144,6 +144,7 @@ integrations or extras that aren't in this plan without asking the owner.
 | D14 | How parents receive logins: printed letter with QR, SMS, or both. | **Open — ask owner** |
 | D15 | Where each role works: **admins on the Django web ERP; teachers, students and parents in the app** (phone, or browser at `/app/`). New School features are built once, in the API + app. The Django student/teacher pages are frozen (bug fixes only) and removed once the app covers them. Drops P3.4 and P3.5. | **Decided 2026-10-26 (owner)** |
 | D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
+| D17 | Admin web language: office staff need the **admin pages in Uzbek and Russian** (English stays). The admin web has no Django i18n today, so P3.0 adds it before the School admin pages. | **Decided 2026-10-27 (owner)** |
 
 Record each answer here with the date before starting the task that depends on it.
 
@@ -559,6 +560,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P3 — Web screens (admins and teachers)
 
+- [ ] **P3.0** Translation setup for the admin web (D17): Django i18n (`LocaleMiddleware`, `uz`/`ru`/
+      `en`, `locale/` with `.po` files compiled in the build), a language switch in the admin header
+      remembered per user, and the shared admin layout, menu and login translated first. Existing pages
+      are translated as they are touched; every new School admin page ships in all three. Done when:
+      switching language changes the admin menu and a School page, tests for the switch.
+      Needs: nothing. Do before P3.1.
 - [ ] **P3.1** Admin: classes (create 7-B, homeroom teacher, students), subjects per class, current
       session and quarters. Needs: P1.1–P1.3.
 - [ ] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
