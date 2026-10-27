@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 
 from ... import branching
 from ...models import Enrollment, Group, Invoice, Staff, Student
+from ..family import student_for_request
 from ..serializers import InvoiceSerializer
 
 
@@ -29,6 +30,14 @@ class InvoiceView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = InvoiceSerializer
 
+    def list(self, request, *args, **kwargs):
+        if str(request.user.user_type) == "4":
+            student, error = student_for_request(request)
+            if error is not None:
+                return error
+            self.parent_child = student
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         user = self.request.user
         user_type = str(user.user_type)
@@ -38,6 +47,8 @@ class InvoiceView(generics.ListAPIView):
                 return qs.filter(student=user.student).order_by("-period")
             except Student.DoesNotExist:
                 return qs.none()
+        if user_type == "4":
+            return qs.filter(student=self.parent_child).order_by("-period")
         if user_type == "1":
             students = branching.filter_students_for_user(user, Student.objects.all())
             return qs.filter(student__in=students).order_by("-period")
@@ -57,6 +68,8 @@ class InvoiceDetailView(generics.RetrieveAPIView):
                 return qs.filter(student=user.student)
             except Student.DoesNotExist:
                 return qs.none()
+        if user_type == "4":
+            return qs.filter(student__in=branching.children_for_parent(user))
         if user_type == "1":
             students = branching.filter_students_for_user(user, Student.objects.all())
             return qs.filter(student__in=students)

@@ -45,7 +45,7 @@ python -m ruff format --check .
 python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py collectstatic --noinput --dry-run -v 0
-python manage.py test               # 229 tests passing as of 2026-10-26
+python manage.py test               # 255 tests passing as of 2026-10-27
 ```
 
 Backend tests live in `backend/main_app/tests/` (one file per topic). App tests live in
@@ -59,8 +59,8 @@ when `mobile/iceberg_app/` changes; run the same locally where Flutter is instal
 
 ## Domain rules
 
-- Roles: `CustomUser.user_type` `"1"` Admin/HOD, `"2"` Staff/Teacher, `"3"` Student. There is no
-  parent role yet (planned as `"4"`).
+- Roles: `CustomUser.user_type` `"1"` Admin/HOD, `"2"` Staff/Teacher, `"3"` Student. `"4"` Parent
+  (linked to children through `ParentChild`; uses the app only).
 - **Where each role works (owner decision D15, 2026-10-26):** admins use the Django web ERP; teachers,
   students and parents use the Flutter app (phone, or the browser at `/app/`). Build new School
   features in the API + app, and admin screens only on the web. The Django student and teacher pages

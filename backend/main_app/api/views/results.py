@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 
 from ... import branching
 from ...models import Enrollment, Group, Notification, Student, StudentResult
+from ..family import student_for_request
 from ..serializers import StudentResultSerializer
 
 
@@ -18,6 +19,11 @@ class ResultView(APIView):
 
         qs = StudentResult.objects.select_related("student__admin", "group")
         qs = branching.filter_results_for_user(user, qs)
+        if str(user.user_type) == "4":
+            student, error = student_for_request(request)
+            if error is not None:
+                return error
+            qs = qs.filter(student=student)
 
         if group_id:
             qs = qs.filter(group_id=group_id)

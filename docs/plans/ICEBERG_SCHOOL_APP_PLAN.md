@@ -88,7 +88,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | Phase | What | Status |
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
-| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 2/8 |
+| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 5/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
@@ -144,6 +144,7 @@ integrations or extras that aren't in this plan without asking the owner.
 | D14 | How parents receive logins: printed letter with QR, SMS, or both. | **Open — ask owner** |
 | D15 | Where each role works: **admins on the Django web ERP; teachers, students and parents in the app** (phone, or browser at `/app/`). New School features are built once, in the API + app. The Django student/teacher pages are frozen (bug fixes only) and removed once the app covers them. Drops P3.4 and P3.5. | **Decided 2026-10-26 (owner)** |
 | D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
+| D17 | Admin web language: office staff need the **admin pages in Uzbek and Russian** (English stays). The admin web has no Django i18n today, so P3.0 adds it before the School admin pages. | **Decided 2026-10-27 (owner)** |
 
 Record each answer here with the date before starting the task that depends on it.
 
@@ -485,15 +486,28 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P1.3** School subjects per class: `ClassSubject`; one "Iceberg School" `Course` per school
       branch holds the school `Subject`s (seed the standard subject list as editable data). Done when: model, admin API, tests; a class lists its subjects and
       teachers.
-- [ ] **P1.4** Parent model: `user_type "4"` (`USER_TYPE` choices), `Parent` profile, `ParentChild`
-      link, post-save profile creation like other roles. Done when: migration, tests.
-- [ ] **P1.5** Parent role everywhere it is checked: `LoginCheckMiddleWare` (parent allowed only on
+- [x] **P1.4** Parent model: `user_type "4"` (`USER_TYPE` choices), `Parent` profile, `ParentChild`
+      link, post-save profile creation like other roles. Done when: migration, tests. — done
+      2026-10-27, PR #33; verified: full suite 255 OK, `ParentModelTests`. Notes: `Parent(admin, phone,
+      children` M2M through `ParentChild(relation, is_primary)`), unique parent+child; Django admin
+      has `ParentAdmin` with a children inline until the admin tools of P1.7.
+- [x] **P1.5** Parent role everywhere it is checked: `LoginCheckMiddleWare` (parent allowed only on
       parent pages and the API), `api/permissions.py` `IsParent`, `branching.py` helpers
       (`children_for_parent`, `user_can_access_student`), login redirect. Done when: a parent can log
       in on web and API without being logged out; access tests (8.2) for existing student endpoints
-      with `?student=`.
-- [ ] **P1.6** `me/` and login response include `role` and `children` (id, name, class, branch brand).
-      Done when: serializer + tests; Study Center responses unchanged except the new keys.
+      with `?student=`. — done 2026-10-27, PR #33; verified: full suite 255 OK, `ParentWebLoginTests`,
+      `ParentBranchingTests`, `ParentChildDataAccessTests`. Notes: per D15 parents have no web pages:
+      web login and every web page send them to `/app/`. Read-only for parents with `?student=<id>`
+      (optional with one child; other child 404): `attendance/`, `student/attendance/summary/`,
+      `results/`, `invoices/` (+ detail). The resolver is `api/family.py` `student_for_request`.
+      `student/home/` stays student-only (the parent home is P5). The app sends parents to the
+      coming-soon screen until P5.
+- [x] **P1.6** `me/` and login response include `role` and `children` (id, name, class, branch brand).
+      Done when: serializer + tests; Study Center responses unchanged except the new keys. — done
+      2026-10-27, PR #33; verified: `ParentApiLoginAndMeTests`. Notes: `role` is admin/teacher/
+      student/parent; `children` is `[]` for non-parents; `class` is the active class of the current
+      year (`{id, name, grade_level, letter}` or null). A parent's own `brand` follows the children's
+      branches (one brand → that brand, mixed → center).
 - [ ] **P1.7** Admin tools to create parents and link children: form + API. Done when: tests.
       (**CSV import** with a dry-run preview moved to Release 2, D16.)
 - [ ] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
@@ -546,6 +560,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P3 — Web screens (admins and teachers)
 
+- [ ] **P3.0** Translation setup for the admin web (D17): Django i18n (`LocaleMiddleware`, `uz`/`ru`/
+      `en`, `locale/` with `.po` files compiled in the build), a language switch in the admin header
+      remembered per user, and the shared admin layout, menu and login translated first. Existing pages
+      are translated as they are touched; every new School admin page ships in all three. Done when:
+      switching language changes the admin menu and a School page, tests for the switch.
+      Needs: nothing. Do before P3.1.
 - [ ] **P3.1** Admin: classes (create 7-B, homeroom teacher, students), subjects per class, current
       session and quarters. Needs: P1.1–P1.3.
 - [ ] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
@@ -680,6 +700,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-27 — P1.4, P1.5, P1.6 done (PR #33): parent role `"4"`, `Parent` + `ParentChild`,
+  `branching.children_for_parent` / `user_can_access_student`, `IsParent`, parents read their child's
+  attendance, results and invoices with `?student=`; `me/`/login return `role` and `children`. Parents
+  on the web go to `/app/`. Next: P1.3 (class subjects), P1.7 (admin tools to create parents).
 
 - 2026-10-26 — P1.1, P1.2 done (PR #32): `Session.name/is_current` + `Term`, `Group.kind/grade_level/
   letter/session`, one class per student per year. Also fixed `admin/groups-manage/<id>/` (it crashed on

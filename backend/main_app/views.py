@@ -19,6 +19,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .forms import AdminForm, StaffProfileForm, StudentProfileForm
+from .middleware import PARENT_HOME_URL
 from .models import (
     Admin,
     Assignment,
@@ -27,6 +28,7 @@ from .models import (
     Branch,
     Enrollment,
     Group,
+    Parent,
     ResultFile,
     Staff,
     Student,
@@ -43,6 +45,7 @@ def _ensure_role_profile(user):
         "1": Admin,
         "2": Staff,
         "3": Student,
+        "4": Parent,
     }
     profile_model = model_map.get(user_type)
     if profile_model is None:
@@ -65,6 +68,8 @@ def _redirect_authenticated_user(user):
         return redirect(reverse("staff_home"))
     if user_type == "3":
         return redirect(reverse("student_home"))
+    if user_type == "4":
+        return redirect(PARENT_HOME_URL)
     return None  # Unknown type — fall through to show login page
 
 
@@ -215,6 +220,8 @@ def doLogin(request, **kwargs):
         return redirect(reverse("staff_home"))
     if user_type == "3":
         return redirect(reverse("student_home"))
+    if user_type == "4":
+        return redirect(PARENT_HOME_URL)
 
     # Unknown user_type: log it, inform the user, and log them out safely.
     logger.error(

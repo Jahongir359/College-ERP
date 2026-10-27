@@ -148,7 +148,7 @@ class CustomUser(AbstractUser):
     # String keys so CharField comparisons are always consistent.
     # Integer keys (the original) caused `1 == '1'` → False in Python 3,
     # which broke login redirects and get_user_type_display().
-    USER_TYPE = (("1", "HOD"), ("2", "Staff"), ("3", "Student"))
+    USER_TYPE = (("1", "HOD"), ("2", "Staff"), ("3", "Student"), ("4", "Parent"))
     GENDER = [("M", "Male"), ("F", "Female")]
 
     username = None  # Removed username, using email instead
@@ -316,6 +316,46 @@ class Student(models.Model):
         if enrollment and enrollment.group:
             return enrollment.group.branch
         return None
+
+
+class Parent(models.Model):
+    """A parent or guardian (user_type "4"). Sees only their linked children."""
+
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20, blank=True, default="")
+    children = models.ManyToManyField(
+        Student, through="ParentChild", related_name="parents", blank=True
+    )
+
+    def __str__(self):
+        return f"{self.admin.first_name} {self.admin.last_name}".strip() or str(self.admin.login_id)
+
+
+class ParentChild(models.Model):
+    RELATION_MOTHER = "mother"
+    RELATION_FATHER = "father"
+    RELATION_GUARDIAN = "guardian"
+    RELATION_CHOICES = [
+        (RELATION_MOTHER, "Mother"),
+        (RELATION_FATHER, "Father"),
+        (RELATION_GUARDIAN, "Guardian"),
+    ]
+
+    parent = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name="child_links")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="parent_links")
+    relation = models.CharField(max_length=10, choices=RELATION_CHOICES, default=RELATION_GUARDIAN)
+    is_primary = models.BooleanField(
+        default=False, help_text="Main contact for this child (gets messages first)."
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["parent", "student"], name="unique_parent_child"),
+        ]
+
+    def __str__(self):
+        return f"{self.parent} → {self.student} ({self.relation})"
 
 
 class Staff(models.Model):
@@ -605,6 +645,8 @@ def create_user_profile(sender, instance, created, **kwargs):
         Staff.objects.get_or_create(admin=instance)
     elif user_type == "3":
         Student.objects.get_or_create(admin=instance)
+    elif user_type == "4":
+        Parent.objects.get_or_create(admin=instance)
 
 
 class Branch(models.Model):

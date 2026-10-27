@@ -33,6 +33,14 @@ void main() {
       expect(roleRedirect(auth, '/coming-soon'), isNull);
     });
 
+    test('parents see the coming-soon wall until their screens ship', () {
+      final auth = AuthState.auth(_user('4'));
+      expect(auth.user!.isParent, isTrue);
+      expect(roleRedirect(auth, '/login'), '/coming-soon');
+      expect(roleRedirect(auth, '/student/home'), '/coming-soon');
+      expect(roleRedirect(auth, '/coming-soon'), isNull);
+    });
+
     test('teachers stay in the teacher portal', () {
       final auth = AuthState.auth(_user('2'));
       expect(roleRedirect(auth, '/login'), '/staff/home');

@@ -6,6 +6,8 @@ from ..models import (
     Course,
     Branch,
     Group,
+    Parent,
+    Session,
     Student,
     Staff,
     Enrollment,
@@ -120,6 +122,11 @@ class MeSerializer(serializers.ModelSerializer):
     # Iceberg brand the client should render ("center" or "school"); see branding.py.
     brand = serializers.SerializerMethodField()
     brand_name = serializers.SerializerMethodField()
+    # "admin" | "teacher" | "student" | "parent"; children is filled for parents only.
+    role = serializers.SerializerMethodField()
+    children = serializers.SerializerMethodField()
+
+    ROLE_NAMES = {"1": "admin", "2": "teacher", "3": "student", "4": "parent"}
 
     class Meta:
         model = CustomUser
@@ -138,8 +145,30 @@ class MeSerializer(serializers.ModelSerializer):
             "role_profile",
             "brand",
             "brand_name",
+            "role",
+            "children",
         ]
         read_only_fields = ["id", "email", "login_id", "user_type"]
+
+    def get_role(self, obj):
+        return self.ROLE_NAMES.get(str(obj.user_type))
+
+    def get_children(self, obj):
+        if str(obj.user_type) != "4":
+            return []
+        from ..branching import children_for_parent
+        from ..branding import brand_key_for_student
+
+        children = children_for_parent(obj).select_related("admin", "branch")
+        return [
+            {
+                "id": child.pk,
+                "name": child.admin.get_full_name(),
+                "class": _current_class(child),
+                "brand": brand_key_for_student(child),
+            }
+            for child in children.order_by("admin__first_name", "admin__last_name")
+        ]
 
     def _brand_key(self, obj):
         from ..branding import brand_key_for_user, resolve_brand_key
@@ -184,7 +213,33 @@ class MeSerializer(serializers.ModelSerializer):
                 return StudentRoleSerializer(obj.student, context=ctx).data
             except Student.DoesNotExist:
                 return None
+        if user_type == "4":
+            try:
+                return {"id": obj.parent.pk, "phone": obj.parent.phone}
+            except Parent.DoesNotExist:
+                return None
         return None
+
+
+def _current_class(student):
+    """The student's active school class, preferring the current year, or None."""
+    enrollments = Enrollment.objects.filter(
+        student=student, is_active=True, group__kind=Group.KIND_CLASS
+    ).select_related("group")
+    current = Session.current()
+    enrollment = None
+    if current is not None:
+        enrollment = enrollments.filter(group__session=current).first()
+    enrollment = enrollment or enrollments.order_by("-group__session__start_year").first()
+    if enrollment is None:
+        return None
+    group = enrollment.group
+    return {
+        "id": group.pk,
+        "name": group.name,
+        "grade_level": group.grade_level,
+        "letter": group.letter,
+    }
 
 
 class ChangePasswordSerializer(serializers.Serializer):

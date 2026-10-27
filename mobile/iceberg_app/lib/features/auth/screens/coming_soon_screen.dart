@@ -24,6 +24,8 @@ class ComingSoonScreen extends ConsumerWidget {
         ? 'The admin'
         : user.isStaff
         ? 'The teacher'
+        : user.isParent
+        ? 'The parent'
         : 'This';
 
     return Scaffold(

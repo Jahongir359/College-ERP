@@ -34,6 +34,7 @@ class IceUser {
   bool get isAdmin => userType == '1';
   bool get isStaff => userType == '2';
   bool get isStudent => userType == '3';
+  bool get isParent => userType == '4';
   bool get isSuperAdmin => isAdmin && (roleProfile?['is_super_admin'] == true);
   List<int> get branchIds =>
       isAdmin ? ((roleProfile?['branch_ids'] as List?)?.cast<int>() ?? []) : [];

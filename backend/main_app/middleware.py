@@ -7,6 +7,10 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.db.utils import OperationalError, ProgrammingError
 
+# Parents have no web pages: they use the app, at /app/ in the browser.
+PARENT_HOME_URL = "/app/"
+PARENT_WEB_PREFIXES = ("/app", "/download/", "/media/")
+
 
 class LoginCheckMiddleWare(MiddlewareMixin):
     def process_view(self, request, view_func, view_args, view_kwargs):
@@ -49,6 +53,13 @@ class LoginCheckMiddleWare(MiddlewareMixin):
             elif user_type == "3":  # Student
                 if modulename in ("main_app.hod_views", "main_app.staff_views"):
                     return redirect(reverse("student_home"))
+
+            elif user_type == "4":  # Parent: uses the app only (D15)
+                if not (
+                    request.path in auth_allowed_paths
+                    or request.path.startswith(PARENT_WEB_PREFIXES)
+                ):
+                    return redirect(PARENT_HOME_URL)
 
             else:
                 # Unknown/corrupt user_type: log out and redirect to login.
