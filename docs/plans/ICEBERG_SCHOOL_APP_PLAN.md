@@ -88,7 +88,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | Phase | What | Status |
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
-| P1 | ERP school data model: years and quarters, classes, subjects, parents | Open — 0/8 |
+| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 2/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
@@ -465,12 +465,23 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P1 — ERP school data model
 
-- [ ] **P1.1** Academic year and quarters: `Session.name`, `Session.is_current`, `Term` model, admin
+- [x] **P1.1** Academic year and quarters: `Session.name`, `Session.is_current`, `Term` model, admin
       CRUD in the existing session pages and `admin/sessions/` API. Done when: migration, model tests,
-      only one current session per branch (constraint). Needs: P0.2.
-- [ ] **P1.2** Classes on groups: `Group.kind`, `grade_level`, `letter`, `session` + validation (class
+      only one current session per branch (constraint). Needs: P0.2. — done 2026-10-26, PR #32;
+      verified: full suite 229 OK, `SessionModelTests`, `TermModelTests`, `SessionApiAccessTests`,
+      `SessionWebPageTests`. Notes: `Session` has no branch, so the constraint is **one current
+      session overall** (`Session.current()` falls back to the year covering today). Quarters:
+      `admin/sessions/<id>/terms/` and `admin/terms/<id>/` (super admins change, admins read) and the
+      Django admin; the web page for quarters is built in P3.1.
+- [x] **P1.2** Classes on groups: `Group.kind`, `grade_level`, `letter`, `session` + validation (class
       needs grade 1–11 and letter; one active class per student per session). Course groups unchanged.
-      Done when: migration, tests for both kinds, existing group pages still work for courses.
+      Done when: migration, tests for both kinds, existing group pages still work for courses. — done
+      2026-10-26, PR #32; verified: full suite 229 OK, `ClassModelTests`, `OneClassPerYearTests`,
+      `ClassEnrollmentPathsTests`, `ClassApiTests`. Notes: a class also needs a School-brand branch and an
+      academic year; DB check constraint on grade 1–11; one-class-per-year is enforced by
+      `models.class_enrollment_conflict()` in `Enrollment.clean()` and all three enrollment paths (web
+      page, `admin/enroll/`, `admin/enrollments/`). Classes are set through `admin/groups-manage/`; the
+      web Group pages are unchanged (School class pages come in P3.1).
 - [ ] **P1.3** School subjects per class: `ClassSubject`; one "Iceberg School" `Course` per school
       branch holds the school `Subject`s (seed the standard subject list as editable data). Done when: model, admin API, tests; a class lists its subjects and
       teachers.
@@ -669,6 +680,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-26 — P1.1, P1.2 done (PR #32): `Session.name/is_current` + `Term`, `Group.kind/grade_level/
+  letter/session`, one class per student per year. Also fixed `admin/groups-manage/<id>/` (it crashed on
+  `g.enrollments`; enrolled counts were always 0). Found: the admin web pages are English-only (no Django
+  i18n); P3 needs a translation setup before School admin pages ship in uz/ru. Next: P1.3, P1.4.
 
 - 2026-10-26 — P4.1 done (PR #31): big app screens split into `part` files; backend `tests.py` and
   `tests_brand*.py` moved into the `main_app/tests/` package (one file per topic — add new tests there,

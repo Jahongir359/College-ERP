@@ -10,6 +10,7 @@ from .models import (
     Loan,
     Subject,
     Session,
+    Term,
     Branch,
     Group,
     Enrollment,
@@ -162,7 +163,19 @@ admin.site.register(Course)
 admin.site.register(Book)
 admin.site.register(Loan)
 admin.site.register(Subject)
-admin.site.register(Session)
+
+
+class TermInline(admin.TabularInline):
+    model = Term
+    extra = 0
+
+
+@admin.register(Session)
+class SessionAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "start_year", "end_year", "is_current")
+    inlines = [TermInline]
+
+
 admin.site.register(Branch)
 admin.site.register(Group)
 admin.site.register(Enrollment)

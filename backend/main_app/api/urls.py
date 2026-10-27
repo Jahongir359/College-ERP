@@ -183,6 +183,14 @@ urlpatterns = [
         admin_views.SessionDetailView.as_view(),
         name="api_admin_session_detail",
     ),
+    path(
+        "admin/sessions/<int:pk>/terms/",
+        admin_views.SessionTermListView.as_view(),
+        name="api_admin_session_terms",
+    ),
+    path(
+        "admin/terms/<int:pk>/", admin_views.TermDetailView.as_view(), name="api_admin_term_detail"
+    ),
     path("admin/subjects/", admin_views.SubjectListView.as_view(), name="api_admin_subjects"),
     path(
         "admin/subjects/<int:pk>/",

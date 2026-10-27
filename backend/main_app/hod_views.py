@@ -2086,6 +2086,10 @@ def add_enrollment(request):
                     errors["student"] = (
                         "This student belongs to a different branch than the selected group."
                     )
+                elif is_active and (other_class := class_enrollment_conflict(student.id, group)):
+                    errors["student"] = (
+                        f"{student} is already in class {other_class.name} this academic year."
+                    )
                 else:
                     _, created = Enrollment.objects.get_or_create(
                         student=student, group=group, defaults={"is_active": is_active}

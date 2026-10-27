@@ -30,6 +30,7 @@ from ...models import (
     StudentResult,
     Submission,
     VocabularyDay,
+    class_enrollment_conflict,
 )
 from ..permissions import IsAdmin
 from ..serializers import EnrollmentSerializer, GroupSerializer, UserSerializer
@@ -119,6 +120,12 @@ class AdminEnrollmentView(APIView):
         ):
             return Response(
                 {"detail": "Student belongs to a different branch than the group."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        other_class = class_enrollment_conflict(student.id, group)
+        if other_class is not None:
+            return Response(
+                {"detail": f"Student is already in class {other_class.name} this academic year."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
