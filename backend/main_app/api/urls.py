@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views, admin_views, student_views
+from . import views, admin_views, school_views, student_views
 
 urlpatterns = [
     # ── Auth ─────────────────────────────────────────────────────────────────
@@ -190,6 +190,17 @@ urlpatterns = [
     ),
     path(
         "admin/terms/<int:pk>/", admin_views.TermDetailView.as_view(), name="api_admin_term_detail"
+    ),
+    # ── Admin: School subjects per class (P1.3) ──────────────────────────────
+    path(
+        "admin/classes/<int:pk>/subjects/",
+        school_views.ClassSubjectListView.as_view(),
+        name="api_admin_class_subjects",
+    ),
+    path(
+        "admin/class-subjects/<int:pk>/",
+        school_views.ClassSubjectDetailView.as_view(),
+        name="api_admin_class_subject_detail",
     ),
     path("admin/subjects/", admin_views.SubjectListView.as_view(), name="api_admin_subjects"),
     path(

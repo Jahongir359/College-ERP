@@ -406,7 +406,8 @@ class Staff(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=120)
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    # School subjects have no single teacher: each class sets its own (ClassSubject).
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -823,6 +824,41 @@ def class_enrollment_conflict(student_id, group, exclude_pk=None):
         qs = qs.exclude(pk=exclude_pk)
     match = qs.select_related("group").first()
     return match.group if match else None
+
+
+class ClassSubject(models.Model):
+    """A subject taught in one school class, by one teacher, so many hours a week."""
+
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="class_subjects")
+    subject = models.ForeignKey(Subject, on_delete=models.PROTECT, related_name="class_subjects")
+    teacher = models.ForeignKey(
+        Staff,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="class_subjects",
+    )
+    weekly_hours = models.PositiveSmallIntegerField(
+        default=1, validators=[MinValueValidator(1), MaxValueValidator(12)]
+    )
+
+    class Meta:
+        ordering = ["group", "subject__name"]
+        constraints = [
+            models.UniqueConstraint(fields=["group", "subject"], name="unique_class_subject"),
+        ]
+
+    def __str__(self):
+        return f"{self.group} · {self.subject}"
+
+    def clean(self):
+        errors = {}
+        if self.group_id and not self.group.is_class:
+            errors["group"] = "Subjects can only be added to a school class."
+        elif self.group_id and self.subject_id and self.subject.course_id != self.group.course_id:
+            errors["subject"] = "This subject belongs to another course than the class."
+        if errors:
+            raise ValidationError(errors)
 
 
 class ChatThread(models.Model):

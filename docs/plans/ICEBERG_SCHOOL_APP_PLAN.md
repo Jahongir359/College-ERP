@@ -88,7 +88,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | Phase | What | Status |
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
-| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 5/8 |
+| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 6/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
@@ -483,9 +483,17 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `models.class_enrollment_conflict()` in `Enrollment.clean()` and all three enrollment paths (web
       page, `admin/enroll/`, `admin/enrollments/`). Classes are set through `admin/groups-manage/`; the
       web Group pages are unchanged (School class pages come in P3.1).
-- [ ] **P1.3** School subjects per class: `ClassSubject`; one "Iceberg School" `Course` per school
+- [x] **P1.3** School subjects per class: `ClassSubject`; one "Iceberg School" `Course` per school
       branch holds the school `Subject`s (seed the standard subject list as editable data). Done when: model, admin API, tests; a class lists its subjects and
-      teachers.
+      teachers. — done 2026-10-27, PR #34; verified: full suite 271 OK, `ClassSubjectModelTests`,
+      `ClassSubjectApiTests`, `ClassSubjectBranchingTests`, `SeedSchoolSubjectsTests`. Notes:
+      `ClassSubject(group, subject, teacher, weekly_hours 1–12)`, one row per subject per class, the
+      subject must belong to the class's course. `Subject.staff` is now optional (school subjects get
+      their teacher per class). `python manage.py seed_school_subjects` creates the "Iceberg School"
+      course and 24 standard subjects (Uzbek names, editable; safe to re-run; `--course` for a second
+      school). API: `admin/classes/<id>/subjects/` and `admin/class-subjects/<id>/` (admins of the
+      class's branch); scope in `branching.filter_class_subjects_for_user`. Django admin: subjects
+      inline on Group.
 - [x] **P1.4** Parent model: `user_type "4"` (`USER_TYPE` choices), `Parent` profile, `ParentChild`
       link, post-save profile creation like other roles. Done when: migration, tests. — done
       2026-10-27, PR #33; verified: full suite 255 OK, `ParentModelTests`. Notes: `Parent(admin, phone,
@@ -700,6 +708,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-27 — P1.3 done (PR #34): `ClassSubject`, optional `Subject.staff`, `seed_school_subjects`
+  command, class-subject admin API in the new `api/school_views.py`. Also D17 recorded (admin web in
+  uz/ru, task P3.0). Next: P1.7 (admin tools for parents), P1.8, then P2.1 timetable.
 
 - 2026-10-27 — P1.4, P1.5, P1.6 done (PR #33): parent role `"4"`, `Parent` + `ParentChild`,
   `branching.children_for_parent` / `user_can_access_student`, `IsParent`, parents read their child's
