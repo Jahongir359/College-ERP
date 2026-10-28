@@ -26,6 +26,7 @@ from . import (
     password_recovery,
     payments_views,
     public_views,
+    school_admin_views,
     staff_views,
     student_views,
     views,
@@ -36,6 +37,57 @@ urlpatterns = [
     path("", views.login_page, name="entry_page"),
     path("login/", views.login_page, name="login_page"),
     path("language/", language.set_language, name="set_language"),
+    # ── Maktab: School admin pages (P3.1) ────────────────────────────────────
+    path("maktab/classes/", school_admin_views.classes, name="school_classes"),
+    path("maktab/classes/add/", school_admin_views.class_add, name="school_class_add"),
+    path("maktab/classes/<int:pk>/", school_admin_views.class_detail, name="school_class_detail"),
+    path("maktab/classes/<int:pk>/edit/", school_admin_views.class_edit, name="school_class_edit"),
+    path(
+        "maktab/classes/<int:pk>/students/add/",
+        school_admin_views.class_student_add,
+        name="school_class_student_add",
+    ),
+    path(
+        "maktab/classes/<int:pk>/students/<int:student_pk>/remove/",
+        school_admin_views.class_student_remove,
+        name="school_class_student_remove",
+    ),
+    path(
+        "maktab/classes/<int:pk>/subjects/add/",
+        school_admin_views.class_subject_add,
+        name="school_class_subject_add",
+    ),
+    path(
+        "maktab/classes/<int:pk>/subjects/<int:cs_pk>/",
+        school_admin_views.class_subject_edit,
+        name="school_class_subject_edit",
+    ),
+    path(
+        "maktab/classes/<int:pk>/subjects/<int:cs_pk>/remove/",
+        school_admin_views.class_subject_remove,
+        name="school_class_subject_remove",
+    ),
+    path("maktab/years/", school_admin_views.school_years, name="school_years"),
+    path(
+        "maktab/years/<int:pk>/current/",
+        school_admin_views.school_year_make_current,
+        name="school_year_make_current",
+    ),
+    path(
+        "maktab/years/<int:pk>/quarters/add/",
+        school_admin_views.school_term_add,
+        name="school_term_add",
+    ),
+    path(
+        "maktab/quarters/<int:term_pk>/",
+        school_admin_views.school_term_edit,
+        name="school_term_edit",
+    ),
+    path(
+        "maktab/quarters/<int:term_pk>/delete/",
+        school_admin_views.school_term_delete,
+        name="school_term_delete",
+    ),
     path(
         "accounts/password_reset/",
         views.SafePasswordResetView.as_view(),

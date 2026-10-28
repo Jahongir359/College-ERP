@@ -1,0 +1,45 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="ice-form-card">
+  <div class="ice-info-card-head">
+    <i class="fas fa-door-open"></i>
+    <span>{{ page_title }}</span>
+  </div>
+
+  <form method="POST" novalidate>
+    {% csrf_token %}
+    <div class="ice-form-body">
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle me-1"></i>
+        {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="ice-section-title">{% translate "Class" %}</div>
+      <div class="ice-form-grid cols-2">
+        {% for field in form %}
+        <div class="ice-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="ice-field-req">*</span>{% endif %}</label>
+          {{ field }}
+          {% if field.errors %}<div class="ice-field-error">{{ field.errors.0 }}</div>{% endif %}
+          {% if field.help_text %}<small class="ice-field-help">{{ field.help_text }}</small>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="ice-submit-bar">
+      <button type="submit" class="ice-btn-primary">
+        <i class="fas fa-save"></i> {% translate "Save class" %}
+      </button>
+      <a href="{% if group %}{% url 'school_class_detail' group.pk %}{% else %}{% url 'school_classes' %}{% endif %}" class="ice-btn-secondary">
+        {% translate "Cancel" %}
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock content %}

@@ -1,0 +1,152 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="ice-manage-page">
+  <section class="ice-manage-hero">
+    <div class="ice-manage-hero__main">
+      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-door-open"></i></span>
+      <div class="ice-manage-hero__copy">
+        <h2 class="ice-manage-hero__title">{{ group.name }}</h2>
+        <p class="ice-manage-hero__subtitle">
+          {{ group.branch.name }} · {{ group.session }}
+          · {% translate "Homeroom teacher" %}: {% if group.teacher %}{{ group.teacher.admin.get_full_name }}{% else %}{% translate "Not set" %}{% endif %}
+          {% if group.room %}· {{ group.room }}{% endif %}
+        </p>
+      </div>
+    </div>
+    <div class="ice-manage-hero__actions">
+      <a href="{% url 'school_classes' %}" class="ice-manage-action">← {% translate "All classes" %}</a>
+      <a href="{% url 'school_class_edit' group.pk %}" class="ice-manage-add-btn">
+        <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit class" %}
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Students ── -->
+  <section class="school-section" aria-labelledby="students-title">
+    <div class="school-section__head">
+      <h3 id="students-title">{% translate "Students" %} <span class="school-muted">{{ enrollments|length }} / {{ group.capacity }}</span></h3>
+      <form method="post" action="{% url 'school_class_student_add' group.pk %}" class="school-inline-form">
+        {% csrf_token %}
+        <div>
+          <label for="{{ student_form.student.id_for_label }}">{{ student_form.student.label }}</label>
+          {{ student_form.student }}
+        </div>
+        <button type="submit" class="ice-manage-action ice-manage-action--primary">
+          <i class="fas fa-user-plus" aria-hidden="true"></i> {% translate "Add to class" %}
+        </button>
+      </form>
+    </div>
+    <div class="ice-manage-table-wrap">
+      <table class="ice-manage-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{% translate "Student" %}</th>
+            <th>{% translate "Login ID" %}</th>
+            <th>{% translate "Parents linked" %}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for enrollment in enrollments %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td><strong>{{ enrollment.student.admin.get_full_name }}</strong></td>
+            <td>{{ enrollment.student.admin.login_id|default:"—" }}</td>
+            <td>
+              {% if enrollment.parent_count %}
+              <span class="ice-manage-chip ice-manage-chip--success">{{ enrollment.parent_count }}</span>
+              {% else %}
+              <span class="ice-manage-chip ice-manage-chip--warning">{% translate "None" %}</span>
+              {% endif %}
+            </td>
+            <td>
+              <form method="post" action="{% url 'school_class_student_remove' group.pk enrollment.student_id %}" class="school-inline-form">
+                {% csrf_token %}
+                <button type="submit" class="ice-manage-action ice-manage-action--danger"
+                        data-confirm="{% translate 'Remove this student from the class?' %}"
+                        onclick="return confirm(this.dataset.confirm)">
+                  {% translate "Remove" %}
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5"><div class="ice-manage-empty"><strong>{% translate "No students in this class yet." %}</strong></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Subjects ── -->
+  <section class="school-section" aria-labelledby="subjects-title">
+    <div class="school-section__head">
+      <h3 id="subjects-title">{% translate "Subjects" %} <span class="school-muted">{% blocktranslate count hours=weekly_hours %}{{ hours }} hour a week{% plural %}{{ hours }} hours a week{% endblocktranslate %}</span></h3>
+    </div>
+    <div class="ice-manage-table-wrap">
+      <table class="ice-manage-table">
+        <thead>
+          <tr>
+            <th>{% translate "Subject" %}</th>
+            <th>{% translate "Teacher" %} · {% translate "Hours a week" %}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cs, form in subjects %}
+          <tr>
+            <td><strong>{{ cs.subject.name }}</strong></td>
+            <td>
+              <form method="post" action="{% url 'school_class_subject_edit' group.pk cs.pk %}" class="school-inline-form">
+                {% csrf_token %}
+                <label class="visually-hidden" for="{{ form.teacher.id_for_label }}">{{ form.teacher.label }}</label>
+                {{ form.teacher }}
+                <label class="visually-hidden" for="{{ form.weekly_hours.id_for_label }}">{{ form.weekly_hours.label }}</label>
+                <input type="number" name="{{ form.weekly_hours.html_name }}" id="{{ form.weekly_hours.id_for_label }}" value="{{ cs.weekly_hours }}" min="1" max="12" class="form-control school-hours">
+                <button type="submit" class="ice-manage-action">{% translate "Save" %}</button>
+              </form>
+            </td>
+            <td>
+              <form method="post" action="{% url 'school_class_subject_remove' group.pk cs.pk %}" class="school-inline-form">
+                {% csrf_token %}
+                <button type="submit" class="ice-manage-action ice-manage-action--danger"
+                        data-confirm="{% translate 'Remove this subject from the class?' %}"
+                        onclick="return confirm(this.dataset.confirm)">
+                  {% translate "Remove" %}
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3"><div class="ice-manage-empty"><strong>{% translate "No subjects yet." %}</strong></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if subject_form.fields.subject.queryset.exists %}
+    <form method="post" action="{% url 'school_class_subject_add' group.pk %}" class="school-inline-form" style="margin-top:12px;">
+      {% csrf_token %}
+      {% for field in subject_form %}
+      <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endfor %}
+      <button type="submit" class="ice-manage-action ice-manage-action--primary">
+        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "Add subject" %}
+      </button>
+    </form>
+    {% endif %}
+  </section>
+</div>
+{% endblock content %}

@@ -11,6 +11,57 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Classes"
+msgstr "Sinflar"
+
+#, python-format
+msgid "Class %(name)s saved."
+msgstr "%(name)s sinfi saqlandi."
+
+#, python-format
+msgid "Edit class %(name)s"
+msgstr "%(name)s sinfini tahrirlash"
+
+msgid "New class"
+msgstr "Yangi sinf"
+
+#, python-format
+msgid "Class %(name)s"
+msgstr "%(name)s sinfi"
+
+#, python-format
+msgid "%(student)s added to %(name)s."
+msgstr "%(student)s %(name)s sinfiga qoʻshildi."
+
+#, python-format
+msgid "%(student)s removed from %(name)s."
+msgstr "%(student)s %(name)s sinfidan chiqarildi."
+
+msgid "This class already has this subject."
+msgstr "Bu sinfda bu fan allaqachon bor."
+
+msgid "Subjects saved."
+msgstr "Fanlar saqlandi."
+
+#, python-format
+msgid "%(subject)s removed."
+msgstr "%(subject)s olib tashlandi."
+
+msgid "Academic year"
+msgstr "Oʻquv yili"
+
+#, python-format
+msgid "%(year)s is now the current academic year."
+msgstr "%(year)s endi joriy oʻquv yili."
+
+#, python-format
+msgid "%(term)s saved."
+msgstr "%(term)s saqlandi."
+
+#, python-format
+msgid "%(term)s deleted."
+msgstr "%(term)s oʻchirildi."
+
 msgid "First name"
 msgstr "Ism"
 
@@ -54,6 +105,197 @@ msgstr "Vasiy"
 
 msgid "Main contact for this child"
 msgstr "Farzand boʻyicha asosiy aloqa"
+
+msgid "Homeroom teacher"
+msgstr "Sinf rahbari"
+
+msgid "Branch"
+msgstr "Filial"
+
+msgid "Grade"
+msgstr "Sinf (raqami)"
+
+msgid "Letter"
+msgstr "Harf"
+
+msgid "Subject list (course)"
+msgstr "Fanlar roʻyxati (kurs)"
+
+msgid "Classroom"
+msgstr "Xona"
+
+msgid "Places"
+msgstr "Oʻrinlar"
+
+msgid "Monthly fee (soʻm)"
+msgstr "Oylik toʻlov (soʻm)"
+
+msgid "For 7-B type B."
+msgstr "7-B uchun B ni kiriting."
+
+msgid "The course whose subjects this class studies."
+msgstr "Bu sinf oʻqiydigan fanlar kursi."
+
+msgid "Leave blank to use the course fee."
+msgstr "Kurs narxini qoʻllash uchun boʻsh qoldiring."
+
+#, python-format
+msgid "Class %(name)s already exists in this branch for this year."
+msgstr "%(name)s sinfi bu filialda shu yil uchun allaqachon bor."
+
+msgid "Student"
+msgstr "Oʻquvchi"
+
+#, python-format
+msgid "This student is already in class %(name)s this academic year."
+msgstr "Bu oʻquvchi shu oʻquv yilida allaqachon %(name)s sinfida."
+
+msgid "Teacher"
+msgstr "Oʻqituvchi"
+
+msgid "Subject"
+msgstr "Fan"
+
+msgid "Hours a week"
+msgstr "Haftasiga soat"
+
+msgid "Quarter"
+msgstr "Chorak"
+
+msgid "Name"
+msgstr "Nomi"
+
+msgid "First day"
+msgstr "Birinchi kun"
+
+msgid "Last day"
+msgstr "Oxirgi kun"
+
+msgid "This year already has this quarter."
+msgstr "Bu yilda bu chorak allaqachon bor."
+
+msgid "Not set"
+msgstr "Belgilanmagan"
+
+msgid "All classes"
+msgstr "Barcha sinflar"
+
+msgid "Edit class"
+msgstr "Sinfni tahrirlash"
+
+msgid "Students"
+msgstr "Oʻquvchilar"
+
+msgid "Add to class"
+msgstr "Sinfga qoʻshish"
+
+msgid "Login ID"
+msgstr "Login ID"
+
+msgid "Parents linked"
+msgstr "Bogʻlangan ota-onalar"
+
+msgid "None"
+msgstr "Yoʻq"
+
+msgid "Remove this student from the class?"
+msgstr "Bu oʻquvchini sinfdan chiqarasizmi?"
+
+msgid "Remove"
+msgstr "Olib tashlash"
+
+msgid "No students in this class yet."
+msgstr "Bu sinfda hali oʻquvchi yoʻq."
+
+msgid "Subjects"
+msgstr "Fanlar"
+
+#, python-format
+msgid "%(hours)s hour a week"
+msgid_plural "%(hours)s hours a week"
+msgstr[0] "haftasiga %(hours)s soat"
+msgstr[1] "haftasiga %(hours)s soat"
+
+msgid "Save"
+msgstr "Saqlash"
+
+msgid "Remove this subject from the class?"
+msgstr "Bu fanni sinfdan olib tashlaysizmi?"
+
+msgid "No subjects yet."
+msgstr "Hali fanlar yoʻq."
+
+msgid "Add subject"
+msgstr "Fan qoʻshish"
+
+msgid "Class"
+msgstr "Sinf"
+
+msgid "Save class"
+msgstr "Sinfni saqlash"
+
+msgid "Cancel"
+msgstr "Bekor qilish"
+
+msgid "No academic year yet."
+msgstr "Hali oʻquv yili yoʻq."
+
+msgid "Students with a parent linked"
+msgstr "Ota-onasi bogʻlangan oʻquvchilar"
+
+msgid "Search classes"
+msgstr "Sinflarni qidirish"
+
+msgid "Search classes or teachers…"
+msgstr "Sinf yoki oʻqituvchini qidirish…"
+
+msgid "No classes found"
+msgstr "Sinflar topilmadi"
+
+msgid "Open"
+msgstr "Ochish"
+
+msgid "No classes yet"
+msgstr "Hali sinflar yoʻq"
+
+msgid "Create the first class, for example 1-A."
+msgstr "Birinchi sinfni yarating, masalan 1-A."
+
+msgid "Years and quarters are shared by all branches."
+msgstr "Oʻquv yillari va choraklar barcha filiallar uchun umumiy."
+
+msgid "Only a super admin can change them."
+msgstr "Ularni faqat bosh administrator oʻzgartira oladi."
+
+msgid "New academic year"
+msgstr "Yangi oʻquv yili"
+
+msgid "Current"
+msgstr "Joriy"
+
+msgid "Make current"
+msgstr "Joriy qilish"
+
+msgid "Edit dates"
+msgstr "Sanalarni tahrirlash"
+
+msgid "Dates"
+msgstr "Sanalar"
+
+msgid "Delete this quarter?"
+msgstr "Bu chorakni oʻchirasizmi?"
+
+msgid "Delete"
+msgstr "Oʻchirish"
+
+msgid "No quarters yet."
+msgstr "Hali choraklar yoʻq."
+
+msgid "Add quarter"
+msgstr "Chorak qoʻshish"
+
+msgid "No academic years yet."
+msgstr "Hali oʻquv yillari yoʻq."
 
 msgid "Toggle menu"
 msgstr "Menyuni ochish/yopish"
@@ -106,12 +348,6 @@ msgstr "Sahifa tayyorlanmoqda…"
 msgid "Admin"
 msgstr "Administrator"
 
-msgid "Teacher"
-msgstr "Oʻqituvchi"
-
-msgid "Student"
-msgstr "Oʻquvchi"
-
 msgid "Overview"
 msgstr "Umumiy"
 
@@ -121,14 +357,14 @@ msgstr "Profil va sozlamalar"
 msgid "People"
 msgstr "Odamlar"
 
-msgid "Students"
-msgstr "Oʻquvchilar"
-
 msgid "Teachers"
 msgstr "Oʻqituvchilar"
 
 msgid "Admins"
 msgstr "Administratorlar"
+
+msgid "School"
+msgstr "Maktab"
 
 msgid "Academic Management"
 msgstr "Oʻquv jarayoni"
