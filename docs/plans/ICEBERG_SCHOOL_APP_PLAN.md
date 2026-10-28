@@ -467,7 +467,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       class subjects, 12 students, 12 parents (`DEMO-PR01` has two children, `DEMO-IC01` two parents)
       and this month's invoices (3 paid, 1 partial). Logins `DEMO-TC01…`, `DEMO-IC01…`,
       `DEMO-PR01…`, emails `@demo.iceberg.internal`, phones `+998 00 …`. New logins get the password
-      from `--password`, default `Demo12345!`. **Timetable week added 2026-10-28, PR #PRNUM**
+      from `--password`, default `Demo12345!`. **Timetable week added 2026-10-28, PR #42**
       (`SeedSchoolDemoTimetableTests`): six bell periods (08:00–13:30, longer break after the 3rd) and a
       clash-free Mon–Sat week, each subject as many times as its weekly hours, grade 1 within 4 periods,
       PE in "Sport zali", Informatika in "Informatika xonasi"; a class that already has lessons is
@@ -779,7 +779,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P0.6 timetable week (PR #PRNUM): `seed_school_demo` now adds bell periods and a
+- 2026-10-28 — P0.6 timetable week (PR #42): `seed_school_demo` now adds bell periods and a
   clash-free week, so the timetable API and screens have data. Claimed P2.2 (register) and added +
   claimed P4.13 (app screens readable under the School brand), both found from screenshots of the
   running app. Tip: run `compilemessages` before `manage.py test`, or 6 i18n tests fail locally.
