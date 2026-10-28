@@ -43,7 +43,8 @@ A task is done only when **all** of these hold:
       page: the right role gets it, every other role and another branch's user gets 403/404, and a
       parent never sees another family's child (section 8.2).
 - [ ] Branch scoping goes through `backend/main_app/branching.py` only (new `filter_*`/`user_can_*`
-      helpers there). No inline branch filters in views, serializers or forms.
+      helpers there). No inline branch filters in views, serializers or forms. New School modules go in
+      `SCHOOL_MODULES` of `tests/test_scoping.py`, which checks this.
 - [ ] Migrations are **additive** and generated with `makemigrations` (new models, new nullable or
       defaulted fields). No renames, no drops, no data loss. A data migration, if any, is reversible.
 - [ ] Learning Center unchanged: the existing suite passes, and Study Center users see no new School
@@ -88,8 +89,8 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | Phase | What | Status |
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
-| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 7/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
+| P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 1/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
@@ -455,10 +456,19 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       a test login works. Needs: P0.1 (D9), P0.2.
 - [ ] **P0.5** A **staging** instance (same image, separate database) with `SCHOOL_BRAND_ENABLED=True`.
       Done when: staging URL works and is written in `docs/DEPLOYMENT.md`. Needs: P0.4.
-- [ ] **P0.6** Demo data command `python manage.py seed_school_demo` (one school branch, classes 1-A,
+- [~] **P0.6** Demo data command `python manage.py seed_school_demo` (one school branch, classes 1-A,
       7-B, 11-A, teachers, students, parents, a week of timetable, marks, invoices). Re-runnable,
       refuses to run when `DEBUG=False` unless `--force`. Done when: command + test; staging seeded.
-      Needs: P1.1–P1.6 (write it at the end of P1; tick it then).
+      Needs: P1.1–P1.6 (write it at the end of P1; tick it then). — claimed 2026-10-28, branch
+      feat/school-p0.6-demo-data. **Partly done 2026-10-28, PR #37** (`SeedSchoolDemoTests`,
+      `SeedSchoolDemoCommandTests`): logic in `main_app/school_demo.py`. Seeds an "Iceberg School
+      (demo)" branch and course, the current year (reused if one exists, else created) with 4 quarters
+      (only if the year has none), 6 teachers, classes 1-A/7-B/11-A with homeroom teachers and 32
+      class subjects, 12 students, 12 parents (`DEMO-PR01` has two children, `DEMO-IC01` two parents)
+      and this month's invoices (3 paid, 1 partial). Logins `DEMO-TC01…`, `DEMO-IC01…`,
+      `DEMO-PR01…`, emails `@demo.iceberg.internal`, phones `+998 00 …`. New logins get the password
+      from `--password`, default `Demo12345!`. **Still open:** a week of timetable (add to
+      `school_demo.py` in P2.1), marks (P2.4, Release 2), "staging seeded" (needs P0.5).
 - [ ] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
       Needs: P0.4.
 - [ ] **P0.8** Monitoring: uptime checks for `app.iceberglc.com` and `iceberglc.com`, error alerts (e.g.
@@ -530,21 +540,45 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       the children of their branches (`has_other_children` flags the rest) and can't delete a parent
       who has children elsewhere. Scope: new `branching.filter_parents_for_user` (a 4.2 helper, P1.8
       still reviews the rest).
-- [ ] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
-      of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code.
+- [x] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
+      of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code. — done
+      2026-10-28, PR #39 (stacked on #36); verified: full suite 333 OK, `InlineBranchFilterGuardTests`,
+      `SchoolHelperScopeTests`, `ParentProfilePhoneTests`. Reviewed P1.1–P1.7 and P2.1. Fixed: child-link
+      scoping moved from `parents.visible_links` to new `branching.filter_parent_links_for_user`; the
+      lesson API no longer filters periods by branch inline (`Lesson.clean` refuses another branch's
+      period, 400); a parent can no longer take another family's phone in `me/` PATCH (D4). Kept on
+      purpose: `?branch=` narrowing of an already scoped list (marked `# scoping-ok`), academic years
+      shared by all branches (P1.1), link-by-login and the duplicate-phone check looking across branches
+      (P1.7, they reveal nothing the admin can't see). The grep is now a test:
+      `tests/test_scoping.py` fails when a module in `SCHOOL_MODULES` filters by branch inline.
+      `filter_marks_for_user` (4.2) waits for the `Mark` model: P2.4.
 
 ### P2 — ERP school features
 
-- [ ] **P2.1** Bell periods and timetable: `BellPeriod`, `Lesson`, clash checks (teacher, room, class
+- [x] **P2.1** Bell periods and timetable: `BellPeriod`, `Lesson`, clash checks (teacher, room, class
       at the same period). Done when: models, validation tests, `school/timetable/` API for each role.
-      Needs: P1.2, P1.3.
+      Needs: P1.2, P1.3. — done 2026-10-28, PR #36; verified: full suite 325 OK (after merging main with P1.7),
+      `BellPeriodModelTests`, `LessonModelTests`, `LessonClashTests`, `TimetableBranchingTests`,
+      `BellPeriodApiTests`, `LessonApiTests`, `TimetableApiTests` (access matrix 8.2). Notes:
+      `BellPeriod(branch, number 1–12, start/end time)`, School branches only, no overlaps in a branch.
+      `Lesson(group, class_subject, weekday 1–6, period, room, valid_from/to)`; blank room = class room.
+      Clashes (`models.lesson_clashes`) compare **times** on the same weekday with overlapping valid
+      dates: same class, same teacher (any branch), same room name (same branch). The API answers a
+      clash with 400 `{detail, clashes: [{kind, lesson_id, class_id, class_name, message}]}` for the P3.2
+      editor. Admin API: `admin/bell-periods/` (+`<id>/`, `?branch=`), `admin/classes/<id>/lessons/`,
+      `admin/lessons/<id>/`. `school/timetable/?date=&student=&class=` returns Mon–Sat of the week:
+      students their class, parents a child (family.py), teachers their own lessons or `?class=`,
+      admins `?class=` (required). New helpers `branching.filter_classes_for_user` (plan 4.2),
+      `filter_lessons_for_user`, `filter_bell_periods_for_user`. Not checked yet: changing a
+      `ClassSubject`'s teacher later can create a teacher clash (P3.2 should re-check on save).
 - [ ] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
       for a class and date; `school/register/` API; reuses `Attendance`/`AttendanceReport` (+ fields).
       Done when: tests incl. "only homeroom teacher of that class", one register per date. Needs: P1.2.
 - [ ] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
       P2.8). Done when: test that exactly the linked parents get it.
 - [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
-      teacher limited to own `ClassSubject`, values outside 2–5 rejected. Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
+      teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
+      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
 - [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [ ] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
@@ -585,11 +619,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       remembered per user, and the shared admin layout, menu and login translated first. Existing pages
       are translated as they are touched; every new School admin page ships in all three. Done when:
       switching language changes the admin menu and a School page, tests for the switch.
-      Needs: nothing. Do before P3.1. — done 2026-10-28, PR #38; verified: full suite 306 OK,
+      Needs: nothing. Do before P3.1. — done 2026-10-28, PR #38; verified: full suite 353 OK (stacked on #37),
       `LanguageSwitchTests`, `SchoolTranslationTests`, `TranslationCatalogTests`. Notes:
       `settings.LANGUAGES` uz/ru/en, **English stays the default**. Instead of `LocaleMiddleware`,
       `middleware.UserLanguageMiddleware` picks the user's saved `CustomUser.language` (migration
-      0044), else the `iceberg_language` cookie, else English. It **ignores the browser language**, so
+      0045), else the `iceberg_language` cookie, else English. It **ignores the browser language**, so
       nobody's pages change until they pick one. Switch: `includes/language_switch.html` (UZ/RU/EN) in
       the admin header and on the sign-in page, posting to `/language/` (`main_app/language.py`). A
       language picked on the sign-in page is saved to the user at sign-in. Translated: `base.html`,
@@ -733,10 +767,24 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P3.0 done (PR #38): admin web in uz/ru/en with a per-user switch. New web pages:
-  `{% load i18n %}` + `{% translate %}`, then `makemessages` and fill uz/ru (see P3.0 notes). PR #38
-  and the timetable PR #36 both add migration 0044, so whichever merges second renumbers its migration
-  to 0045. Next: P3.1 (admin classes page; needs PD.8 mockup approval for that screen), else P3.6.
+- 2026-10-28 — P3.0 done (PR #38, stacked on #37): admin web in uz/ru/en with a per-user switch. New
+  web pages: `{% load i18n %}` + `{% translate %}`, then `makemessages` and fill uz/ru (see P3.0 notes).
+  Its migration is `0045_user_language` (after #36's `0044_timetable`). Next: P3.1 (admin classes page).
+
+- 2026-10-28 — P0.6 partly done (PR #37, stacked on #39): `seed_school_demo` seeds everything that
+  exists today; stays `[~]` until the demo timetable week (the P2.1 session adds it in
+  `school_demo.py`), marks and staging exist. Demo quarters follow the real 2026–27 calendar (2.1).
+
+- 2026-10-28 — P1.8 done (PR #39, stacked on #36 P2.1): scoping review of P1.1–P1.7 and P2.1, guard
+  test `tests/test_scoping.py`, `branching.filter_parent_links_for_user`, parent phone check in `me/`.
+  P1 is complete. Other session's open PRs: #37 (P0.6 demo data; the demo timetable week is mine once
+  #36 and #37 are merged) and #38 (P3.0; it also adds migration 0044, so #36 or #38 renumbers). Next
+  for this thread: the demo week in `school_demo.py`, then P2.2 daily register.
+
+- 2026-10-28 — P2.1 done (PR #36): `BellPeriod`, `Lesson`, clash checks, admin API for periods and
+  lessons, `school/timetable/` for every role (migration `0044_timetable`). Built in parallel with P1.7
+  (#35) and merged with it; new helpers `filter_classes_for_user`, `filter_lessons_for_user`,
+  `filter_bell_periods_for_user` are ready for the P1.8 review. Next: P2.2 daily register.
 
 - 2026-10-28 — P1.7 done (PR #35): parent admin API + forms, `branching.filter_parents_for_user`.
   Also PR #34 merged after a fix (deleting a subject a class uses returned 500, now 400). Login

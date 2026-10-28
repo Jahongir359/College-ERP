@@ -863,6 +863,197 @@ class ClassSubject(models.Model):
             raise ValidationError(errors)
 
 
+class BellPeriod(models.Model):
+    """One lesson slot of a school branch's day, e.g. period 2 from 08:55 to 09:40."""
+
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name="bell_periods")
+    number = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(12)]
+    )
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    class Meta:
+        ordering = ["branch", "number"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["branch", "number"], name="one_bell_period_number_per_branch"
+            ),
+            models.CheckConstraint(
+                condition=Q(end_time__gt=models.F("start_time")),
+                name="bell_period_ends_after_start",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.number} ({self.start_time:%H:%M}–{self.end_time:%H:%M})"
+
+    def clean(self):
+        errors = {}
+        if self.start_time and self.end_time and self.end_time <= self.start_time:
+            errors["end_time"] = "The end time must be after the start time."
+        if self.branch_id and self.branch.brand != Branch.BRAND_SCHOOL:
+            errors["branch"] = "Bell periods belong to an Iceberg School branch."
+        if not errors and self.branch_id and self.start_time and self.end_time:
+            overlapping = (
+                BellPeriod.objects.filter(branch_id=self.branch_id)
+                .exclude(pk=self.pk)
+                .filter(start_time__lt=self.end_time, end_time__gt=self.start_time)
+            )
+            if overlapping.exists():
+                errors["start_time"] = "Bell periods in one branch must not overlap."
+        if errors:
+            raise ValidationError(errors)
+
+
+class Lesson(models.Model):
+    """One timetable slot: a class has a subject on a weekday in a bell period.
+
+    ``valid_from``/``valid_to`` (both optional) limit the slot to part of the
+    year, so a timetable change mid-year keeps the old weeks right. ``group``
+    must be the class of ``class_subject``; it is stored for fast queries.
+    """
+
+    WEEKDAY_CHOICES = [
+        (1, "Monday"),
+        (2, "Tuesday"),
+        (3, "Wednesday"),
+        (4, "Thursday"),
+        (5, "Friday"),
+        (6, "Saturday"),
+    ]
+
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="lessons")
+    class_subject = models.ForeignKey(
+        ClassSubject, on_delete=models.CASCADE, related_name="lessons"
+    )
+    weekday = models.PositiveSmallIntegerField(choices=WEEKDAY_CHOICES)
+    period = models.ForeignKey(BellPeriod, on_delete=models.PROTECT, related_name="lessons")
+    room = models.CharField(
+        max_length=50, blank=True, default="", help_text="Leave blank to use the class's room."
+    )
+    valid_from = models.DateField(null=True, blank=True)
+    valid_to = models.DateField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["weekday", "period__start_time"]
+        indexes = [
+            models.Index(fields=["group", "weekday"]),
+            models.Index(fields=["weekday", "period"]),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(weekday__gte=1) & Q(weekday__lte=6), name="lesson_weekday_1_to_6"
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.group} · {self.get_weekday_display()} {self.period.number}"
+
+    @property
+    def effective_room(self):
+        return self.room or self.group.room
+
+    def is_on(self, day):
+        """True when this lesson takes place on the date ``day``."""
+        if day.isoweekday() != self.weekday:
+            return False
+        if self.valid_from and day < self.valid_from:
+            return False
+        if self.valid_to and day > self.valid_to:
+            return False
+        session = self.group.session
+        if session and not session.start_year <= day <= session.end_year:
+            return False
+        return True
+
+    def clean(self):
+        errors = {}
+        if self.group_id and not self.group.is_class:
+            errors["group"] = "Lessons can only be added to a school class."
+        if self.group_id and self.class_subject_id and self.class_subject.group_id != self.group_id:
+            errors["class_subject"] = "This subject is not taught in this class."
+        if self.group_id and self.period_id and self.period.branch_id != self.group.branch_id:
+            errors["period"] = "This bell period belongs to another branch."
+        if self.valid_from and self.valid_to and self.valid_to < self.valid_from:
+            errors["valid_to"] = "The end date must not be before the start date."
+        if errors:
+            raise ValidationError(errors)
+        if self.group_id and self.class_subject_id and self.period_id and self.weekday:
+            clashes = lesson_clashes(self)
+            if clashes:
+                raise LessonClashError(clashes)
+
+
+class LessonClashError(ValidationError):
+    """A lesson would double-book its class, teacher or room.
+
+    ``clashes`` keeps the details (kind and the other lesson) so screens can
+    show where the conflict is; the messages say the same in words. They are
+    non-field errors, so model forms (Django admin) show them too.
+    """
+
+    MESSAGES = {
+        "class": "The class already has a lesson at this time.",
+        "teacher": "The teacher already teaches {other} at this time.",
+        "room": "The room is already used by {other} at this time.",
+    }
+
+    def __init__(self, clashes):
+        self.clashes = clashes
+        super().__init__([self.message_for(kind, other) for kind, other in clashes])
+
+    @classmethod
+    def message_for(cls, kind, other):
+        return cls.MESSAGES[kind].format(other=other.group.name)
+
+
+def lesson_clashes(lesson):
+    """Other lessons that would be double-booked with ``lesson``.
+
+    Returns a list of ``(kind, other_lesson)`` with kind ``"class"``,
+    ``"teacher"`` or ``"room"``, at most one entry per kind. Lessons clash when
+    they are on the same weekday, their bell times overlap (a teacher may work
+    in several branches) and their valid dates overlap. Rooms are compared by
+    name inside one branch.
+    """
+    period = lesson.period
+    candidates = (
+        Lesson.objects.filter(
+            weekday=lesson.weekday,
+            period__start_time__lt=period.end_time,
+            period__end_time__gt=period.start_time,
+        )
+        .exclude(pk=lesson.pk)
+        .select_related("group", "class_subject")
+    )
+    if lesson.valid_to:
+        candidates = candidates.filter(
+            Q(valid_from__isnull=True) | Q(valid_from__lte=lesson.valid_to)
+        )
+    if lesson.valid_from:
+        candidates = candidates.filter(
+            Q(valid_to__isnull=True) | Q(valid_to__gte=lesson.valid_from)
+        )
+
+    clashes = []
+    other = candidates.filter(group_id=lesson.group_id).first()
+    if other:
+        clashes.append(("class", other))
+    teacher_id = lesson.class_subject.teacher_id
+    if teacher_id:
+        other = candidates.filter(class_subject__teacher_id=teacher_id).first()
+        if other:
+            clashes.append(("teacher", other))
+    room = lesson.effective_room.strip().lower()
+    if room:
+        for other in candidates.filter(group__branch_id=lesson.group.branch_id):
+            if other.effective_room.strip().lower() == room:
+                clashes.append(("room", other))
+                break
+    return clashes
+
+
 class ChatThread(models.Model):
     """Persistent group conversation for a class group."""
 
