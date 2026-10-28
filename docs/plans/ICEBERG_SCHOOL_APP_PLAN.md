@@ -580,12 +580,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P3 — Web screens (admins and teachers)
 
-- [ ] **P3.0** Translation setup for the admin web (D17): Django i18n (`LocaleMiddleware`, `uz`/`ru`/
+- [~] **P3.0** Translation setup for the admin web (D17): Django i18n (`LocaleMiddleware`, `uz`/`ru`/
       `en`, `locale/` with `.po` files compiled in the build), a language switch in the admin header
       remembered per user, and the shared admin layout, menu and login translated first. Existing pages
       are translated as they are touched; every new School admin page ships in all three. Done when:
       switching language changes the admin menu and a School page, tests for the switch.
-      Needs: nothing. Do before P3.1.
+      Needs: nothing. Do before P3.1. — claimed 2026-10-28, branch feat/school-p3.0-admin-i18n
 - [ ] **P3.1** Admin: classes (create 7-B, homeroom teacher, students), subjects per class, current
       session and quarters. Needs: P1.1–P1.3.
 - [ ] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
