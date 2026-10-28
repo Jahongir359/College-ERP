@@ -202,6 +202,32 @@ urlpatterns = [
         school_views.ClassSubjectDetailView.as_view(),
         name="api_admin_class_subject_detail",
     ),
+    # ── Admin + all roles: bell periods and timetable (P2.1) ─────────────────
+    path(
+        "admin/bell-periods/",
+        school_views.BellPeriodListView.as_view(),
+        name="api_admin_bell_periods",
+    ),
+    path(
+        "admin/bell-periods/<int:pk>/",
+        school_views.BellPeriodDetailView.as_view(),
+        name="api_admin_bell_period_detail",
+    ),
+    path(
+        "admin/classes/<int:pk>/lessons/",
+        school_views.ClassLessonListView.as_view(),
+        name="api_admin_class_lessons",
+    ),
+    path(
+        "admin/lessons/<int:pk>/",
+        school_views.LessonDetailView.as_view(),
+        name="api_admin_lesson_detail",
+    ),
+    path(
+        "school/timetable/",
+        school_views.TimetableView.as_view(),
+        name="api_school_timetable",
+    ),
     path("admin/subjects/", admin_views.SubjectListView.as_view(), name="api_admin_subjects"),
     path(
         "admin/subjects/<int:pk>/",

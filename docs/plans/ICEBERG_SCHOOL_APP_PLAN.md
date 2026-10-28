@@ -89,7 +89,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 6/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | Open — 0/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
@@ -523,9 +523,22 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P2 — ERP school features
 
-- [~] **P2.1** Bell periods and timetable: `BellPeriod`, `Lesson`, clash checks (teacher, room, class
+- [x] **P2.1** Bell periods and timetable: `BellPeriod`, `Lesson`, clash checks (teacher, room, class
       at the same period). Done when: models, validation tests, `school/timetable/` API for each role.
-      Needs: P1.2, P1.3. — claimed 2026-10-28, branch feat/school-p2.1-timetable
+      Needs: P1.2, P1.3. — done 2026-10-28, PR #PRNUM; verified: full suite 304 OK,
+      `BellPeriodModelTests`, `LessonModelTests`, `LessonClashTests`, `TimetableBranchingTests`,
+      `BellPeriodApiTests`, `LessonApiTests`, `TimetableApiTests` (access matrix 8.2). Notes:
+      `BellPeriod(branch, number 1–12, start/end time)`, School branches only, no overlaps in a branch.
+      `Lesson(group, class_subject, weekday 1–6, period, room, valid_from/to)`; blank room = class room.
+      Clashes (`models.lesson_clashes`) compare **times** on the same weekday with overlapping valid
+      dates: same class, same teacher (any branch), same room name (same branch). The API answers a
+      clash with 400 `{detail, clashes: [{kind, lesson_id, class_id, class_name, message}]}` for the P3.2
+      editor. Admin API: `admin/bell-periods/` (+`<id>/`, `?branch=`), `admin/classes/<id>/lessons/`,
+      `admin/lessons/<id>/`. `school/timetable/?date=&student=&class=` returns Mon–Sat of the week:
+      students their class, parents a child (family.py), teachers their own lessons or `?class=`,
+      admins `?class=` (required). New helpers `branching.filter_classes_for_user` (plan 4.2),
+      `filter_lessons_for_user`, `filter_bell_periods_for_user`. Not checked yet: changing a
+      `ClassSubject`'s teacher later can create a teacher clash (P3.2 should re-check on save).
 - [ ] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
       for a class and date; `school/register/` API; reuses `Attendance`/`AttendanceReport` (+ fields).
       Done when: tests incl. "only homeroom teacher of that class", one register per date. Needs: P1.2.
@@ -708,6 +721,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P2.1 done (PR #PRNUM): `BellPeriod`, `Lesson`, clash checks, admin API for periods and
+  lessons, `school/timetable/` for every role (migration `0044_timetable`). Done in parallel with P1.7
+  (another agent, branch `feat/school-p1.7-parent-admin`): if P1.7 also adds a `0044_*` migration, the
+  second PR to merge renumbers its migration (or adds a merge migration). P1.8 waits for P1.7. Next:
+  P2.2 daily register.
 
 - 2026-10-27 — P1.3 done (PR #34): `ClassSubject`, optional `Subject.staff`, `seed_school_subjects`
   command, class-subject admin API in the new `api/school_views.py`. Also D17 recorded (admin web in
