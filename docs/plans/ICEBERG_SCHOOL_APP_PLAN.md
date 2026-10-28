@@ -459,7 +459,15 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       7-B, 11-A, teachers, students, parents, a week of timetable, marks, invoices). Re-runnable,
       refuses to run when `DEBUG=False` unless `--force`. Done when: command + test; staging seeded.
       Needs: P1.1–P1.6 (write it at the end of P1; tick it then). — claimed 2026-10-28, branch
-      feat/school-p0.6-demo-data
+      feat/school-p0.6-demo-data. **Partly done 2026-10-28, PR #37** (`SeedSchoolDemoTests`,
+      `SeedSchoolDemoCommandTests`): logic in `main_app/school_demo.py`. Seeds an "Iceberg School
+      (demo)" branch and course, the current year (reused if one exists, else created) with 4 quarters
+      (only if the year has none), 6 teachers, classes 1-A/7-B/11-A with homeroom teachers and 32
+      class subjects, 12 students, 12 parents (`DEMO-PR01` has two children, `DEMO-IC01` two parents)
+      and this month's invoices (3 paid, 1 partial). Logins `DEMO-TC01…`, `DEMO-IC01…`,
+      `DEMO-PR01…`, emails `@demo.iceberg.internal`, phones `+998 00 …`. New logins get the password
+      from `--password`, default `Demo12345!`. **Still open:** a week of timetable (add to
+      `school_demo.py` in P2.1), marks (P2.4, Release 2), "staging seeded" (needs P0.5).
 - [ ] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
       Needs: P0.4.
 - [ ] **P0.8** Monitoring: uptime checks for `app.iceberglc.com` and `iceberglc.com`, error alerts (e.g.
@@ -721,6 +729,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P0.6 partly done (PR #37): `seed_school_demo` seeds everything that exists today;
+  stays `[~]` until the timetable (P2.1: whoever finishes it adds a demo week in
+  `school_demo.py`), marks and staging exist. P1.8 is left to the session doing it. Next for this
+  thread: P3.0 (admin web translations, needs nothing) unless the owner says otherwise.
 
 - 2026-10-28 — P1.7 done (PR #35): parent admin API + forms, `branching.filter_parents_for_user`.
   Also PR #34 merged after a fix (deleting a subject a class uses returned 500, now 400). Login
