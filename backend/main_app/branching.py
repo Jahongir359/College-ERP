@@ -279,6 +279,34 @@ def filter_results_for_user(user, queryset):
     return queryset.none()
 
 
+def filter_class_subjects_for_user(user, queryset):
+    """Filter a ClassSubject queryset: admins by branch, teachers by class or subject."""
+    if is_super_admin(user):
+        return queryset
+
+    profile = get_admin_profile(user)
+    if profile is not None:
+        return queryset.filter(group__branch_id__in=profile.branches.values_list("id", flat=True))
+
+    staff = _get_staff(user)
+    if staff is not None:
+        return queryset.filter(Q(teacher=staff) | Q(group__teacher=staff)).distinct()
+
+    student = _get_student(user)
+    if student is not None:
+        return queryset.filter(
+            group__enrollment__student=student, group__enrollment__is_active=True
+        )
+
+    if _get_parent(user) is not None:
+        return queryset.filter(
+            group__enrollment__student__in=children_for_parent(user).values("pk"),
+            group__enrollment__is_active=True,
+        ).distinct()
+
+    return queryset.none()
+
+
 # ── Single-object access checks ──────────────────────────────────────────────
 
 

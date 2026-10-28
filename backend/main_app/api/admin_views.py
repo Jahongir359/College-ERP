@@ -595,7 +595,7 @@ class SubjectListView(APIView):
                 "course_id": s.course_id,
                 "course_name": s.course.name,
                 "staff_id": s.staff_id,
-                "staff_name": str(s.staff),
+                "staff_name": str(s.staff) if s.staff_id else "",
             }
             for s in qs
         ]
@@ -612,19 +612,22 @@ class SubjectListView(APIView):
         name = request.data.get("name", "").strip()
         course_id = request.data.get("course_id")
         staff_id = request.data.get("staff_id")
-        if not name or not course_id or not staff_id:
+        if not name or not course_id:
             return Response(
-                {"detail": "name, course_id, and staff_id are required."},
+                {"detail": "name and course_id are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         try:
             course = Course.objects.get(pk=course_id)
         except Course.DoesNotExist:
             return Response({"detail": "Course not found."}, status=status.HTTP_404_NOT_FOUND)
-        try:
-            staff = Staff.objects.get(pk=staff_id)
-        except Staff.DoesNotExist:
-            return Response({"detail": "Staff not found."}, status=status.HTTP_404_NOT_FOUND)
+        # Optional: school subjects get their teacher per class (ClassSubject).
+        staff = None
+        if staff_id:
+            try:
+                staff = Staff.objects.get(pk=staff_id)
+            except Staff.DoesNotExist:
+                return Response({"detail": "Staff not found."}, status=status.HTTP_404_NOT_FOUND)
 
         subject = Subject.objects.create(name=name, course=course, staff=staff)
         return Response(
@@ -658,7 +661,7 @@ class SubjectDetailView(APIView):
                 "course_id": subject.course_id,
                 "course_name": subject.course.name,
                 "staff_id": subject.staff_id,
-                "staff_name": str(subject.staff),
+                "staff_name": str(subject.staff) if subject.staff_id else "",
             }
         )
 
@@ -697,7 +700,13 @@ class SubjectDetailView(APIView):
         subject, err = self._get_subject(request, pk)
         if err:
             return err
-        subject.delete()
+        try:
+            subject.delete()
+        except ProtectedError:
+            return Response(
+                {"detail": "School classes use this subject. Remove it from them first."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

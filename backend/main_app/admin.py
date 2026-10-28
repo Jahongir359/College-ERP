@@ -15,6 +15,7 @@ from .models import (
     Term,
     Branch,
     Group,
+    ClassSubject,
     Enrollment,
     ChatThread,
     ChatMessage,
@@ -201,7 +202,21 @@ class SessionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Branch)
-admin.site.register(Group)
+
+
+class ClassSubjectInline(admin.TabularInline):
+    model = ClassSubject
+    extra = 0
+    raw_id_fields = ("teacher",)
+
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ("name", "kind", "branch", "session")
+    list_filter = ("kind", "branch")
+    inlines = [ClassSubjectInline]
+
+
 admin.site.register(Enrollment)
 
 
