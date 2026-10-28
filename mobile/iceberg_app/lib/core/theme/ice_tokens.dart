@@ -172,6 +172,34 @@ class IceTokens extends ThemeExtension<IceTokens> {
     );
   }
 
+  /// Tokens for content on a hero card ([heroGradient]). Hero cards are dark
+  /// in every theme, but the School light accent is maroon, the same colour as
+  /// the card, so there the accent and mint switch to the School dark ones.
+  /// Everywhere else this returns the same tokens.
+  IceTokens get onHero {
+    if (!brand.isSchool || accent != SchoolColors.primary) return this;
+    return IceTokens(
+      bg: bg,
+      card: card,
+      cardHi: cardHi,
+      cardLo: cardLo,
+      inset: inset,
+      stroke: stroke,
+      textHi: textHi,
+      textMid: textMid,
+      textLow: textLow,
+      accent: SchoolColors.ink,
+      accentInk: SchoolColors.ink,
+      onAccent: SchoolColors.primaryDeep,
+      mint: SchoolColors.onPrimarySoft,
+      coral: coral,
+      sky: sky,
+      amber: amber,
+      isDark: isDark,
+      brand: brand,
+    );
+  }
+
   /// Slightly translucent accent for soft fills behind icons.
   Color get accentSoft => accent.withValues(alpha: 0.14);
   Color get coralSoft => coral.withValues(alpha: 0.14);

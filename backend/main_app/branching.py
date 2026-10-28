@@ -411,6 +411,83 @@ def filter_bell_periods_for_user(user, queryset):
     return queryset.none()
 
 
+def teachers_for_student(student):
+    """Staff who teach this student in a School class: the homeroom teacher and
+    the subject teachers of the student's active classes (teacher ↔ parent
+    messages, P2.6)."""
+    student_id = getattr(student, "pk", student)
+    classes = Group.objects.filter(
+        kind=Group.KIND_CLASS,
+        is_archived=False,
+        enrollment__student_id=student_id,
+        enrollment__is_active=True,
+    )
+    return Staff.objects.filter(
+        Q(group__in=classes) | Q(class_subjects__group__in=classes)
+    ).distinct()
+
+
+def filter_parent_threads_for_user(user, queryset):
+    """Filter a ChatThread queryset to the teacher ↔ parent threads this user
+    may read. Admins: students in their branches (read-only, see
+    ``user_can_post_in_parent_thread``). Teachers: their own threads. Parents:
+    their children's threads. Students see none."""
+    queryset = queryset.filter(kind="parent")
+    if is_super_admin(user):
+        return queryset
+
+    if get_admin_profile(user) is not None:
+        students = filter_students_for_user(user, Student.objects.all())
+        return queryset.filter(student__in=students)
+
+    staff = _get_staff(user)
+    if staff is not None:
+        return queryset.filter(teacher=staff)
+
+    if _get_parent(user) is not None:
+        return queryset.filter(student__in=children_for_parent(user).values("pk"))
+
+    return queryset.none()
+
+
+def user_can_message_about_student(user, student):
+    """Whether the user may open teacher ↔ parent messages about this student.
+    Teachers: also as a subject teacher (``teachers_for_student``), which
+    ``filter_students_for_user`` doesn't cover. Everyone else as
+    ``user_can_access_student``; students never."""
+    if student is None or _get_student(user) is not None:
+        return False
+    staff = _get_staff(user)
+    if staff is not None:
+        return teachers_for_student(student).filter(pk=staff.pk).exists()
+    return user_can_access_student(user, student)
+
+
+def user_can_post_in_parent_thread(user, thread):
+    """Only the thread's teacher and the student's linked parents write."""
+    staff = _get_staff(user)
+    if staff is not None:
+        return thread.teacher_id == staff.pk
+    if _get_parent(user) is not None:
+        return children_for_parent(user).filter(pk=thread.student_id).exists()
+    return False
+
+
+def user_can_start_parent_thread(user, student, teacher):
+    """A parent may write to a teacher of their child; a teacher may write to the
+    parents of a student they teach (``teachers_for_student``)."""
+    if student is None or teacher is None:
+        return False
+    if not teachers_for_student(student).filter(pk=teacher.pk).exists():
+        return False
+    staff = _get_staff(user)
+    if staff is not None:
+        return staff.pk == teacher.pk
+    if _get_parent(user) is not None:
+        return children_for_parent(user).filter(pk=student.pk).exists()
+    return False
+
+
 # ── Single-object access checks ──────────────────────────────────────────────
 
 

@@ -29,7 +29,7 @@ from django.http import FileResponse, Http404
 from django.views.static import serve as static_serve
 
 from . import branching, messaging
-from .models import ChatMessage, Enrollment, ResultFile, Submission
+from .models import ChatMessage, ChatThread, Enrollment, ResultFile, Submission
 
 
 def _can_access_result_file(user, path):
@@ -101,6 +101,10 @@ def _can_access_chat_attachment(user, path):
     msg = ChatMessage.objects.filter(attachment=path).select_related("thread__group").first()
     if msg is None:
         return False
+    if msg.thread.kind == ChatThread.KIND_PARENT:
+        return branching.filter_parent_threads_for_user(
+            user, ChatThread.objects.filter(pk=msg.thread_id)
+        ).exists()
     return messaging.can_access_group(user, msg.thread.group)
 
 
