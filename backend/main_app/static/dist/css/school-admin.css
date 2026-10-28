@@ -48,3 +48,38 @@
 @media (max-width: 640px) {
   .school-inline-form, .school-inline-form .form-control { width: 100%; }
 }
+
+/* Timetable week grid (P3.2, mockup 17) */
+.school-week-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.school-week { width: 100%; min-width: 860px; border-collapse: separate; border-spacing: 8px; }
+.school-week th { font-size: 14px; font-weight: 700; text-align: left; padding: 0 4px; }
+.school-week__period { width: 72px; white-space: nowrap; font-weight: 700; }
+.school-week__period span { display: block; font-weight: 600; opacity: .7; }
+.school-cell {
+  vertical-align: top;
+  padding: 8px;
+  border: 1px solid var(--ice-manage-border, rgba(127, 127, 127, .25));
+  border-radius: 12px;
+  background: var(--ice-surface, #fff);
+}
+.school-cell select { width: 100%; min-width: 0; font-weight: 600; }
+.school-cell__teacher { display: block; margin-top: 4px; font-size: 12px; opacity: .75; }
+.school-cell--empty { border-style: dashed; }
+.school-cell--clash { border-color: #C0392B; background: #FBE9E7; }
+.school-cell__error { display: block; margin-top: 4px; font-size: 12px; font-weight: 700; color: #B03A2E; }
+.school-week-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+}
+.school-hours-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+.school-hours-list li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ice-manage-border, rgba(127, 127, 127, .25));
+  font-size: 13px;
+}
+.school-hours-list .is-off { border-color: #C0392B; color: #B03A2E; font-weight: 700; }

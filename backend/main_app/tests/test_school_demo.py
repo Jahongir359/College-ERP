@@ -9,20 +9,23 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from main_app.models import (
+    BellPeriod,
     Branch,
     ClassSubject,
     CustomUser,
     Enrollment,
     Group,
     Invoice,
+    Lesson,
     Parent,
     ParentChild,
     Payment,
     Session,
     Student,
     Term,
+    lesson_clashes,
 )
-from main_app.school_demo import DEMO_BRANCH, DEMO_PASSWORD, seed_school_demo
+from main_app.school_demo import BELLS, DEMO_BRANCH, DEMO_PASSWORD, seed_school_demo
 
 TODAY = date(2026, 10, 28)
 
@@ -37,6 +40,8 @@ def _totals():
         "terms": Term.objects.count(),
         "invoices": Invoice.objects.count(),
         "payments": Payment.objects.count(),
+        "bell_periods": BellPeriod.objects.count(),
+        "lessons": Lesson.objects.count(),
     }
 
 
@@ -122,6 +127,58 @@ class SeedSchoolDemoTests(TestCase):
         )
 
 
+class SeedSchoolDemoTimetableTests(TestCase):
+    def setUp(self):
+        self.counts = seed_school_demo(today=TODAY)
+        self.branch = Branch.objects.get(name=DEMO_BRANCH)
+
+    def test_bell_periods_and_every_weekly_hour_placed(self):
+        self.assertEqual(self.counts["bell_periods"], len(BELLS))
+        self.assertEqual(BellPeriod.objects.filter(branch=self.branch).count(), len(BELLS))
+        total = 0
+        for cs in ClassSubject.objects.filter(group__branch=self.branch):
+            with self.subTest(class_subject=str(cs)):
+                self.assertEqual(cs.lessons.count(), cs.weekly_hours)
+            total += cs.weekly_hours
+        self.assertEqual(self.counts["lessons"], total)
+
+    def test_week_has_no_clashes_and_follows_the_school_day(self):
+        lessons = Lesson.objects.select_related("group", "class_subject", "period")
+        for lesson in lessons:
+            with self.subTest(lesson=str(lesson)):
+                self.assertEqual(lesson_clashes(lesson), [])
+                lesson.full_clean()
+        first_grade = lessons.filter(group__name="1-A")
+        self.assertFalse(first_grade.filter(period__number__gt=4).exists())
+        self.assertEqual(set(lessons.values_list("weekday", flat=True)), {1, 2, 3, 4, 5, 6})
+        pe = lessons.filter(class_subject__subject__name="Jismoniy tarbiya")
+        self.assertEqual(set(pe.values_list("room", flat=True)), {"Sport zali"})
+
+    def test_running_again_keeps_an_edited_timetable(self):
+        edited = Lesson.objects.filter(group__name="7-B").first()
+        edited.room = "Kutubxona"
+        edited.save()
+        before = _totals()
+        again = seed_school_demo(today=TODAY)
+        self.assertEqual((again["bell_periods"], again["lessons"]), (0, 0))
+        self.assertEqual(_totals(), before)
+        edited.refresh_from_db()
+        self.assertEqual(edited.room, "Kutubxona")
+
+    @override_settings(SECURE_SSL_REDIRECT=False)
+    def test_demo_pupil_sees_the_week(self):
+        api = APIClient()
+        api.force_authenticate(user=CustomUser.objects.get(login_id="DEMO-IC05"))
+        res = api.get(reverse("api_school_timetable"), {"date": "2026-10-26"})
+        self.assertEqual(res.status_code, 200, res.data)
+        self.assertEqual(res.data["class"]["name"], "7-B")
+        week = sum(len(day["lessons"]) for day in res.data["days"])
+        hours = sum(
+            ClassSubject.objects.filter(group__name="7-B").values_list("weekly_hours", flat=True)
+        )
+        self.assertEqual(week, hours)
+
+
 class SeedSchoolDemoCommandTests(TestCase):
     @override_settings(DEBUG=False)
     def test_refuses_without_force_when_debug_is_off(self):
@@ -135,6 +192,7 @@ class SeedSchoolDemoCommandTests(TestCase):
         call_command("seed_school_demo", "--force", stdout=out)
         self.assertIn("3 classes", out.getvalue())
         self.assertIn("12 parents", out.getvalue())
+        self.assertIn("6 bell periods", out.getvalue())
         self.assertNotIn(DEMO_PASSWORD, out.getvalue())
 
     @override_settings(DEBUG=True)
