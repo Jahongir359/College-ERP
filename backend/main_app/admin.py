@@ -237,8 +237,10 @@ admin.site.register(Enrollment)
 
 @admin.register(ChatThread)
 class ChatThreadAdmin(admin.ModelAdmin):
-    list_display = ("group", "updated_at", "created_at")
+    list_display = ("__str__", "kind", "updated_at", "created_at")
+    list_filter = ("kind",)
     search_fields = ("group__name",)
+    raw_id_fields = ("group", "student", "teacher")
     readonly_fields = ("created_at", "updated_at")
 
 

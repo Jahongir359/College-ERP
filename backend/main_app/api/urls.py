@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views, admin_views, register_views, school_views, student_views
+from . import views, admin_views, parent_messages, register_views, school_views, student_views
 
 urlpatterns = [
     # ── Auth ─────────────────────────────────────────────────────────────────
@@ -255,6 +255,21 @@ urlpatterns = [
         "school/register/<int:pk>/<str:day>/",
         register_views.RegisterView.as_view(),
         name="api_school_register",
+    ),
+    path(
+        "messages/parent/",
+        parent_messages.ParentThreadListView.as_view(),
+        name="api_parent_threads",
+    ),
+    path(
+        "messages/parent/contacts/",
+        parent_messages.ParentContactsView.as_view(),
+        name="api_parent_thread_contacts",
+    ),
+    path(
+        "messages/parent/<int:pk>/",
+        parent_messages.ParentThreadDetailView.as_view(),
+        name="api_parent_thread",
     ),
     path("admin/subjects/", admin_views.SubjectListView.as_view(), name="api_admin_subjects"),
     path(
