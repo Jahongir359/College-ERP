@@ -6,11 +6,12 @@ the unused "00" operator code, so it never mixes with or collides with real
 families. Re-running finds what exists (by login ID) and adds only what is
 missing; it never changes passwords or real data.
 
-Not seeded yet, because the models don't exist: the timetable (P2.1) and marks
-(P2.4). Add them here when those tasks land.
+The timetable is a clash-free week: six bell periods and, per class, each
+subject as many times as its weekly hours. Not seeded yet, because the model
+doesn't exist: marks (P2.4). Add them here when that task lands.
 """
 
-from datetime import date
+from datetime import date, time
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -19,12 +20,14 @@ from django.utils import timezone
 
 from . import parents
 from .models import (
+    BellPeriod,
     Branch,
     ClassSubject,
     CustomUser,
     Enrollment,
     Group,
     Invoice,
+    Lesson,
     ParentChild,
     Payment,
     Session,
@@ -160,6 +163,24 @@ QUARTERS = [
 ]
 
 
+# The school day of the design mockups (screen 6): 45-minute lessons, a longer break after the third.
+BELLS = [
+    (1, time(8, 0), time(8, 45)),
+    (2, time(8, 55), time(9, 40)),
+    (3, time(9, 50), time(10, 35)),
+    (4, time(10, 55), time(11, 40)),
+    (5, time(11, 50), time(12, 35)),
+    (6, time(12, 45), time(13, 30)),
+]
+WEEKDAYS = (1, 2, 3, 4, 5, 6)  # Monday to Saturday
+# Subjects taught in a shared room; other lessons use the class's own room.
+SPECIAL_ROOMS = {"Jismoniy tarbiya": "Sport zali", "Informatika": "Informatika xonasi"}
+
+
+def _periods_per_day(grade):
+    return 4 if grade <= 4 else len(BELLS)
+
+
 def login_id(suffix):
     return f"DEMO-{suffix}"
 
@@ -221,6 +242,86 @@ def _quarters(session):
     return created
 
 
+def _bell_periods(branch):
+    """The demo branch's bell times. Returns ({number: BellPeriod}, number created)."""
+    periods, created = {}, 0
+    for number, start, end in BELLS:
+        period, was_created = BellPeriod.objects.get_or_create(
+            branch=branch, number=number, defaults={"start_time": start, "end_time": end}
+        )
+        periods[number] = period
+        created += was_created
+    return periods, created
+
+
+def _timetable(classes, periods):
+    """A clash-free week for each class that has no lessons yet. Returns lessons created.
+
+    Every subject gets its weekly hours, one a day where it can (two at most), on the
+    class's lightest day, in the first period where the class, the teacher and any
+    shared room are free. Classes that already have lessons (an admin may have
+    edited them) are kept.
+    """
+    busy = set()  # ("class"|"teacher"|"room", id or name, weekday, period number)
+    for lesson in Lesson.objects.filter(period__in=periods.values()).select_related(
+        "class_subject__subject", "period"
+    ):
+        slot = (lesson.weekday, lesson.period.number)
+        busy.add(("class", lesson.group_id, *slot))
+        if lesson.class_subject.teacher_id:
+            busy.add(("teacher", lesson.class_subject.teacher_id, *slot))
+        room = SPECIAL_ROOMS.get(lesson.class_subject.subject.name)
+        if room:
+            busy.add(("room", room, *slot))
+
+    created = 0
+    for group in classes.values():
+        if group.lessons.exists():
+            continue
+        last = _periods_per_day(group.grade_level)
+        todo = [
+            cs
+            for cs in group.class_subjects.select_related("subject").order_by(
+                "-weekly_hours", "subject__name"
+            )
+            for _ in range(cs.weekly_hours)
+        ]
+        per_day = {}  # (class subject id, weekday) -> lessons that day
+        load = dict.fromkeys(WEEKDAYS, 0)  # lessons this class has each day
+        for cs in todo:
+            room = SPECIAL_ROOMS.get(cs.subject.name, "")
+            # The lightest day first, so every day of the week gets a similar number of lessons.
+            days = sorted(WEEKDAYS, key=lambda day: (load[day], day))
+            slot = next(
+                (
+                    (day, number)
+                    for limit in (1, 2)
+                    for day in days
+                    if per_day.get((cs.pk, day), 0) < limit
+                    for number in range(1, last + 1)
+                    if ("class", group.pk, day, number) not in busy
+                    and ("teacher", cs.teacher_id, day, number) not in busy
+                    and not (room and ("room", room, day, number) in busy)
+                ),
+                None,
+            )
+            if slot is None:  # the week is full for this class or teacher; skip the lesson
+                continue
+            day, number = slot
+            Lesson.objects.create(
+                group=group, class_subject=cs, weekday=day, period=periods[number], room=room
+            )
+            busy.add(("class", group.pk, day, number))
+            if cs.teacher_id:
+                busy.add(("teacher", cs.teacher_id, day, number))
+            if room:
+                busy.add(("room", room, day, number))
+            per_day[(cs.pk, day)] = per_day.get((cs.pk, day), 0) + 1
+            load[day] += 1
+            created += 1
+    return created
+
+
 @transaction.atomic
 def seed_school_demo(password=DEMO_PASSWORD, today=None):
     """Create (or complete) the demo school. Returns a dict of counts for the report."""
@@ -235,6 +336,8 @@ def seed_school_demo(password=DEMO_PASSWORD, today=None):
             "links",
             "invoices",
             "payments",
+            "bell_periods",
+            "lessons",
         ),
         0,
     )
@@ -323,6 +426,9 @@ def seed_school_demo(password=DEMO_PASSWORD, today=None):
             if not ParentChild.objects.filter(parent=parent, student=student).exists():
                 parents.link_child(parent, student, relation, is_primary)
                 counts["links"] += 1
+
+    periods, counts["bell_periods"] = _bell_periods(branch)
+    counts["lessons"] = _timetable(classes, periods)
 
     # This month's tuition, with a few payments so all invoice states show.
     period = today.replace(day=1)

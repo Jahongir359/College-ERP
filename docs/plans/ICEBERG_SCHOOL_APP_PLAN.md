@@ -518,8 +518,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       class subjects, 12 students, 12 parents (`DEMO-PR01` has two children, `DEMO-IC01` two parents)
       and this month's invoices (3 paid, 1 partial). Logins `DEMO-TC01…`, `DEMO-IC01…`,
       `DEMO-PR01…`, emails `@demo.iceberg.internal`, phones `+998 00 …`. New logins get the password
-      from `--password`, default `Demo12345!`. **Still open:** a week of timetable (add to
-      `school_demo.py` in P2.1), marks (P2.4, Release 2), "staging seeded" (needs P0.5).
+      from `--password`, default `Demo12345!`. **Timetable week added 2026-10-28, PR #42**
+      (`SeedSchoolDemoTimetableTests`): six bell periods (08:00–13:30, longer break after the 3rd) and a
+      clash-free Mon–Sat week, each subject as many times as its weekly hours, grade 1 within 4 periods,
+      PE in "Sport zali", Informatika in "Informatika xonasi"; a class that already has lessons is
+      kept. **Still open:** marks (P2.4, Release 2), "staging seeded" (needs P0.5).
 - [ ] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
       Needs: P0.4.
 - [ ] **P0.8** Monitoring: uptime checks for `app.iceberglc.com` and `iceberglc.com`, error alerts (e.g.
@@ -622,9 +625,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       admins `?class=` (required). New helpers `branching.filter_classes_for_user` (plan 4.2),
       `filter_lessons_for_user`, `filter_bell_periods_for_user`. Not checked yet: changing a
       `ClassSubject`'s teacher later can create a teacher clash (P3.2 should re-check on save).
-- [ ] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
+- [~] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
       for a class and date; `school/register/` API; reuses `Attendance`/`AttendanceReport` (+ fields).
       Done when: tests incl. "only homeroom teacher of that class", one register per date. Needs: P1.2.
+      — claimed 2026-10-28, branch feat/school-p2.2-register
 - [ ] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
       P2.8). Done when: test that exactly the linked parents get it.
 - [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
@@ -745,7 +749,15 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       offline banner and a clear "not saved, try again" error stay in P4.10.
 - [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
       with store links when older. Tests. (Release 2, D16.)
-
+- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
+      the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
+      avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
+      maroon; English text in uz/ru screens ("My Classes", "Groups you teach", "Present", "Days
+      streak", "Missed total", "Coming Soon"…). Done when: every text on a maroon surface uses the
+      on-primary colour (contrast 4.5:1 or more), those strings come from `strings.dart` in uz/ru/en,
+      before/after screenshots at 390 px light and dark; Study Center screens unchanged. Not in this
+      task: School sign-in colours (P4.2), hiding Study Center-only tabs (P4.9), the web admin pages
+      (brand layer, other thread). — claimed 2026-10-28, branch feat/school-p4.13-brand-polish
 ### P5 — Store readiness
 
 - [ ] **P5.1** **Owner** — D-U-N-S number for the organisation, then Google Play developer account (organisation)
@@ -853,6 +865,13 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P0.6 timetable week (PR #42): `seed_school_demo` adds bell periods and a clash-free
+  week, so the timetable API and screens have data. Claimed P2.2 (register) and added + claimed P4.13
+  (app screens readable under the School brand), found from screenshots of the running app. Reviewed
+  P3.1's pages against mockup 16 and sent the gaps to the other thread (maroon buttons and header
+  cards, readable active sidebar item, phone bottom bar). Split agreed: this thread P2.2, P4.13,
+  PD.9 part 2 (register report mockup); the other P3.2, PD.9 part 1, P3.3. Next here: P2.2.
 
 - 2026-10-28 — P3.2 done (PR #43): web timetable editor and bell times (uz/ru/en). Sessions now
   work in parallel worktrees; the pushed `[~]` claim decides who owns a task. Next for this session:
