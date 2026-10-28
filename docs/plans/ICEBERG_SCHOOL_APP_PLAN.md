@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 2/5 (P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -699,9 +699,20 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       enrollment (`is_active=False`) for history. Years and quarters are shared by all branches, so only
       a super admin may change them; branch admins see them read-only. Left out of mockup 16 on purpose:
       the "today's attendance" column (needs P2.2) and the CSV export button (Release 2).
-- [~] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
-      Needs: P2.1. — claimed 2026-10-28 by college-erp-41, branch feat/school-p3.2-timetable-editor
-      (WIP: views/templates done; tests, uz/ru strings still to do).
+- [x] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
+      Needs: P2.1. — done 2026-10-28, PR #<pr>; verified: full suite 378 OK,
+      `test_school_timetable_pages` (11). Notes: sidebar **School → Timetable** (`/maktab/timetable/
+      ?class=`) and **Bell times** (`/maktab/bells/`), views in `school_timetable_views.py`. The grid
+      (Mon–Sat × the branch's periods) is one form: each cell picks one of the class's subjects; Save
+      applies all cells in one transaction and, on any clash (teacher in any branch, room, class), saves
+      nothing and shows the cells in red ("Ustoz band: 4-B"). Clashes already in the saved timetable are
+      shown red on load. "Changes apply from" (default today, inside the class's year): on or before the
+      year's first day the lessons are replaced; later, a changed lesson gets `valid_to` = the day
+      before and the new one `valid_from` = that date, so past weeks keep the old timetable. Under the
+      grid: lessons a week per subject vs `weekly_hours` (red when different). Changing a subject's
+      teacher on the class page is now refused when the new teacher is busy at one of its lesson times
+      (the open point from P2.1). Bell period model messages are now translatable (`gettext_lazy`).
+      Room per lesson is kept but not edited in the grid (the class room is used; the API can set it).
 - [ ] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7.
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
@@ -842,6 +853,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P3.2 done (PR #<pr>): web timetable editor and bell times (uz/ru/en). Sessions now
+  work in parallel worktrees; the pushed `[~]` claim decides who owns a task. Next for this session:
+  P3.3 once the PD.9 parents mockup (screen 18) is approved.
 
 - 2026-10-28 — P3.1 done (PR #41, stacked on #40): admin **School → Classes / Academic year**
   pages in uz/ru/en. Merge order #36 → #39 → #37 → #38 → #40 → this. Next free: P3.3 (parents
