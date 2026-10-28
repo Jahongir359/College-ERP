@@ -778,7 +778,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [-] **P4.11** Offline queue for the register and messages — dropped 2026-10-26 (D16, keep it simple). The
       offline banner and a clear "not saved, try again" error stay in P4.10.
 - [~] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
-      with store links when older. Tests. (Release 2, D16.) — **backend half done** 2026-10-28, PR (pending);
+      with store links when older. Tests. (Release 2, D16.) — **backend half done** 2026-10-28, PR #51;
       verified: `tests/test_app_version.py` AppVersionTests. Public `GET /api/v1/app/version/` (no
       token, under `/api/` so the login middleware lets it through) returns `min_app_version` and
       per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
@@ -901,7 +901,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P4.12 backend half (PR pending): `GET /api/v1/app/version/` for the app's start-up
+- 2026-10-28 — P4.12 backend half (PR #51): `GET /api/v1/app/version/` for the app's start-up
   check, env vars in `.env.example` and `DEPLOYMENT.md`. P4.12 stays `[~]` until the app screen
   (mobile/, after P4.13) compares its version and shows the store link.
 
