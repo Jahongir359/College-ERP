@@ -23,8 +23,8 @@ from main_app.models import (
     Session,
     Student,
     Term,
+    lesson_clashes,
 )
-from main_app.models import lesson_clashes
 from main_app.school_demo import BELLS, DEMO_BRANCH, DEMO_PASSWORD, seed_school_demo
 
 TODAY = date(2026, 10, 28)
