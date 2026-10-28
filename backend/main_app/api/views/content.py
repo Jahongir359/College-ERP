@@ -422,7 +422,8 @@ class LeaderboardView(APIView):
 
 
 class StoryListView(APIView):
-    """GET: all authenticated users. Filters by enrolled groups for students."""
+    """GET: all authenticated users. Filters by enrolled groups for students
+    and by their children's groups for parents."""
 
     permission_classes = [IsAuthenticated]
 
@@ -452,6 +453,17 @@ class StoryListView(APIView):
             # Show stories targeted to enrolled groups OR stories with no target groups (all)
             qs = qs.filter(
                 Q(target_groups__isnull=True) | Q(target_groups__in=enrolled_group_ids)
+            ).distinct()
+        elif user_type == "4":
+            # Parents see what their children see: school-wide stories plus
+            # stories aimed at any of their children's classes and groups.
+            child_group_ids = list(
+                Enrollment.objects.filter(
+                    student__in=branching.children_for_parent(user), is_active=True
+                ).values_list("group_id", flat=True)
+            )
+            qs = qs.filter(
+                Q(target_groups__isnull=True) | Q(target_groups__in=child_group_ids)
             ).distinct()
 
         qs = qs.order_by("-created_at")

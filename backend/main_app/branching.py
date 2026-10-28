@@ -19,7 +19,7 @@ rules live in exactly one place. Do not re-implement branch filtering inline.
 
 from django.db.models import Q
 
-from .models import Admin, Branch, Enrollment, Group, Parent, Staff, Student
+from .models import Admin, Branch, Enrollment, Group, Parent, ParentChild, Staff, Student
 
 
 # ── Identity helpers ─────────────────────────────────────────────────────────
@@ -74,6 +74,19 @@ def children_for_parent(user):
     if parent is None:
         return Student.objects.none()
     return Student.objects.filter(parent_links__parent=parent).distinct()
+
+
+def parent_user_ids_for_students(students):
+    """CustomUser ids of the parents linked to any of ``students``.
+
+    ``students`` should already be scoped to what the caller may reach (e.g.
+    by ``filter_students_for_user``); parents follow their children.
+    """
+    return (
+        ParentChild.objects.filter(student__in=students)
+        .values_list("parent__admin_id", flat=True)
+        .distinct()
+    )
 
 
 def is_super_admin(user):

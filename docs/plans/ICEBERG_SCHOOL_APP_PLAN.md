@@ -90,7 +90,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 2/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 3/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
@@ -650,9 +650,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [ ] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
       reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
-- [ ] **P2.7** Parents can see and pay invoices of their children (existing invoice API with
+- [x] **P2.7** Parents can see and pay invoices of their children (existing invoice API with
       `?student=`); class announcements reach parents (stories/notifications target parents of a
-      class). Done when: tests.
+      class). Done when: tests. — done 2026-10-28, PR #45; verified: invoices with `?student=`
+      already worked and were tested since P1.6 (`test_parents.py`); stories API now filters for
+      parents (school-wide + their children's groups; before, parents saw every story);
+      `admin/send-notification/` takes `target="parents"` and `"all"` includes parents of the
+      targeted students (`branching.parent_user_ids_for_students`); 12 tests in
+      `test_parent_announcements.py`. Paying online stays P8 (D16).
 - [ ] **P2.8** Push notifications with FCM HTTP v1 (service-account credentials via env vars, never
       committed): send for notifications, absence, new message. Done when: unit tests with the sender
       mocked; a real push received on a test phone on staging; documented in `docs/DEPLOYMENT.md`.
@@ -877,6 +882,11 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P2.7 done (PR #45, backend only): parents get stories for their children's
+  classes and class announcements from `admin/send-notification/` (`target` "all"/"parents"). No
+  web strings, no migration. P2.6 and P2.3 are
+  in progress in other sessions.
 
 - 2026-10-28 — P2.2 done (PR #44): daily register API with arrival time and note, homeroom teacher
   only, `register_summaries` for the Classes page. P2.3 (absence alerts) can build on the POST (compare
