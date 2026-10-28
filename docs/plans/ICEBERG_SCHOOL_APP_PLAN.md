@@ -93,7 +93,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 3/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
+| P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 0/6 |
@@ -773,7 +773,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       offline banner and a clear "not saved, try again" error stay in P4.10.
 - [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
       with store links when older. Tests. (Release 2, D16.)
-- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
+- [x] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
       the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
       avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
       maroon; English text in uz/ru screens ("My Classes", "Groups you teach", "Present", "Days
@@ -781,7 +781,18 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       on-primary colour (contrast 4.5:1 or more), those strings come from `strings.dart` in uz/ru/en,
       before/after screenshots at 390 px light and dark; Study Center screens unchanged. Not in this
       task: School sign-in colours (P4.2), hiding Study Center-only tabs (P4.9), the web admin pages
-      (brand layer, other thread). — claimed 2026-10-28, branch feat/school-p4.13-brand-polish
+      (brand layer, other thread). — done 2026-10-28, PR #TBD; verified: `flutter analyze` (no new
+      issues), `flutter test` 18 OK (`test/school_brand_readability_test.dart`: contrast 4.5:1+ on both
+      hero colours, Study Center tokens unchanged, uz/ru keys), screenshots at 390 px light and dark
+      against the demo school: `docs/plans/school-app-screens/p4.13-before-after.png`; the Study Center
+      login renders pixel-identical. Notes: `IceTokens.onHero` swaps accent/mint to the School dark ones
+      on hero gradients when the School accent is maroon (else returns the same tokens); `IceCard(hero:)`
+      applies it to its children (`IceOnHero`), and screens use `t.onHero.*` for colours they pick
+      themselves. The Coming Soon wall (what parents see until P4.3) uses the user's brand. Teacher
+      class list says "Sinflar / Классы" for the School (`IceBrand.teacherGroupsKey`); `roomLabel()`
+      stops "Xona Xona 1A". Left for later: month and weekday names are English in every language
+      (`DateFormat` has no locale anywhere in the app), and the unreachable `/staff/more` page has no
+      Scaffold.
 ### P5 — Store readiness
 
 - [ ] **P5.1** **Owner** — D-U-N-S number for the organisation, then Google Play developer account (organisation)
@@ -890,6 +901,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-10-28 — P4.13 done (PR #TBD, app only): School hero cards, the pupil profile and attendance,
+  the teacher class list and the parent Coming Soon wall are readable on maroon and in uz/ru
+  (before/after image in `docs/plans/school-app-screens/`). New colours on a hero card: use
+  `t.onHero`. Follow-up worth a task: localised dates (`DateFormat` with the app language).
 - 2026-10-28 — PD.8: screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session), unchanged (PR #46). P3.3 claimed; it starts
   after #43 (shares urls.py, erpnext_sidebar.html, school_forms.py and the .po files).
 - 2026-10-28 — PD.9 part 1 drawn: web parents screens 18 (list + New parent) and 18b (parent page,
