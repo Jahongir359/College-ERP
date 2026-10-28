@@ -98,6 +98,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P6 | Pilot and quality | Open — 0/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 | P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
+| P9 | eMaktab connection (future feature, after Release 2, D18) | Future — 0/2 |
 
 **Release 1 (first store version)** = P0, P1 (P1.7 without CSV import), P2.1–P2.3 + P2.6–P2.8, PD
 (without PD.5), P3.1–P3.3 + P3.6, P4 (without P4.7, P4.11, P4.12), P5, PL, P6, P7. **Release 2 (store
@@ -145,9 +146,9 @@ integrations or extras that aren't in this plan without asking the owner.
 | D13 | Parent password resets: **SMS code through Eskiz** (already used for payment reminders in `main_app/payments.py`; about 85 soʻm per SMS, so 1,000 resets ≈ 85,000 soʻm), sent to the phone stored on the parent (P1.7). **Reset by the school office** (admin API from P1.7) stays as the fallback. Rate-limit codes per phone. | **Decided 2026-10-28** (owner delegated; research 2.1) |
 | D14 | How parents receive logins: **both**. A **printed letter** (login ID, temporary password, QR to the store pages; PL.1) handed out at the parent meeting, which is where Uzbek schools give parents such information. Plus an **SMS with the login ID and the store link** (no password in SMS) for parents who missed the meeting or lost the letter; they then set a password with the D13 SMS code. | **Decided 2026-10-28** (owner delegated; research 2.1) |
 | D15 | Where each role works: **admins on the Django web ERP; teachers, students and parents in the app** (phone, or browser at `/app/`). New School features are built once, in the API + app. The Django student/teacher pages are frozen (bug fixes only) and removed once the app covers them. Drops P3.4 and P3.5. | **Decided 2026-10-26 (owner)** |
-| D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
+| D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik) in Release 1 or 2; eMaktab comes later as P9 (D18). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
 | D17 | Admin web language: office staff need the **admin pages in Uzbek and Russian** (English stays). The admin web has no Django i18n today, so P3.0 adds it before the School admin pages. | **Decided 2026-10-27 (owner)** |
-| D18 | **Does Iceberg School's licence require it to keep the state eMaktab journal?** eMaktab is required in "all general education schools" (2018 decree, 2019 decree, ministry order No. 205 of 24 Jun 2022); research found no rule that names private schools either way. If yes, teachers would enter attendance and marks twice (eMaktab and this app), and the register/gradebook here must be designed around that (e.g. parents-only views, or a quick export). Ask the school director or the inspectorate; it doesn't block P1–P3 work. | **Open — owner (ask the school)** |
+| D18 | **eMaktab: the school does keep the state eMaktab journal** (required for general education schools). Connecting this app to eMaktab is a **future feature (P9), not in Release 1 or 2**. Until then teachers fill in eMaktab as they do today, and this app's register and gradebook serve parents and the office. Design the register, marks and term grades so they can later be sent to eMaktab or exported (store per-lesson and per-date data, use the same 2–5 scale and quarters as eMaktab, keep student identifiers). Don't build any eMaktab code before P9. | **Decided 2026-10-28 (owner)** |
 
 Record each answer here with the date before starting the task that depends on it.
 
@@ -753,6 +754,16 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P8.3** App: "To'lash" button on Payments and Home opens checkout; status updates after return.
       Needs: P8.2, P4.8.
 
+### P9 — eMaktab connection (future feature, D18)
+
+Not scheduled: start only when the owner says so, after Release 2. The school keeps eMaktab meanwhile.
+
+- [ ] **P9.1** Find out what eMaktab allows: an official API or data exchange for private schools, an
+      import file format, or only manual entry. Write the findings and a proposal here. **Owner** decides
+      the approach.
+- [ ] **P9.2** Build the chosen connection so teachers enter attendance and marks once (in this app) and
+      eMaktab gets them, with a clear log of what was sent and what failed. Needs: P9.1, P2.2, P2.4.
+
 ---
 
 ## 10. Risks and how this plan handles them
@@ -780,6 +791,7 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 - 2026-10-28 — owner delegated D9, D10, D12–D14 and PD.8 to the agent: decided from research on how
   Uzbek schools work (section 2.1). New open question **D18** (must the school keep eMaktab?). PD.8
   approved with two changes (screens 12 and 16), so P3.1 can start once P3.0 (#38) is merged.
+  Owner answered D18 the same day: the school keeps eMaktab; connecting to it is future phase P9.
 
 - 2026-10-28 — P1.7 done (PR #35): parent admin API + forms, `branching.filter_parents_for_user`.
   Also PR #34 merged after a fix (deleting a subject a class uses returned 500, now 400). Login
