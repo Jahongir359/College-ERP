@@ -149,11 +149,13 @@ PARENTS = [
     ("PR12", "Ravshan", "Mirzayev", "+998 00 000 01 12", [("IC12", "father", True)]),
 ]
 
-# Uzbek school quarters as (month, day) offsets from the year's September start.
+# Uzbek school quarters as (year offset, month, day) from the September start. The real
+# 2026–27 dates: classes from 2 Sep, autumn break 4–9 Nov; winter (14 days from ~28 Dec)
+# and spring (~19–29 Mar) breaks follow the 2025–26 pattern. See the plan, section 2.1.
 QUARTERS = [
-    (1, "1-chorak", (0, 9, 2), (0, 10, 31)),
-    (2, "2-chorak", (0, 11, 9), (0, 12, 27)),
-    (3, "3-chorak", (1, 1, 8), (1, 3, 20)),
+    (1, "1-chorak", (0, 9, 2), (0, 11, 3)),
+    (2, "2-chorak", (0, 11, 10), (0, 12, 26)),
+    (3, "3-chorak", (1, 1, 11), (1, 3, 18)),
     (4, "4-chorak", (1, 3, 30), (1, 5, 25)),
 ]
 
