@@ -359,6 +359,8 @@ money is shown as `[summa]` because prices are not decided.
 | 15 | Empty, error, loading and offline states | [15-states.png](school-app-mockups/15-states.png) | P4.10, P4.11 |
 | 16 | Web — classes list (admin) | [16-web-classes.png](school-app-mockups/16-web-classes.png) | P3.1 |
 | 17 | Web — timetable editor with clash | [17-web-timetable.png](school-app-mockups/17-web-timetable.png) | P3.2 |
+| 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
+| 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
 
 Navigation per role (bottom tabs, at most five):
 
@@ -677,8 +679,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       entry still to draw**. (Release 2.)
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
-- [ ] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
-      the web is no longer needed, D15; the CSV import preview waits for Release 2).
+- [~] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
+      the web is no longer needed, D15; the CSV import preview waits for Release 2). **Part 1 (parents)
+      drawn 2026-10-28**, branch docs/school-pd9-parents-mockup: screens 18–18b, content from P1.7 (no
+      CSV import, D16); approved 2026-10-28 (owner delegated to the reviewer session), unchanged. Part 2 (register report) still to draw.
 - [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en); a clean
       transparent Study Center wordmark replacing the defective `iceberg-wordmark.png`.
 - [~] **PD.8** **Owner** approves the mockups in section 6.0 (and later PD.5, PD.7, PD.9; record the date per screen here). Code tasks for a screen
@@ -688,7 +692,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       saqlanadi va keyin yuboriladi" (offline register dropped, D16); **16 (web classes)** no "CSV
       yuklash" button until Release 2 (CSV import moved, D16). Also: the grades tabs (14) list all four
       quarters plus Yillik; Uzbek UI text uses the modifier letter ʻ (Oʻquvchilar), as in the code.
-      Still to approve when drawn: PD.5 (teacher grade entry), PD.7, PD.9.
+      Still to approve when drawn: PD.5 (teacher grade entry), PD.7, PD.9 part 2.
+      **Screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session)**, unchanged.
 
 ### P3 — Web screens (admins and teachers)
 
@@ -734,7 +739,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       teacher on the class page is now refused when the new teacher is busy at one of its lesson times
       (the open point from P2.1). Bell period model messages are now translatable (`gettext_lazy`).
       Room per lesson is kept but not edited in the grid (the class room is used; the API can set it).
-- [ ] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7.
+- [~] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7. — claimed 2026-10-28,
+      branch feat/school-p3.3-parents-admin (#43 merged; build from screens 18–18b; CSV
+      import screen is Release 2, D16).
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
@@ -882,6 +889,12 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — PD.8: screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session), unchanged (PR #46). P3.3 claimed; it starts
+  after #43 (shares urls.py, erpnext_sidebar.html, school_forms.py and the .po files).
+- 2026-10-28 — PD.9 part 1 drawn: web parents screens 18 (list + New parent) and 18b (parent page,
+  link by login ID + phone). `build_mockups.py` takes screen names to render only those; web sidebar
+  labels now use ʻ (16–17 re-rendered, no other change). Next: owner approves 18–18b (PD.8), then P3.3.
 
 - 2026-10-28 — P2.7 done (PR #45, backend only): parents get stories for their children's
   classes and class announcements from `admin/send-notification/` (`target` "all"/"parents"). No

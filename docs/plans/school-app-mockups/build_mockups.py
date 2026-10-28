@@ -5,9 +5,10 @@ with Playwright (Chromium). Sample names, times and data are fictional; amounts 
 "[summa]" because prices are not decided.
 
     pip install playwright pillow          # dev machine only, not a project dependency
-    python docs/plans/school-app-mockups/build_mockups.py
+    python docs/plans/school-app-mockups/build_mockups.py [NAME ...]
 
-Writes NN-name.png next to this file and overview.png (all phone screens on one sheet).
+Writes NN-name.png next to this file and overview.png (all phone screens on one sheet). Pass screen
+names (e.g. ``18-web-parents``) to render only those and skip the overview.
 """
 
 from __future__ import annotations
@@ -129,6 +130,8 @@ ICONS = {
     "refresh": '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',
     "door": '<path d="M5 21V4h10v17M15 12h.01M3 21h18"/>',
     "upload": '<path d="M12 16V4m-5 5 5-5 5 5M4 20h16"/>',
+    "key": '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9m-4 4 3 3m-6 0 2 2"/>',
+    "link": '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
 }
 
 
@@ -711,7 +714,7 @@ def s_states() -> str:
 
 WEB_SIDEBAR = [
     ("grid", "Bosh sahifa", False),
-    ("users", "O'quvchilar", False),
+    ("users", "Oʻquvchilar", False),
     ("user", "Xodimlar", False),
     (None, "Maktab", None),
     ("door", "Sinflar", True),
@@ -720,7 +723,7 @@ WEB_SIDEBAR = [
     ("chart", "Baholar", False),
     ("users", "Ota-onalar", False),
     (None, "Moliya", None),
-    ("wallet", "To'lovlar", False),
+    ("wallet", "Toʻlovlar", False),
     (None, "Aloqa", None),
     ("chat", "Xabarlar", False),
 ]
@@ -851,6 +854,157 @@ def w_timetable() -> str:
     return web_shell("Dars jadvali", content, "Dars jadvali")
 
 
+def _star() -> str:
+    icon = i("star", 'style="width:13px;height:13px;fill:currentColor"')
+    return f'<span style="color:var(--gold-ink);display:inline-flex">{icon}</span>'
+
+
+def _kid(label: str, primary: bool = False, other: bool = False) -> str:
+    style = (
+        "border:1px dashed var(--border);color:var(--muted)" if other else "background:var(--tint)"
+    )
+    return f'<span class="pill" style="{style};font-weight:600">{_star() if primary else ""}{label}</span>'
+
+
+def _field(label: str, value: str, hint: str = "", muted: bool = False) -> str:
+    colour = "var(--muted)" if muted else "var(--text)"
+    note = f'<div class="tiny muted" style="margin-top:4px">{hint}</div>' if hint else ""
+    return (
+        f'<div><div class="tiny b muted" style="margin-bottom:5px">{label}</div>'
+        f'<div style="height:40px;border:1px solid var(--border);border-radius:10px;padding:0 12px;display:flex;'
+        f'align-items:center;font-size:14px;color:{colour};background:var(--surface)">{value}</div>{note}</div>'
+    )
+
+
+def _toggle(on: bool) -> str:
+    bg = "var(--m)" if on else "var(--border)"
+    side = "right" if on else "left"
+    return (
+        f'<span style="width:34px;height:20px;border-radius:999px;background:{bg};position:relative;display:inline-block">'
+        f'<span style="position:absolute;top:3px;{side}:3px;width:14px;height:14px;border-radius:999px;background:#fff"></span></span>'
+    )
+
+
+def w_parents() -> str:
+    # (name, login ID, phone, [(child label, primary contact, child in another branch)])
+    data = [
+        (
+            "Nodira Karimova",
+            "PR503",
+            "+998 90 111 22 33",
+            [("Aziz · 3-A", True, False), ("Madina · 7-B", False, False)],
+        ),
+        (
+            "Rustam Karimov",
+            "PR504",
+            "+998 93 444 55 66",
+            [("Aziz · 3-A", False, False), ("Madina · 7-B", True, False)],
+        ),
+        ("Feruza Nazarova", "PR507", "+998 91 222 77 88", [("Sardor · 1-A", True, False)]),
+        (
+            "Jamshid Usmonov",
+            "PR509",
+            "+998 97 333 10 20",
+            [("Laylo · 11-A", True, False), ("+1 boshqa filialda", False, True)],
+        ),
+        ("Mohira Saidova", "PR511", "+998 99 555 40 41", [("Otabek · 5-A", True, False)]),
+        ("Ulugʻbek Tojiyev", "PR512", "+998 94 666 70 71", [("Diyora · 9-A", False, False)]),
+    ]
+    rows = "".join(
+        f'<tr style="border-top:1px solid var(--border)"><td style="padding:11px 14px"><div class="b">{name}</div>'
+        f'<div class="tiny muted">{login}</div></td><td class="small">{phone}</td>'
+        f'<td><div class="row" style="gap:6px;flex-wrap:wrap;padding:6px 0">{"".join(_kid(*k) for k in kids)}</div></td>'
+        f'<td style="text-align:right;padding-right:14px;color:var(--m)" class="small b">Ochish →</td></tr>'
+        for name, login, phone, kids in data
+    )
+    link_icon = i("link", 'style="width:18px;height:18px"')
+    search_icon = i("search", 'style="width:18px;height:18px"')
+    close_icon = i("x", 'style="width:18px;height:18px"')
+    tick = i("check", 'style="width:13px;height:13px;stroke-width:3"')
+    content = f"""
+<div class="row between"><div><p class="kicker">Maktab</p><h1 class="serif" style="font-size:30px;color:var(--m);margin-top:4px">Ota-onalar</h1></div>
+  <div class="row" style="gap:10px"><div class="btn btn-ghost" style="height:44px;padding:0 16px">{link_icon}Login ID orqali ulash</div><div class="btn btn-m" style="height:44px;padding:0 18px">{i("plus")}Yangi ota-ona</div></div></div>
+<div style="display:grid;grid-template-columns:1fr 330px;gap:16px;margin-top:16px;align-items:start">
+  <div>
+    <div class="row" style="gap:10px">
+      <div class="row" style="flex:1;gap:8px;height:42px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--muted)">{search_icon}<span class="small">Ism, login ID yoki telefon…</span></div>
+      <span class="pill" style="background:var(--surface);border:1px solid var(--border);padding:11px 14px">Sinf: hammasi ▾</span>
+    </div>
+    <div class="card" style="margin-top:12px;padding:0;overflow:hidden">
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <thead><tr style="background:var(--tint);text-align:left" class="small muted"><th style="padding:11px 14px">Ota-ona</th><th>Telefon</th><th>Farzandlari</th><th></th></tr></thead>
+        <tbody>{rows}</tbody>
+      </table>
+    </div>
+    <p class="small muted row" style="gap:6px;margin-top:10px">{_star()} farzand boʻyicha asosiy aloqa · punktir — boshqa filialdagi farzand (nomi koʻrsatilmaydi)</p>
+  </div>
+  <div class="card" style="padding:18px;display:grid;gap:12px">
+    <div class="row between"><div class="b" style="font-size:17px;color:var(--m)">Yangi ota-ona</div><span class="muted">{close_icon}</span></div>
+    <div class="grid2" style="gap:10px">{_field("Ism", "Zarina")}{_field("Familiya", "Hamidova")}</div>
+    {_field("Telefon raqami", "+998 90 777 88 99", "Bitta raqam — bitta ota-ona")}
+    {_field("Parol", "••••••••", "Login ID avtomatik beriladi: PR513")}
+    <div class="tiny b" style="letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);margin-top:4px">Birinchi farzand</div>
+    {_field("Farzand", "Hamidov Sanjar · 4-B ▾")}
+    {_field("Qarindoshlik", "Onasi ▾")}
+    <div class="row small" style="gap:8px"><span style="width:18px;height:18px;border-radius:5px;background:var(--m);color:#fff;display:grid;place-items:center">{tick}</span>Farzand boʻyicha asosiy aloqa</div>
+    <div class="btn btn-m" style="height:44px">Saqlash</div>
+  </div>
+</div>"""
+    return web_shell("Ota-onalar", content, "Ota-onalar")
+
+
+def w_parent_page() -> str:
+    links = [("Aziz Karimov", "3-A", "Onasi", True), ("Madina Karimova", "7-B", "Onasi", False)]
+    rows = "".join(
+        f'<tr style="border-top:1px solid var(--border)"><td style="padding:12px 14px" class="b">{name}</td><td>{cls}</td>'
+        f'<td><span class="pill" style="background:var(--surface);border:1px solid var(--border)">{rel} ▾</span></td>'
+        f"<td>{_toggle(primary)}</td>"
+        f'<td style="text-align:right;padding-right:14px;color:var(--abs)" class="small b">Uzish</td></tr>'
+        for name, cls, rel, primary in links
+    )
+    key_icon = i("key", 'style="width:18px;height:18px"')
+    link_icon = i("link", 'style="width:18px;height:18px"')
+    content = f"""
+<div class="row between"><div><p class="kicker">Maktab · Ota-onalar</p><h1 class="serif" style="font-size:30px;color:var(--m);margin-top:4px">Nodira Karimova</h1></div>
+  <div class="row" style="gap:10px"><div class="btn btn-ghost" style="height:44px;padding:0 16px">{key_icon}Parolni tiklash</div><div class="btn btn-ghost" style="height:44px;padding:0 16px;color:var(--abs)">Oʻchirish</div></div></div>
+<div style="display:grid;grid-template-columns:290px 1fr;gap:16px;margin-top:18px;align-items:start">
+  <div class="card" style="padding:18px;display:grid;gap:12px">
+    <div class="row" style="gap:12px"><span class="av lg">NK</span><div><div class="b">Nodira Karimova</div><div class="small muted">Login ID: PR503</div></div></div>
+    {_field("Ism", "Nodira")}
+    {_field("Familiya", "Karimova")}
+    {_field("Telefon raqami", "+998 90 111 22 33")}
+    <div class="btn btn-m" style="height:44px">Saqlash</div>
+    <div class="tiny muted">“Parolni tiklash” yangi vaqtinchalik parol beradi; uni ota-onaga topshiring.</div>
+  </div>
+  <div style="display:grid;gap:16px">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="b" style="font-size:17px;color:var(--m);padding:14px 16px">Farzandlari</div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <thead><tr style="background:var(--tint);text-align:left" class="small muted"><th style="padding:10px 14px">Farzand</th><th>Sinf</th><th>Qarindoshlik</th><th>Asosiy aloqa</th><th></th></tr></thead>
+        <tbody>{rows}</tbody>
+      </table>
+      <div class="row" style="gap:10px;padding:12px 16px;border-top:1px solid var(--border);background:var(--bg);align-items:end">
+        <div style="flex:1">{_field("Farzand ulash", "Oʻquvchini tanlang ▾", muted=True)}</div>
+        <div style="width:150px">{_field("Qarindoshlik", "Vasiy ▾")}</div>
+        <div class="btn btn-m" style="height:40px;padding:0 18px">Ulash</div>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;border-color:var(--gold-soft)">
+      <div class="row" style="gap:12px"><span class="tile" style="width:38px;height:38px;border-radius:11px">{link_icon}</span>
+        <div><div class="b">Ota-ona boshqa filialda roʻyxatdan oʻtganmi?</div><div class="small muted">Yangi akkaunt ochmang: login ID va telefon raqami mos kelsa, farzand shu ota-onaga ulanadi.</div></div></div>
+      <div class="row" style="gap:10px;margin-top:12px;align-items:end">
+        <div style="width:120px">{_field("Login ID", "PR488")}</div>
+        <div style="flex:1">{_field("Telefon raqami", "+998 95 123 00 11")}</div>
+        <div style="flex:1">{_field("Farzand", "Karimov Aziz · 3-A ▾")}</div>
+        <div class="btn btn-ghost" style="height:40px;padding:0 18px">Ulash</div>
+      </div>
+      <div class="tiny muted" style="margin-top:8px">Mos kelmasa — faqat “Ota-ona topilmadi”; boshqa filial maʼlumotlari koʻrsatilmaydi.</div>
+    </div>
+  </div>
+</div>"""
+    return web_shell("Ota-onalar", content, "Ota-onalar")
+
+
 SCREENS = [
     ("01-choice", "Tanlov · Choice", s_choice),
     ("02-login-school", "Kirish · School", s_login_school),
@@ -871,10 +1025,12 @@ SCREENS = [
 WEB_SCREENS = [
     ("16-web-classes", "Web · Sinflar", w_classes),
     ("17-web-timetable", "Web · Dars jadvali", w_timetable),
+    ("18-web-parents", "Web · Ota-onalar", w_parents),
+    ("18b-web-parent-page", "Web · Ota-ona sahifasi", w_parent_page),
 ]
 
 
-def main() -> None:
+def main(only: list[str]) -> None:
     from PIL import Image, ImageDraw, ImageFont
     from playwright.sync_api import sync_playwright
 
@@ -890,6 +1046,8 @@ def main() -> None:
             ctx = browser.new_context(viewport={"width": w, "height": h}, device_scale_factor=2)
             pg = ctx.new_page()
             for name, _label, fn in items:
+                if only and name not in only:
+                    continue
                 html_path = HERE / f".{name}.html"
                 html_path.write_text(fn(), encoding="utf-8")
                 pg.goto(html_path.as_uri())
@@ -903,6 +1061,8 @@ def main() -> None:
                 print("wrote", out.name, im.size)
             ctx.close()
         browser.close()
+    if only:
+        return
 
     # Overview sheet: phone screens in rows of 5 with labels.
     tiles = [(label, Image.open(HERE / f"{name}.png")) for name, label, _ in SCREENS]
@@ -932,4 +1092,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))
