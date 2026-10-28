@@ -202,6 +202,28 @@ urlpatterns = [
         school_views.ClassSubjectDetailView.as_view(),
         name="api_admin_class_subject_detail",
     ),
+    # ── Admin: School parents and their children (P1.7) ──────────────────────
+    path("admin/parents/", school_views.ParentListView.as_view(), name="api_admin_parents"),
+    path(
+        "admin/parents/link-by-login/",
+        school_views.ParentLinkByLoginView.as_view(),
+        name="api_admin_parent_link_by_login",
+    ),
+    path(
+        "admin/parents/<int:pk>/",
+        school_views.ParentDetailView.as_view(),
+        name="api_admin_parent_detail",
+    ),
+    path(
+        "admin/parents/<int:pk>/children/",
+        school_views.ParentChildListView.as_view(),
+        name="api_admin_parent_children",
+    ),
+    path(
+        "admin/parents/<int:pk>/children/<int:student_pk>/",
+        school_views.ParentChildDetailView.as_view(),
+        name="api_admin_parent_child_detail",
+    ),
     path("admin/subjects/", admin_views.SubjectListView.as_view(), name="api_admin_subjects"),
     path(
         "admin/subjects/<int:pk>/",

@@ -279,6 +279,27 @@ def filter_results_for_user(user, queryset):
     return queryset.none()
 
 
+def filter_parents_for_user(user, queryset):
+    """Filter a Parent queryset: admins see parents of children in their branches.
+
+    A parent with children in several branches is visible to each of those
+    branches' admins (who still see only their own children, see parents.py).
+    A parent sees themself. Teachers and students see no parents here.
+    """
+    if is_super_admin(user):
+        return queryset
+
+    if get_admin_profile(user) is not None:
+        students = filter_students_for_user(user, Student.objects.all())
+        return queryset.filter(child_links__student__in=students).distinct()
+
+    parent = _get_parent(user)
+    if parent is not None:
+        return queryset.filter(pk=parent.pk)
+
+    return queryset.none()
+
+
 def filter_class_subjects_for_user(user, queryset):
     """Filter a ClassSubject queryset: admins by branch, teachers by class or subject."""
     if is_super_admin(user):
