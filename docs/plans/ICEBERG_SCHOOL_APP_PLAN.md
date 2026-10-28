@@ -740,7 +740,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       (the open point from P2.1). Bell period model messages are now translatable (`gettext_lazy`).
       Room per lesson is kept but not edited in the grid (the class room is used; the API can set it).
 - [x] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7. — done 2026-10-28,
-      PR #PRNUM; verified: full suite 423 OK, `test_school_parent_pages` (access incl. other-branch 404 on
+      PR #53; verified: full suite 423 OK, `test_school_parent_pages` (access incl. other-branch 404 on
       every action, duplicate phone, link by login ID + phone, unlinking the last child, uz/ru).
       Notes: **Maktab → Ota-onalar** (`/maktab/parents/`), views in `school_parent_views.py`, built from
       screens 18–18b on the P1.7 rules in `parents.py` (shared with the API; the login ID + phone
@@ -898,7 +898,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P3.3 done (PR #PRNUM): admin parents list, new parent, parent page, link by
+- 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
   login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
 - 2026-10-28 — PD.8: screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session), unchanged (PR #46). P3.3 claimed; it starts
   after #43 (shares urls.py, erpnext_sidebar.html, school_forms.py and the .po files).
