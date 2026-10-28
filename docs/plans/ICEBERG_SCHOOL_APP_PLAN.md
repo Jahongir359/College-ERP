@@ -775,9 +775,17 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       teacher on the class page is now refused when the new teacher is busy at one of its lesson times
       (the open point from P2.1). Bell period model messages are now translatable (`gettext_lazy`).
       Room per lesson is kept but not edited in the grid (the class room is used; the API can set it).
-- [~] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7. — claimed 2026-10-28,
-      branch feat/school-p3.3-parents-admin (#43 merged; build from screens 18–18b; CSV
-      import screen is Release 2, D16).
+- [x] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7. — done 2026-10-28,
+      PR #53; verified: full suite 423 OK, `test_school_parent_pages` (access incl. other-branch 404 on
+      every action, duplicate phone, link by login ID + phone, unlinking the last child, uz/ru).
+      Notes: **Maktab → Ota-onalar** (`/maktab/parents/`), views in `school_parent_views.py`, built from
+      screens 18–18b on the P1.7 rules in `parents.py` (shared with the API; the login ID + phone
+      lookup moved there as `parent_by_login_and_phone`, so a mismatch is only "Parent not found").
+      Reset password makes a temporary one shown once on the page (never in a message or cookie).
+      Children in branches the admin can't see show only as "+N in another branch". The CSV import
+      screen is Release 2 (D16). These tables stay visible below 1025 px (`school-table-wrap`):
+      `admin-manage-mobile.css` hides `.ice-manage-table-wrap` there, which also hides the P3.1/P3.2
+      tables on phones (for P3.6).
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
@@ -945,6 +953,9 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
+  login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
 
 - 2026-10-28 — P2.4 done (PR #52): `Mark` model, `school/marks/` API in `api/marks_views.py`,
   `branching.filter_marks_for_user`. Migration `0048_mark` (after P2.6's 0047). Next on this line: P2.5 term grades (same session).

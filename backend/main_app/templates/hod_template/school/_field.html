@@ -1,0 +1,7 @@
+{% comment %}One labelled form field with its errors and an optional help line. Use: include with field=form.x help="…"{% endcomment %}
+<div class="school-field">
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% for error in field.errors %}<div class="school-error">{{ error }}</div>{% endfor %}
+  {% if help %}<div class="school-help">{{ help }}</div>{% elif field.help_text %}<div class="school-help">{{ field.help_text }}</div>{% endif %}
+</div>
