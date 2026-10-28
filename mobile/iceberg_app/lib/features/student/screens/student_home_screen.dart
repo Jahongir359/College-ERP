@@ -12,6 +12,7 @@ import '../../../core/api/api_providers.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/ice_kit.dart';
 
 part 'student_home/home_widgets.dart';
@@ -147,11 +148,11 @@ class _Dashboard extends ConsumerWidget {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.star_rounded, size: 14, color: t.accent),
+                              Icon(Icons.star_rounded, size: 14, color: t.onHero.accent),
                               const SizedBox(width: 4),
                               MicroLabel(
                                 tier.isEmpty ? s('My standing') : tier,
-                                color: t.accent,
+                                color: t.onHero.accent,
                               ),
                             ],
                           ),
@@ -206,13 +207,13 @@ class _Dashboard extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(7),
                         decoration: BoxDecoration(
-                          color: t.accent.withValues(alpha: 0.15),
+                          color: t.onHero.accent.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.local_fire_department_rounded,
                           size: 16,
-                          color: t.accent,
+                          color: t.onHero.accent,
                         ),
                       ),
                       const SizedBox(width: 10),

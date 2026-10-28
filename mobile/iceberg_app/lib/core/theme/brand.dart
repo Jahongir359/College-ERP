@@ -23,6 +23,11 @@ enum IceBrand {
   /// Use with the strings provider: `s(brand.groupKey)`.
   String get groupKey => isSchool ? 'Class' : 'Group';
   String get myGroupKey => isSchool ? 'My Class' : 'My Group';
+
+  /// The teacher's list of groups (menu item, page title and subtitle).
+  String get teacherGroupsKey => isSchool ? 'Classes' : 'My Classes';
+  String get teacherGroupsHintKey =>
+      isSchool ? 'Classes you teach' : 'Groups you teach';
 }
 
 /// Iceberg School palette (docs/brand/iceberg-school/tokens.json).

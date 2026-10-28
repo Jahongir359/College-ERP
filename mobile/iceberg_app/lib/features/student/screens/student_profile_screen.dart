@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_providers.dart';
 import '../../../core/auth/auth_state.dart';
+import '../../../core/i18n/strings.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
@@ -132,14 +133,14 @@ class StudentProfileScreen extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.account_balance_rounded, size: 16, color: t.mint),
+                  Icon(Icons.account_balance_rounded, size: 16, color: t.onHero.mint),
                   const SizedBox(width: 8),
-                  MicroLabel('Tuition Balance', color: t.mint),
+                  MicroLabel(s('Tuition Balance'), color: t.onHero.mint),
                 ],
               ),
               const SizedBox(height: 10),
               Text(
-                balance > 0 ? _uzs(balance) : 'All paid 🎉',
+                balance > 0 ? _uzs(balance) : '${s('All paid')} 🎉',
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
@@ -153,7 +154,7 @@ class StudentProfileScreen extends ConsumerWidget {
                   children: [
                     if (dueDate != null)
                       StatusBadge(
-                        _dueLabel(dueDate),
+                        _dueLabel(s, dueDate),
                         tone: dueDate.isBefore(DateTime.now())
                             ? BadgeTone.coral
                             : BadgeTone.amber,
@@ -167,8 +168,8 @@ class StudentProfileScreen extends ConsumerWidget {
                   child: FilledButton(
                     onPressed: () => context.go('/student/payments'),
                     style: FilledButton.styleFrom(
-                      backgroundColor: t.accent,
-                      foregroundColor: t.onAccent,
+                      backgroundColor: t.onHero.accent,
+                      foregroundColor: t.onHero.onAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -195,7 +196,7 @@ class StudentProfileScreen extends ConsumerWidget {
               child: _QuickCard(
                 icon: Icons.payments_outlined,
                 title: s('Payments'),
-                subtitle: 'History & invoices',
+                subtitle: s('History & invoices'),
                 onTap: () => context.go('/student/payments'),
               ),
             ),
@@ -204,7 +205,7 @@ class StudentProfileScreen extends ConsumerWidget {
               child: _QuickCard(
                 icon: Icons.event_busy_outlined,
                 title: s('Leave Requests'),
-                subtitle: 'Manage absences',
+                subtitle: s('Manage absences'),
                 onTap: () => context.go('/student/leave'),
               ),
             ),
@@ -217,7 +218,7 @@ class StudentProfileScreen extends ConsumerWidget {
               child: _QuickCard(
                 icon: Icons.forum_outlined,
                 title: s('Feedback'),
-                subtitle: 'Reviews & reports',
+                subtitle: s('Reviews & reports'),
                 onTap: () => context.go('/student/feedback'),
               ),
             ),
@@ -226,7 +227,7 @@ class StudentProfileScreen extends ConsumerWidget {
               child: _QuickCard(
                 icon: Icons.settings_outlined,
                 title: s('Settings'),
-                subtitle: 'App preferences',
+                subtitle: s('App preferences'),
                 onTap: () => context.push('/student/settings'),
               ),
             ),
@@ -236,16 +237,16 @@ class StudentProfileScreen extends ConsumerWidget {
 
         // ── Recent activity ──────────────────────────────────────────────
         SectionHeader(
-          'Recent Activity',
+          s('Recent Activity'),
           actionLabel: s('View All'),
           onAction: () => context.go('/student/notifications'),
         ),
         notifications.maybeWhen(
           data: (list) => list.isEmpty
-              ? const IceCard(
+              ? IceCard(
                   child: EmptyState(
                     icon: Icons.history_rounded,
-                    title: 'No activity yet',
+                    title: s('No activity yet'),
                   ),
                 )
               : Column(
@@ -257,10 +258,10 @@ class StudentProfileScreen extends ConsumerWidget {
                           child: ActionTile(
                             icon: _categoryIcon(n['category']),
                             iconColor: t.mint,
-                            title: _categoryTitle(n['category']),
+                            title: _categoryTitle(s, n['category']),
                             subtitle: n['message'] ?? '',
                             trailing: n['is_read'] == false
-                                ? StatusBadge('New', tone: BadgeTone.accent)
+                                ? StatusBadge(s('New'), tone: BadgeTone.accent)
                                 : null,
                             onTap: () => context.go('/student/notifications'),
                           ),
@@ -273,14 +274,14 @@ class StudentProfileScreen extends ConsumerWidget {
         const SizedBox(height: 16),
 
         // ── Appearance selector ──────────────────────────────────────────
-        const SectionHeader('Appearance'),
+        SectionHeader(s('Appearance')),
         IceCard(
           padding: const EdgeInsets.all(8),
           child: Column(
             children: [
               _ThemeRow(
                 icon: Icons.contrast_rounded,
-                label: 'System Default',
+                label: s('System Default'),
                 selected: settings.themeMode == ThemeMode.system,
                 onTap: () => ref
                     .read(appSettingsProvider.notifier)
@@ -288,7 +289,7 @@ class StudentProfileScreen extends ConsumerWidget {
               ),
               _ThemeRow(
                 icon: Icons.light_mode_outlined,
-                label: 'Light Mode',
+                label: s('Light Mode'),
                 selected: settings.themeMode == ThemeMode.light,
                 onTap: () => ref
                     .read(appSettingsProvider.notifier)
@@ -296,7 +297,7 @@ class StudentProfileScreen extends ConsumerWidget {
               ),
               _ThemeRow(
                 icon: Icons.dark_mode_outlined,
-                label: 'Dark Mode',
+                label: s('Dark Mode'),
                 selected: settings.themeMode == ThemeMode.dark,
                 onTap: () => ref
                     .read(appSettingsProvider.notifier)
@@ -316,14 +317,14 @@ class StudentProfileScreen extends ConsumerWidget {
     );
   }
 
-  String _dueLabel(DateTime due) {
+  String _dueLabel(S s, DateTime due) {
     final today = DateTime.now();
     final diff = due
         .difference(DateTime(today.year, today.month, today.day))
         .inDays;
-    if (diff < 0) return 'Overdue';
-    if (diff == 0) return 'Due today';
-    return 'Due in $diff days';
+    if (diff < 0) return s('Overdue');
+    if (diff == 0) return s('Due today');
+    return s('Due in {n} days').replaceAll('{n}', '$diff');
   }
 
   IconData _categoryIcon(dynamic c) => switch (c) {
@@ -336,14 +337,14 @@ class StudentProfileScreen extends ConsumerWidget {
     _ => Icons.notifications_none_rounded,
   };
 
-  String _categoryTitle(dynamic c) => switch (c) {
-    'attendance' => 'Attendance',
-    'result' => 'Result',
-    'announcement' => 'Announcement',
-    'homework' => 'Assignment',
-    'vocabulary' => 'Vocabulary',
-    'payment' => 'Payment',
-    _ => 'Notification',
+  String _categoryTitle(S s, dynamic c) => switch (c) {
+    'attendance' => s('Attendance'),
+    'result' => s('Result'),
+    'announcement' => s('Announcement'),
+    'homework' => s('Assignment'),
+    'vocabulary' => s('Vocabulary'),
+    'payment' => s('Payment'),
+    _ => s('Notification'),
   };
 }
 

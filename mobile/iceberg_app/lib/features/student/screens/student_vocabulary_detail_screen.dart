@@ -141,7 +141,7 @@ class _StudentVocabularyDetailScreenState
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: i == _previewIndex
-                                ? t.accent
+                                ? t.onHero.accent
                                 : Colors.white.withValues(alpha: 0.3),
                           ),
                         ),
