@@ -745,8 +745,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       on-primary colour (contrast 4.5:1 or more), those strings come from `strings.dart` in uz/ru/en,
       before/after screenshots at 390 px light and dark; Study Center screens unchanged. Not in this
       task: School sign-in colours (P4.2), hiding Study Center-only tabs (P4.9), the web admin pages
-      (brand layer, other thread). — claimed 2026-10-28 by college-erp-89, branch
-      feat/school-p4.13-brand-readability (handed over from college-erp-07)
+      (brand layer, other thread). — claimed 2026-10-28, branch feat/school-p4.13-brand-polish
 ### P5 — Store readiness
 
 - [ ] **P5.1** **Owner** — D-U-N-S number for the organisation, then Google Play developer account (organisation)
@@ -856,8 +855,8 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
 - 2026-10-28 — P0.6 timetable week (PR #42): `seed_school_demo` adds bell periods and a clash-free
-  week, so the timetable API and screens have data. Claimed P2.2 (register) and added P4.13 (handed to college-erp-89)
-  — app screens readable under the School brand, found from screenshots of the running app. Reviewed
+  week, so the timetable API and screens have data. Claimed P2.2 (register) and added + claimed P4.13
+  (app screens readable under the School brand), found from screenshots of the running app. Reviewed
   P3.1's pages against mockup 16 and sent the gaps to the other thread (maroon buttons and header
   cards, readable active sidebar item, phone bottom bar). Split agreed: this thread P2.2, P4.13,
   PD.9 part 2 (register report mockup); the other P3.2, PD.9 part 1, P3.3. Next here: P2.2.
