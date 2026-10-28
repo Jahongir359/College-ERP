@@ -11,6 +11,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+msgid "The end time must be after the start time."
+msgstr "Время окончания должно быть позже времени начала."
+
+msgid "Bell periods belong to an Iceberg School branch."
+msgstr "Звонки относятся только к филиалу Iceberg School."
+
+msgid "Bell periods in one branch must not overlap."
+msgstr "Звонки одного филиала не должны пересекаться."
+
 msgid "Classes"
 msgstr "Классы"
 
@@ -36,6 +45,10 @@ msgstr "%(student)s добавлен(а) в %(name)s."
 #, python-format
 msgid "%(student)s removed from %(name)s."
 msgstr "%(student)s удалён(а) из %(name)s."
+
+#, python-format
+msgid "%(teacher)s already teaches %(class)s at that time (%(day)s, period %(period)s)."
+msgstr "%(teacher)s в это время уже ведёт урок в %(class)s (%(day)s, %(period)s-й урок)."
 
 msgid "This class already has this subject."
 msgstr "В этом классе уже есть этот предмет."
@@ -174,6 +187,78 @@ msgstr "Последний день"
 msgid "This year already has this quarter."
 msgstr "В этом году уже есть эта четверть."
 
+msgid "Period"
+msgstr "Урок"
+
+msgid "Starts"
+msgstr "Начало"
+
+msgid "Ends"
+msgstr "Конец"
+
+#, python-format
+msgid "This branch already has period %(number)s."
+msgstr "В этом филиале уже есть %(number)s-й урок."
+
+#, python-format
+msgid "Teacher busy: %(class)s"
+msgstr "Учитель занят: %(class)s"
+
+#, python-format
+msgid "Room busy: %(class)s"
+msgstr "Кабинет занят: %(class)s"
+
+msgid "The class already has a lesson at this time."
+msgstr "У класса уже есть урок в это время."
+
+msgid "Bell times"
+msgstr "Звонки"
+
+#, python-format
+msgid "Period %(number)s saved."
+msgstr "%(number)s-й урок сохранён."
+
+msgid "Lessons use this period. Move or delete them first."
+msgstr "На это время стоят уроки. Сначала перенесите или удалите их."
+
+#, python-format
+msgid "Period %(number)s deleted."
+msgstr "%(number)s-й урок удалён."
+
+msgid "Timetable"
+msgstr "Расписание"
+
+msgid "The date must be inside the class's academic year."
+msgstr "Дата должна быть внутри учебного года класса."
+
+#, python-format
+msgid "Timetable of %(name)s saved."
+msgstr "Расписание %(name)s сохранено."
+
+msgid "Nothing was saved: fix the red cells first."
+msgstr "Ничего не сохранено: сначала исправьте красные ячейки."
+
+msgid "The lesson periods of each school branch. The timetable uses them."
+msgstr "Время уроков каждого филиала школы. Расписание строится по нему."
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Delete this period?"
+msgstr "Удалить это время урока?"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "No bell times yet."
+msgstr "Звонков пока нет."
+
+msgid "Add period"
+msgstr "Добавить урок"
+
+msgid "No school branch yet."
+msgstr "Филиала школы пока нет."
+
 msgid "Not set"
 msgstr "Не назначен"
 
@@ -217,9 +302,6 @@ msgstr[0] "%(hours)s час в неделю"
 msgstr[1] "%(hours)s часа в неделю"
 msgstr[2] "%(hours)s часов в неделю"
 
-msgid "Save"
-msgstr "Сохранить"
-
 msgid "Remove this subject from the class?"
 msgstr "Убрать этот предмет из класса?"
 
@@ -262,6 +344,43 @@ msgstr "Классов пока нет"
 msgid "Create the first class, for example 1-A."
 msgstr "Создайте первый класс, например 1-A."
 
+msgid "Class page"
+msgstr "Страница класса"
+
+msgid "Changes apply from"
+msgstr "Изменения действуют с"
+
+msgid "Show"
+msgstr "Показать"
+
+msgid "This branch has no bell times yet."
+msgstr "В этом филиале пока нет звонков."
+
+msgid "Add the bell times first."
+msgstr "Сначала добавьте звонки."
+
+msgid "This class has no subjects yet."
+msgstr "У этого класса пока нет предметов."
+
+msgid "Add subjects on the class page first."
+msgstr "Сначала добавьте предметы на странице класса."
+
+msgid "lesson"
+msgstr "урок"
+
+msgid "Lessons a week per subject"
+msgstr "Уроков в неделю по предметам"
+
+msgid "Changes apply to the whole academic year."
+msgstr "Изменения действуют на весь учебный год."
+
+#, python-format
+msgid "Changes apply from %(day)s; earlier weeks keep the old timetable."
+msgstr "Изменения действуют с %(day)s; прошлые недели сохраняют старое расписание."
+
+msgid "A red cell is a clash: the teacher or room is busy at that time. Fix it before saving."
+msgstr "Красная ячейка — конфликт: учитель или кабинет заняты в это время. Исправьте перед сохранением."
+
 msgid "Years and quarters are shared by all branches."
 msgstr "Учебные годы и четверти общие для всех филиалов."
 
@@ -285,9 +404,6 @@ msgstr "Даты"
 
 msgid "Delete this quarter?"
 msgstr "Удалить эту четверть?"
-
-msgid "Delete"
-msgstr "Удалить"
 
 msgid "No quarters yet."
 msgstr "Четвертей пока нет."

@@ -11,6 +11,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "The end time must be after the start time."
+msgstr "Tugash vaqti boshlanish vaqtidan keyin boʻlishi kerak."
+
+msgid "Bell periods belong to an Iceberg School branch."
+msgstr "Qoʻngʻiroq vaqtlari faqat Iceberg School filialiga tegishli."
+
+msgid "Bell periods in one branch must not overlap."
+msgstr "Bir filialdagi qoʻngʻiroq vaqtlari bir-biriga toʻgʻri kelmasligi kerak."
+
 msgid "Classes"
 msgstr "Sinflar"
 
@@ -36,6 +45,10 @@ msgstr "%(student)s %(name)s sinfiga qoʻshildi."
 #, python-format
 msgid "%(student)s removed from %(name)s."
 msgstr "%(student)s %(name)s sinfidan chiqarildi."
+
+#, python-format
+msgid "%(teacher)s already teaches %(class)s at that time (%(day)s, period %(period)s)."
+msgstr "%(teacher)s bu vaqtda %(class)s sinfida dars beradi (%(day)s, %(period)s-dars)."
 
 msgid "This class already has this subject."
 msgstr "Bu sinfda bu fan allaqachon bor."
@@ -174,6 +187,78 @@ msgstr "Oxirgi kun"
 msgid "This year already has this quarter."
 msgstr "Bu yilda bu chorak allaqachon bor."
 
+msgid "Period"
+msgstr "Dars"
+
+msgid "Starts"
+msgstr "Boshlanishi"
+
+msgid "Ends"
+msgstr "Tugashi"
+
+#, python-format
+msgid "This branch already has period %(number)s."
+msgstr "Bu filialda %(number)s-dars allaqachon bor."
+
+#, python-format
+msgid "Teacher busy: %(class)s"
+msgstr "Ustoz band: %(class)s"
+
+#, python-format
+msgid "Room busy: %(class)s"
+msgstr "Xona band: %(class)s"
+
+msgid "The class already has a lesson at this time."
+msgstr "Bu sinfda shu vaqtda dars allaqachon bor."
+
+msgid "Bell times"
+msgstr "Qoʻngʻiroqlar"
+
+#, python-format
+msgid "Period %(number)s saved."
+msgstr "%(number)s-dars saqlandi."
+
+msgid "Lessons use this period. Move or delete them first."
+msgstr "Bu vaqtda darslar bor. Avval ularni koʻchiring yoki oʻchiring."
+
+#, python-format
+msgid "Period %(number)s deleted."
+msgstr "%(number)s-dars oʻchirildi."
+
+msgid "Timetable"
+msgstr "Dars jadvali"
+
+msgid "The date must be inside the class's academic year."
+msgstr "Sana sinfning oʻquv yili ichida boʻlishi kerak."
+
+#, python-format
+msgid "Timetable of %(name)s saved."
+msgstr "%(name)s dars jadvali saqlandi."
+
+msgid "Nothing was saved: fix the red cells first."
+msgstr "Hech narsa saqlanmadi: avval qizil kataklarni tuzating."
+
+msgid "The lesson periods of each school branch. The timetable uses them."
+msgstr "Har bir maktab filialining dars vaqtlari. Dars jadvali ulardan foydalanadi."
+
+msgid "Save"
+msgstr "Saqlash"
+
+msgid "Delete this period?"
+msgstr "Bu dars vaqtini oʻchirasizmi?"
+
+msgid "Delete"
+msgstr "Oʻchirish"
+
+msgid "No bell times yet."
+msgstr "Hali qoʻngʻiroq vaqtlari yoʻq."
+
+msgid "Add period"
+msgstr "Dars vaqti qoʻshish"
+
+msgid "No school branch yet."
+msgstr "Hali maktab filiali yoʻq."
+
 msgid "Not set"
 msgstr "Belgilanmagan"
 
@@ -215,9 +300,6 @@ msgid "%(hours)s hour a week"
 msgid_plural "%(hours)s hours a week"
 msgstr[0] "haftasiga %(hours)s soat"
 msgstr[1] "haftasiga %(hours)s soat"
-
-msgid "Save"
-msgstr "Saqlash"
 
 msgid "Remove this subject from the class?"
 msgstr "Bu fanni sinfdan olib tashlaysizmi?"
@@ -261,6 +343,43 @@ msgstr "Hali sinflar yoʻq"
 msgid "Create the first class, for example 1-A."
 msgstr "Birinchi sinfni yarating, masalan 1-A."
 
+msgid "Class page"
+msgstr "Sinf sahifasi"
+
+msgid "Changes apply from"
+msgstr "Oʻzgarishlar kuchga kiradigan sana"
+
+msgid "Show"
+msgstr "Koʻrsatish"
+
+msgid "This branch has no bell times yet."
+msgstr "Bu filialda hali qoʻngʻiroq vaqtlari yoʻq."
+
+msgid "Add the bell times first."
+msgstr "Avval qoʻngʻiroq vaqtlarini qoʻshing."
+
+msgid "This class has no subjects yet."
+msgstr "Bu sinfda hali fanlar yoʻq."
+
+msgid "Add subjects on the class page first."
+msgstr "Avval sinf sahifasida fanlarni qoʻshing."
+
+msgid "lesson"
+msgstr "dars"
+
+msgid "Lessons a week per subject"
+msgstr "Har bir fan boʻyicha haftalik darslar"
+
+msgid "Changes apply to the whole academic year."
+msgstr "Oʻzgarishlar butun oʻquv yiliga taalluqli."
+
+#, python-format
+msgid "Changes apply from %(day)s; earlier weeks keep the old timetable."
+msgstr "Oʻzgarishlar %(day)s dan kuchga kiradi; oldingi haftalar eski jadvalda qoladi."
+
+msgid "A red cell is a clash: the teacher or room is busy at that time. Fix it before saving."
+msgstr "Qizil katak — toʻqnashuv: oʻqituvchi yoki xona shu vaqtda band. Saqlashdan oldin tuzating."
+
 msgid "Years and quarters are shared by all branches."
 msgstr "Oʻquv yillari va choraklar barcha filiallar uchun umumiy."
 
@@ -284,9 +403,6 @@ msgstr "Sanalar"
 
 msgid "Delete this quarter?"
 msgstr "Bu chorakni oʻchirasizmi?"
-
-msgid "Delete"
-msgstr "Oʻchirish"
 
 msgid "No quarters yet."
 msgstr "Hali choraklar yoʻq."
