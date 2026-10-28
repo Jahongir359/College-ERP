@@ -455,10 +455,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       a test login works. Needs: P0.1 (D9), P0.2.
 - [ ] **P0.5** A **staging** instance (same image, separate database) with `SCHOOL_BRAND_ENABLED=True`.
       Done when: staging URL works and is written in `docs/DEPLOYMENT.md`. Needs: P0.4.
-- [ ] **P0.6** Demo data command `python manage.py seed_school_demo` (one school branch, classes 1-A,
+- [~] **P0.6** Demo data command `python manage.py seed_school_demo` (one school branch, classes 1-A,
       7-B, 11-A, teachers, students, parents, a week of timetable, marks, invoices). Re-runnable,
       refuses to run when `DEBUG=False` unless `--force`. Done when: command + test; staging seeded.
-      Needs: P1.1–P1.6 (write it at the end of P1; tick it then).
+      Needs: P1.1–P1.6 (write it at the end of P1; tick it then). — claimed 2026-10-28, branch
+      feat/school-p0.6-demo-data
 - [ ] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
       Needs: P0.4.
 - [ ] **P0.8** Monitoring: uptime checks for `app.iceberglc.com` and `iceberglc.com`, error alerts (e.g.
