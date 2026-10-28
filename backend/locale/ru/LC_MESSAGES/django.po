@@ -690,3 +690,140 @@ msgstr "Не удалось войти из-за ошибки сервера. П
 msgid "Your account role is not configured correctly. Please contact the administrator."
 msgstr "Роль вашего аккаунта настроена неверно. Обратитесь к администратору."
 
+
+# Parents pages (P3.3)
+
+msgid "Parents"
+msgstr "Родители"
+
+msgid "Parent"
+msgstr "Родитель"
+
+msgid "New parent"
+msgstr "Новый родитель"
+
+msgid "All parents"
+msgstr "Все родители"
+
+msgid "Search parents"
+msgstr "Поиск родителей"
+
+msgid "Name, login ID or phone…"
+msgstr "Имя, логин или телефон…"
+
+msgid "Search"
+msgstr "Найти"
+
+msgid "Children"
+msgstr "Дети"
+
+msgid "Details"
+msgstr "Данные"
+
+msgid "Saved."
+msgstr "Сохранено."
+
+msgid "Main contact"
+msgstr "Основной контакт"
+
+msgid "main contact for this child"
+msgstr "основной контакт ребёнка"
+
+msgid "dashed: a child in another branch (not shown)"
+msgstr "пунктир — ребёнок в другом филиале (не показан)"
+
+msgid "One login per family: a parent sees all their children in the app."
+msgstr "Один логин на семью: родитель видит в приложении всех своих детей."
+
+msgid "Link by login ID"
+msgstr "Привязать по логину"
+
+msgid "No parents found"
+msgstr "Родители не найдены"
+
+msgid "No parents yet"
+msgstr "Родителей пока нет"
+
+msgid "Create a parent together with their first child."
+msgstr "Создайте родителя вместе с его первым ребёнком."
+
+msgid "One phone number, one parent."
+msgstr "Один номер — один родитель."
+
+msgid "The login ID (PR…) is given automatically."
+msgstr "Логин (PR…) выдаётся автоматически."
+
+msgid "First child"
+msgstr "Первый ребёнок"
+
+msgid "Parent registered in another branch?"
+msgstr "Родитель зарегистрирован в другом филиале?"
+
+msgid "Don't open a second login: if the login ID and phone number both match, the child is linked to that parent."
+msgstr "Не создавайте второй логин: если логин и номер телефона совпадают, ребёнок будет привязан к этому родителю."
+
+msgid "Link"
+msgstr "Привязать"
+
+msgid "Link child"
+msgstr "Привязать ребёнка"
+
+msgid "Unlink"
+msgstr "Отвязать"
+
+msgid "Unlink this child from the parent?"
+msgstr "Отвязать этого ребёнка от родителя?"
+
+msgid "No children linked."
+msgstr "Нет привязанных детей."
+
+msgid "Reset password"
+msgstr "Сбросить пароль"
+
+msgid "Give this parent a new password? The old one stops working."
+msgstr "Выдать родителю новый пароль? Старый перестанет работать."
+
+msgid "New password"
+msgstr "Новый пароль"
+
+msgid "Give it to the parent now; it is shown only once."
+msgstr "Передайте его родителю сейчас: он показывается только один раз."
+
+msgid "“Reset password” gives a new temporary password; hand it to the parent."
+msgstr "«Сбросить пароль» выдаёт новый временный пароль; передайте его родителю."
+
+msgid "Delete this parent login? Their children stay."
+msgstr "Удалить логин родителя? Дети останутся."
+
+msgid "Parent not found. Check the login ID and the phone number."
+msgstr "Родитель не найден. Проверьте логин и номер телефона."
+
+#, python-format
+msgid "%(child)s linked to parent %(login)s."
+msgstr "%(child)s привязан(а) к родителю %(login)s."
+
+#, python-format
+msgid "Parent %(name)s created. Login ID: %(login)s."
+msgstr "Родитель %(name)s создан. Логин: %(login)s."
+
+msgid "This parent also has children in another branch, so the login can't be deleted. Unlink your children instead."
+msgstr "У этого родителя есть дети в другом филиале, поэтому логин удалить нельзя. Отвяжите своих детей."
+
+#, python-format
+msgid "Parent %(name)s deleted."
+msgstr "Родитель %(name)s удалён."
+
+#, python-format
+msgid "%(child)s linked."
+msgstr "%(child)s привязан(а)."
+
+#, python-format
+msgid "%(child)s unlinked."
+msgstr "%(child)s отвязан(а)."
+
+#, python-format
+msgid "+%(n)s in another branch"
+msgid_plural "+%(n)s in other branches"
+msgstr[0] "+%(n)s в другом филиале"
+msgstr[1] "+%(n)s в других филиалах"
+msgstr[2] "+%(n)s в других филиалах"

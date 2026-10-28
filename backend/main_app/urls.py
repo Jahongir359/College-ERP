@@ -27,6 +27,7 @@ from . import (
     payments_views,
     public_views,
     school_admin_views,
+    school_parent_views,
     school_timetable_views,
     staff_views,
     student_views,
@@ -101,6 +102,35 @@ urlpatterns = [
         "maktab/bells/<int:pk>/delete/",
         school_timetable_views.bell_delete,
         name="school_bell_delete",
+    ),
+    path("maktab/parents/", school_parent_views.parent_list, name="school_parents"),
+    path(
+        "maktab/parents/<int:pk>/", school_parent_views.parent_detail, name="school_parent_detail"
+    ),
+    path(
+        "maktab/parents/<int:pk>/password/",
+        school_parent_views.parent_reset_password,
+        name="school_parent_reset_password",
+    ),
+    path(
+        "maktab/parents/<int:pk>/delete/",
+        school_parent_views.parent_delete,
+        name="school_parent_delete",
+    ),
+    path(
+        "maktab/parents/<int:pk>/children/add/",
+        school_parent_views.parent_child_add,
+        name="school_parent_child_add",
+    ),
+    path(
+        "maktab/parents/<int:pk>/children/<int:student_pk>/",
+        school_parent_views.parent_child_edit,
+        name="school_parent_child_edit",
+    ),
+    path(
+        "maktab/parents/<int:pk>/children/<int:student_pk>/remove/",
+        school_parent_views.parent_child_remove,
+        name="school_parent_child_remove",
     ),
     path(
         "accounts/password_reset/",

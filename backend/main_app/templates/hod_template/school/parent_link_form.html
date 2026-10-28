@@ -1,0 +1,15 @@
+{% load i18n %}
+<h3 class="school-panel__title">{% translate "Parent registered in another branch?" %}</h3>
+<p class="school-help">{% translate "Don't open a second login: if the login ID and phone number both match, the child is linked to that parent." %}</p>
+<form method="post" action="{% url 'school_parents' %}" class="school-stack">
+  {% csrf_token %}
+  <input type="hidden" name="action" value="link">
+  <div class="school-pair">
+    {% include "hod_template/school/_field.html" with field=link_form.login_id %}
+    {% include "hod_template/school/_field.html" with field=link_form.phone %}
+  </div>
+  {% include "hod_template/school/_field.html" with field=link_form.student %}
+  {% include "hod_template/school/_field.html" with field=link_form.relation %}
+  <label class="school-check">{{ link_form.is_primary }} {{ link_form.is_primary.label }}</label>
+  <button type="submit" class="ice-manage-action ice-manage-action--primary school-submit"><i class="fas fa-link" aria-hidden="true"></i> {% translate "Link" %}</button>
+</form>
