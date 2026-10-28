@@ -99,17 +99,18 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P6 | Pilot and quality | Open — 0/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 | P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
+| P9 | eMaktab connection (future feature, after Release 2, D18) | Future — 0/2 |
 
 **Release 1 (first store version)** = P0, P1 (P1.7 without CSV import), P2.1–P2.3 + P2.6–P2.8, PD
 (without PD.5), P3.1–P3.3 + P3.6, P4 (without P4.7, P4.11, P4.12), P5, PL, P6, P7. **Release 2 (store
 update)** = gradebook (P2.4–P2.5, PD.5, P4.7), report cards, CSV import of parents, minimum app version
 (P4.12), and online payments (P8).
-The owner may still move the gradebook into Release 1 (about 3–4 extra weeks).
+The gradebook (Release 2) must ship before all parents start on 2 Sep 2027 (D10).
 
 Scope rule (D16): this is a **simple tracking app** for admins, teachers, students and parents. Don't add
 integrations or extras that aren't in this plan without asking the owner.
 
-### 1.1 Target timeline (proposed 2026-10-26; confirm with D10)
+### 1.1 Target timeline (proposed 2026-10-26; dates confirmed by D10 on 2026-10-28)
 
 | When | What | Phases |
 |---|---|---|
@@ -118,9 +119,11 @@ integrations or extras that aren't in this plan without asking the owner.
 | mid Dec 2026 – Jan 2027 | Timetable, register, absence alerts, teacher–parent messages, invoices for parents, push | P2 (Release 1 parts) |
 | Jan – Feb 2027 | Admin web screens; app screens (choice, parent home, timetable, register, homework, payments view, messages) | P3, P4 |
 | Feb – Mar 2027 | Store readiness and launch readiness. **Owner:** Payme/Click merchant contract (for P8) | P5, PL |
-| Mar – Apr 2027 | Pilot with real teachers and parents, fix blockers | P6 |
-| late Apr – May 2027 | Store submission and release; parents start using the app | P7 |
-| after release | Release 2: gradebook, online payments (P8), CSV import, minimum version | P2.4–2.5, P4.7, P8 |
+| Mar – Apr 2027 | Pilot in the 4th quarter (from ~30 Mar) with 1–2 classes' teachers and parents, fix blockers | P6 |
+| late Apr – May 2027 | Store submission and release | P7 |
+| Jun – Aug 2027 | Release 2 before the new year: gradebook first, then CSV import, minimum version | P2.4–2.5, P4.7 |
+| 2 Sep 2027 | **All parents start**: login letters at the start-of-year parent meetings (D14) | PL |
+| after that | Online payments (P8) | P8 |
 
 
 ---
@@ -137,17 +140,65 @@ integrations or extras that aren't in this plan without asking the owner.
 | D6 | The academic year reuses the existing `Session` model (add `name`, `is_current`); quarters are a new `Term` model. | Proposed (technical) |
 | D7 | Choice-screen label for the Learning Center: **"Iceberg Study Center"** (same in uz/ru/en; the logo carries the brand). | **Decided 2026-10-23 (owner)** |
 | D8 | Store accounts: **organisation** for both Google Play and Apple (seller shown as the organisation; Play skips the 12-tester/14-day rule for new personal accounts). Needs a free **D-U-N-S number** (1–2 weeks) — apply first. | **Decided 2026-10-23 (owner)** |
-| D9 | Hosting for the ERP (DigitalOcean is stopped): Cloudflare Containers + Neon + R2, a VPS, or other. | **Open — ask owner** |
-| D10 | Target date when parents start using the app (sets what moves to Release 2). | **Open — ask owner** (proposed: early May 2027, see 1.1) |
+| D9 | Hosting for the ERP (DigitalOcean is stopped): **one Docker VPS in an EU data centre (Frankfurt/Germany)** running the existing `Dockerfile`, with PostgreSQL on the same server and a daily off-site backup (P0.7). Provider: whichever the owner can pay from Uzbekistan (Hetzner is the cheapest; DigitalOcean Frankfurt if the old account is reused). Not Cloudflare Containers + Neon + R2: three vendors and a newer container product for a small app. Uzbekistan → Frankfurt is fast enough for forms and lists. Can move to an Uzbek host later with the same image if D12 ever requires it. | **Decided 2026-10-28** (owner delegated; research 2.1) |
+| D10 | Target dates: keep the **store release in spring 2027** (P7) with a **pilot in the 4th quarter** (from ~30 Mar 2027) with the homeroom teachers and parents of 1–2 classes. **All parents start on 2 Sep 2027**, at the start-of-year parent meetings (ota-onalar majlisi), not in May when the year ends ~25 May. The **gradebook (Release 2) must ship before 2 Sep 2027**, because marks and attendance are what Uzbek parents already check in eMaktab. | **Decided 2026-10-28** (owner delegated; research 2.1) |
 | D11 | Leaderboard, vocabulary and flashcards are **Study Center only**; School users never see them. | **Decided 2026-10-23 (owner)** |
-| D12 | Where the data may be hosted under Uzbekistan's personal-data rules (affects D9) — check with a local lawyer. | **Open — owner** |
-| D13 | Parent password resets: SMS codes (provider + cost) or reset by the school office. Note: Eskiz SMS sending already exists in `main_app/payments.py` (payment reminders) and can be reused. | **Open — ask owner** |
-| D14 | How parents receive logins: printed letter with QR, SMS, or both. | **Open — ask owner** |
+| D12 | Data law: since **27 Mar 2026** the Law "On Personal Data" requires storage **in Uzbekistan only for biometric, genetic and telecom-subscriber data**. Other personal data may be stored abroad in a country with "adequate" protection (Cabinet of Ministers list) or under approved standard contractual clauses. The ERP stores **no biometric data**: keep it that way (no Face ID login data, no face photos for attendance). So EU hosting (D9) is allowed for staging and the pilot. **Before real families' data (P6.3)**, one short check with a local lawyer: is Germany on the adequacy list, and what must the privacy policy (P5.5) and parental consent (PL) say? | **Decided 2026-10-28** (owner delegated; research 2.1), lawyer check before P6.3 |
+| D13 | Parent password resets: **SMS code through Eskiz** (already used for payment reminders in `main_app/payments.py`; about 85 soʻm per SMS, so 1,000 resets ≈ 85,000 soʻm), sent to the phone stored on the parent (P1.7). **Reset by the school office** (admin API from P1.7) stays as the fallback. Rate-limit codes per phone. | **Decided 2026-10-28** (owner delegated; research 2.1) |
+| D14 | How parents receive logins: **both**. A **printed letter** (login ID, temporary password, QR to the store pages; PL.1) handed out at the parent meeting, which is where Uzbek schools give parents such information. Plus an **SMS with the login ID and the store link** (no password in SMS) for parents who missed the meeting or lost the letter; they then set a password with the D13 SMS code. | **Decided 2026-10-28** (owner delegated; research 2.1) |
 | D15 | Where each role works: **admins on the Django web ERP; teachers, students and parents in the app** (phone, or browser at `/app/`). New School features are built once, in the API + app. The Django student/teacher pages are frozen (bug fixes only) and removed once the app covers them. Drops P3.4 and P3.5. | **Decided 2026-10-26 (owner)** |
-| D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
+| D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik) in Release 1 or 2; eMaktab comes later as P9 (D18). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
 | D17 | Admin web language: office staff need the **admin pages in Uzbek and Russian** (English stays). The admin web has no Django i18n today, so P3.0 adds it before the School admin pages. | **Decided 2026-10-27 (owner)** |
+| D18 | **eMaktab: the school does keep the state eMaktab journal** (required for general education schools). Connecting this app to eMaktab is a **future feature (P9), not in Release 1 or 2**. Until then teachers fill in eMaktab as they do today, and this app's register and gradebook serve parents and the office. Design the register, marks and term grades so they can later be sent to eMaktab or exported (store per-lesson and per-date data, use the same 2–5 scale and quarters as eMaktab, keep student identifiers). Don't build any eMaktab code before P9. | **Decided 2026-10-28 (owner)** |
 
 Record each answer here with the date before starting the task that depends on it.
+
+### 2.1 How Uzbek schools work (research 2026-10-28)
+
+The owner asked the agent to decide D9, D10, D12–D14 and PD.8 from how Uzbek schools operate. Findings
+(web sources, checked 2026-10-28; official texts on lex.uz and the ministry site win if they differ):
+
+- **Calendar.** Classes start **2 Sep 2026**; autumn break **4–9 Nov**, 2nd quarter from **10 Nov**. In
+  2025–26 the winter break was 14 days from 28 Dec (27 Dec for grades 1–4) to 10 Jan, 3rd quarter from
+  12 Jan; spring break about 19–29 Mar, 4th quarter from 30 Mar; the year ends late May. So 2026–27 is
+  about: Q1 2 Sep–3 Nov, Q2 10 Nov–26 Dec, Q3 11 Jan–18 Mar, Q4 30 Mar–25 May. Exact dates come in
+  ministry orders each year, so **quarters stay admin-editable data** (P1.1), never hard-coded.
+- **Week and lessons.** Monday–Saturday school week, 45-minute lessons; some schools run two shifts.
+  The timetable (P2.1) needs weekdays 1–6 and bell periods per branch (already planned). The grade 1–4
+  break starting on a Saturday suggests younger grades may have Saturdays off, so a class's week must
+  allow an empty Saturday.
+- **Marks.** Scale **2–5** (5 excellent, 4 good, 3 satisfactory, 2 unsatisfactory; 1 is not used),
+  quarter (chorak) and year grades. Matches D3 and the mockups.
+- **eMaktab.** The state electronic journal and diary (formerly Kundalik). Attendance and marks in "all
+  general education schools" are kept there; teachers mark the journal right after each lesson; the
+  journal is kept 25 years; parents already see marks and homework there, and a fintech service for
+  parents of **private schools in Tashkent** is being piloted from Sep 2026. Whether a private school
+  must use it is not stated in what was found → **D18**. Teachers and parents also use **Telegram
+  groups** informally; our app should replace those, not compete with eMaktab on paperwork.
+- **Personal data.** The 2021 rule that all citizens' data must sit on servers in Uzbekistan was
+  narrowed on **27 Mar 2026** to biometric, genetic and telecom-subscriber data; other data may go
+  abroad to "adequate" countries or under standard contractual clauses. Sources disagree on whether
+  the adequacy list (49 countries) is published yet → lawyer check in D12.
+- **Private-school licence.** Issued by the education quality inspectorate through the state services
+  portal; the 2024 changes eased teacher and class-size requirements. Nothing found about software.
+- **SMS.** Eskiz charges about 85 soʻm per SMS to all operators (an undated listing; confirm on
+  eskiz.uz).
+
+Sources: [yep.uz — 2026/27 start dates](https://yep.uz/en/2026/08/uzbekistan-2026-2027-academic-year-start-dates/),
+[yuz.uz — autumn break](https://yuz.uz/en/news/osennie-kanikuly-v-skolax-uzbekistana-nacnutsia-4-noiabria),
+[anhor.uz — winter break 2025/26](https://anhor.uz/news/school-18/),
+[talimxabarlari.uz — spring break 2026](https://talimxabarlari.uz/?p=68883),
+[Wikipedia — Education in Uzbekistan](https://en.wikipedia.org/wiki/Education_in_Uzbekistan),
+[daryo.uz — eMaktab stays](https://daryo.uz/ru/2026/02/04/shkoly-uzbekistana-ne-vozvrashchayutsya-k-bumazhnym-dnevnikam-i-klassnym-zhurnalam-ministerstvo/),
+[idum.uz — eMaktab journal instruction](https://idum.uz/ru/archives/18194),
+[dgov.uz — eMaktab](https://dgov.uz/en/solution-detail/30),
+[gazeta.uz — eMaktab 2026/27 update](https://www.gazeta.uz/oz/2026/08/25/e-maktab/),
+[kun.uz — teachers' Telegram groups](https://kun.uz/ru/news/2020/03/19/pochemu-fotografii-opozdavshix-uchenikov-urgutskoy-shkoly-razletelis-v-messendjyere),
+[Dentons — data localization narrowed](https://www.dentons.com/en/insights/articles/2026/march/31/uzbekistan-dismantles-strict-data-localization-regime),
+[Settle Advisory](https://settleadvisory.com/news-en/localization-of-personal-data-in-uzbekistan-transition-to-a-more-flexible-regulatory-model/),
+[The Diplomat — adequacy list](https://thediplomat.com/2026/10/from-data-localization-to-digital-openness-uzbekistans-regulatory-shift/),
+[lex.uz — private school licensing (2024)](https://www.lex.uz/docs/-7286573),
+[Bitrix24 — Eskiz SMS rate](https://www.bitrix24.ru/apps/app/vebpult.eskiz_sms_shlyuz_uzbekistan/).
 
 ---
 
@@ -609,8 +660,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       the web is no longer needed, D15; the CSV import preview waits for Release 2).
 - [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en); a clean
       transparent Study Center wordmark replacing the defective `iceberg-wordmark.png`.
-- [ ] **PD.8** **Owner** approves the mockups in section 6.0 (and later PD.5, PD.7, PD.9; record the date per screen here). Code tasks for a screen
+- [~] **PD.8** **Owner** approves the mockups in section 6.0 (and later PD.5, PD.7, PD.9; record the date per screen here). Code tasks for a screen
       need its approval.
+      **2026-10-28 (owner delegated; checked against research 2.1):** screens 1–17 **approved**, with two
+      changes the build PRs must make: **12 (register)** drop the footer "Internet boʻlmasa ham
+      saqlanadi va keyin yuboriladi" (offline register dropped, D16); **16 (web classes)** no "CSV
+      yuklash" button until Release 2 (CSV import moved, D16). Also: the grades tabs (14) list all four
+      quarters plus Yillik; Uzbek UI text uses the modifier letter ʻ (Oʻquvchilar), as in the code.
+      Still to approve when drawn: PD.5 (teacher grade entry), PD.7, PD.9.
 
 ### P3 — Web screens (admins and teachers)
 
@@ -743,6 +800,16 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P8.3** App: "To'lash" button on Payments and Home opens checkout; status updates after return.
       Needs: P8.2, P4.8.
 
+### P9 — eMaktab connection (future feature, D18)
+
+Not scheduled: start only when the owner says so, after Release 2. The school keeps eMaktab meanwhile.
+
+- [ ] **P9.1** Find out what eMaktab allows: an official API or data exchange for private schools, an
+      import file format, or only manual entry. Write the findings and a proposal here. **Owner** decides
+      the approach.
+- [ ] **P9.2** Build the chosen connection so teachers enter attendance and marks once (in this app) and
+      eMaktab gets them, with a clear log of what was sent and what failed. Needs: P9.1, P2.2, P2.4.
+
 ---
 
 ## 10. Risks and how this plan handles them
@@ -766,6 +833,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — owner delegated D9, D10, D12–D14 and PD.8 to the agent: decided from research on how
+  Uzbek schools work (section 2.1). New open question **D18** (must the school keep eMaktab?). PD.8
+  approved with two changes (screens 12 and 16), so P3.1 can start once P3.0 (#38) is merged.
+  Owner answered D18 the same day: the school keeps eMaktab; connecting to it is future phase P9.
 
 - 2026-10-28 — P3.0 done (PR #38, stacked on #37): admin web in uz/ru/en with a per-user switch. New
   web pages: `{% load i18n %}` + `{% translate %}`, then `makemessages` and fill uz/ru (see P3.0 notes).
