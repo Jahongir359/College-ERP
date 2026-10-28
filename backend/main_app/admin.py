@@ -16,6 +16,8 @@ from .models import (
     Branch,
     Group,
     ClassSubject,
+    BellPeriod,
+    Lesson,
     Enrollment,
     ChatThread,
     ChatMessage,
@@ -215,6 +217,19 @@ class GroupAdmin(admin.ModelAdmin):
     list_display = ("name", "kind", "branch", "session")
     list_filter = ("kind", "branch")
     inlines = [ClassSubjectInline]
+
+
+@admin.register(BellPeriod)
+class BellPeriodAdmin(admin.ModelAdmin):
+    list_display = ("branch", "number", "start_time", "end_time")
+    list_filter = ("branch",)
+
+
+@admin.register(Lesson)
+class LessonAdmin(admin.ModelAdmin):
+    list_display = ("group", "weekday", "period", "class_subject", "room")
+    list_filter = ("weekday", "group__branch")
+    raw_id_fields = ("group", "class_subject", "period")
 
 
 admin.site.register(Enrollment)
