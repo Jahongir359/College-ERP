@@ -625,7 +625,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [x] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
       for a class and date; `school/register/` API; reuses `Attendance`/`AttendanceReport` (+ fields).
       Done when: tests incl. "only homeroom teacher of that class", one register per date. Needs: P1.2.
-      — done 2026-10-28, PR #PRNUM; verified: full suite 378 OK, `RegisterAccessTests` (access matrix
+      — done 2026-10-28, PR #44; verified: full suite 378 OK, `RegisterAccessTests` (access matrix
       8.2), `RegisterFlowTests`, `RegisterSummaryTests`. Notes: migration `0046_daily_register` adds
       `Attendance.taken_by` and `AttendanceReport.arrival_time` + `note` (max 200); one register per class
       and date is the existing `unique_together`. `GET/POST school/register/<class>/<YYYY-MM-DD>/` in
@@ -855,7 +855,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P2.2 done (PR #PRNUM): daily register API with arrival time and note, homeroom teacher
+- 2026-10-28 — P2.2 done (PR #44): daily register API with arrival time and note, homeroom teacher
   only, `register_summaries` for the Classes page. P2.3 (absence alerts) can build on the POST (compare
   old and new marks) and P2.8's sender; P4.6 (register screen) on `school/register/`. Next here:
   PD.9 part 2 (register report mockup, screen 19), then P4.13.
