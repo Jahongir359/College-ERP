@@ -11,6 +11,8 @@ from . import (
 )
 
 urlpatterns = [
+    # ── App start (no login) ──────────────────────────────────────────────────
+    path("app/version/", views.AppVersionView.as_view(), name="api_app_version"),
     # ── Auth ─────────────────────────────────────────────────────────────────
     path("auth/login/", views.LoginView.as_view(), name="api_login"),
     path("auth/logout/", views.LogoutView.as_view(), name="api_logout"),

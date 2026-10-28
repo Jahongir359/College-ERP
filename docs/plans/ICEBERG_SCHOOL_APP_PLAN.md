@@ -807,6 +807,15 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       for each new screen.
 - [-] **P4.11** Offline queue for the register and messages — dropped 2026-10-26 (D16, keep it simple). The
       offline banner and a clear "not saved, try again" error stay in P4.10.
+- [~] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
+      with store links when older. Tests. (Release 2, D16.) — **backend half done** 2026-10-28, PR #51;
+      verified: `tests/test_app_version.py` AppVersionTests. Public `GET /api/v1/app/version/` (no
+      token, under `/api/` so the login middleware lets it through) returns `min_app_version` and
+      per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
+      (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
+      = `0.0.0` (never blocks). **Still open:** the app's "update" screen (after P4.13).
+- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
+
 - [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
       with store links when older. Tests. (Release 2, D16.)
 - [x] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
@@ -939,6 +948,10 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 
 - 2026-10-28 — P2.4 done (PR #52): `Mark` model, `school/marks/` API in `api/marks_views.py`,
   `branching.filter_marks_for_user`. Migration `0048_mark` (after P2.6's 0047). Next on this line: P2.5 term grades (same session).
+
+- 2026-10-28 — P4.12 backend half (PR #51): `GET /api/v1/app/version/` for the app's start-up
+  check, env vars in `.env.example` and `DEPLOYMENT.md`. P4.12 stays `[~]` until the app screen
+  (mobile/, after P4.13) compares its version and shows the store link.
 
 - 2026-10-28 — P2.6 done (PR #48): teacher ↔ parent threads per student and teacher, API
   `messages/parent/…`, access matrix tests. Migration `0047_parent_chat_threads` (after P2.2's 0046). The app screens are P4.8.
