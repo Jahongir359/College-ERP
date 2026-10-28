@@ -690,7 +690,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       Run it locally before `manage.py test`. `TranslationCatalogTests` fails on any empty or fuzzy
       entry, so every new `{% translate %}` string needs uz and ru in the same PR.
 - [x] **P3.1** Admin: classes (create 7-B, homeroom teacher, students), subjects per class, current
-      session and quarters. Needs: P1.1–P1.3. — done 2026-10-28, PR #<pr> (stacked on #40); verified:
+      session and quarters. Needs: P1.1–P1.3. — done 2026-10-28, PR #41 (stacked on #40); verified:
       full suite 367 OK, `test_school_admin_pages` (14). Notes: new sidebar section **School**
       (`context_processors.school_nav`: admins with a School-brand branch) with **Classes**
       (`/maktab/classes/`) and **Academic year** (`/maktab/years/`). Views in `school_admin_views.py`,
@@ -842,7 +842,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P3.1 done (PR #<pr>, stacked on #40): admin **School → Classes / Academic year**
+- 2026-10-28 — P3.1 done (PR #41, stacked on #40): admin **School → Classes / Academic year**
   pages in uz/ru/en. Merge order #36 → #39 → #37 → #38 → #40 → this. Next free: P3.3 (parents
   screen); P2.2 and the demo timetable week belong to the other agent.
 
