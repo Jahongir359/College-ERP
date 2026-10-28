@@ -644,7 +644,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       corrected. `school.register_summaries(classes, day)` gives `{class id: {taken, present, late,
       absent}}` for the Classes page "today" column (P3.1 follow-up) and P2.3.
 - [x] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
-      P2.8). Done when: test that exactly the linked parents get it. — done 2026-10-28, PR (pending);
+      P2.8). Done when: test that exactly the linked parents get it. — done 2026-10-28, PR #47;
       verified: full suite 413 OK, `tests/test_register_notices.py`
       RegisterNoticeTests. Saving the register (`RegisterView.post`) adds an `attendance`
       `Notification` for each linked parent (`branching.parent_user_ids_for_students`) when a pupil
@@ -896,7 +896,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P2.3 done (PR pending): parents get an in-app `attendance` notice when their child
+- 2026-10-28 — P2.3 done (PR #47): parents get an in-app `attendance` notice when their child
   is newly marked absent or late in the register; text stored in Uzbek. Uses
   `branching.parent_user_ids_for_students` from P2.7. Next: P2.8 push should pick up these notices.
 
