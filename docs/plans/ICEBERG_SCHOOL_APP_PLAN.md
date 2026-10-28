@@ -523,9 +523,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P2 — ERP school features
 
-- [ ] **P2.1** Bell periods and timetable: `BellPeriod`, `Lesson`, clash checks (teacher, room, class
+- [~] **P2.1** Bell periods and timetable: `BellPeriod`, `Lesson`, clash checks (teacher, room, class
       at the same period). Done when: models, validation tests, `school/timetable/` API for each role.
-      Needs: P1.2, P1.3.
+      Needs: P1.2, P1.3. — claimed 2026-10-28, branch feat/school-p2.1-timetable
 - [ ] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
       for a class and date; `school/register/` API; reuses `Attendance`/`AttendanceReport` (+ fields).
       Done when: tests incl. "only homeroom teacher of that class", one register per date. Needs: P1.2.
