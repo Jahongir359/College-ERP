@@ -44,6 +44,7 @@ SCHOOL_MODULES = (
     "api/family.py",
     "parents.py",
     "school.py",
+    "school_demo.py",
     "school_forms.py",
 )
 

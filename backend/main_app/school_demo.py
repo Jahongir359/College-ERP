@@ -263,7 +263,7 @@ def seed_school_demo(password=DEMO_PASSWORD, today=None):
     subjects = {s.name: s for s in Subject.objects.filter(course=course)}
     classes = {}
     for name, grade, letter, homeroom, plan in CLASSES:
-        group = Group.objects.filter(
+        group = Group.objects.filter(  # scoping-ok: seed data, finds its own demo class
             branch=branch, kind=Group.KIND_CLASS, session=session, name=name
         ).first()
         if group is None:
@@ -328,12 +328,10 @@ def seed_school_demo(password=DEMO_PASSWORD, today=None):
     period = today.replace(day=1)
     result = generate_invoices_for_month(period, due_date=period.replace(day=10), branch=branch)
     counts["invoices"] = len(result["created"])
-    invoices = {
-        inv.student.admin.login_id: inv
-        for inv in Invoice.objects.filter(group__branch=branch, period=period).select_related(
-            "student__admin"
-        )
-    }
+    demo_invoices = Invoice.objects.filter(  # scoping-ok: seed data, its own demo invoices
+        group__branch=branch, period=period
+    ).select_related("student__admin")
+    invoices = {inv.student.admin.login_id: inv for inv in demo_invoices}
     for suffix, share in (("IC01", 1), ("IC05", 1), ("IC09", 1), ("IC06", Decimal("0.5"))):
         invoice = invoices.get(login_id(suffix))
         if invoice is None or invoice.payments.exists():
