@@ -45,7 +45,7 @@ python -m ruff format --check .
 python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py collectstatic --noinput --dry-run -v 0
-python manage.py test               # 293 tests passing as of 2026-10-28
+python manage.py test               # 340 tests passing as of 2026-10-28
 ```
 
 Backend tests live in `backend/main_app/tests/` (one file per topic). App tests live in

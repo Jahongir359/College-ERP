@@ -456,10 +456,19 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       a test login works. Needs: P0.1 (D9), P0.2.
 - [ ] **P0.5** A **staging** instance (same image, separate database) with `SCHOOL_BRAND_ENABLED=True`.
       Done when: staging URL works and is written in `docs/DEPLOYMENT.md`. Needs: P0.4.
-- [ ] **P0.6** Demo data command `python manage.py seed_school_demo` (one school branch, classes 1-A,
+- [~] **P0.6** Demo data command `python manage.py seed_school_demo` (one school branch, classes 1-A,
       7-B, 11-A, teachers, students, parents, a week of timetable, marks, invoices). Re-runnable,
       refuses to run when `DEBUG=False` unless `--force`. Done when: command + test; staging seeded.
-      Needs: P1.1–P1.6 (write it at the end of P1; tick it then).
+      Needs: P1.1–P1.6 (write it at the end of P1; tick it then). — claimed 2026-10-28, branch
+      feat/school-p0.6-demo-data. **Partly done 2026-10-28, PR #37** (`SeedSchoolDemoTests`,
+      `SeedSchoolDemoCommandTests`): logic in `main_app/school_demo.py`. Seeds an "Iceberg School
+      (demo)" branch and course, the current year (reused if one exists, else created) with 4 quarters
+      (only if the year has none), 6 teachers, classes 1-A/7-B/11-A with homeroom teachers and 32
+      class subjects, 12 students, 12 parents (`DEMO-PR01` has two children, `DEMO-IC01` two parents)
+      and this month's invoices (3 paid, 1 partial). Logins `DEMO-TC01…`, `DEMO-IC01…`,
+      `DEMO-PR01…`, emails `@demo.iceberg.internal`, phones `+998 00 …`. New logins get the password
+      from `--password`, default `Demo12345!`. **Still open:** a week of timetable (add to
+      `school_demo.py` in P2.1), marks (P2.4, Release 2), "staging seeded" (needs P0.5).
 - [ ] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
       Needs: P0.4.
 - [ ] **P0.8** Monitoring: uptime checks for `app.iceberglc.com` and `iceberglc.com`, error alerts (e.g.
@@ -745,6 +754,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P0.6 partly done (PR #37, stacked on #39): `seed_school_demo` seeds everything that
+  exists today; stays `[~]` until the demo timetable week (the P2.1 session adds it in
+  `school_demo.py`), marks and staging exist. Demo quarters follow the real 2026–27 calendar (2.1).
 
 - 2026-10-28 — P1.8 done (PR #39, stacked on #36 P2.1): scoping review of P1.1–P1.7 and P2.1, guard
   test `tests/test_scoping.py`, `branching.filter_parent_links_for_user`, parent phone check in `me/`.
