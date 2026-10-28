@@ -778,8 +778,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [-] **P4.11** Offline queue for the register and messages — dropped 2026-10-26 (D16, keep it simple). The
       offline banner and a clear "not saved, try again" error stay in P4.10.
 - [~] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
-      with store links when older. Tests. (Release 2, D16.) — backend half claimed 2026-10-28, branch
-      feat/school-p4.12-min-version; the app screen waits for P4.13 (mobile/ owner).
+      with store links when older. Tests. (Release 2, D16.) — **backend half done** 2026-10-28, PR (pending);
+      verified: `tests/test_app_version.py` AppVersionTests. Public `GET /api/v1/app/version/` (no
+      token, under `/api/` so the login middleware lets it through) returns `min_app_version` and
+      per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
+      (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
+      = `0.0.0` (never blocks). **Still open:** the app's "update" screen (after P4.13).
 - [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
       the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
       avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
@@ -896,6 +900,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P4.12 backend half (PR pending): `GET /api/v1/app/version/` for the app's start-up
+  check, env vars in `.env.example` and `DEPLOYMENT.md`. P4.12 stays `[~]` until the app screen
+  (mobile/, after P4.13) compares its version and shows the store link.
 
 - 2026-10-28 — P2.3 done (PR #47): parents get an in-app `attendance` notice when their child
   is newly marked absent or late in the register; text stored in Uzbek. Uses
