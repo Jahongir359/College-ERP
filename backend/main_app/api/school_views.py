@@ -1,22 +1,23 @@
-"""API for Iceberg School data: subjects per class (plan task P1.3), bell
-periods and the timetable (P2.1).
+"""API for Iceberg School data: subjects per class (plan task P1.3), parents
+with their children (P1.7), bell periods and the timetable (P2.1).
 
-Who may see or change a class is decided in ``branching.py``: super admins
-every class, branch admins the classes of their branches.
+Who may see or change a class or parent is decided in ``branching.py``: super
+admins everything, branch admins the classes and children of their branches.
+Parent rules (one login per family, one primary contact) live in ``parents.py``.
 """
 
 from datetime import date, timedelta
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, Q
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .. import branching
+from .. import branching, parents
 from ..models import (
     BellPeriod,
     Branch,
@@ -24,10 +25,13 @@ from ..models import (
     Group,
     Lesson,
     LessonClashError,
+    Parent,
     Staff,
     Subject,
 )
+from ..school_forms import ParentChildForm, ParentForm
 from .family import student_for_request
+from .serializers import _current_class
 from .permissions import IsAdmin
 
 
@@ -150,6 +154,231 @@ class ClassSubjectDetailView(APIView):
         if cs is None:
             return _not_found("Class subject")
         cs.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ── Parents and their children (P1.7) ────────────────────────────────────────
+
+
+def _form_errors(*forms):
+    errors = {}
+    for form in forms:
+        errors.update({field: [str(e) for e in errs] for field, errs in form.errors.items()})
+    return _bad_request(errors)
+
+
+def _link_dict(link):
+    student = link.student
+    return {
+        "student_id": student.pk,
+        "name": student.admin.get_full_name(),
+        "login_id": student.admin.login_id,
+        "branch_name": student.branch.name if student.branch_id else None,
+        "class": _current_class(student),
+        "relation": link.relation,
+        "is_primary": link.is_primary,
+    }
+
+
+def _parent_dict(request, parent):
+    user = parent.admin
+    links = list(parents.visible_links(request.user, parent))
+    return {
+        "id": parent.pk,
+        "login_id": user.login_id,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "name": user.get_full_name(),
+        "phone": parent.phone,
+        "children": [_link_dict(link) for link in links],
+        # Children in branches this admin can't see exist, but aren't listed.
+        "has_other_children": parent.child_links.count() > len(links),
+    }
+
+
+def _visible_parent(request, pk):
+    qs = branching.filter_parents_for_user(request.user, Parent.objects.select_related("admin"))
+    return qs.filter(pk=pk).first()
+
+
+def _link_payload(data, student_id=None):
+    payload = {
+        "student": student_id if student_id is not None else data.get("student_id"),
+        "relation": data.get("relation") or "guardian",
+    }
+    if str(data.get("is_primary", "")).strip().lower() not in ("", "false", "0", "off", "none"):
+        payload["is_primary"] = "on"
+    return payload
+
+
+class ParentListView(APIView):
+    """GET/POST /api/v1/admin/parents/
+
+    POST creates the parent login together with its first child:
+    ``{first_name, last_name, phone, password, student_id, relation, is_primary}``.
+    """
+
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def get(self, request):
+        qs = branching.filter_parents_for_user(request.user, Parent.objects.select_related("admin"))
+        search = (request.query_params.get("search") or "").strip()
+        if search:
+            qs = qs.filter(
+                Q(admin__first_name__icontains=search)
+                | Q(admin__last_name__icontains=search)
+                | Q(admin__login_id__icontains=search)
+                | Q(phone__icontains=search)
+            )
+        qs = qs.order_by("admin__first_name", "admin__last_name")
+        return Response([_parent_dict(request, p) for p in qs])
+
+    def post(self, request):
+        form = ParentForm(request.data, user=request.user)
+        link_form = ParentChildForm(_link_payload(request.data), user=request.user)
+        if not (form.is_valid() & link_form.is_valid()):
+            return _form_errors(form, link_form)
+        parent = parents.create_parent(
+            first_name=form.cleaned_data["first_name"],
+            last_name=form.cleaned_data["last_name"],
+            phone=form.cleaned_data["phone"],
+            password=form.cleaned_data["password"],
+            student=link_form.cleaned_data["student"],
+            relation=link_form.cleaned_data["relation"],
+            is_primary=link_form.cleaned_data["is_primary"],
+        )
+        return Response(_parent_dict(request, parent), status=status.HTTP_201_CREATED)
+
+
+class ParentDetailView(APIView):
+    """GET/PATCH/DELETE /api/v1/admin/parents/<pk>/
+
+    PATCH takes any of first_name, last_name, phone, password (a new password
+    resets it). DELETE removes the login; it is refused while the parent also
+    has children in a branch this admin can't see.
+    """
+
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def get(self, request, pk):
+        parent = _visible_parent(request, pk)
+        if parent is None:
+            return _not_found("Parent")
+        return Response(_parent_dict(request, parent))
+
+    def patch(self, request, pk):
+        parent = _visible_parent(request, pk)
+        if parent is None:
+            return _not_found("Parent")
+        data = {
+            "first_name": parent.admin.first_name,
+            "last_name": parent.admin.last_name,
+            "phone": parent.phone,
+        }
+        data.update({k: request.data[k] for k in (*data, "password") if k in request.data})
+        form = ParentForm(data, user=request.user, instance=parent)
+        if not form.is_valid():
+            return _form_errors(form)
+        parents.update_parent(parent, **form.cleaned_data)
+        return Response(_parent_dict(request, parent))
+
+    def delete(self, request, pk):
+        parent = _visible_parent(request, pk)
+        if parent is None:
+            return _not_found("Parent")
+        if parents.has_hidden_children(request.user, parent):
+            return Response(
+                {
+                    "detail": "This parent also has children in another branch. "
+                    "Remove your children from the parent instead."
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        parent.admin.delete()  # the Parent profile and its links go with the login
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ParentChildListView(APIView):
+    """POST /api/v1/admin/parents/<pk>/children/  ``{student_id, relation, is_primary}``"""
+
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request, pk):
+        parent = _visible_parent(request, pk)
+        if parent is None:
+            return _not_found("Parent")
+        return _link(request, parent)
+
+
+class ParentLinkByLoginView(APIView):
+    """POST /api/v1/admin/parents/link-by-login/
+    ``{login_id, phone, student_id, relation, is_primary}``
+
+    Links a child to a parent this admin can't see yet (for example a School
+    parent whose younger child joins the Study Center), using the login ID the
+    parent gives the office. One login per family (D4). The phone must match
+    too, so a mistyped login ID can't hand a child's data to another family.
+    """
+
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request):
+        login_id = str(request.data.get("login_id") or "").strip()
+        digits = parents.phone_digits(str(request.data.get("phone") or ""))
+        parent = None
+        if login_id and digits:
+            parent = (
+                Parent.objects.select_related("admin")
+                .filter(admin__login_id__iexact=login_id)
+                .first()
+            )
+        if parent is None or parents.phone_digits(parent.phone) != digits:
+            return _not_found("Parent with this login ID and phone")
+        return _link(request, parent)
+
+
+def _link(request, parent):
+    form = ParentChildForm(_link_payload(request.data), user=request.user)
+    if not form.is_valid():
+        return _form_errors(form)
+    parents.link_child(parent, **form.cleaned_data)
+    return Response(_parent_dict(request, parent), status=status.HTTP_201_CREATED)
+
+
+class ParentChildDetailView(APIView):
+    """PATCH/DELETE /api/v1/admin/parents/<pk>/children/<student_pk>/
+
+    PATCH changes relation and/or is_primary; DELETE unlinks the child (the
+    parent login stays).
+    """
+
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def _link(self, request, pk, student_pk):
+        parent = _visible_parent(request, pk)
+        if parent is None:
+            return None
+        return parents.visible_links(request.user, parent).filter(student_id=student_pk).first()
+
+    def patch(self, request, pk, student_pk):
+        link = self._link(request, pk, student_pk)
+        if link is None:
+            return _not_found("Child link")
+        data = {"relation": link.relation, "is_primary": link.is_primary}
+        data.update({k: request.data[k] for k in data if k in request.data})
+        form = ParentChildForm(_link_payload(data, student_id=student_pk), user=request.user)
+        if not form.is_valid():
+            return _form_errors(form)
+        parents.update_link(
+            link, relation=form.cleaned_data["relation"], is_primary=form.cleaned_data["is_primary"]
+        )
+        return Response(_link_dict(link))
+
+    def delete(self, request, pk, student_pk):
+        link = self._link(request, pk, student_pk)
+        if link is None:
+            return _not_found("Child link")
+        link.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

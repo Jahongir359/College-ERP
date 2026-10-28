@@ -88,7 +88,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | Phase | What | Status |
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
-| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 6/8 |
+| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 7/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
@@ -516,8 +516,20 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       student/parent; `children` is `[]` for non-parents; `class` is the active class of the current
       year (`{id, name, grade_level, letter}` or null). A parent's own `brand` follows the children's
       branches (one brand → that brand, mixed → center).
-- [ ] **P1.7** Admin tools to create parents and link children: form + API. Done when: tests.
-      (**CSV import** with a dry-run preview moved to Release 2, D16.)
+- [x] **P1.7** Admin tools to create parents and link children: form + API. Done when: tests.
+      (**CSV import** with a dry-run preview moved to Release 2, D16.) — done 2026-10-28, PR #35;
+      verified: full suite 293 OK, `ParentServiceTests`, `ParentFormTests`, `ParentBranchingTests`,
+      `ParentApiTests` (incl. the role matrix). Notes: rules in `main_app/parents.py`, forms
+      `ParentForm`/`ParentChildForm` in `main_app/school_forms.py` (gettext labels, for P3.3), API in
+      `api/school_views.py`: `admin/parents/` (GET search, POST = parent + first child),
+      `admin/parents/<id>/` (GET/PATCH incl. password reset/DELETE), `admin/parents/<id>/children/`
+      (POST link), `admin/parents/<id>/children/<student_id>/` (PATCH relation/primary, DELETE unlink),
+      `admin/parents/link-by-login/` (login ID **and** matching phone: link a child to a parent of
+      another branch, D4). Parent login IDs are `PR500`, `PR501`, … A phone already used by a parent
+      is refused (compared on the last 9 digits), one primary contact per child, an admin sees only
+      the children of their branches (`has_other_children` flags the rest) and can't delete a parent
+      who has children elsewhere. Scope: new `branching.filter_parents_for_user` (a 4.2 helper, P1.8
+      still reviews the rest).
 - [ ] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
       of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code.
 
@@ -525,7 +537,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 - [x] **P2.1** Bell periods and timetable: `BellPeriod`, `Lesson`, clash checks (teacher, room, class
       at the same period). Done when: models, validation tests, `school/timetable/` API for each role.
-      Needs: P1.2, P1.3. — done 2026-10-28, PR #36; verified: full suite 304 OK,
+      Needs: P1.2, P1.3. — done 2026-10-28, PR #36; verified: full suite 325 OK (after merging main with P1.7),
       `BellPeriodModelTests`, `LessonModelTests`, `LessonClashTests`, `TimetableBranchingTests`,
       `BellPeriodApiTests`, `LessonApiTests`, `TimetableApiTests` (access matrix 8.2). Notes:
       `BellPeriod(branch, number 1–12, start/end time)`, School branches only, no overlaps in a branch.
@@ -723,10 +735,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
 - 2026-10-28 — P2.1 done (PR #36): `BellPeriod`, `Lesson`, clash checks, admin API for periods and
-  lessons, `school/timetable/` for every role (migration `0044_timetable`). Done in parallel with P1.7
-  (another agent, branch `feat/school-p1.7-parent-admin`): if P1.7 also adds a `0044_*` migration, the
-  second PR to merge renumbers its migration (or adds a merge migration). P1.8 waits for P1.7. Next:
-  P2.2 daily register.
+  lessons, `school/timetable/` for every role (migration `0044_timetable`). Built in parallel with P1.7
+  (#35) and merged with it; new helpers `filter_classes_for_user`, `filter_lessons_for_user`,
+  `filter_bell_periods_for_user` are ready for the P1.8 review. Next: P2.2 daily register.
+
+- 2026-10-28 — P1.7 done (PR #35): parent admin API + forms, `branching.filter_parents_for_user`.
+  Also PR #34 merged after a fix (deleting a subject a class uses returned 500, now 400). Login
+  delivery to parents (D14) is still open and doesn't block this. Next: P1.8 (branch scoping
+  review), then P0.6 demo data (end of P1), then P2.1 timetable.
 
 - 2026-10-27 — P1.3 done (PR #34): `ClassSubject`, optional `Subject.staff`, `seed_school_subjects`
   command, class-subject admin API in the new `api/school_views.py`. Also D17 recorded (admin web in
