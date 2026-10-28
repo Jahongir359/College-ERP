@@ -90,7 +90,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 2/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 2/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
@@ -280,7 +280,7 @@ GET  school/marks/?student=&term=      POST school/marks/ teacher (own ClassSubj
 GET  school/term-grades/?student=      POST teacher/admin
 GET  school/calendar/                   current session, terms, holidays
 GET  parent/children/                   parent: children + today summary
-GET/POST messages/parent/<thread>/      teacher ↔ parent threads
+GET/POST messages/parent/               teacher ↔ parent threads (+ contacts/, <thread>/)
 ```
 Existing endpoints that parents also need (`assignments/`, `invoices/`, `notifications/`,
 `student/attendance/summary/`) accept `?student=<id>` for parents, checked by `user_can_access_student`.
@@ -632,9 +632,25 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
 - [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
-- [~] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
-      reuses the chat UI and read states. Done when: access tests (parent only own child's threads). — claimed 2026-10-28, branch
-      `feat/school-p2.6-parent-messages`.
+- [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
+      reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
+      — done 2026-10-28, PR #TBD; verified: full suite 391 OK, `test_parent_messages` (24: model,
+      branching, access matrix 8.2). Notes: `ChatThread` + `kind`, `student`, `teacher` (migration
+      `0046_parent_chat_threads`; `group` became nullable, nothing else changed), one thread per
+      student and teacher, shared by all the child's linked parents. Only **School classes** count:
+      the homeroom and subject teachers of the child's active, unarchived class
+      (`branching.teachers_for_student`); Study Center groups get no parent threads. API in
+      `api/parent_messages.py`: `messages/parent/` (GET `?student=`, POST `{student, teacher}` opens
+      or creates; teachers leave `teacher` out), `messages/parent/contacts/` (parent: the child's
+      teachers, homeroom first, with subjects; teacher: their students who have a parent, with any
+      open `thread_id`), `messages/parent/<id>/` (GET marks read, POST `{message, attachment?}`).
+      Messages have the group-chat shape plus `sender_role`. Access: parents 404 on another family's
+      child, students 403, teachers only their own threads; branch admins **read** their branches'
+      threads (`can_post: false`). New helpers `filter_parent_threads_for_user`,
+      `user_can_post_in_parent_thread`, `user_can_start_parent_thread`,
+      `user_can_message_about_student` (subject teachers too, which `filter_students_for_user`
+      doesn't cover). The group chat (`messages/`, web chat, unread badge) is unchanged. For P2.8:
+      send the push from `ParentThreadDetailView.post` to the other side of the thread.
 - [ ] **P2.7** Parents can see and pay invoices of their children (existing invoice API with
       `?student=`); class announcements reach parents (stories/notifications target parents of a
       class). Done when: tests.
@@ -842,6 +858,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P2.6 done (PR #TBD): teacher ↔ parent threads per student and teacher, API
+  `messages/parent/…`, access matrix tests. Migration `0046_parent_chat_threads` will clash with
+  other open PRs' 0046: regenerate with `makemigrations` after main moves. The app screens are P4.8.
 
 - 2026-10-28 — P3.1 done (PR #41, stacked on #40): admin **School → Classes / Academic year**
   pages in uz/ru/en. Merge order #36 → #39 → #37 → #38 → #40 → this. Next free: P3.3 (parents

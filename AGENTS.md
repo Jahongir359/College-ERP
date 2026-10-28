@@ -46,7 +46,7 @@ python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py collectstatic --noinput --dry-run -v 0
 python manage.py compilemessages    # web translations (uz/ru); needs gettext, tests need it
-python manage.py test               # 367 tests passing as of 2026-10-28
+python manage.py test               # 391 tests passing as of 2026-10-28
 ```
 
 Backend tests live in `backend/main_app/tests/` (one file per topic). App tests live in

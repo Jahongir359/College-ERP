@@ -1055,9 +1055,32 @@ def lesson_clashes(lesson):
 
 
 class ChatThread(models.Model):
-    """Persistent group conversation for a class group."""
+    """Persistent conversation: one per group, or one per student and teacher
+    for the School teacher ↔ parent messages (kind "parent", plan P2.6). All
+    linked parents of the student share the parent thread."""
 
-    group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name="chat_thread")
+    KIND_GROUP = "group"
+    KIND_PARENT = "parent"
+    KIND_CHOICES = [(KIND_GROUP, "Group chat"), (KIND_PARENT, "Teacher and parents")]
+
+    group = models.OneToOneField(
+        Group, on_delete=models.CASCADE, related_name="chat_thread", null=True, blank=True
+    )
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES, default=KIND_GROUP)
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="parent_threads",
+        null=True,
+        blank=True,
+    )
+    teacher = models.ForeignKey(
+        Staff,
+        on_delete=models.CASCADE,
+        related_name="parent_threads",
+        null=True,
+        blank=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -1066,9 +1089,18 @@ class ChatThread(models.Model):
         indexes = [
             models.Index(fields=["updated_at"]),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "teacher"],
+                condition=models.Q(kind="parent"),
+                name="unique_parent_thread_per_student_teacher",
+            ),
+        ]
 
     def __str__(self):
-        return f"Chat - {self.group.name}"
+        if self.kind == self.KIND_PARENT:
+            return f"Parents chat - {self.student} / {self.teacher}"
+        return f"Chat - {self.group.name if self.group_id else '-'}"
 
 
 class ChatMessage(models.Model):
@@ -1118,7 +1150,7 @@ class ChatReadState(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.user.email} read {self.thread.group.name}"
+        return f"{self.user.email} read {self.thread}"
 
 
 @receiver(post_save, sender=Group)
