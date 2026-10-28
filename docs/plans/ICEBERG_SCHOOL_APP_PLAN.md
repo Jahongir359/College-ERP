@@ -632,8 +632,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
 - [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
-- [ ] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
-      reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
+- [~] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
+      reuses the chat UI and read states. Done when: access tests (parent only own child's threads). — claimed 2026-10-28, branch
+      `feat/school-p2.6-parent-messages`.
 - [ ] **P2.7** Parents can see and pay invoices of their children (existing invoice API with
       `?student=`); class announcements reach parents (stories/notifications target parents of a
       class). Done when: tests.
