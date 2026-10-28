@@ -1,0 +1,16 @@
+{% load i18n %}{# Web language switch (P3.0). Posts to set_language; the choice is saved per user. #}
+{% get_current_language as current_language %}
+<form class="ice-lang-switch{% if lang_class %} {{ lang_class }}{% endif %}" method="post" action="{% url 'set_language' %}" aria-label="{% translate 'Language' %}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  <button type="submit" name="language" value="uz" lang="uz" title="Oʻzbekcha"{% if current_language == "uz" %} aria-current="true" class="is-active"{% endif %}>UZ</button>
+  <button type="submit" name="language" value="ru" lang="ru" title="Русский"{% if current_language == "ru" %} aria-current="true" class="is-active"{% endif %}>RU</button>
+  <button type="submit" name="language" value="en" lang="en" title="English"{% if current_language == "en" %} aria-current="true" class="is-active"{% endif %}>EN</button>
+</form>
+<style>
+.ice-lang-switch { display: inline-flex; align-items: center; gap: 2px; margin: 0; padding: 2px; border-radius: 999px; background: rgba(127,127,127,.12); }
+.ice-lang-switch button { border: 0; background: none; cursor: pointer; padding: 4px 8px; border-radius: 999px; font: 700 11px/1 inherit; letter-spacing: .04em; color: inherit; opacity: .65; }
+.ice-lang-switch button:hover { opacity: 1; }
+.ice-lang-switch button.is-active { opacity: 1; background: var(--brand-primary, #0C1F45); color: #fff; }
+.ice-lang-switch button:focus-visible { outline: 2px solid var(--brand-primary, #0C1F45); outline-offset: 1px; }
+</style>

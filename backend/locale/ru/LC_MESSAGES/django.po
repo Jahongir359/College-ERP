@@ -1,0 +1,339 @@
+# Russian translations of the Iceberg ERP web pages (plan task P3.0).
+# Update: cd backend && python manage.py makemessages -l uz -l ru --no-location \
+#   --ignore 'staticfiles/*' --ignore 'static/*' --ignore 'media/*'
+# then fill the empty msgstr lines. The build runs compilemessages.
+msgid ""
+msgstr ""
+"Project-Id-Version: Iceberg ERP\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "First name"
+msgstr "Имя"
+
+msgid "Last name"
+msgstr "Фамилия"
+
+msgid "Phone number"
+msgstr "Номер телефона"
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "Leave blank to keep the current password."
+msgstr "Оставьте пустым, чтобы сохранить текущий пароль."
+
+#, python-format
+msgid "Parent %(login)s already uses this phone number. Link the child to that parent instead."
+msgstr "Этот номер телефона уже у родителя %(login)s. Привяжите ребёнка к этому родителю."
+
+msgid ""
+"A parent with this phone number already has a login. Ask the parent for their login ID and link "
+"the child to it."
+msgstr ""
+"У родителя с этим номером телефона уже есть логин. Попросите у родителя его логин ID и привяжите "
+"ребёнка к нему."
+
+msgid "Child"
+msgstr "Ребёнок"
+
+msgid "Relation"
+msgstr "Кем приходится"
+
+msgid "Mother"
+msgstr "Мать"
+
+msgid "Father"
+msgstr "Отец"
+
+msgid "Guardian"
+msgstr "Опекун"
+
+msgid "Main contact for this child"
+msgstr "Основной контакт ребёнка"
+
+msgid "Toggle menu"
+msgstr "Показать/скрыть меню"
+
+msgid "Toggle navigation menu"
+msgstr "Показать/скрыть меню навигации"
+
+msgid "Toggle dark/light mode"
+msgstr "Тёмная/светлая тема"
+
+msgid "Toggle dark or bright theme"
+msgstr "Переключить тёмную или светлую тему"
+
+msgid "Messages"
+msgstr "Сообщения"
+
+msgid "Open group messages"
+msgstr "Открыть сообщения групп"
+
+msgid "Notifications"
+msgstr "Уведомления"
+
+msgid "Open notifications"
+msgstr "Открыть уведомления"
+
+msgid "My profile"
+msgstr "Мой профиль"
+
+msgid "Open my profile and settings"
+msgstr "Открыть профиль и настройки"
+
+msgid "Logout"
+msgstr "Выйти"
+
+msgid "Main navigation"
+msgstr "Основная навигация"
+
+msgid "Dashboard"
+msgstr "Главная"
+
+msgid "Open dashboard"
+msgstr "Открыть главную"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Preparing your page…"
+msgstr "Готовим страницу…"
+
+msgid "Admin"
+msgstr "Администратор"
+
+msgid "Teacher"
+msgstr "Учитель"
+
+msgid "Student"
+msgstr "Ученик"
+
+msgid "Overview"
+msgstr "Обзор"
+
+msgid "Profile & Settings"
+msgstr "Профиль и настройки"
+
+msgid "People"
+msgstr "Люди"
+
+msgid "Students"
+msgstr "Ученики"
+
+msgid "Teachers"
+msgstr "Учителя"
+
+msgid "Admins"
+msgstr "Администраторы"
+
+msgid "Academic Management"
+msgstr "Учебный процесс"
+
+msgid "Groups & Enrollments"
+msgstr "Группы и зачисления"
+
+msgid "Branches"
+msgstr "Филиалы"
+
+msgid "Courses"
+msgstr "Курсы"
+
+msgid "Attendance"
+msgstr "Посещаемость"
+
+msgid "Finance"
+msgstr "Финансы"
+
+msgid "Payments"
+msgstr "Платежи"
+
+msgid "Vocabulary & Content"
+msgstr "Словарь и контент"
+
+msgid "Vocabulary"
+msgstr "Словарь"
+
+msgid "Leaderboard"
+msgstr "Рейтинг"
+
+msgid "Stories"
+msgstr "Истории"
+
+msgid "Communication"
+msgstr "Связь"
+
+msgid "Leads"
+msgstr "Заявки"
+
+msgid "Student Feedback"
+msgstr "Отзывы учеников"
+
+msgid "Teacher Feedback"
+msgstr "Отзывы учителей"
+
+msgid "Requests"
+msgstr "Запросы"
+
+msgid "Student Leave"
+msgstr "Отпуска учеников"
+
+msgid "Teacher Leave"
+msgstr "Отпуска учителей"
+
+msgid "Home"
+msgstr "Главная"
+
+msgid "Teaching"
+msgstr "Преподавание"
+
+msgid "Take Attendance"
+msgstr "Отметить посещаемость"
+
+msgid "Update Attendance"
+msgstr "Изменить посещаемость"
+
+msgid "Scores"
+msgstr "Оценки"
+
+msgid "Result Files"
+msgstr "Файлы результатов"
+
+msgid "Assignments"
+msgstr "Задания"
+
+msgid "Library"
+msgstr "Библиотека"
+
+msgid "Leave"
+msgstr "Отпуск"
+
+msgid "Feedback"
+msgstr "Обратная связь"
+
+msgid "Study"
+msgstr "Учёба"
+
+msgid "Progress"
+msgstr "Прогресс"
+
+msgid "Sign Out"
+msgstr "Выйти"
+
+msgid "Sign out of Iceberg"
+msgstr "Выйти из Iceberg"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Sign In"
+msgstr "Войти"
+
+msgid "Welcome back"
+msgstr "С возвращением"
+
+msgid "Sign in to Iceberg School"
+msgstr "Вход в Iceberg School"
+
+msgid "Sign in to continue"
+msgstr "Войдите, чтобы продолжить"
+
+msgid "You were signed out due to inactivity. Please sign in again."
+msgstr "Вы вышли из системы из-за бездействия. Пожалуйста, войдите снова."
+
+msgid "Your ID"
+msgstr "Ваш ID"
+
+msgid "Student ID"
+msgstr "Например, IC052401"
+
+msgid "Your Password"
+msgstr "Ваш пароль"
+
+msgid "Show or hide password"
+msgstr "Показать или скрыть пароль"
+
+msgid "Contact admin to reset your password."
+msgstr "Чтобы сбросить пароль, обратитесь к администратору."
+
+msgid "Iceberg Learning Center sign-in"
+msgstr "Вход в Iceberg Learning Center"
+
+msgid "Primary navigation"
+msgstr "Основная навигация"
+
+msgid "Open admin dashboard"
+msgstr "Открыть панель администратора"
+
+msgid "Open people management"
+msgstr "Открыть раздел «Люди»"
+
+msgid "Open messages"
+msgstr "Открыть сообщения"
+
+msgid "Chat"
+msgstr "Чат"
+
+msgid "Open profile and settings"
+msgstr "Открыть профиль и настройки"
+
+msgid "Profile"
+msgstr "Профиль"
+
+msgid "Open teacher dashboard"
+msgstr "Открыть главную учителя"
+
+msgid "Open attendance"
+msgstr "Открыть посещаемость"
+
+msgid "Open scores"
+msgstr "Открыть оценки"
+
+msgid "Open student dashboard"
+msgstr "Открыть главную ученика"
+
+msgid "Open results"
+msgstr "Открыть результаты"
+
+msgid "Results"
+msgstr "Результаты"
+
+msgid "Login verification is not configured. Contact the administrator."
+msgstr "Проверка входа не настроена. Обратитесь к администратору."
+
+msgid "Please complete the captcha challenge."
+msgstr "Пожалуйста, пройдите проверку captcha."
+
+msgid "Captcha could not be verified. Try again."
+msgstr "Не удалось проверить captcha. Попробуйте ещё раз."
+
+msgid "Invalid captcha. Try again."
+msgstr "Неверная captcha. Попробуйте ещё раз."
+
+msgid "Please enter both your ID/email and password."
+msgstr "Пожалуйста, введите ID/email и пароль."
+
+msgid "Too many failed login attempts. Please wait 15 minutes before trying again."
+msgstr "Слишком много неудачных попыток входа. Подождите 15 минут и попробуйте снова."
+
+msgid "Login is temporarily unavailable. Please try again in a moment."
+msgstr "Вход временно недоступен. Попробуйте ещё раз чуть позже."
+
+msgid "Account not found."
+msgstr "Аккаунт не найден."
+
+msgid "Incorrect password."
+msgstr "Неверный пароль."
+
+msgid "ID not found. Please check your ICEBERG login ID."
+msgstr "ID не найден. Проверьте ваш логин ID ICEBERG."
+
+msgid "Login failed due to a server issue. Please try again shortly."
+msgstr "Не удалось войти из-за ошибки сервера. Попробуйте ещё раз чуть позже."
+
+msgid "Your account role is not configured correctly. Please contact the administrator."
+msgstr "Роль вашего аккаунта настроена неверно. Обратитесь к администратору."
+

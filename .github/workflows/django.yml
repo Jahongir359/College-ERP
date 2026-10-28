@@ -60,6 +60,10 @@ jobs:
         python manage.py check
         python manage.py makemigrations --check --dry-run
         python manage.py collectstatic --noinput --dry-run -v 0
+    - name: Compile Translations
+      run: |
+        sudo apt-get install -y --no-install-recommends gettext
+        python manage.py compilemessages
     - name: Run Tests
       run: |
         python manage.py test

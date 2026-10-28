@@ -21,6 +21,7 @@ from main_app.EditResultView import EditResultView
 
 from . import (
     hod_views,
+    language,
     messaging_views,
     password_recovery,
     payments_views,
@@ -34,6 +35,7 @@ urlpatterns = [
     path("health/", views.health, name="health"),
     path("", views.login_page, name="entry_page"),
     path("login/", views.login_page, name="login_page"),
+    path("language/", language.set_language, name="set_language"),
     path(
         "accounts/password_reset/",
         views.SafePasswordResetView.as_view(),
