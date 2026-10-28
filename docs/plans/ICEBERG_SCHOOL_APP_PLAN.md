@@ -643,8 +643,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `arrival_time` and `note`. No future dates, none outside the class's year; past days can be
       corrected. `school.register_summaries(classes, day)` gives `{class id: {taken, present, late,
       absent}}` for the Classes page "today" column (P3.1 follow-up) and P2.3.
-- [ ] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
-      P2.8). Done when: test that exactly the linked parents get it.
+- [~] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
+      P2.8). Done when: test that exactly the linked parents get it. — claimed 2026-10-28, branch
+      feat/school-p2.3-absence-notify
 - [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
       teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
       (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
