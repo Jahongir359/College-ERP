@@ -1063,9 +1063,32 @@ def lesson_clashes(lesson):
 
 
 class ChatThread(models.Model):
-    """Persistent group conversation for a class group."""
+    """Persistent conversation: one per group, or one per student and teacher
+    for the School teacher ↔ parent messages (kind "parent", plan P2.6). All
+    linked parents of the student share the parent thread."""
 
-    group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name="chat_thread")
+    KIND_GROUP = "group"
+    KIND_PARENT = "parent"
+    KIND_CHOICES = [(KIND_GROUP, "Group chat"), (KIND_PARENT, "Teacher and parents")]
+
+    group = models.OneToOneField(
+        Group, on_delete=models.CASCADE, related_name="chat_thread", null=True, blank=True
+    )
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES, default=KIND_GROUP)
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="parent_threads",
+        null=True,
+        blank=True,
+    )
+    teacher = models.ForeignKey(
+        Staff,
+        on_delete=models.CASCADE,
+        related_name="parent_threads",
+        null=True,
+        blank=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -1074,9 +1097,18 @@ class ChatThread(models.Model):
         indexes = [
             models.Index(fields=["updated_at"]),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "teacher"],
+                condition=models.Q(kind="parent"),
+                name="unique_parent_thread_per_student_teacher",
+            ),
+        ]
 
     def __str__(self):
-        return f"Chat - {self.group.name}"
+        if self.kind == self.KIND_PARENT:
+            return f"Parents chat - {self.student} / {self.teacher}"
+        return f"Chat - {self.group.name if self.group_id else '-'}"
 
 
 class ChatMessage(models.Model):
@@ -1110,7 +1142,7 @@ class ChatMessage(models.Model):
         )
 
     def __str__(self):
-        return f"{self.sender.email} -> {self.thread.group.name}: {self.body[:50]}"
+        return f"{self.sender.email} -> {self.thread}: {self.body[:50]}"
 
 
 class ChatReadState(models.Model):
@@ -1126,7 +1158,7 @@ class ChatReadState(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.user.email} read {self.thread.group.name}"
+        return f"{self.user.email} read {self.thread}"
 
 
 @receiver(post_save, sender=Group)
@@ -1764,3 +1796,50 @@ class Payment(models.Model):
     @property
     def receipt_no(self):
         return f"PAY-{self.pk:06d}" if self.pk else "PAY-——"
+
+
+class Mark(models.Model):
+    """One gradebook mark (2–5) a subject teacher gives a pupil on a lesson date (plan P2.4).
+
+    Same scale and per-date data as the state eMaktab journal (decision D18), so
+    marks can be exported later. The quarter is not stored: it is the ``Term``
+    of the class's academic year whose dates contain ``date``.
+    """
+
+    KIND_LESSON = "lesson"
+    KIND_TEST = "test"
+    KIND_EXAM = "exam"
+    KIND_CHOICES = [(KIND_LESSON, "Lesson"), (KIND_TEST, "Test"), (KIND_EXAM, "Exam")]
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="marks")
+    class_subject = models.ForeignKey(ClassSubject, on_delete=models.CASCADE, related_name="marks")
+    date = models.DateField()
+    value = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(2), MaxValueValidator(5)]
+    )
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES, default=KIND_LESSON)
+    comment = models.CharField(max_length=200, blank=True, default="")
+    given_by = models.ForeignKey(
+        Staff, on_delete=models.SET_NULL, null=True, blank=True, related_name="marks_given"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["date", "pk"]
+        indexes = [
+            models.Index(fields=["student", "date"]),
+            models.Index(fields=["class_subject", "date"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "class_subject", "date", "kind"],
+                name="one_mark_per_pupil_subject_date_kind",
+            ),
+            models.CheckConstraint(
+                condition=Q(value__gte=2) & Q(value__lte=5), name="mark_value_2_to_5"
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.student} · {self.class_subject} · {self.date}: {self.value}"

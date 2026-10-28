@@ -7,22 +7,39 @@ and 13). Admins of the class's branch and its subject teachers can read the
 register; only the homeroom teacher saves it. Pupils and parents don't see a
 whole class's register (they read their own marks through ``attendance/``).
 Access rules live in ``branching.py``.
+
+Saving tells the linked parents in the app when their child is newly marked
+absent or late (plan task P2.3). Only a change sends a notice: saving the same
+marks again sends nothing, and a correction back to present sends nothing.
 """
 
 from datetime import date, datetime
 
 from django.db import transaction
-from django.utils import timezone
+from django.utils import timezone, translation
+from django.utils.translation import gettext as _
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .. import branching
-from ..models import Attendance, AttendanceReport, Enrollment, Group, Staff
+from ..models import (
+    Attendance,
+    AttendanceReport,
+    Enrollment,
+    Group,
+    Notification,
+    Staff,
+    Student,
+)
 from ..school import REGISTER_STATUS_NAMES, REGISTER_STATUSES
 
 NOTE_MAX = AttendanceReport._meta.get_field("note").max_length
+
+# Notification.message is stored text, so notices are written once in the
+# school's language (Uzbek); ru and en exist in the .po files for later.
+NOTICE_LANGUAGE = "uz"
 
 
 def _bad_request(detail):
@@ -43,6 +60,36 @@ def _parse_time(raw):
 def _initials(user):
     letters = (user.last_name[:1] + user.first_name[:1]).upper()
     return letters or user.email[:1].upper()
+
+
+def _notice(report, group, day):
+    """The parent's text for a newly absent or late ``report`` (in NOTICE_LANGUAGE)."""
+    values = {
+        "name": report.student.admin.get_full_name(),
+        "class": group.name,
+        "date": day.strftime("%d.%m.%Y"),
+        "time": _time(report.arrival_time),
+    }
+    with translation.override(NOTICE_LANGUAGE):
+        if report.status == AttendanceReport.ABSENT:
+            return _("%(name)s was marked absent in class %(class)s on %(date)s.") % values
+        if report.arrival_time:
+            return _("%(name)s came late to class %(class)s on %(date)s, at %(time)s.") % values
+        return _("%(name)s was marked late in class %(class)s on %(date)s.") % values
+
+
+def _notify_parents(group, day, reports):
+    """Tell the linked parents of each pupil in ``reports`` (newly absent or late)."""
+    notices = []
+    for report in reports:
+        message = _notice(report, group, day)
+        for user_id in branching.parent_user_ids_for_students([report.student]):
+            notices.append(
+                Notification(
+                    recipient_id=user_id, category=Notification.ATTENDANCE, message=message
+                )
+            )
+    Notification.objects.bulk_create(notices)
 
 
 def _check_day(group, day):
@@ -195,26 +242,34 @@ class RegisterView(APIView):
             register.taken_by = teacher
             register.save(update_fields=["taken_by", "updated_at"])
             existing = {r.student_id: r for r in register.attendancereport_set.all()}
-            to_create, to_update = [], []
+            to_create, to_update, newly_missing = [], [], []
             for student_id in pupils:
                 code, arrival, note = marks.get(student_id, (AttendanceReport.PRESENT, None, ""))
                 report = existing.get(student_id)
+                before = report.status if report else None
                 if report is None:
-                    to_create.append(
-                        AttendanceReport(
-                            attendance=register,
-                            student_id=student_id,
-                            status=code,
-                            arrival_time=arrival,
-                            note=note,
-                        )
+                    report = AttendanceReport(
+                        attendance=register,
+                        student_id=student_id,
+                        status=code,
+                        arrival_time=arrival,
+                        note=note,
                     )
+                    to_create.append(report)
                 else:
                     report.status, report.arrival_time, report.note = code, arrival, note
                     to_update.append(report)
+                if code != AttendanceReport.PRESENT and code != before:
+                    newly_missing.append(report)
             AttendanceReport.objects.bulk_create(to_create)
             AttendanceReport.objects.bulk_update(to_update, ["status", "arrival_time", "note"])
             # A pupil who left the class keeps no mark on a re-saved register.
             register.attendancereport_set.exclude(student_id__in=pupils).delete()
+            students = Student.objects.select_related("admin").in_bulk(
+                [r.student_id for r in newly_missing]
+            )
+            for report in newly_missing:
+                report.student = students[report.student_id]
+            _notify_parents(group, day, newly_missing)
 
         return Response(self._payload(request, group, day))

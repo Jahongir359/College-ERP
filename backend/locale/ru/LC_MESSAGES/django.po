@@ -827,3 +827,16 @@ msgid_plural "+%(n)s in other branches"
 msgstr[0] "+%(n)s в другом филиале"
 msgstr[1] "+%(n)s в других филиалах"
 msgstr[2] "+%(n)s в других филиалах"
+
+# School register notices to parents (P2.3)
+#, python-format
+msgid "%(name)s was marked absent in class %(class)s on %(date)s."
+msgstr "%(name)s отсутствует на занятиях в классе %(class)s %(date)s."
+
+#, python-format
+msgid "%(name)s came late to class %(class)s on %(date)s, at %(time)s."
+msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s, пришёл(а) в %(time)s."
+
+#, python-format
+msgid "%(name)s was marked late in class %(class)s on %(date)s."
+msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s."

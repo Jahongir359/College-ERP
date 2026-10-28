@@ -825,3 +825,16 @@ msgid "+%(n)s in another branch"
 msgid_plural "+%(n)s in other branches"
 msgstr[0] "+%(n)s boshqa filialda"
 msgstr[1] "+%(n)s boshqa filiallarda"
+
+# School register notices to parents (P2.3)
+#, python-format
+msgid "%(name)s was marked absent in class %(class)s on %(date)s."
+msgstr "%(name)s %(date)s kuni %(class)s sinfida darsda boʻlmadi."
+
+#, python-format
+msgid "%(name)s came late to class %(class)s on %(date)s, at %(time)s."
+msgstr "%(name)s %(date)s kuni %(class)s sinfiga kechikib keldi, soat %(time)s da."
+
+#, python-format
+msgid "%(name)s was marked late in class %(class)s on %(date)s."
+msgstr "%(name)s %(date)s kuni %(class)s sinfiga kechikib keldi."

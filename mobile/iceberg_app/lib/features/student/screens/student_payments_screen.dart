@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/api/api_providers.dart';
+import '../../../core/i18n/strings.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
@@ -84,7 +85,7 @@ class _StudentPaymentsScreenState extends ConsumerState<StudentPaymentsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MicroLabel(s('Outstanding Balance'), color: t.mint),
+              MicroLabel(s('Outstanding Balance'), color: t.onHero.mint),
               const SizedBox(height: 8),
               Text(
                 outstanding > 0 ? _uzs(outstanding) : s('All paid 🎉'),
@@ -98,7 +99,7 @@ class _StudentPaymentsScreenState extends ConsumerState<StudentPaymentsScreen> {
               if (outstanding > 0 && nextDue != null) ...[
                 const SizedBox(height: 10),
                 StatusBadge(
-                  'Due ${DateFormat('MMM d, yyyy').format(nextDue)}',
+                  s('Due {date}').replaceAll('{date}', DateFormat('MMM d, yyyy').format(nextDue)),
                   tone: nextDue.isBefore(DateTime.now())
                       ? BadgeTone.coral
                       : BadgeTone.amber,
@@ -110,8 +111,8 @@ class _StudentPaymentsScreenState extends ConsumerState<StudentPaymentsScreen> {
                   child: FilledButton(
                     onPressed: () => _payInfo(context),
                     style: FilledButton.styleFrom(
-                      backgroundColor: t.accent,
-                      foregroundColor: t.onAccent,
+                      backgroundColor: t.onHero.accent,
+                      foregroundColor: t.onHero.onAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -237,29 +238,30 @@ class _StudentPaymentsScreenState extends ConsumerState<StudentPaymentsScreen> {
   }
 }
 
-class _InvoiceCard extends StatelessWidget {
+class _InvoiceCard extends ConsumerWidget {
   final Map<String, dynamic> inv;
   const _InvoiceCard({required this.inv});
 
-  (String, BadgeTone) get _badge => switch (inv['status']) {
-    'paid' => ('Paid', BadgeTone.accent),
-    'partial' => ('Partial', BadgeTone.amber),
-    'cancelled' => ('Cancelled', BadgeTone.neutral),
-    _ => ('Due', BadgeTone.coral),
+  (String, BadgeTone) _badge(S s) => switch (inv['status']) {
+    'paid' => (s('Paid'), BadgeTone.accent),
+    'partial' => (s('Partial'), BadgeTone.amber),
+    'cancelled' => (s('Cancelled'), BadgeTone.neutral),
+    _ => (s('Due'), BadgeTone.coral),
   };
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final period = DateTime.tryParse(inv['period']?.toString() ?? '');
     final due = DateTime.tryParse(inv['due_date']?.toString() ?? '');
-    final (badge, tone) = _badge;
+    final (badge, tone) = _badge(s);
     final amount = _money(inv['amount']);
     final amountDue = _money(inv['amount_due']);
 
     return IceCard(
       padding: const EdgeInsets.all(16),
-      onTap: () => _showDetail(context),
+      onTap: () => _showDetail(context, s),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -269,7 +271,7 @@ class _InvoiceCard extends StatelessWidget {
                 child: Text(
                   period != null
                       ? DateFormat('MMMM yyyy').format(period)
-                      : 'Invoice #${inv['id']}',
+                      : '${s('Invoice')} #${inv['id']}',
                   style: TextStyle(
                     fontSize: 15.5,
                     fontWeight: FontWeight.w800,
@@ -294,7 +296,7 @@ class _InvoiceCard extends StatelessWidget {
               const Spacer(),
               if (amountDue > 0)
                 Text(
-                  '${_uzs(amountDue)} due',
+                  '${_uzs(amountDue)} ${s('due')}',
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
@@ -303,7 +305,7 @@ class _InvoiceCard extends StatelessWidget {
                 )
               else
                 Text(
-                  due != null ? 'Due ${DateFormat('MMM d').format(due)}' : '',
+                  due != null ? s('Due {date}').replaceAll('{date}', DateFormat('MMM d').format(due)) : '',
                   style: TextStyle(fontSize: 12, color: t.textLow),
                 ),
             ],
@@ -313,7 +315,7 @@ class _InvoiceCard extends StatelessWidget {
     );
   }
 
-  void _showDetail(BuildContext context) {
+  void _showDetail(BuildContext context, S s) {
     final t = context.ice;
     final payments = (inv['payments'] as List? ?? [])
         .cast<Map<String, dynamic>>();
@@ -357,7 +359,7 @@ class _InvoiceCard extends StatelessWidget {
             ],
             if (payments.isNotEmpty) ...[
               const SizedBox(height: 16),
-              MicroLabel('Payments'),
+              MicroLabel(s('Payments')),
               const SizedBox(height: 8),
               ...payments.map((p) => _PaymentRow(payment: p)),
             ],

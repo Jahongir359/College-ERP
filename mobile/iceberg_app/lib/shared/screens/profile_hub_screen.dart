@@ -6,6 +6,7 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_providers.dart';
 import '../../core/auth/auth_state.dart';
 import '../../core/settings/app_settings.dart';
+import '../../core/theme/brand.dart';
 import '../../core/theme/ice_tokens.dart';
 import '../../shared/widgets/ice_kit.dart';
 import '../../shared/widgets/ice_shell.dart';
@@ -148,8 +149,8 @@ class ProfileHubScreen extends ConsumerWidget {
           Expanded(
             child: _QuickCard(
               icon: Icons.class_outlined,
-              title: s('My Classes'),
-              subtitle: s('Groups you teach'),
+              title: s(context.brand.teacherGroupsKey),
+              subtitle: s(context.brand.teacherGroupsHintKey),
               onTap: () => context.push('/staff/classes'),
             ),
           ),
@@ -500,14 +501,15 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
 
 // ─── Change Password Sheet ────────────────────────────────────────────────────
 
-class _ChangePasswordSheet extends StatefulWidget {
+class _ChangePasswordSheet extends ConsumerStatefulWidget {
   const _ChangePasswordSheet();
 
   @override
-  State<_ChangePasswordSheet> createState() => _ChangePasswordSheetState();
+  ConsumerState<_ChangePasswordSheet> createState() =>
+      _ChangePasswordSheetState();
 }
 
-class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
+class _ChangePasswordSheetState extends ConsumerState<_ChangePasswordSheet> {
   final _old = TextEditingController();
   final _new = TextEditingController();
   final _confirm = TextEditingController();
@@ -538,7 +540,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+            .showSnackBar(SnackBar(content: Text('${ref.read(stringsProvider)('Error')}: $e')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -548,6 +550,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
   @override
   Widget build(BuildContext context) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final bottom =
         MediaQuery.viewInsetsOf(context).bottom + MediaQuery.paddingOf(context).bottom;
     return Container(
@@ -565,7 +568,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
               color: t.stroke, borderRadius: BorderRadius.circular(2)),
           ),
         ),
-        Text('Change Password',
+        Text(s('Change Password'),
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -575,32 +578,32 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
           key: _formKey,
           child: Column(children: [
             _PwdField(
-              ctrl: _old, label: 'Current Password',
+              ctrl: _old, label: s('Current Password'),
               show: _showOld, onToggle: () => setState(() => _showOld = !_showOld),
-              validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+              validator: (v) => (v?.isEmpty ?? true) ? s('Required') : null,
             ),
             const SizedBox(height: 12),
             _PwdField(
-              ctrl: _new, label: 'New Password',
+              ctrl: _new, label: s('New Password'),
               show: _showNew, onToggle: () => setState(() => _showNew = !_showNew),
               validator: (v) {
-                if (v?.isEmpty ?? true) return 'Required';
-                if (v!.length < 6) return 'At least 6 characters';
+                if (v?.isEmpty ?? true) return s('Required');
+                if (v!.length < 6) return s('At least 6 characters');
                 return null;
               },
             ),
             const SizedBox(height: 12),
             _PwdField(
-              ctrl: _confirm, label: 'Confirm Password',
+              ctrl: _confirm, label: s('Confirm Password'),
               show: _showConfirm, onToggle: () => setState(() => _showConfirm = !_showConfirm),
               validator: (v) {
-                if (v?.isEmpty ?? true) return 'Required';
-                if (v != _new.text) return 'Passwords do not match';
+                if (v?.isEmpty ?? true) return s('Required');
+                if (v != _new.text) return s('Passwords do not match');
                 return null;
               },
             ),
             const SizedBox(height: 20),
-            IceButton('Update Password', busy: _saving, onPressed: _submit),
+            IceButton(s('Update Password'), busy: _saving, onPressed: _submit),
           ]),
         ),
       ]),
