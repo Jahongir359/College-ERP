@@ -41,6 +41,7 @@ APP_DIR = Path(__file__).resolve().parent.parent
 # not listed.
 SCHOOL_MODULES = (
     "api/school_views.py",
+    "api/register_views.py",
     "api/family.py",
     "parents.py",
     "school.py",

@@ -55,3 +55,49 @@ def school_course():
     if course is None:
         course, _ = seed_school_subjects()
     return course
+
+
+# ── Daily register (plan task P2.2) ──────────────────────────────────────────
+
+# API names for AttendanceReport.status, in the order the register shows them.
+REGISTER_STATUSES = {"present": 1, "late": 2, "absent": 0}
+REGISTER_STATUS_NAMES = {code: name for name, code in REGISTER_STATUSES.items()}
+
+
+def register_summaries(classes, day):
+    """Today's register for each class: ``{class id: {taken, present, late, absent}}``.
+
+    ``classes`` is a Group queryset already scoped by ``branching``. A class whose
+    register for ``day`` hasn't been saved has ``taken`` False and zero counts.
+    """
+    from django.db.models import Count, Q
+
+    from .models import Attendance, AttendanceReport
+
+    summary = {
+        pk: {"taken": False, "present": 0, "late": 0, "absent": 0}
+        for pk in classes.values_list("pk", flat=True)
+    }
+    registers = (
+        Attendance.objects.filter(group__in=classes.values("pk"), date=day)
+        .values("group_id")
+        .annotate(
+            present=Count(
+                "attendancereport", filter=Q(attendancereport__status=AttendanceReport.PRESENT)
+            ),
+            late=Count(
+                "attendancereport", filter=Q(attendancereport__status=AttendanceReport.LATE)
+            ),
+            absent=Count(
+                "attendancereport", filter=Q(attendancereport__status=AttendanceReport.ABSENT)
+            ),
+        )
+    )
+    for row in registers:
+        summary[row["group_id"]] = {
+            "taken": True,
+            "present": row["present"],
+            "late": row["late"],
+            "absent": row["absent"],
+        }
+    return summary

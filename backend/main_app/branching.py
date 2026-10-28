@@ -469,6 +469,29 @@ def user_can_access_group(user, group):
     return False
 
 
+def user_can_view_register(user, group):
+    """True for admins of the class's branch and the class's teachers (plan P2.2).
+
+    Pupils and parents never read a whole class's register (other children's
+    marks and notes); they see their own child's marks through ``attendance/``.
+    """
+    if group is None or _user_type(user) not in ("1", "2"):
+        return False
+    return filter_classes_for_user(user, Group.objects.filter(pk=group.pk)).exists()
+
+
+def user_can_take_register(user, group):
+    """True only for the homeroom teacher of a school class (plan P2.2).
+
+    Admins and subject teachers may read a class's register through
+    ``filter_classes_for_user``, but only the homeroom teacher saves it.
+    """
+    staff = _get_staff(user)
+    if staff is None or group is None or not group.is_class:
+        return False
+    return group.teacher_id == staff.id
+
+
 # ── Dashboard stories ────────────────────────────────────────────────────────
 
 

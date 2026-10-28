@@ -428,6 +428,10 @@ class Subject(models.Model):
 class Attendance(models.Model):
     group = models.ForeignKey("Group", on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField()
+    # School daily register (P2.2): the homeroom teacher who saved it last.
+    taken_by = models.ForeignKey(
+        "Staff", on_delete=models.SET_NULL, null=True, blank=True, related_name="registers_taken"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -449,6 +453,9 @@ class AttendanceReport(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
     status = models.SmallIntegerField(default=ABSENT, choices=STATUS_CHOICES)
+    # School daily register (P2.2): when a late pupil arrived, and a short note ("Kasal").
+    arrival_time = models.TimeField(null=True, blank=True)
+    note = models.CharField(max_length=200, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
