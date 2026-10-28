@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/api/api_providers.dart';
 import '../../core/auth/auth_state.dart';
 import '../../core/settings/app_settings.dart';
+import '../../core/theme/brand.dart';
 import '../../core/theme/ice_tokens.dart';
 import 'ice_kit.dart';
 
@@ -270,7 +271,7 @@ class IceDrawer extends ConsumerWidget {
       item(Icons.event_available_rounded, s('Attendance'), '/staff/attendance'),
       item(Icons.grading_rounded, s('Results'), '/staff/results'),
       item(Icons.assignment_outlined, s('Assignments'), '/staff/assignments'),
-      item(Icons.class_outlined, s('My Classes'), '/staff/classes'),
+      item(Icons.class_outlined, s(context.brand.teacherGroupsKey), '/staff/classes'),
       item(Icons.chat_bubble_outline_rounded, s('Messages'), '/staff/messages'),
       item(Icons.event_busy_outlined, s('Leave Requests'), '/staff/leave'),
       item(Icons.forum_outlined, s('Feedback'), '/staff/feedback'),

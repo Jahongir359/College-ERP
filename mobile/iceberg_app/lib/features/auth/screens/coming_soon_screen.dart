@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_state.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 
 /// Shown when a staff or admin account signs in. Their dedicated mobile
@@ -14,19 +15,21 @@ class ComingSoonScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = IceTokens.dark();
+    // Always the dark palette of the user's brand (the School gets maroon).
+    final t = IceTokens.dark(brand: context.ice.brand).onHero;
+    final s = ref.watch(stringsProvider);
     final user = ref.watch(authProvider).user;
-    final role = user == null
-        ? 'This'
+    final message = user == null
+        ? s('This app is still under construction.')
         : user.isSuperAdmin
-        ? 'The super-admin'
+        ? s('The super-admin app is still under construction.')
         : user.isAdmin
-        ? 'The admin'
+        ? s('The admin app is still under construction.')
         : user.isStaff
-        ? 'The teacher'
+        ? s('The teacher app is still under construction.')
         : user.isParent
-        ? 'The parent'
-        : 'This';
+        ? s('The parent app is still under construction.')
+        : s('This app is still under construction.');
 
     return Scaffold(
       backgroundColor: t.bg,
@@ -74,7 +77,7 @@ class ComingSoonScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      'Coming Soon',
+                      s('Coming Soon'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 30,
@@ -85,9 +88,8 @@ class ComingSoonScreen extends ConsumerWidget {
                     ).animate().fadeIn(delay: 100.ms).moveY(begin: 12, end: 0),
                     const SizedBox(height: 12),
                     Text(
-                      '$role app is still under construction. For now, only the '
-                      'student experience is available on mobile.\n\nPlease use '
-                      'the web portal for staff and admin tasks.',
+                      '$message ${s('For now, only the student experience is available on mobile.')}'
+                      '\n\n${s('Please use the web portal for staff and admin tasks.')}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14.5,
@@ -118,7 +120,7 @@ class ComingSoonScreen extends ConsumerWidget {
                           ),
                         ),
                         icon: const Icon(Icons.arrow_back_rounded, size: 20),
-                        label: const Text('Back to login'),
+                        label: Text(s('Back to login')),
                       ),
                     ).animate().fadeIn(delay: 260.ms).moveY(begin: 10, end: 0),
                   ],
