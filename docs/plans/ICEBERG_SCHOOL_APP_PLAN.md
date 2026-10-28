@@ -533,7 +533,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       still reviews the rest).
 - [x] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
       of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code. — done
-      2026-10-28, PR #PRNUM (stacked on #36); verified: full suite 333 OK, `InlineBranchFilterGuardTests`,
+      2026-10-28, PR #39 (stacked on #36); verified: full suite 333 OK, `InlineBranchFilterGuardTests`,
       `SchoolHelperScopeTests`, `ParentProfilePhoneTests`. Reviewed P1.1–P1.7 and P2.1. Fixed: child-link
       scoping moved from `parents.visible_links` to new `branching.filter_parent_links_for_user`; the
       lesson API no longer filters periods by branch inline (`Lesson.clean` refuses another branch's
@@ -746,7 +746,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P1.8 done (PR #PRNUM, stacked on #36 P2.1): scoping review of P1.1–P1.7 and P2.1, guard
+- 2026-10-28 — P1.8 done (PR #39, stacked on #36 P2.1): scoping review of P1.1–P1.7 and P2.1, guard
   test `tests/test_scoping.py`, `branching.filter_parent_links_for_user`, parent phone check in `me/`.
   P1 is complete. Other session's open PRs: #37 (P0.6 demo data; the demo timetable week is mine once
   #36 and #37 are merged) and #38 (P3.0; it also adds migration 0044, so #36 or #38 renumbers). Next
