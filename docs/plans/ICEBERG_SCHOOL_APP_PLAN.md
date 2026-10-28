@@ -530,8 +530,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       the children of their branches (`has_other_children` flags the rest) and can't delete a parent
       who has children elsewhere. Scope: new `branching.filter_parents_for_user` (a 4.2 helper, P1.8
       still reviews the rest).
-- [ ] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
-      of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code.
+- [~] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
+      of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code. — claimed 2026-10-28, branch feat/school-p1.8-scoping-review
 
 ### P2 — ERP school features
 
