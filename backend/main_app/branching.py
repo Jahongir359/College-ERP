@@ -629,3 +629,57 @@ def story_storage_ok():
     import os
 
     return bool(os.environ.get("SPACES_KEY") and os.environ.get("SPACES_BUCKET"))
+
+
+# ── Gradebook (plan task P2.4) ───────────────────────────────────────────────
+
+
+def filter_marks_for_user(user, queryset):
+    """Filter a Mark queryset (plan 4.2).
+
+    Admins: marks in their branches' classes. Teachers: marks of the subjects
+    they teach (a homeroom teacher doesn't see other teachers' marks here).
+    Students: their own marks. Parents: their linked children's marks.
+    """
+    if is_super_admin(user):
+        return queryset
+
+    profile = get_admin_profile(user)
+    if profile is not None:
+        return queryset.filter(
+            class_subject__group__branch_id__in=profile.branches.values_list("id", flat=True)
+        )
+
+    staff = _get_staff(user)
+    if staff is not None:
+        return queryset.filter(class_subject__teacher=staff)
+
+    student = _get_student(user)
+    if student is not None:
+        return queryset.filter(student=student)
+
+    if _get_parent(user) is not None:
+        return queryset.filter(student__in=children_for_parent(user).values("pk"))
+
+    return queryset.none()
+
+
+def user_can_view_subject_marks(user, class_subject):
+    """True when ``user`` may read every pupil's marks for ``class_subject``.
+
+    Admins of the class's branch and the subject's own teacher. Pupils and
+    parents read only their own child's marks.
+    """
+    if class_subject is None:
+        return False
+    if _user_type(user) == "1":
+        return class_subject.group.is_class and user_can_access_group(user, class_subject.group)
+    return user_can_give_marks(user, class_subject)
+
+
+def user_can_give_marks(user, class_subject):
+    """True only for the teacher of this subject in this school class (plan P2.4)."""
+    staff = _get_staff(user)
+    if staff is None or class_subject is None:
+        return False
+    return class_subject.teacher_id == staff.id and class_subject.group.is_class

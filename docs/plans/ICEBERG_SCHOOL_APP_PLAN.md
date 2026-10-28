@@ -90,7 +90,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 5/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 6/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
@@ -651,9 +651,22 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       is *newly* absent or late: re-saving the same marks, a new arrival time or note, or a
       correction to present sends nothing; late ↔ absent sends a new notice. Text is stored in
       Uzbek (`NOTICE_LANGUAGE`; ru in the .po for later). P2.8 should send push for these rows.
-- [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
+- [x] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
       teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
-      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
+      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.) — done
+      2026-10-28, PR #52; verified: full suite 461 OK, `MarkAccessTests` (access matrix 8.2),
+      `MarkSavingTests`, `MarkReadingTests`, `FilterMarksForUserTests`. Notes: `Mark` has student,
+      class_subject, date (lesson day), value 2–5 (DB check constraint + API), kind lesson/test/exam,
+      comment (max 200), given_by; one mark per pupil, subject, date and kind. The quarter is not
+      stored: it is the `Term` whose dates contain `date` (D18). `GET school/marks/` for a pupil or
+      parent (`?student=`, `?term=`; default the quarter containing today, the whole year on a holiday)
+      returns the child's marks by subject (screen 14); for a teacher or admin it needs
+      `?class_subject=` and returns every pupil. `POST school/marks/` `{class_subject, date, kind?,
+      records: [{student_id, value, comment?}]}` by the subject's teacher only; `value: null` removes a
+      mark. Dates in the future, outside the year or between quarters are refused. A homeroom teacher
+      doesn't see other teachers' marks (4.2). New helpers `branching.filter_marks_for_user`,
+      `user_can_view_subject_marks`, `user_can_give_marks`. API messages are English like the register
+      API; app wording comes with P4.7.
 - [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
@@ -932,6 +945,9 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P2.4 done (PR #52): `Mark` model, `school/marks/` API in `api/marks_views.py`,
+  `branching.filter_marks_for_user`. Migration `0048_mark` (after P2.6's 0047). Next on this line: P2.5 term grades (same session).
 
 - 2026-10-28 — P4.12 backend half (PR #51): `GET /api/v1/app/version/` for the app's start-up
   check, env vars in `.env.example` and `DEPLOYMENT.md`. P4.12 stays `[~]` until the app screen
