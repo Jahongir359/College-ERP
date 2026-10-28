@@ -525,7 +525,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       clash-free Mon–Sat week, each subject as many times as its weekly hours, grade 1 within 4 periods,
       PE in "Sport zali", Informatika in "Informatika xonasi"; a class that already has lessons is
       kept. **Still open:** marks (P2.4, Release 2), "staging seeded" (needs P0.5).
-- [ ] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
+- [~] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
+      — code half (`backup_db` command + restore guide) claimed 2026-10-28, branch
+      `feat/school-p0.7-backup`; scheduling on the real host stays with the owner.
       Needs: P0.4.
 - [ ] **P0.8** Monitoring: uptime checks for `app.iceberglc.com` and `iceberglc.com`, error alerts (e.g.
       Sentry or the host's alerts) to the owner's Telegram or email; documented. Needs: P0.4.
