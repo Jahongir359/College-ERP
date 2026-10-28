@@ -15,7 +15,10 @@ from main_app.school_demo import DEMO_BRANCH, DEMO_PASSWORD, seed_school_demo
 
 
 class Command(BaseCommand):
-    help = "Create a demo school branch with classes, teachers, students, parents and invoices."
+    help = (
+        "Create a demo school branch with classes, teachers, students, parents, invoices "
+        "and a week of timetable."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -40,10 +43,11 @@ class Command(BaseCommand):
         self.stdout.write(
             "Added: {teachers} teachers, {classes} classes, {class_subjects} class subjects, "
             "{students} students, {parents} parents, {links} parent links, {quarters} quarters, "
-            "{invoices} invoices, {payments} payments.".format(**counts)
+            "{invoices} invoices, {payments} payments, {bell_periods} bell periods, "
+            "{lessons} timetable lessons.".format(**counts)
         )
         self.stdout.write(
             "Logins: teachers DEMO-TC01…TC06, students DEMO-IC01…IC12, parents "
             "DEMO-PR01…PR12 (DEMO-PR01 has two children). New logins use the --password value."
         )
-        self.stdout.write("Not seeded yet: timetable (P2.1) and marks (P2.4).")
+        self.stdout.write("Not seeded yet: marks (P2.4).")

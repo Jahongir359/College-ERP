@@ -8,6 +8,7 @@ from django.db import OperationalError, ProgrammingError, models
 from django.db.models import Q
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.utils.translation import gettext_lazy
 from datetime import datetime, timedelta
 
 
@@ -427,6 +428,10 @@ class Subject(models.Model):
 class Attendance(models.Model):
     group = models.ForeignKey("Group", on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField()
+    # School daily register (P2.2): the homeroom teacher who saved it last.
+    taken_by = models.ForeignKey(
+        "Staff", on_delete=models.SET_NULL, null=True, blank=True, related_name="registers_taken"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -448,6 +453,9 @@ class AttendanceReport(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
     status = models.SmallIntegerField(default=ABSENT, choices=STATUS_CHOICES)
+    # School daily register (P2.2): when a late pupil arrived, and a short note ("Kasal").
+    arrival_time = models.TimeField(null=True, blank=True)
+    note = models.CharField(max_length=200, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -891,9 +899,9 @@ class BellPeriod(models.Model):
     def clean(self):
         errors = {}
         if self.start_time and self.end_time and self.end_time <= self.start_time:
-            errors["end_time"] = "The end time must be after the start time."
+            errors["end_time"] = gettext_lazy("The end time must be after the start time.")
         if self.branch_id and self.branch.brand != Branch.BRAND_SCHOOL:
-            errors["branch"] = "Bell periods belong to an Iceberg School branch."
+            errors["branch"] = gettext_lazy("Bell periods belong to an Iceberg School branch.")
         if not errors and self.branch_id and self.start_time and self.end_time:
             overlapping = (
                 BellPeriod.objects.filter(branch_id=self.branch_id)
@@ -901,7 +909,7 @@ class BellPeriod(models.Model):
                 .filter(start_time__lt=self.end_time, end_time__gt=self.start_time)
             )
             if overlapping.exists():
-                errors["start_time"] = "Bell periods in one branch must not overlap."
+                errors["start_time"] = gettext_lazy("Bell periods in one branch must not overlap.")
         if errors:
             raise ValidationError(errors)
 
