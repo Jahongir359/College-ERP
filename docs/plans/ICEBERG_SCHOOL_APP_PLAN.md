@@ -645,9 +645,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       absent}}` for the Classes page "today" column (P3.1 follow-up) and P2.3.
 - [ ] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
       P2.8). Done when: test that exactly the linked parents get it.
-- [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
+- [~] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
       teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
-      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
+      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.) — claimed
+      2026-10-28, branch feat/school-p2.4-marks
 - [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [ ] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
