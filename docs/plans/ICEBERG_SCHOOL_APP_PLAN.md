@@ -781,7 +781,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       on-primary colour (contrast 4.5:1 or more), those strings come from `strings.dart` in uz/ru/en,
       before/after screenshots at 390 px light and dark; Study Center screens unchanged. Not in this
       task: School sign-in colours (P4.2), hiding Study Center-only tabs (P4.9), the web admin pages
-      (brand layer, other thread). — done 2026-10-28, PR #TBD; verified: `flutter analyze` (no new
+      (brand layer, other thread). — done 2026-10-28, PR #49; verified: `flutter analyze` (no new
       issues), `flutter test` 18 OK (`test/school_brand_readability_test.dart`: contrast 4.5:1+ on both
       hero colours, Study Center tokens unchanged, uz/ru keys), screenshots at 390 px light and dark
       against the demo school: `docs/plans/school-app-screens/p4.13-before-after.png`; the Study Center
@@ -901,7 +901,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P4.13 done (PR #TBD, app only): School hero cards, the pupil profile and attendance,
+- 2026-10-28 — P4.13 done (PR #49, app only): School hero cards, the pupil profile and attendance,
   the teacher class list and the parent Coming Soon wall are readable on maroon and in uz/ru
   (before/after image in `docs/plans/school-app-screens/`). New colours on a hero card: use
   `t.onHero`. Follow-up worth a task: localised dates (`DateFormat` with the app language).
