@@ -11,6 +11,57 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+msgid "Classes"
+msgstr "Классы"
+
+#, python-format
+msgid "Class %(name)s saved."
+msgstr "Класс %(name)s сохранён."
+
+#, python-format
+msgid "Edit class %(name)s"
+msgstr "Редактировать класс %(name)s"
+
+msgid "New class"
+msgstr "Новый класс"
+
+#, python-format
+msgid "Class %(name)s"
+msgstr "Класс %(name)s"
+
+#, python-format
+msgid "%(student)s added to %(name)s."
+msgstr "%(student)s добавлен(а) в %(name)s."
+
+#, python-format
+msgid "%(student)s removed from %(name)s."
+msgstr "%(student)s удалён(а) из %(name)s."
+
+msgid "This class already has this subject."
+msgstr "В этом классе уже есть этот предмет."
+
+msgid "Subjects saved."
+msgstr "Предметы сохранены."
+
+#, python-format
+msgid "%(subject)s removed."
+msgstr "%(subject)s удалён."
+
+msgid "Academic year"
+msgstr "Учебный год"
+
+#, python-format
+msgid "%(year)s is now the current academic year."
+msgstr "%(year)s теперь текущий учебный год."
+
+#, python-format
+msgid "%(term)s saved."
+msgstr "%(term)s сохранена."
+
+#, python-format
+msgid "%(term)s deleted."
+msgstr "%(term)s удалена."
+
 msgid "First name"
 msgstr "Имя"
 
@@ -54,6 +105,198 @@ msgstr "Опекун"
 
 msgid "Main contact for this child"
 msgstr "Основной контакт ребёнка"
+
+msgid "Homeroom teacher"
+msgstr "Классный руководитель"
+
+msgid "Branch"
+msgstr "Филиал"
+
+msgid "Grade"
+msgstr "Параллель"
+
+msgid "Letter"
+msgstr "Буква"
+
+msgid "Subject list (course)"
+msgstr "Список предметов (курс)"
+
+msgid "Classroom"
+msgstr "Кабинет"
+
+msgid "Places"
+msgstr "Мест"
+
+msgid "Monthly fee (soʻm)"
+msgstr "Ежемесячная оплата (сум)"
+
+msgid "For 7-B type B."
+msgstr "Для 7-B введите B."
+
+msgid "The course whose subjects this class studies."
+msgstr "Курс, предметы которого изучает этот класс."
+
+msgid "Leave blank to use the course fee."
+msgstr "Оставьте пустым, чтобы использовать стоимость курса."
+
+#, python-format
+msgid "Class %(name)s already exists in this branch for this year."
+msgstr "Класс %(name)s уже есть в этом филиале на этот год."
+
+msgid "Student"
+msgstr "Ученик"
+
+#, python-format
+msgid "This student is already in class %(name)s this academic year."
+msgstr "Этот ученик уже учится в классе %(name)s в этом учебном году."
+
+msgid "Teacher"
+msgstr "Учитель"
+
+msgid "Subject"
+msgstr "Предмет"
+
+msgid "Hours a week"
+msgstr "Часов в неделю"
+
+msgid "Quarter"
+msgstr "Четверть"
+
+msgid "Name"
+msgstr "Название"
+
+msgid "First day"
+msgstr "Первый день"
+
+msgid "Last day"
+msgstr "Последний день"
+
+msgid "This year already has this quarter."
+msgstr "В этом году уже есть эта четверть."
+
+msgid "Not set"
+msgstr "Не назначен"
+
+msgid "All classes"
+msgstr "Все классы"
+
+msgid "Edit class"
+msgstr "Редактировать класс"
+
+msgid "Students"
+msgstr "Ученики"
+
+msgid "Add to class"
+msgstr "Добавить в класс"
+
+msgid "Login ID"
+msgstr "Логин ID"
+
+msgid "Parents linked"
+msgstr "Привязанные родители"
+
+msgid "None"
+msgstr "Нет"
+
+msgid "Remove this student from the class?"
+msgstr "Убрать этого ученика из класса?"
+
+msgid "Remove"
+msgstr "Убрать"
+
+msgid "No students in this class yet."
+msgstr "В этом классе пока нет учеников."
+
+msgid "Subjects"
+msgstr "Предметы"
+
+#, python-format
+msgid "%(hours)s hour a week"
+msgid_plural "%(hours)s hours a week"
+msgstr[0] "%(hours)s час в неделю"
+msgstr[1] "%(hours)s часа в неделю"
+msgstr[2] "%(hours)s часов в неделю"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Remove this subject from the class?"
+msgstr "Убрать этот предмет из класса?"
+
+msgid "No subjects yet."
+msgstr "Пока нет предметов."
+
+msgid "Add subject"
+msgstr "Добавить предмет"
+
+msgid "Class"
+msgstr "Класс"
+
+msgid "Save class"
+msgstr "Сохранить класс"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "No academic year yet."
+msgstr "Учебного года пока нет."
+
+msgid "Students with a parent linked"
+msgstr "Ученики с привязанным родителем"
+
+msgid "Search classes"
+msgstr "Поиск классов"
+
+msgid "Search classes or teachers…"
+msgstr "Поиск классов или учителей…"
+
+msgid "No classes found"
+msgstr "Классы не найдены"
+
+msgid "Open"
+msgstr "Открыть"
+
+msgid "No classes yet"
+msgstr "Классов пока нет"
+
+msgid "Create the first class, for example 1-A."
+msgstr "Создайте первый класс, например 1-A."
+
+msgid "Years and quarters are shared by all branches."
+msgstr "Учебные годы и четверти общие для всех филиалов."
+
+msgid "Only a super admin can change them."
+msgstr "Изменять их может только главный администратор."
+
+msgid "New academic year"
+msgstr "Новый учебный год"
+
+msgid "Current"
+msgstr "Текущий"
+
+msgid "Make current"
+msgstr "Сделать текущим"
+
+msgid "Edit dates"
+msgstr "Изменить даты"
+
+msgid "Dates"
+msgstr "Даты"
+
+msgid "Delete this quarter?"
+msgstr "Удалить эту четверть?"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "No quarters yet."
+msgstr "Четвертей пока нет."
+
+msgid "Add quarter"
+msgstr "Добавить четверть"
+
+msgid "No academic years yet."
+msgstr "Учебных лет пока нет."
 
 msgid "Toggle menu"
 msgstr "Показать/скрыть меню"
@@ -106,12 +349,6 @@ msgstr "Готовим страницу…"
 msgid "Admin"
 msgstr "Администратор"
 
-msgid "Teacher"
-msgstr "Учитель"
-
-msgid "Student"
-msgstr "Ученик"
-
 msgid "Overview"
 msgstr "Обзор"
 
@@ -121,14 +358,14 @@ msgstr "Профиль и настройки"
 msgid "People"
 msgstr "Люди"
 
-msgid "Students"
-msgstr "Ученики"
-
 msgid "Teachers"
 msgstr "Учителя"
 
 msgid "Admins"
 msgstr "Администраторы"
+
+msgid "School"
+msgstr "Школа"
 
 msgid "Academic Management"
 msgstr "Учебный процесс"

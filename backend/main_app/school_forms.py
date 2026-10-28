@@ -1,7 +1,8 @@
-"""Admin forms for Iceberg School data (plan task P1.7: parents and their children).
+"""Admin forms for Iceberg School data: parents and their children (P1.7), and
+classes, their students and subjects, and quarters (P3.1).
 
-The admin API validates through these same forms, and the admin parents page
-(P3.3) renders them. Labels and messages use gettext so P3.0 can translate them.
+The admin API validates through the parent forms, and the admin pages render
+all of them. Labels and messages use gettext (translated in P3.0's catalogs).
 """
 
 from django import forms
@@ -9,7 +10,21 @@ from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
 
 from . import branching
-from .models import Parent, ParentChild, Student
+from .models import (
+    Branch,
+    ClassSubject,
+    Course,
+    Enrollment,
+    Group,
+    Parent,
+    ParentChild,
+    Session,
+    Staff,
+    Student,
+    Subject,
+    Term,
+    class_enrollment_conflict,
+)
 from .parents import parent_with_phone
 
 
@@ -106,3 +121,209 @@ class ParentChildForm(_AdminForm):
         self.fields["student"].queryset = branching.filter_students_for_user(
             user, Student.objects.select_related("admin").order_by("admin__first_name")
         )
+
+
+# ── Classes (P3.1) ───────────────────────────────────────────────────────────
+
+
+def _staff_choices(user):
+    return branching.filter_staff_for_user(
+        user, Staff.objects.select_related("admin").order_by("admin__first_name")
+    )
+
+
+class _TeacherChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.admin.get_full_name() or obj.admin.email
+
+
+class ClassForm(forms.ModelForm):
+    """Create or edit a school class (a ``Group`` with kind "class"). The name is grade-letter."""
+
+    teacher = _TeacherChoiceField(
+        label=_("Homeroom teacher"), queryset=Staff.objects.none(), required=False
+    )
+
+    class Meta:
+        model = Group
+        fields = [
+            "branch",
+            "session",
+            "grade_level",
+            "letter",
+            "teacher",
+            "course",
+            "room",
+            "capacity",
+            "monthly_fee",
+        ]
+        labels = {
+            "branch": _("Branch"),
+            "session": _("Academic year"),
+            "grade_level": _("Grade"),
+            "letter": _("Letter"),
+            "course": _("Subject list (course)"),
+            "room": _("Classroom"),
+            "capacity": _("Places"),
+            "monthly_fee": _("Monthly fee (soʻm)"),
+        }
+        help_texts = {
+            "letter": _("For 7-B type B."),
+            "course": _("The course whose subjects this class studies."),
+            "monthly_fee": _("Leave blank to use the course fee."),
+        }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.fields["branch"].queryset = branching.filter_branches_for_user(
+            user, Branch.objects.filter(brand=Branch.BRAND_SCHOOL).order_by("name")
+        )
+        self.fields["branch"].required = True
+        self.fields["branch"].empty_label = None
+        self.fields["session"].queryset = Session.objects.order_by("-start_year")
+        self.fields["session"].required = True
+        self.fields["session"].empty_label = None
+        self.fields["grade_level"].required = True
+        self.fields["grade_level"].widget = forms.Select(
+            choices=[(n, str(n)) for n in range(1, 12)]
+        )
+        self.fields["letter"].required = True
+        self.fields["teacher"].queryset = _staff_choices(user)
+        self.fields["course"].queryset = Course.objects.filter(is_active=True).order_by("name")
+        if self.instance.pk is None:
+            from .school import school_course
+
+            current = Session.current()
+            if current is not None:
+                self.initial.setdefault("session", current.pk)
+            self.initial.setdefault("course", school_course().pk)
+        for field in self.visible_fields():
+            field.field.widget.attrs["class"] = "form-control"
+
+    def clean_letter(self):
+        return self.cleaned_data["letter"].strip().upper()
+
+    def clean(self):
+        cleaned = super().clean()
+        branch, session = cleaned.get("branch"), cleaned.get("session")
+        grade, letter = cleaned.get("grade_level"), cleaned.get("letter")
+        if branch and session and grade and letter:
+            twin = (
+                Group.objects.filter(  # scoping-ok: uniqueness check inside a chosen branch
+                    kind=Group.KIND_CLASS, branch=branch, session=session, grade_level=grade
+                )
+                .filter(letter__iexact=letter)
+                .exclude(pk=self.instance.pk)
+            )
+            if twin.exists():
+                raise forms.ValidationError(
+                    _("Class %(name)s already exists in this branch for this year."),
+                    params={"name": f"{grade}-{letter}"},
+                    code="duplicate_class",
+                )
+        return cleaned
+
+    def _post_clean(self):
+        # Fill the fields Group.clean() checks before the model validates.
+        self.instance.kind = Group.KIND_CLASS
+        grade, letter = self.cleaned_data.get("grade_level"), self.cleaned_data.get("letter")
+        if grade and letter:
+            self.instance.name = f"{grade}-{letter}"
+        super()._post_clean()
+
+
+class ClassStudentForm(_AdminForm):
+    """Add a student to a class: students of the class's branch without a class this year."""
+
+    student = forms.ModelChoiceField(label=_("Student"), queryset=Student.objects.none())
+
+    def __init__(self, *args, user=None, group=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.group = group
+        students = branching.filter_students_for_user(user, Student.objects.all())
+        in_a_class = Enrollment.objects.filter(
+            is_active=True, group__kind=Group.KIND_CLASS, group__session_id=group.session_id
+        ).values("student_id")
+        self.fields["student"].queryset = (
+            students.filter(branch_id=group.branch_id)  # scoping-ok: narrows a scoped list
+            .exclude(pk__in=in_a_class)
+            .select_related("admin")
+            .order_by("admin__first_name", "admin__last_name")
+        )
+        self.fields["student"].label_from_instance = lambda s: (
+            f"{s.admin.get_full_name()} ({s.admin.login_id or s.admin.email})"
+        )
+
+    def clean_student(self):
+        student = self.cleaned_data["student"]
+        other = class_enrollment_conflict(student.pk, self.group)
+        if other is not None:
+            raise forms.ValidationError(
+                _("This student is already in class %(name)s this academic year."),
+                params={"name": other.name},
+            )
+        return student
+
+
+class ClassSubjectForm(forms.ModelForm):
+    """Add a subject to a class, or change its teacher and weekly hours."""
+
+    teacher = _TeacherChoiceField(label=_("Teacher"), queryset=Staff.objects.none(), required=False)
+
+    class Meta:
+        model = ClassSubject
+        fields = ["subject", "teacher", "weekly_hours"]
+        labels = {"subject": _("Subject"), "weekly_hours": _("Hours a week")}
+
+    def __init__(self, *args, user=None, group=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.group = group
+        taken = group.class_subjects.exclude(pk=self.instance.pk).values("subject_id")
+        self.fields["subject"].queryset = (
+            Subject.objects.filter(course_id=group.course_id).exclude(pk__in=taken).order_by("name")
+        )
+        if self.instance.pk:
+            self.fields["subject"].disabled = True
+        self.fields["teacher"].queryset = _staff_choices(user)
+        for field in self.visible_fields():
+            field.field.widget.attrs["class"] = "form-control"
+
+
+class TermForm(forms.ModelForm):
+    """A quarter (chorak) of an academic year."""
+
+    class Meta:
+        model = Term
+        fields = ["number", "name", "start_date", "end_date"]
+        labels = {
+            "number": _("Quarter"),
+            "name": _("Name"),
+            "start_date": _("First day"),
+            "end_date": _("Last day"),
+        }
+        widgets = {
+            "number": forms.Select(choices=[(n, str(n)) for n in range(1, 5)]),
+            "start_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+            "end_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+        }
+
+    def __init__(self, *args, session=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.session = session
+        for field in self.visible_fields():
+            field.field.widget.attrs["class"] = "form-control"
+
+    def clean(self):
+        cleaned = super().clean()
+        number = cleaned.get("number")
+        if number and (
+            Term.objects.filter(session=self.instance.session, number=number)
+            .exclude(pk=self.instance.pk)
+            .exists()
+        ):
+            self.add_error("number", _("This year already has this quarter."))
+        if number and not cleaned.get("name"):
+            cleaned["name"] = f"{number}-chorak"
+            self.instance.name = cleaned["name"]
+        return cleaned

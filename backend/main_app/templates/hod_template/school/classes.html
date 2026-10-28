@@ -1,0 +1,106 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="ice-manage-page" data-manage-search-scope>
+  <section class="ice-manage-hero">
+    <div class="ice-manage-hero__main">
+      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-door-open"></i></span>
+      <div class="ice-manage-hero__copy">
+        <h2 class="ice-manage-hero__title">{% translate "Classes" %}</h2>
+        <p class="ice-manage-hero__subtitle">{% if year %}{{ year }}{% else %}{% translate "No academic year yet." %}{% endif %}</p>
+      </div>
+    </div>
+    <div class="ice-manage-hero__actions">
+      <a href="{% url 'school_class_add' %}" class="ice-manage-add-btn">
+        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New class" %}
+      </a>
+    </div>
+  </section>
+
+  {% if years|length > 1 %}
+  <form method="get" class="ice-manage-filter">
+    <label for="year-filter" class="ice-manage-filter__label"><i class="fas fa-calendar-alt" aria-hidden="true"></i> {% translate "Academic year" %}</label>
+    <select id="year-filter" name="year" class="ice-manage-filter__select" onchange="this.form.submit()">
+      {% for y in years %}
+      <option value="{{ y.pk }}" {% if y.pk == year.pk %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+
+  <div class="school-stats">
+    <div class="school-stat">
+      <span class="school-stat__label">{% translate "Classes" %}</span>
+      <span class="school-stat__value">{{ classes|length }}</span>
+    </div>
+    <div class="school-stat">
+      <span class="school-stat__label">{% translate "Students" %}</span>
+      <span class="school-stat__value">{{ total_students }}</span>
+    </div>
+    <div class="school-stat">
+      <span class="school-stat__label">{% translate "Students with a parent linked" %}</span>
+      <span class="school-stat__value">{{ linked_students }}</span>
+    </div>
+  </div>
+
+  <label class="ice-manage-search" aria-label="{% translate 'Search classes' %}">
+    <i class="fas fa-search" aria-hidden="true"></i>
+    <input type="search" class="ice-manage-search__input" data-manage-search placeholder="{% translate 'Search classes or teachers…' %}" autocomplete="off">
+  </label>
+
+  <div class="ice-manage-empty" data-manage-empty-state hidden>
+    <i class="fas fa-search" aria-hidden="true"></i>
+    <strong>{% translate "No classes found" %}</strong>
+  </div>
+
+  <div class="ice-manage-table-wrap">
+    <table class="ice-manage-table">
+      <thead>
+        <tr>
+          <th>{% translate "Class" %}</th>
+          {% if show_branch %}<th>{% translate "Branch" %}</th>{% endif %}
+          <th>{% translate "Homeroom teacher" %}</th>
+          <th>{% translate "Students" %}</th>
+          <th>{% translate "Subjects" %}</th>
+          <th>{% translate "Classroom" %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for group in classes %}
+        <tr data-manage-search-item data-manage-search-text="{{ group.name }} {{ group.branch.name }} {{ group.teacher.admin.get_full_name|default:'' }}">
+          <td><strong>{{ group.name }}</strong></td>
+          {% if show_branch %}<td>{{ group.branch.name }}</td>{% endif %}
+          <td>{% if group.teacher %}{{ group.teacher.admin.get_full_name }}{% else %}<span class="school-muted">{% translate "Not set" %}</span>{% endif %}</td>
+          <td>{{ group.student_count }} / {{ group.capacity }}</td>
+          <td>{{ group.subject_count }}</td>
+          <td>{{ group.room|default:"—" }}</td>
+          <td>
+            <div class="ice-manage-actions">
+              <a href="{% url 'school_class_detail' group.pk %}" class="ice-manage-action ice-manage-action--primary">{% translate "Open" %} →</a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7">
+            <div class="ice-manage-empty">
+              <i class="fas fa-door-open" aria-hidden="true"></i>
+              <strong>{% translate "No classes yet" %}</strong>
+              <span>{% translate "Create the first class, for example 1-A." %}</span>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}

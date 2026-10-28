@@ -68,6 +68,26 @@
             </a>
         </div>
 
+        {% if show_school_nav %}
+        <h6 class="nav-section-title">{% translate "School" %}</h6>
+
+        <div class="nav-item">
+            {% url 'school_classes' as school_classes_url %}
+            <a href="{{ school_classes_url }}" class="nav-link {% if 'maktab/classes' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-door-open"></i>
+                <span class="nav-text">{% translate "Classes" %}</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            {% url 'school_years' as school_years_url %}
+            <a href="{{ school_years_url }}" class="nav-link {% if 'maktab/years' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <span class="nav-text">{% translate "Academic year" %}</span>
+            </a>
+        </div>
+        {% endif %}
+
         <h6 class="nav-section-title">{% translate "Academic Management" %}</h6>
 
         <div class="nav-item">

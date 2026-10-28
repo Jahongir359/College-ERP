@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 1/5 (P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 2/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -689,8 +689,16 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       header). `.mo` files are compiled by `compilemessages` in the Dockerfile and CI, never committed.
       Run it locally before `manage.py test`. `TranslationCatalogTests` fails on any empty or fuzzy
       entry, so every new `{% translate %}` string needs uz and ru in the same PR.
-- [ ] **P3.1** Admin: classes (create 7-B, homeroom teacher, students), subjects per class, current
-      session and quarters. Needs: P1.1–P1.3.
+- [x] **P3.1** Admin: classes (create 7-B, homeroom teacher, students), subjects per class, current
+      session and quarters. Needs: P1.1–P1.3. — done 2026-10-28, PR #<pr> (stacked on #40); verified:
+      full suite 367 OK, `test_school_admin_pages` (14). Notes: new sidebar section **School**
+      (`context_processors.school_nav`: admins with a School-brand branch) with **Classes**
+      (`/maktab/classes/`) and **Academic year** (`/maktab/years/`). Views in `school_admin_views.py`,
+      forms in `school_forms.py`; class name is built as `<grade>-<letter>`, one class per
+      grade+letter+branch+year; only School-brand branches are offered. Removing a student keeps the
+      enrollment (`is_active=False`) for history. Years and quarters are shared by all branches, so only
+      a super admin may change them; branch admins see them read-only. Left out of mockup 16 on purpose:
+      the "today's attendance" column (needs P2.2) and the CSV export button (Release 2).
 - [ ] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
       Needs: P2.1.
 - [ ] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7.
@@ -833,6 +841,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P3.1 done (PR #<pr>, stacked on #40): admin **School → Classes / Academic year**
+  pages in uz/ru/en. Merge order #36 → #39 → #37 → #38 → #40 → this. Next free: P3.3 (parents
+  screen); P2.2 and the demo timetable week belong to the other agent.
 
 - 2026-10-28 — owner delegated D9, D10, D12–D14 and PD.8 to the agent: decided from research on how
   Uzbek schools work (section 2.1). New open question **D18** (must the school keep eMaktab?). PD.8

@@ -1,0 +1,50 @@
+/* Maktab admin pages (plan task P3.1, mockup 16). Builds on admin-manage-mobile.css. */
+.school-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.school-stat {
+  padding: 14px 16px;
+  border: 1px solid var(--ice-manage-border, rgba(127, 127, 127, .2));
+  border-radius: 16px;
+  background: var(--ice-surface, #fff);
+}
+.school-stat__label { display: block; font-size: 13px; opacity: .75; }
+.school-stat__value { display: block; font-size: 28px; font-weight: 800; line-height: 1.2; }
+.school-section { margin-top: 22px; }
+.school-section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.school-section__head h3 { margin: 0; font-size: 18px; font-weight: 800; }
+.school-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 0;
+}
+.school-inline-form .form-control { width: auto; min-width: 120px; max-width: 100%; }
+.school-inline-form label { display: block; font-size: 12px; font-weight: 600; opacity: .8; }
+.school-inline-form .school-hours { min-width: 72px; width: 80px; }
+.school-muted { opacity: .65; }
+.school-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--brand-primary, #0C1F45);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  .school-inline-form, .school-inline-form .form-control { width: 100%; }
+}

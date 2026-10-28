@@ -1,0 +1,124 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="ice-manage-page">
+  <section class="ice-manage-hero">
+    <div class="ice-manage-hero__main">
+      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-calendar-alt"></i></span>
+      <div class="ice-manage-hero__copy">
+        <h2 class="ice-manage-hero__title">{% translate "Academic year" %}</h2>
+        <p class="ice-manage-hero__subtitle">
+          {% translate "Years and quarters are shared by all branches." %}
+          {% if not can_edit %}{% translate "Only a super admin can change them." %}{% endif %}
+        </p>
+      </div>
+    </div>
+    {% if can_edit %}
+    <div class="ice-manage-hero__actions">
+      <a href="{% url 'add_session' %}" class="ice-manage-add-btn">
+        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New academic year" %}
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+  {% for year in years %}
+  <section class="school-section" aria-labelledby="year-{{ year.pk }}">
+    <div class="school-section__head">
+      <h3 id="year-{{ year.pk }}">
+        {{ year }}
+        <span class="school-muted">{{ year.start_year|date:"d.m.Y" }} – {{ year.end_year|date:"d.m.Y" }}</span>
+        {% if current and year.pk == current.pk %}<span class="school-current">{% translate "Current" %}</span>{% endif %}
+      </h3>
+      {% if can_edit %}
+      <div class="ice-manage-actions">
+        {% if not year.is_current %}
+        <form method="post" action="{% url 'school_year_make_current' year.pk %}" class="school-inline-form">
+          {% csrf_token %}
+          <button type="submit" class="ice-manage-action">{% translate "Make current" %}</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'edit_session' year.pk %}" class="ice-manage-action">{% translate "Edit dates" %}</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="ice-manage-table-wrap">
+      <table class="ice-manage-table">
+        <thead>
+          <tr>
+            <th>{% translate "Quarter" %}</th>
+            <th>{% translate "Dates" %}</th>
+            {% if can_edit %}<th></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for term in year.terms.all %}
+          <tr>
+            {% if can_edit %}
+            {% for term_pk, form in edit_forms.items %}{% if term_pk == term.pk %}
+            <td colspan="2">
+              <form method="post" action="{% url 'school_term_edit' term.pk %}" class="school-inline-form">
+                {% csrf_token %}
+                {% for field in form %}
+                <div>
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                </div>
+                {% endfor %}
+                <button type="submit" class="ice-manage-action">{% translate "Save" %}</button>
+              </form>
+            </td>
+            {% endif %}{% endfor %}
+            <td>
+              <form method="post" action="{% url 'school_term_delete' term.pk %}" class="school-inline-form">
+                {% csrf_token %}
+                <button type="submit" class="ice-manage-action ice-manage-action--danger"
+                        data-confirm="{% translate 'Delete this quarter?' %}"
+                        onclick="return confirm(this.dataset.confirm)">{% translate "Delete" %}</button>
+              </form>
+            </td>
+            {% else %}
+            <td><strong>{{ term.name|default:term.number }}</strong></td>
+            <td>{{ term.start_date|date:"d.m.Y" }} – {{ term.end_date|date:"d.m.Y" }}</td>
+            {% endif %}
+          </tr>
+          {% empty %}
+          <tr><td colspan="3"><div class="ice-manage-empty"><strong>{% translate "No quarters yet." %}</strong></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if can_edit %}
+    {% for year_pk, form in add_forms.items %}{% if year_pk == year.pk and year.terms.all|length < 4 %}
+    <form method="post" action="{% url 'school_term_add' year.pk %}" class="school-inline-form" style="margin-top:12px;">
+      {% csrf_token %}
+      {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endfor %}
+      <button type="submit" class="ice-manage-action ice-manage-action--primary">
+        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "Add quarter" %}
+      </button>
+    </form>
+    {% endif %}{% endfor %}
+    {% endif %}
+  </section>
+  {% empty %}
+  <div class="ice-manage-empty">
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <strong>{% translate "No academic years yet." %}</strong>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %}
