@@ -525,7 +525,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 - [x] **P2.1** Bell periods and timetable: `BellPeriod`, `Lesson`, clash checks (teacher, room, class
       at the same period). Done when: models, validation tests, `school/timetable/` API for each role.
-      Needs: P1.2, P1.3. — done 2026-10-28, PR #PRNUM; verified: full suite 304 OK,
+      Needs: P1.2, P1.3. — done 2026-10-28, PR #36; verified: full suite 304 OK,
       `BellPeriodModelTests`, `LessonModelTests`, `LessonClashTests`, `TimetableBranchingTests`,
       `BellPeriodApiTests`, `LessonApiTests`, `TimetableApiTests` (access matrix 8.2). Notes:
       `BellPeriod(branch, number 1–12, start/end time)`, School branches only, no overlaps in a branch.
@@ -722,7 +722,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P2.1 done (PR #PRNUM): `BellPeriod`, `Lesson`, clash checks, admin API for periods and
+- 2026-10-28 — P2.1 done (PR #36): `BellPeriod`, `Lesson`, clash checks, admin API for periods and
   lessons, `school/timetable/` for every role (migration `0044_timetable`). Done in parallel with P1.7
   (another agent, branch `feat/school-p1.7-parent-admin`): if P1.7 also adds a `0044_*` migration, the
   second PR to merge renumbers its migration (or adds a merge migration). P1.8 waits for P1.7. Next:
