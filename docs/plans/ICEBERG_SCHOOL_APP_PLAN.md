@@ -91,8 +91,8 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 4/8 |
-| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
+| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 5/9 (mockups 1–19 drawn) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/6 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -361,6 +361,7 @@ money is shown as `[summa]` because prices are not decided.
 | 17 | Web — timetable editor with clash | [17-web-timetable.png](school-app-mockups/17-web-timetable.png) | P3.2 |
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
+| 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
 
 Navigation per role (bottom tabs, at most five):
 
@@ -685,10 +686,13 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       entry still to draw**. (Release 2.)
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
-- [~] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
+- [x] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
       the web is no longer needed, D15; the CSV import preview waits for Release 2). **Part 1 (parents)
       drawn 2026-10-28**, branch docs/school-pd9-parents-mockup: screens 18–18b, content from P1.7 (no
-      CSV import, D16); approved 2026-10-28 (owner delegated to the reviewer session), unchanged. Part 2 (register report) still to draw.
+      CSV import, D16); approved 2026-10-28 (owner delegated to the reviewer session), unchanged. **Part 2 (register
+      report) drawn 2026-10-28**, PR #TBD: screen 19, built for P3.7 from the P2.2 register data
+      (`register_summaries`, arrival time, note) and the P2.3 parent notices. Same classes, teachers
+      and counts as screen 16. Waiting for approval (PD.8).
 - [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en); a clean
       transparent Study Center wordmark replacing the defective `iceberg-wordmark.png`.
 - [~] **PD.8** **Owner** approves the mockups in section 6.0 (and later PD.5, PD.7, PD.9; record the date per screen here). Code tasks for a screen
@@ -698,7 +702,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       saqlanadi va keyin yuboriladi" (offline register dropped, D16); **16 (web classes)** no "CSV
       yuklash" button until Release 2 (CSV import moved, D16). Also: the grades tabs (14) list all four
       quarters plus Yillik; Uzbek UI text uses the modifier letter ʻ (Oʻquvchilar), as in the code.
-      Still to approve when drawn: PD.5 (teacher grade entry), PD.7, PD.9 part 2.
+      Still to approve: **19 (register report, drawn)**; when drawn: PD.5 (teacher grade entry), PD.7.
       **Screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session)**, unchanged.
 
 ### P3 — Web screens (admins and teachers)
@@ -751,6 +755,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
+- [ ] **P3.7** Admin: register report page (screen 19, after its PD.8 approval): for a date and
+      optional class, which classes took the register (time, homeroom teacher), present/late/absent
+      counts and rate per class, the list of absent and late pupils with arrival time and note, CSV
+      export of the same rows. Read-only (teachers take the register in the app, D15); data from
+      `Attendance`/`AttendanceReport` and `school.register_summaries`, scoped through
+      `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
+      branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
+      Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
 - [ ] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
       desktop in the PR.
 
@@ -896,6 +908,9 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-10-28 — PD.9 part 2 drawn (PR #TBD): web register report, screen 19
+  (`python build_mockups.py 19-web-register-report`). Added task **P3.7** (build it); it waits for
+  the owner's approval of 19 (PD.8).
 - 2026-10-28 — P2.3 done (PR #47): parents get an in-app `attendance` notice when their child
   is newly marked absent or late in the register; text stored in Uzbek. Uses
   `branching.parent_user_ids_for_students` from P2.7. Next: P2.8 push should pick up these notices.
