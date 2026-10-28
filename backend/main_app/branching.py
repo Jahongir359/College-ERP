@@ -328,6 +328,58 @@ def filter_class_subjects_for_user(user, queryset):
     return queryset.none()
 
 
+def filter_classes_for_user(user, queryset):
+    """Filter a Group queryset to the school classes this user may see.
+
+    Admins: classes in their branches. Teachers: classes where they are the
+    homeroom teacher or teach a subject. Students: their own active class.
+    Parents: their children's active classes.
+    """
+    queryset = queryset.filter(kind=Group.KIND_CLASS)
+    if is_super_admin(user):
+        return queryset
+
+    profile = get_admin_profile(user)
+    if profile is not None:
+        return queryset.filter(branch_id__in=profile.branches.values_list("id", flat=True))
+
+    staff = _get_staff(user)
+    if staff is not None:
+        return queryset.filter(Q(teacher=staff) | Q(class_subjects__teacher=staff)).distinct()
+
+    student = _get_student(user)
+    if student is not None:
+        return queryset.filter(enrollment__student=student, enrollment__is_active=True).distinct()
+
+    if _get_parent(user) is not None:
+        return queryset.filter(
+            enrollment__student__in=children_for_parent(user).values("pk"),
+            enrollment__is_active=True,
+        ).distinct()
+
+    return queryset.none()
+
+
+def filter_lessons_for_user(user, queryset):
+    """Filter a Lesson queryset: the timetables of the classes the user may see."""
+    if is_super_admin(user):
+        return queryset
+    classes = filter_classes_for_user(user, Group.objects.all())
+    return queryset.filter(group__in=classes.values("pk"))
+
+
+def filter_bell_periods_for_user(user, queryset):
+    """Filter a BellPeriod queryset: admins see their branches' bell times only."""
+    if is_super_admin(user):
+        return queryset
+
+    profile = get_admin_profile(user)
+    if profile is not None:
+        return queryset.filter(branch_id__in=profile.branches.values_list("id", flat=True))
+
+    return queryset.none()
+
+
 # ── Single-object access checks ──────────────────────────────────────────────
 
 
