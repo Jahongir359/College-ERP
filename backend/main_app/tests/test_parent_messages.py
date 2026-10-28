@@ -1,9 +1,12 @@
 """Teacher ↔ parent messages (plan task P2.6): threads per student and teacher,
 the access matrix of plan 8.2 and the branching helpers behind it."""
 
+import shutil
+import tempfile
 from datetime import date
 
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -13,6 +16,7 @@ from main_app import branching
 from main_app.models import (
     Admin,
     Branch,
+    ChatMessage,
     ChatThread,
     ClassSubject,
     Enrollment,
@@ -139,6 +143,16 @@ class ParentThreadModelTests(_ParentMessagesFixture, TestCase):
             self.thread(self.aziza, self.kamola)
         # Another teacher of the same child gets their own thread.
         self.thread(self.aziza, self.dilnoza)
+
+    def test_message_str_works_for_parent_and_group_threads(self):
+        parent_msg = ChatMessage.objects.create(
+            thread=self.thread(self.aziza, self.kamola), sender=self.mum, body="Salom"
+        )
+        self.assertIn("Parents chat", str(parent_msg))
+        group_msg = ChatMessage.objects.create(
+            thread=self.class_7b.chat_thread, sender=self.dilnoza.admin, body="Hi"
+        )
+        self.assertIn("7-B", str(group_msg))
 
     def test_group_threads_still_one_per_group(self):
         self.assertTrue(ChatThread.objects.filter(group=self.class_7b, kind="group").exists())
@@ -406,3 +420,51 @@ class ParentMessagesApiTests(_ParentMessagesFixture, TestCase):
         self.as_user(self.dilnoza.admin)
         threads = self.api.get(reverse("api_messages")).json()["threads"]
         self.assertEqual([t["group_id"] for t in threads], [self.class_7b.pk])
+
+
+@override_settings(**_OVERRIDES)
+class ParentThreadAttachmentTests(_ParentMessagesFixture, TestCase):
+    """``chat_attachments/`` is a protected media prefix (media_views.py)."""
+
+    def setUp(self):
+        self.media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.media, ignore_errors=True)
+        settings_override = override_settings(MEDIA_ROOT=self.media)
+        settings_override.enable()
+        self.addCleanup(settings_override.disable)
+        self.make_fixture()
+
+    def attachment_url(self, thread, sender):
+        msg = ChatMessage.objects.create(
+            thread=thread,
+            sender=sender,
+            attachment=SimpleUploadedFile("note.png", b"PNGDATA"),
+        )
+        return "/media/" + msg.attachment.name
+
+    def status_for(self, user, url):
+        self.client.force_login(_reload(user))
+        return self.client.get(url).status_code
+
+    def test_parent_thread_attachment_only_for_its_teacher_and_parents(self):
+        url = self.attachment_url(self.thread(self.aziza, self.kamola), self.mum)
+        self.assertEqual(self.client.get(url).status_code, 404)
+        for user in (self.kamola.admin, self.mum, self.dad, self.branch_admin):
+            with self.subTest(user=user.email):
+                self.assertEqual(self.status_for(user, url), 200)
+        for user in (
+            self.other_parent,
+            self.dilnoza.admin,
+            self.rustam.admin,
+            self.aziza_user,
+            self.other_admin,
+        ):
+            with self.subTest(user=user.email):
+                self.assertEqual(self.status_for(user, url), 404)
+
+    def test_group_chat_attachment_is_unchanged(self):
+        url = self.attachment_url(self.class_7b.chat_thread, self.dilnoza.admin)
+        self.assertEqual(self.status_for(self.dilnoza.admin, url), 200)
+        self.assertEqual(self.status_for(self.aziza_user, url), 200)
+        self.assertEqual(self.status_for(self.mum, url), 404)
+        self.assertEqual(self.status_for(self.rustam.admin, url), 404)

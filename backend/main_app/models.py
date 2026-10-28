@@ -1142,7 +1142,7 @@ class ChatMessage(models.Model):
         )
 
     def __str__(self):
-        return f"{self.sender.email} -> {self.thread.group.name}: {self.body[:50]}"
+        return f"{self.sender.email} -> {self.thread}: {self.body[:50]}"
 
 
 class ChatReadState(models.Model):
