@@ -203,6 +203,13 @@ class ClassSubjectApiTests(_ClassFixture, TestCase):
         self.assertEqual(self.api.delete(detail).status_code, 204)
         self.assertFalse(ClassSubject.objects.filter(pk=cs_id).exists())
 
+    def test_subject_in_use_cannot_be_deleted_through_the_api(self):
+        ClassSubject.objects.create(group=self.class_7b, subject=self.maths)
+        self.as_user(self.super_admin)
+        res = self.api.delete(reverse("api_admin_subject_detail", args=[self.maths.pk]))
+        self.assertEqual(res.status_code, 400)
+        self.assertTrue(Subject.objects.filter(pk=self.maths.pk).exists())
+
     def test_validation_errors(self):
         self.as_user(self.super_admin)
         url = self.list_url(self.class_7b)

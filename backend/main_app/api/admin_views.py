@@ -700,7 +700,13 @@ class SubjectDetailView(APIView):
         subject, err = self._get_subject(request, pk)
         if err:
             return err
-        subject.delete()
+        try:
+            subject.delete()
+        except ProtectedError:
+            return Response(
+                {"detail": "School classes use this subject. Remove it from them first."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
