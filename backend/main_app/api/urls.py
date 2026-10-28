@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views, admin_views, register_views, school_views, student_views
+from . import views, admin_views, marks_views, register_views, school_views, student_views
 
 urlpatterns = [
     # ── Auth ─────────────────────────────────────────────────────────────────
@@ -329,4 +329,6 @@ urlpatterns = [
         admin_views.AdminAdminDetailView.as_view(),
         name="api_admin_admin_detail",
     ),
+    # ── School gradebook (P2.4) ──────────────────────────────────────────────
+    path("school/marks/", marks_views.MarkListView.as_view(), name="api_school_marks"),
 ]

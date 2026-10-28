@@ -1764,3 +1764,50 @@ class Payment(models.Model):
     @property
     def receipt_no(self):
         return f"PAY-{self.pk:06d}" if self.pk else "PAY-——"
+
+
+class Mark(models.Model):
+    """One gradebook mark (2–5) a subject teacher gives a pupil on a lesson date (plan P2.4).
+
+    Same scale and per-date data as the state eMaktab journal (decision D18), so
+    marks can be exported later. The quarter is not stored: it is the ``Term``
+    of the class's academic year whose dates contain ``date``.
+    """
+
+    KIND_LESSON = "lesson"
+    KIND_TEST = "test"
+    KIND_EXAM = "exam"
+    KIND_CHOICES = [(KIND_LESSON, "Lesson"), (KIND_TEST, "Test"), (KIND_EXAM, "Exam")]
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="marks")
+    class_subject = models.ForeignKey(ClassSubject, on_delete=models.CASCADE, related_name="marks")
+    date = models.DateField()
+    value = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(2), MaxValueValidator(5)]
+    )
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES, default=KIND_LESSON)
+    comment = models.CharField(max_length=200, blank=True, default="")
+    given_by = models.ForeignKey(
+        Staff, on_delete=models.SET_NULL, null=True, blank=True, related_name="marks_given"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["date", "pk"]
+        indexes = [
+            models.Index(fields=["student", "date"]),
+            models.Index(fields=["class_subject", "date"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "class_subject", "date", "kind"],
+                name="one_mark_per_pupil_subject_date_kind",
+            ),
+            models.CheckConstraint(
+                condition=Q(value__gte=2) & Q(value__lte=5), name="mark_value_2_to_5"
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.student} · {self.class_subject} · {self.date}: {self.value}"
