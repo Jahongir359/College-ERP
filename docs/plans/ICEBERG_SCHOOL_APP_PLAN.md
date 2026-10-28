@@ -90,7 +90,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 2/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 2/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
@@ -622,9 +622,22 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       admins `?class=` (required). New helpers `branching.filter_classes_for_user` (plan 4.2),
       `filter_lessons_for_user`, `filter_bell_periods_for_user`. Not checked yet: changing a
       `ClassSubject`'s teacher later can create a teacher clash (P3.2 should re-check on save).
-- [ ] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
+- [x] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
       for a class and date; `school/register/` API; reuses `Attendance`/`AttendanceReport` (+ fields).
       Done when: tests incl. "only homeroom teacher of that class", one register per date. Needs: P1.2.
+      — done 2026-10-28, PR #PRNUM; verified: full suite 378 OK, `RegisterAccessTests` (access matrix
+      8.2), `RegisterFlowTests`, `RegisterSummaryTests`. Notes: migration `0046_daily_register` adds
+      `Attendance.taken_by` and `AttendanceReport.arrival_time` + `note` (max 200); one register per class
+      and date is the existing `unique_together`. `GET/POST school/register/<class>/<YYYY-MM-DD>/` in
+      `api/register_views.py`: GET lists every active pupil (unsaved = `present`), `counts`, `taken`,
+      `taken_by`, `can_edit`; POST `{records: [{student_id, status: present|late|absent,
+      arrival_time "HH:MM", note}]}`, pupils left out are present, re-saving replaces the day, an arrival
+      time is kept only for `late`. Only the homeroom teacher saves (`branching.user_can_take_register`);
+      branch admins and the class's subject teachers read (`user_can_view_register`); pupils and parents
+      get 404 (other children's notes) and read their own marks in `attendance/`, which now also returns
+      `arrival_time` and `note`. No future dates, none outside the class's year; past days can be
+      corrected. `school.register_summaries(classes, day)` gives `{class id: {taken, present, late,
+      absent}}` for the Classes page "today" column (P3.1 follow-up) and P2.3.
 - [ ] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
       P2.8). Done when: test that exactly the linked parents get it.
 - [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
@@ -841,6 +854,11 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P2.2 done (PR #PRNUM): daily register API with arrival time and note, homeroom teacher
+  only, `register_summaries` for the Classes page. P2.3 (absence alerts) can build on the POST (compare
+  old and new marks) and P2.8's sender; P4.6 (register screen) on `school/register/`. Next here:
+  PD.9 part 2 (register report mockup, screen 19), then P4.13.
 
 - 2026-10-28 — P3.1 done (PR #41, stacked on #40): admin **School → Classes / Academic year**
   pages in uz/ru/en. Merge order #36 → #39 → #37 → #38 → #40 → this. Next free: P3.3 (parents
