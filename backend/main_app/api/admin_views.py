@@ -1237,7 +1237,7 @@ class AdminSendNotificationView(APIView):
 
         title = request.data.get("title", "").strip()
         body = request.data.get("body", "").strip()
-        target = request.data.get("target", "all")  # "all" | "students" | "staff"
+        target = request.data.get("target", "all")  # "all" | "students" | "parents" | "staff"
         group_id = request.data.get("group_id")
 
         if not title or not body:
@@ -1251,7 +1251,7 @@ class AdminSendNotificationView(APIView):
         # Build the set of recipient CustomUser objects.
         recipient_users = CustomUser.objects.none()
 
-        if target in ("all", "students"):
+        if target in ("all", "students", "parents"):
             student_qs = branching.filter_students_for_user(
                 request.user, Student.objects.select_related("admin")
             )
@@ -1260,8 +1260,17 @@ class AdminSendNotificationView(APIView):
                     group_id=group_id, is_active=True
                 ).values_list("student_id", flat=True)
                 student_qs = student_qs.filter(id__in=enrolled_ids)
-            student_user_ids = student_qs.values_list("admin_id", flat=True)
-            recipient_users = recipient_users | CustomUser.objects.filter(id__in=student_user_ids)
+            if target in ("all", "students"):
+                student_user_ids = student_qs.values_list("admin_id", flat=True)
+                recipient_users = recipient_users | CustomUser.objects.filter(
+                    id__in=student_user_ids
+                )
+            if target in ("all", "parents"):
+                # A class announcement also reaches the parents of its students.
+                parent_user_ids = branching.parent_user_ids_for_students(student_qs)
+                recipient_users = recipient_users | CustomUser.objects.filter(
+                    id__in=parent_user_ids
+                )
 
         if target in ("all", "staff"):
             staff_qs = branching.filter_staff_for_user(
