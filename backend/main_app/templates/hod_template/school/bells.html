@@ -1,0 +1,89 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="ice-manage-page">
+  <section class="ice-manage-hero">
+    <div class="ice-manage-hero__main">
+      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-bell"></i></span>
+      <div class="ice-manage-hero__copy">
+        <h2 class="ice-manage-hero__title">{% translate "Bell times" %}</h2>
+        <p class="ice-manage-hero__subtitle">{% translate "The lesson periods of each school branch. The timetable uses them." %}</p>
+      </div>
+    </div>
+    <div class="ice-manage-hero__actions">
+      <a href="{% url 'school_timetable' %}" class="ice-manage-action">{% translate "Timetable" %} →</a>
+    </div>
+  </section>
+
+  {% for item in branches %}
+  <section class="school-section" aria-labelledby="branch-{{ item.branch.pk }}">
+    <div class="school-section__head">
+      <h3 id="branch-{{ item.branch.pk }}">{{ item.branch.name }}</h3>
+    </div>
+    <div class="ice-manage-table-wrap">
+      <table class="ice-manage-table">
+        <thead>
+          <tr>
+            <th>{% translate "Period" %} · {% translate "Starts" %} · {% translate "Ends" %}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for period, form in item.periods %}
+          <tr>
+            <td>
+              <form method="post" action="{% url 'school_bell_edit' period.pk %}" class="school-inline-form">
+                {% csrf_token %}
+                {% for field in form %}
+                <div>
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                </div>
+                {% endfor %}
+                <button type="submit" class="ice-manage-action">{% translate "Save" %}</button>
+              </form>
+            </td>
+            <td>
+              <form method="post" action="{% url 'school_bell_delete' period.pk %}" class="school-inline-form">
+                {% csrf_token %}
+                <button type="submit" class="ice-manage-action ice-manage-action--danger"
+                        data-confirm="{% translate 'Delete this period?' %}"
+                        onclick="return confirm(this.dataset.confirm)">{% translate "Delete" %}</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="2"><div class="ice-manage-empty"><strong>{% translate "No bell times yet." %}</strong></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <form method="post" action="{% url 'school_bell_add' item.branch.pk %}" class="school-inline-form" style="margin-top:12px;">
+      {% csrf_token %}
+      {% for field in item.add_form %}
+      <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endfor %}
+      <button type="submit" class="ice-manage-action ice-manage-action--primary">
+        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "Add period" %}
+      </button>
+    </form>
+  </section>
+  {% empty %}
+  <div class="ice-manage-empty">
+    <i class="fas fa-bell" aria-hidden="true"></i>
+    <strong>{% translate "No school branch yet." %}</strong>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %}

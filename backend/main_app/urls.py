@@ -27,6 +27,7 @@ from . import (
     payments_views,
     public_views,
     school_admin_views,
+    school_timetable_views,
     staff_views,
     student_views,
     views,
@@ -87,6 +88,19 @@ urlpatterns = [
         "maktab/quarters/<int:term_pk>/delete/",
         school_admin_views.school_term_delete,
         name="school_term_delete",
+    ),
+    path("maktab/timetable/", school_timetable_views.timetable, name="school_timetable"),
+    path("maktab/bells/", school_timetable_views.bells, name="school_bells"),
+    path(
+        "maktab/bells/branch/<int:branch_pk>/add/",
+        school_timetable_views.bell_add,
+        name="school_bell_add",
+    ),
+    path("maktab/bells/<int:pk>/", school_timetable_views.bell_edit, name="school_bell_edit"),
+    path(
+        "maktab/bells/<int:pk>/delete/",
+        school_timetable_views.bell_delete,
+        name="school_bell_delete",
     ),
     path(
         "accounts/password_reset/",

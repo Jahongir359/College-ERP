@@ -23,6 +23,7 @@
     </div>
     <div class="ice-manage-hero__actions">
       <a href="{% url 'school_classes' %}" class="ice-manage-action">← {% translate "All classes" %}</a>
+      <a href="{% url 'school_timetable' %}?class={{ group.pk }}" class="ice-manage-action">{% translate "Timetable" %}</a>
       <a href="{% url 'school_class_edit' group.pk %}" class="ice-manage-add-btn">
         <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit class" %}
       </a>

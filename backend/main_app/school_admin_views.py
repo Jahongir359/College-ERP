@@ -8,6 +8,8 @@ academic years are shared by all branches, so only super admins change them.
 from django.contrib import messages
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
+from django.utils import timezone
+from django.utils.dates import WEEKDAYS
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
@@ -15,7 +17,15 @@ from django.views.decorators.http import require_POST
 
 from . import branching
 from .decorators import admin_only, super_admin_only
-from .models import ClassSubject, Enrollment, Group, ParentChild, Session, Term
+from .models import (
+    ClassSubject,
+    Enrollment,
+    Group,
+    ParentChild,
+    Session,
+    Term,
+    lesson_clashes,
+)
 from .school_forms import ClassForm, ClassStudentForm, ClassSubjectForm, TermForm
 
 
@@ -161,10 +171,39 @@ def class_student_remove(request, pk, student_pk):
     return redirect("school_class_detail", pk=group.pk)
 
 
+def _teacher_clashes(class_subject):
+    """Lessons of ``class_subject`` (today or later) that its new teacher cannot take."""
+    today = timezone.localdate()
+    found = []
+    for lesson in class_subject.lessons.filter(Q(valid_to__isnull=True) | Q(valid_to__gte=today)):
+        lesson.class_subject = class_subject
+        for kind, other in lesson_clashes(lesson):
+            if kind == "teacher":
+                found.append((lesson, other))
+    return found
+
+
 def _save_class_subject(request, form):
     if not form.is_valid():
         _form_errors(request, form)
         return
+    if form.instance.pk and "teacher" in form.changed_data and form.instance.teacher_id:
+        clashes = _teacher_clashes(form.instance)
+        if clashes:
+            for lesson, other in clashes:
+                messages.error(
+                    request,
+                    _(
+                        "%(teacher)s already teaches %(class)s at that time (%(day)s, period %(period)s)."
+                    )
+                    % {
+                        "teacher": form.instance.teacher.admin.get_full_name(),
+                        "class": other.group.name,
+                        "day": WEEKDAYS[lesson.weekday - 1],
+                        "period": lesson.period.number,
+                    },
+                )
+            return
     try:
         with transaction.atomic():
             form.save()
