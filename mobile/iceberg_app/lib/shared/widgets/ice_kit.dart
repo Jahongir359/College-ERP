@@ -65,7 +65,7 @@ class IceCard extends StatelessWidget {
                 ),
               ],
       ),
-      child: child,
+      child: hero ? IceOnHero(child: child) : child,
     );
 
     // RepaintBoundary caches each card as a GPU texture so the compositor
@@ -80,6 +80,33 @@ class IceCard extends StatelessWidget {
           child: body,
         ),
       ),
+    );
+  }
+}
+
+// ─── IceOnHero ───────────────────────────────────────────────────────────────
+/// Gives [child] the [IceTokens.onHero] tokens, so widgets below that read
+/// `context.ice` keep accent text readable on a hero gradient. [IceCard] with
+/// `hero: true` already does this. Colours a screen picked from its own `t`
+/// before the hero must use `t.onHero` directly.
+class IceOnHero extends StatelessWidget {
+  final Widget child;
+  const IceOnHero({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ice;
+    final hero = t.onHero;
+    if (identical(hero, t)) return child;
+    final theme = Theme.of(context);
+    return Theme(
+      data: theme.copyWith(
+        extensions: [
+          ...theme.extensions.values.where((e) => e is! IceTokens),
+          hero,
+        ],
+      ),
+      child: child,
     );
   }
 }

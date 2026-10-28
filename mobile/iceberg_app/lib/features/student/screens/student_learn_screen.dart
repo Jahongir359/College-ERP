@@ -205,7 +205,7 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
                       child: Icon(
                         Icons.volume_up_rounded,
                         size: 19,
-                        color: t.mint,
+                        color: t.onHero.mint,
                       ),
                     ),
                   ),
@@ -239,7 +239,7 @@ class _StudentLearnScreenState extends ConsumerState<StudentLearnScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: t.accent,
+                        color: t.onHero.accent,
                       ),
                     ),
                     if ((word['example_sentence'] as String?)?.isNotEmpty ==

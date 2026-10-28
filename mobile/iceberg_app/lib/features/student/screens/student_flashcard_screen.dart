@@ -295,7 +295,7 @@ class _FrontFace extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.volume_up_rounded, size: 20, color: t.mint),
+                  child: Icon(Icons.volume_up_rounded, size: 20, color: t.onHero.mint),
                 ),
               ),
             ),

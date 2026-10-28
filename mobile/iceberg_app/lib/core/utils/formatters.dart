@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import '../i18n/strings.dart';
+
 String fmtDate(String? iso) {
   if (iso == null || iso.isEmpty) return '—';
   try {
@@ -28,4 +30,14 @@ String fmtCurrency(dynamic value) {
   final d = (value is num) ? value.toDouble() : double.tryParse(value.toString());
   if (d == null) return '—';
   return NumberFormat('#,##0', 'en_US').format(d);
+}
+
+/// "Room 12", or the room name alone when it already says so ("Xona 1A").
+String roomLabel(S s, String room) {
+  final word = s('Room');
+  final lower = room.toLowerCase();
+  if (lower.startsWith(word.toLowerCase()) || lower.startsWith('room')) {
+    return room;
+  }
+  return '$word $room';
 }

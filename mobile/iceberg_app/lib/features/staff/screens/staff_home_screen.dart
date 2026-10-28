@@ -9,7 +9,9 @@ import 'package:intl/intl.dart';
 import '../../../core/api/api_providers.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/settings/app_settings.dart';
+import '../../../core/theme/brand.dart';
 import '../../../core/theme/ice_tokens.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/ice_kit.dart';
 
 part 'staff_home/home_widgets.dart';
@@ -187,7 +189,7 @@ class _Dashboard extends ConsumerWidget {
                         children: [
                           MicroLabel(
                             s('SUPERVISOR'),
-                            color: t.accent,
+                            color: t.onHero.accent,
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -384,7 +386,7 @@ class _Dashboard extends ConsumerWidget {
                   ),
                   _QuickAction(
                     icon: Icons.class_outlined,
-                    label: s('My Classes'),
+                    label: s(context.brand.teacherGroupsKey),
                     color: t.coral,
                     onTap: () => context.push('/staff/classes'),
                   ),
