@@ -1,6 +1,6 @@
-{% load static %}
+{% load static i18n %}{% get_current_language as current_language %}
 <!DOCTYPE html>
-<html lang="en" data-brand="{{ brand.key|default:'center' }}">
+<html lang="{{ current_language|default:'en' }}" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
@@ -204,7 +204,7 @@
     <!-- ── Top Navbar ──────────────────────────────────────────────────────── -->
     <nav class="erpnext-navbar">
         <div class="navbar-left">
-            <button type="button" class="navbar-toggle" onclick="toggleSidebar()" title="Toggle menu" aria-label="Toggle navigation menu" aria-controls="erpnext-sidebar" aria-expanded="false">
+            <button type="button" class="navbar-toggle" onclick="toggleSidebar()" title="{% translate 'Toggle menu' %}" aria-label="{% translate 'Toggle navigation menu' %}" aria-controls="erpnext-sidebar" aria-expanded="false">
                 <i class="fas fa-bars"></i>
             </button>
             <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}"
@@ -214,10 +214,15 @@
         </div>
 
         <div class="navbar-user">
+            <!-- Language switch (admins, P3.0): uz / ru / en, saved per user -->
+            {% if user.user_type == '1' %}
+            {% include "main_app/includes/language_switch.html" with lang_class="navbar-lang-switch" %}
+            {% endif %}
+
             <!-- Theme Toggle (Teacher/Admin only — students use profile settings) -->
             {% if user.user_type == '1' or user.user_type == '2' %}
             <button type="button" id="navbar-theme-toggle" class="navbar-notification"
-                    title="Toggle dark/light mode" aria-label="Toggle dark or bright theme" onclick="iceToggleTheme()"
+                    title="{% translate 'Toggle dark/light mode' %}" aria-label="{% translate 'Toggle dark or bright theme' %}" onclick="iceToggleTheme()"
                     style="border:none;background:none;cursor:pointer;">
                 <i class="fas fa-moon" id="navbar-theme-icon"></i>
             </button>
@@ -225,7 +230,7 @@
 
             <!-- Group Messages -->
             {% url 'messages' as messages_url %}
-            <a href="{{ messages_url }}" class="navbar-notification" title="Messages" aria-label="Open group messages">
+            <a href="{{ messages_url }}" class="navbar-notification" title="{% translate 'Messages' %}" aria-label="{% translate 'Open group messages' %}">
                 <i class="fas fa-comments"></i>
                 {% if unread_message_count > 0 %}
                     <span class="notif-badge">{{ unread_message_count }}</span>
@@ -241,7 +246,7 @@
                 {% url 'messages' as notif_url %}
             {% endif %}
             {% if user.user_type != '1' %}
-                <a href="{{ notif_url }}" class="navbar-notification" title="Notifications" aria-label="Open notifications">
+                <a href="{{ notif_url }}" class="navbar-notification" title="{% translate 'Notifications' %}" aria-label="{% translate 'Open notifications' %}">
                     <i class="fas fa-bell"></i>
                     {% if unread_notification_count > 0 %}
                         <span class="notif-badge">{{ unread_notification_count }}</span>
@@ -255,17 +260,18 @@
                  of the four roles. Still links to the profile hub for settings. -->
             {% url 'profile_hub' as profile_url %}
             <span class="navbar-center-name">{{ brand.display_name|default:"ICEBERG Study Center"|upper }}</span>
-            <a href="{{ profile_url }}" class="navbar-user-avatar" title="My profile" id="navbar-avatar-link" aria-label="Open my profile and settings">
+            <a href="{{ profile_url }}" class="navbar-user-avatar" title="{% translate 'My profile' %}" id="navbar-avatar-link" aria-label="{% translate 'Open my profile and settings' %}">
                 <img src="{% static brand.logo_tile|default:'dist/img/logo.png' %}" alt="{{ brand.mark|default:"ICEBERG" }}">
             </a>
 
             <!-- Logout (animated, POST + CSRF, JS-optional) -->
-            {% include "main_app/includes/animated_logout_button.html" with btn_class="logout-btn" label="Logout" label_class="logout-text" %}
+            {% translate "Logout" as logout_label %}
+            {% include "main_app/includes/animated_logout_button.html" with btn_class="logout-btn" label=logout_label label_class="logout-text" %}
         </div>
     </nav>
 
     <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
-    <aside class="erpnext-sidebar ice-sidebar" id="erpnext-sidebar" aria-label="Main navigation">
+    <aside class="erpnext-sidebar ice-sidebar" id="erpnext-sidebar" aria-label="{% translate 'Main navigation' %}">
         {% include "main_app/erpnext_sidebar.html" %}
     </aside>
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -274,13 +280,13 @@
     <main class="erpnext-main ice-page" id="main-content">
         <div class="page-header ice-page-header">
             <div class="page-header-content">
-                <h1 class="page-title">{% block page_title %}Dashboard{% endblock page_title %}</h1>
+                <h1 class="page-title">{% block page_title %}{% translate "Dashboard" %}{% endblock page_title %}</h1>
                 {% block page_subtitle %}{% if page_subtitle %}<p class="page-subtitle">{{ page_subtitle }}</p>{% endif %}{% endblock page_subtitle %}
             </div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}" aria-label="Open dashboard">
+                        <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}" aria-label="{% translate 'Open dashboard' %}">
                             <i class="fas fa-home"></i>
                         </a>
                     </li>
@@ -295,7 +301,7 @@
                     <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
                         <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'danger' or message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
                         {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% translate 'Close' %}"></button>
                     </div>
                 {% endfor %}
             </div>
@@ -318,7 +324,7 @@
     <div class="app-loader" id="ice-loader" role="status" aria-live="polite" aria-hidden="true">
         <div class="app-loader__card">
             <div class="app-loader__spinner" aria-hidden="true"></div>
-            <div class="app-loader__text">Preparing your page…</div>
+            <div class="app-loader__text">{% translate "Preparing your page…" %}</div>
         </div>
     </div>
 

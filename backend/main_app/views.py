@@ -15,10 +15,12 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .forms import AdminForm, StaffProfileForm, StudentProfileForm
+from .language import remember_cookie_language
 from .middleware import PARENT_HOME_URL
 from .models import (
     Admin,
@@ -95,12 +97,14 @@ def _verify_captcha(request):
         return True
     if not settings.CAPTCHA_SITE_KEY or not settings.CAPTCHA_SECRET_KEY:
         logger.error("CAPTCHA_ENABLED=True but CAPTCHA_SITE_KEY/CAPTCHA_SECRET_KEY are missing.")
-        messages.error(request, "Login verification is not configured. Contact the administrator.")
+        messages.error(
+            request, _("Login verification is not configured. Contact the administrator.")
+        )
         return False
 
     captcha_token = request.POST.get("g-recaptcha-response")
     if not captcha_token:
-        messages.error(request, "Please complete the captcha challenge.")
+        messages.error(request, _("Please complete the captcha challenge."))
         return False
 
     try:
@@ -116,15 +120,15 @@ def _verify_captcha(request):
         payload = response.json()
     except requests.RequestException:
         logger.exception("reCAPTCHA request failed.")
-        messages.error(request, "Captcha could not be verified. Try again.")
+        messages.error(request, _("Captcha could not be verified. Try again."))
         return False
     except ValueError:
         logger.exception("reCAPTCHA returned non-JSON response.")
-        messages.error(request, "Captcha could not be verified. Try again.")
+        messages.error(request, _("Captcha could not be verified. Try again."))
         return False
 
     if not payload.get("success"):
-        messages.error(request, "Invalid captcha. Try again.")
+        messages.error(request, _("Invalid captcha. Try again."))
         return False
     return True
 
@@ -141,7 +145,7 @@ def doLogin(request, **kwargs):
     password = request.POST.get("password") or ""
 
     if not identifier or not password:
-        messages.error(request, "Please enter both your ID/email and password.")
+        messages.error(request, _("Please enter both your ID/email and password."))
         return redirect(reverse("login_page"))
 
     if not _verify_captcha(request):
@@ -153,14 +157,17 @@ def doLogin(request, **kwargs):
         # django-axes raises this once AXES_FAILURE_LIMIT is hit.
         logger.warning("Login locked out by axes for identifier=%s", identifier)
         messages.error(
-            request, "Too many failed login attempts. Please wait 15 minutes before trying again."
+            request,
+            _("Too many failed login attempts. Please wait 15 minutes before trying again."),
         )
         return redirect(reverse("login_page"))
     except Exception:
         logger.exception(
             "authenticate() raised for identifier=%s — DB may be missing migrations", identifier
         )
-        messages.error(request, "Login is temporarily unavailable. Please try again in a moment.")
+        messages.error(
+            request, _("Login is temporarily unavailable. Please try again in a moment.")
+        )
         return redirect(reverse("login_page"))
 
     # NOTE: there is intentionally no "recovery email" re-seed here. The recovery
@@ -174,13 +181,13 @@ def doLogin(request, **kwargs):
         UserModel = get_user_model()
         if "@" in identifier:
             exists = UserModel.objects.filter(email__iexact=identifier).exists()
-            id_err_msg = "Account not found."
-            pw_err_msg = "Incorrect password."
+            id_err_msg = _("Account not found.")
+            pw_err_msg = _("Incorrect password.")
             id_qp = ""
         else:
             exists = UserModel.objects.filter(login_id__iexact=identifier).exists()
-            id_err_msg = "ID not found. Please check your ICEBERG login ID."
-            pw_err_msg = "Incorrect password."
+            id_err_msg = _("ID not found. Please check your ICEBERG login ID.")
+            pw_err_msg = _("Incorrect password.")
             id_qp = identifier
 
         if not exists:
@@ -196,12 +203,17 @@ def doLogin(request, **kwargs):
         login(request, user)
     except DatabaseError:
         logger.exception("Login failed due to session/database error for identifier=%s", identifier)
-        messages.error(request, "Login is temporarily unavailable. Please try again in a moment.")
+        messages.error(
+            request, _("Login is temporarily unavailable. Please try again in a moment.")
+        )
         return redirect(reverse("login_page"))
     except Exception:
         logger.exception("Unexpected login failure for identifier=%s", identifier)
-        messages.error(request, "Login failed due to a server issue. Please try again shortly.")
+        messages.error(request, _("Login failed due to a server issue. Please try again shortly."))
         return redirect(reverse("login_page"))
+
+    # A language picked on the sign-in page becomes the user's own (P3.0).
+    remember_cookie_language(request, user)
 
     # Ensure the role profile row exists (heals accounts created before signals).
     user_type = str(user.user_type)
@@ -231,7 +243,8 @@ def doLogin(request, **kwargs):
     )
     logout(request)
     messages.error(
-        request, "Your account role is not configured correctly. Please contact the administrator."
+        request,
+        _("Your account role is not configured correctly. Please contact the administrator."),
     )
     return redirect("/")
 

@@ -171,6 +171,8 @@ class CustomUser(AbstractUser):
     avatar = models.CharField(max_length=10, blank=True, default="")
     address = models.TextField(blank=True, default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
+    # Web language chosen with the header switch ("uz", "ru", "en"); blank = default (P3.0).
+    language = models.CharField(max_length=5, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     USERNAME_FIELD = "email"

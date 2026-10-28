@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 1/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -614,12 +614,24 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P3 — Web screens (admins and teachers)
 
-- [ ] **P3.0** Translation setup for the admin web (D17): Django i18n (`LocaleMiddleware`, `uz`/`ru`/
+- [x] **P3.0** Translation setup for the admin web (D17): Django i18n (`LocaleMiddleware`, `uz`/`ru`/
       `en`, `locale/` with `.po` files compiled in the build), a language switch in the admin header
       remembered per user, and the shared admin layout, menu and login translated first. Existing pages
       are translated as they are touched; every new School admin page ships in all three. Done when:
       switching language changes the admin menu and a School page, tests for the switch.
-      Needs: nothing. Do before P3.1.
+      Needs: nothing. Do before P3.1. — done 2026-10-28, PR #38; verified: full suite 353 OK (stacked on #37),
+      `LanguageSwitchTests`, `SchoolTranslationTests`, `TranslationCatalogTests`. Notes:
+      `settings.LANGUAGES` uz/ru/en, **English stays the default**. Instead of `LocaleMiddleware`,
+      `middleware.UserLanguageMiddleware` picks the user's saved `CustomUser.language` (migration
+      0045), else the `iceberg_language` cookie, else English. It **ignores the browser language**, so
+      nobody's pages change until they pick one. Switch: `includes/language_switch.html` (UZ/RU/EN) in
+      the admin header and on the sign-in page, posting to `/language/` (`main_app/language.py`). A
+      language picked on the sign-in page is saved to the user at sign-in. Translated: `base.html`,
+      the sidebar (all roles), the bottom nav, the sign-in page and its errors, and the P1.7 parent
+      forms. Catalogs: `backend/locale/{uz,ru}/LC_MESSAGES/django.po` (the update command is in the file
+      header). `.mo` files are compiled by `compilemessages` in the Dockerfile and CI, never committed.
+      Run it locally before `manage.py test`. `TranslationCatalogTests` fails on any empty or fuzzy
+      entry, so every new `{% translate %}` string needs uz and ru in the same PR.
 - [ ] **P3.1** Admin: classes (create 7-B, homeroom teacher, students), subjects per class, current
       session and quarters. Needs: P1.1–P1.3.
 - [ ] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
@@ -754,6 +766,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P3.0 done (PR #38, stacked on #37): admin web in uz/ru/en with a per-user switch. New
+  web pages: `{% load i18n %}` + `{% translate %}`, then `makemessages` and fill uz/ru (see P3.0 notes).
+  Its migration is `0045_user_language` (after #36's `0044_timetable`). Next: P3.1 (admin classes page).
 
 - 2026-10-28 — P0.6 partly done (PR #37, stacked on #39): `seed_school_demo` seeds everything that
   exists today; stays `[~]` until the demo timetable week (the P2.1 session adds it in

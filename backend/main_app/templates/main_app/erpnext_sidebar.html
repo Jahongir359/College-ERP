@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 
 <!-- Sidebar Header -->
 <div class="sidebar-header">
@@ -13,9 +13,9 @@
         <div class="sidebar-user-info">
             <h6>{{ user.get_full_name|default:user.username }}</h6>
             <small>
-                {% if user.user_type == '1' %}Admin
-                {% elif user.user_type == '2' %}Teacher
-                {% else %}Student{% endif %}
+                {% if user.user_type == '1' %}{% translate "Admin" %}
+                {% elif user.user_type == '2' %}{% translate "Teacher" %}
+                {% else %}{% translate "Student" %}{% endif %}
             </small>
         </div>
     </div>
@@ -24,13 +24,13 @@
 <!-- Navigation Menu -->
 <div class="nav-section nav-section--simple">
     {% if user.user_type == '1' %}
-        <h6 class="nav-section-title">Overview</h6>
+        <h6 class="nav-section-title">{% translate "Overview" %}</h6>
 
         <div class="nav-item">
             {% url 'admin_home' as admin_home %}
             <a href="{{ admin_home }}" class="nav-link {% if admin_home == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-th-large"></i>
-                <span class="nav-text">Dashboard</span>
+                <span class="nav-text">{% translate "Dashboard" %}</span>
             </a>
         </div>
 
@@ -38,17 +38,17 @@
             {% url 'profile_hub' as profile_hub_url %}
             <a href="{{ profile_hub_url }}" class="nav-link {% if profile_hub_url == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-circle"></i>
-                <span class="nav-text">Profile & Settings</span>
+                <span class="nav-text">{% translate "Profile & Settings" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">People</h6>
+        <h6 class="nav-section-title">{% translate "People" %}</h6>
 
         <div class="nav-item">
             {% url 'manage_student' as manage_student %}
             <a href="{{ manage_student }}" class="nav-link {% if 'student/manage' in request.path or 'student/add' in request.path or 'student/edit' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-graduate"></i>
-                <span class="nav-text">Students</span>
+                <span class="nav-text">{% translate "Students" %}</span>
             </a>
         </div>
 
@@ -56,7 +56,7 @@
             {% url 'manage_staff' as manage_staff %}
             <a href="{{ manage_staff }}" class="nav-link {% if 'staff/manage' in request.path or 'staff/add' in request.path or 'staff/edit' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-chalkboard-teacher"></i>
-                <span class="nav-text">Teachers</span>
+                <span class="nav-text">{% translate "Teachers" %}</span>
             </a>
         </div>
 
@@ -64,17 +64,17 @@
             {% url 'manage_admin' as manage_admin_url %}
             <a href="{{ manage_admin_url }}" class="nav-link {% if 'admin/manage' in request.path or 'admin/delete' in request.path or 'admin/add' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-shield"></i>
-                <span class="nav-text">Admins</span>
+                <span class="nav-text">{% translate "Admins" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Academic Management</h6>
+        <h6 class="nav-section-title">{% translate "Academic Management" %}</h6>
 
         <div class="nav-item">
             {% url 'manage_group' as manage_group %}
             <a href="{{ manage_group }}" class="nav-link {% if 'group' in request.path or 'enrollment' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-layer-group"></i>
-                <span class="nav-text">Groups & Enrollments</span>
+                <span class="nav-text">{% translate "Groups & Enrollments" %}</span>
             </a>
         </div>
 
@@ -82,7 +82,7 @@
             {% url 'manage_branch' as manage_branch %}
             <a href="{{ manage_branch }}" class="nav-link {% if 'branch' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-map-marker-alt"></i>
-                <span class="nav-text">Branches</span>
+                <span class="nav-text">{% translate "Branches" %}</span>
             </a>
         </div>
 
@@ -90,7 +90,7 @@
             {% url 'manage_course' as manage_course %}
             <a href="{{ manage_course }}" class="nav-link {% if 'course' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-graduation-cap"></i>
-                <span class="nav-text">Courses</span>
+                <span class="nav-text">{% translate "Courses" %}</span>
             </a>
         </div>
 
@@ -98,27 +98,27 @@
             {% url 'admin_view_attendance' as admin_view_attendance %}
             <a href="{{ admin_view_attendance }}" class="nav-link {% if admin_view_attendance == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-chart-line"></i>
-                <span class="nav-text">Attendance</span>
+                <span class="nav-text">{% translate "Attendance" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Finance</h6>
+        <h6 class="nav-section-title">{% translate "Finance" %}</h6>
 
         <div class="nav-item">
             {% url 'admin_payments' as admin_payments_url %}
             <a href="{{ admin_payments_url }}" class="nav-link {% if 'admin/payments' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-money-bill-wave"></i>
-                <span class="nav-text">Payments</span>
+                <span class="nav-text">{% translate "Payments" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Vocabulary & Content</h6>
+        <h6 class="nav-section-title">{% translate "Vocabulary & Content" %}</h6>
 
         <div class="nav-item">
             {% url 'manage_vocabulary_days' as manage_vocabulary_days %}
             <a href="{{ manage_vocabulary_days }}" class="nav-link {% if 'vocabulary-day' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-language"></i>
-                <span class="nav-text">Vocabulary</span>
+                <span class="nav-text">{% translate "Vocabulary" %}</span>
             </a>
         </div>
 
@@ -126,7 +126,7 @@
             {% url 'admin_leaderboard_settings' as leaderboard_settings %}
             <a href="{{ leaderboard_settings }}" class="nav-link {% if 'leaderboard' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-trophy"></i>
-                <span class="nav-text">Leaderboard</span>
+                <span class="nav-text">{% translate "Leaderboard" %}</span>
             </a>
         </div>
 
@@ -134,17 +134,17 @@
             {% url 'manage_stories' as manage_stories %}
             <a href="{{ manage_stories }}" class="nav-link {% if 'stories' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-film"></i>
-                <span class="nav-text">Stories</span>
+                <span class="nav-text">{% translate "Stories" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Communication</h6>
+        <h6 class="nav-section-title">{% translate "Communication" %}</h6>
 
         <div class="nav-item">
             {% url 'messages' as messages_url %}
             <a href="{{ messages_url }}" class="nav-link {% if 'messages' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Messages</span>
+                <span class="nav-text">{% translate "Messages" %}</span>
                 {% if unread_message_count > 0 %}
                 <span class="badge badge-danger badge-pill ml-auto">{{ unread_message_count }}</span>
                 {% endif %}
@@ -155,7 +155,7 @@
             {% url 'manage_registration_leads' as registration_leads_url %}
             <a href="{{ registration_leads_url }}" class="nav-link {% if 'registration-leads' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-clock"></i>
-                <span class="nav-text">Leads</span>
+                <span class="nav-text">{% translate "Leads" %}</span>
             </a>
         </div>
 
@@ -163,7 +163,7 @@
             {% url 'student_feedback_message' as student_feedback_message %}
             <a href="{{ student_feedback_message }}" class="nav-link {% if student_feedback_message == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comment-dots"></i>
-                <span class="nav-text">Student Feedback</span>
+                <span class="nav-text">{% translate "Student Feedback" %}</span>
             </a>
         </div>
 
@@ -171,17 +171,17 @@
             {% url 'staff_feedback_message' as staff_feedback_message %}
             <a href="{{ staff_feedback_message }}" class="nav-link {% if staff_feedback_message == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Teacher Feedback</span>
+                <span class="nav-text">{% translate "Teacher Feedback" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Requests</h6>
+        <h6 class="nav-section-title">{% translate "Requests" %}</h6>
 
         <div class="nav-item">
             {% url 'view_student_leave' as view_student_leave %}
             <a href="{{ view_student_leave }}" class="nav-link {% if view_student_leave == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-times"></i>
-                <span class="nav-text">Student Leave</span>
+                <span class="nav-text">{% translate "Student Leave" %}</span>
             </a>
         </div>
 
@@ -189,18 +189,18 @@
             {% url 'view_staff_leave' as view_staff_leave %}
             <a href="{{ view_staff_leave }}" class="nav-link {% if view_staff_leave == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-check"></i>
-                <span class="nav-text">Teacher Leave</span>
+                <span class="nav-text">{% translate "Teacher Leave" %}</span>
             </a>
         </div>
 
     {% elif user.user_type == '2' %}
-        <h6 class="nav-section-title">Home</h6>
+        <h6 class="nav-section-title">{% translate "Home" %}</h6>
 
         <div class="nav-item">
             {% url 'staff_home' as staff_home %}
             <a href="{{ staff_home }}" class="nav-link {% if staff_home == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-th-large"></i>
-                <span class="nav-text">Dashboard</span>
+                <span class="nav-text">{% translate "Dashboard" %}</span>
             </a>
         </div>
 
@@ -208,17 +208,17 @@
             {% url 'profile_hub' as profile_hub_url %}
             <a href="{{ profile_hub_url }}" class="nav-link {% if profile_hub_url == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-circle"></i>
-                <span class="nav-text">Profile & Settings</span>
+                <span class="nav-text">{% translate "Profile & Settings" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Teaching</h6>
+        <h6 class="nav-section-title">{% translate "Teaching" %}</h6>
 
         <div class="nav-item">
             {% url 'staff_take_attendance' as staff_take_attendance %}
             <a href="{{ staff_take_attendance }}" class="nav-link {% if staff_take_attendance == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-check-circle"></i>
-                <span class="nav-text">Take Attendance</span>
+                <span class="nav-text">{% translate "Take Attendance" %}</span>
             </a>
         </div>
 
@@ -226,7 +226,7 @@
             {% url 'staff_update_attendance' as staff_update_attendance %}
             <a href="{{ staff_update_attendance }}" class="nav-link {% if staff_update_attendance == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-edit"></i>
-                <span class="nav-text">Update Attendance</span>
+                <span class="nav-text">{% translate "Update Attendance" %}</span>
             </a>
         </div>
 
@@ -235,7 +235,7 @@
             {% url 'edit_student_result' as edit_student_result %}
             <a href="{{ staff_add_result }}" class="nav-link {% if staff_add_result == request.path or edit_student_result == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-star"></i>
-                <span class="nav-text">Scores</span>
+                <span class="nav-text">{% translate "Scores" %}</span>
             </a>
         </div>
 
@@ -243,7 +243,7 @@
             {% url 'staff_result_files' as staff_result_files %}
             <a href="{{ staff_result_files }}" class="nav-link {% if 'result/file' in request.path or 'result/upload' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-file-upload"></i>
-                <span class="nav-text">Result Files</span>
+                <span class="nav-text">{% translate "Result Files" %}</span>
             </a>
         </div>
 
@@ -251,7 +251,7 @@
             {% url 'staff_assignments' as staff_assignments %}
             <a href="{{ staff_assignments }}" class="nav-link {% if 'assignment' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-tasks"></i>
-                <span class="nav-text">Assignments</span>
+                <span class="nav-text">{% translate "Assignments" %}</span>
             </a>
         </div>
 
@@ -259,7 +259,7 @@
             {% url 'staff_payments' as staff_payments_url %}
             <a href="{{ staff_payments_url }}" class="nav-link {% if staff_payments_url == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-money-check-alt"></i>
-                <span class="nav-text">Payments</span>
+                <span class="nav-text">{% translate "Payments" %}</span>
             </a>
         </div>
 
@@ -267,7 +267,7 @@
             {% url 'staff_vocabulary_days' as staff_vocabulary_days %}
             <a href="{{ staff_vocabulary_days }}" class="nav-link {% if 'vocabulary-day' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-language"></i>
-                <span class="nav-text">Vocabulary</span>
+                <span class="nav-text">{% translate "Vocabulary" %}</span>
             </a>
         </div>
 
@@ -275,7 +275,7 @@
             {% url 'staff_create_story' as staff_create_story_url %}
             <a href="{{ staff_create_story_url }}" class="nav-link {% if 'stories' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-film"></i>
-                <span class="nav-text">Stories</span>
+                <span class="nav-text">{% translate "Stories" %}</span>
             </a>
         </div>
 
@@ -283,17 +283,17 @@
             {% url 'add_book' as add_book %}
             <a href="{{ add_book }}" class="nav-link {% if add_book == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-book-open"></i>
-                <span class="nav-text">Library</span>
+                <span class="nav-text">{% translate "Library" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Communication</h6>
+        <h6 class="nav-section-title">{% translate "Communication" %}</h6>
 
         <div class="nav-item">
             {% url 'messages' as messages_url %}
             <a href="{{ messages_url }}" class="nav-link {% if 'messages' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Messages</span>
+                <span class="nav-text">{% translate "Messages" %}</span>
                 {% if unread_message_count > 0 %}
                 <span class="badge badge-danger badge-pill ml-auto">{{ unread_message_count }}</span>
                 {% endif %}
@@ -304,7 +304,7 @@
             {% url 'staff_view_notification' as staff_view_notification %}
             <a href="{{ staff_view_notification }}" class="nav-link {% if staff_view_notification == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-bell"></i>
-                <span class="nav-text">Notifications</span>
+                <span class="nav-text">{% translate "Notifications" %}</span>
                 {% if unread_notification_count > 0 %}
                 <span class="badge badge-danger badge-pill ml-auto">{{ unread_notification_count }}</span>
                 {% endif %}
@@ -315,7 +315,7 @@
             {% url 'staff_apply_leave' as staff_apply_leave %}
             <a href="{{ staff_apply_leave }}" class="nav-link {% if staff_apply_leave == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-plus"></i>
-                <span class="nav-text">Leave</span>
+                <span class="nav-text">{% translate "Leave" %}</span>
             </a>
         </div>
 
@@ -323,18 +323,18 @@
             {% url 'staff_feedback' as staff_feedback %}
             <a href="{{ staff_feedback }}" class="nav-link {% if staff_feedback == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comment-alt"></i>
-                <span class="nav-text">Feedback</span>
+                <span class="nav-text">{% translate "Feedback" %}</span>
             </a>
         </div>
 
     {% else %}
-        <h6 class="nav-section-title">Home</h6>
+        <h6 class="nav-section-title">{% translate "Home" %}</h6>
 
         <div class="nav-item">
             {% url 'student_home' as student_home %}
             <a href="{{ student_home }}" class="nav-link {% if student_home == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-th-large"></i>
-                <span class="nav-text">Dashboard</span>
+                <span class="nav-text">{% translate "Dashboard" %}</span>
             </a>
         </div>
 
@@ -342,17 +342,17 @@
             {% url 'profile_hub' as profile_hub_url %}
             <a href="{{ profile_hub_url }}" class="nav-link {% if profile_hub_url == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-circle"></i>
-                <span class="nav-text">Profile & Settings</span>
+                <span class="nav-text">{% translate "Profile & Settings" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Study</h6>
+        <h6 class="nav-section-title">{% translate "Study" %}</h6>
 
         <div class="nav-item">
             {% url 'student_view_attendance' as student_view_attendance %}
             <a href="{{ student_view_attendance }}" class="nav-link {% if student_view_attendance == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-check"></i>
-                <span class="nav-text">Attendance</span>
+                <span class="nav-text">{% translate "Attendance" %}</span>
             </a>
         </div>
 
@@ -360,7 +360,7 @@
             {% url 'student_view_result' as student_view_result %}
             <a href="{{ student_view_result }}" class="nav-link {% if student_view_result == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-chart-bar"></i>
-                <span class="nav-text">Scores</span>
+                <span class="nav-text">{% translate "Scores" %}</span>
             </a>
         </div>
 
@@ -368,7 +368,7 @@
             {% url 'student_result_files' as student_result_files %}
             <a href="{{ student_result_files }}" class="nav-link {% if student_result_files == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-file-alt"></i>
-                <span class="nav-text">Result Files</span>
+                <span class="nav-text">{% translate "Result Files" %}</span>
             </a>
         </div>
 
@@ -376,7 +376,7 @@
             {% url 'student_assignments' as student_assignments %}
             <a href="{{ student_assignments }}" class="nav-link {% if 'assignment' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-tasks"></i>
-                <span class="nav-text">Assignments</span>
+                <span class="nav-text">{% translate "Assignments" %}</span>
             </a>
         </div>
 
@@ -384,7 +384,7 @@
             {% url 'vocabulary_day_list' as vocabulary_day_list %}
             <a href="{{ vocabulary_day_list }}" class="nav-link {% if 'vocabulary-day' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-language"></i>
-                <span class="nav-text">Vocabulary</span>
+                <span class="nav-text">{% translate "Vocabulary" %}</span>
             </a>
         </div>
 
@@ -392,7 +392,7 @@
             {% url 'student_progress' as student_progress %}
             <a href="{{ student_progress }}" class="nav-link {% if student_progress == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-chart-line"></i>
-                <span class="nav-text">Progress</span>
+                <span class="nav-text">{% translate "Progress" %}</span>
             </a>
         </div>
 
@@ -400,7 +400,7 @@
             {% url 'student_payments' as student_payments_url %}
             <a href="{{ student_payments_url }}" class="nav-link {% if 'student/payments' in request.path or 'payments/receipt' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-wallet"></i>
-                <span class="nav-text">Payments</span>
+                <span class="nav-text">{% translate "Payments" %}</span>
             </a>
         </div>
 
@@ -408,7 +408,7 @@
             {% url 'student_leaderboard' as student_leaderboard %}
             <a href="{{ student_leaderboard }}" class="nav-link {% if student_leaderboard == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-trophy"></i>
-                <span class="nav-text">Leaderboard</span>
+                <span class="nav-text">{% translate "Leaderboard" %}</span>
             </a>
         </div>
 
@@ -416,17 +416,17 @@
             {% url 'view_books' as view_books %}
             <a href="{{ view_books }}" class="nav-link {% if view_books == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-book"></i>
-                <span class="nav-text">Library</span>
+                <span class="nav-text">{% translate "Library" %}</span>
             </a>
         </div>
 
-        <h6 class="nav-section-title">Communication</h6>
+        <h6 class="nav-section-title">{% translate "Communication" %}</h6>
 
         <div class="nav-item">
             {% url 'messages' as messages_url %}
             <a href="{{ messages_url }}" class="nav-link {% if 'messages' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Messages</span>
+                <span class="nav-text">{% translate "Messages" %}</span>
                 {% if unread_message_count > 0 %}
                 <span class="badge badge-danger badge-pill ml-auto">{{ unread_message_count }}</span>
                 {% endif %}
@@ -437,7 +437,7 @@
             {% url 'student_view_notification' as student_view_notification %}
             <a href="{{ student_view_notification }}" class="nav-link {% if student_view_notification == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-bell"></i>
-                <span class="nav-text">Notifications</span>
+                <span class="nav-text">{% translate "Notifications" %}</span>
                 {% if unread_notification_count > 0 %}
                 <span class="badge badge-danger badge-pill ml-auto">{{ unread_notification_count }}</span>
                 {% endif %}
@@ -448,7 +448,7 @@
             {% url 'student_apply_leave' as student_apply_leave %}
             <a href="{{ student_apply_leave }}" class="nav-link {% if student_apply_leave == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-plus"></i>
-                <span class="nav-text">Leave</span>
+                <span class="nav-text">{% translate "Leave" %}</span>
             </a>
         </div>
 
@@ -456,7 +456,7 @@
             {% url 'student_feedback' as student_feedback %}
             <a href="{{ student_feedback }}" class="nav-link {% if student_feedback == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comment-alt"></i>
-                <span class="nav-text">Feedback</span>
+                <span class="nav-text">{% translate "Feedback" %}</span>
             </a>
         </div>
     {% endif %}
@@ -464,7 +464,8 @@
 
 <!-- Sidebar Footer with Logout (animated, POST + CSRF, JS-optional) -->
 <div class="sidebar-footer">
-    {% include "main_app/includes/animated_logout_button.html" with btn_class="sidebar-logout-btn" label="Sign Out" aria="Sign out of Iceberg" %}
+    {% translate "Sign Out" as sign_out_label %}{% translate "Sign out of Iceberg" as sign_out_aria %}
+    {% include "main_app/includes/animated_logout_button.html" with btn_class="sidebar-logout-btn" label=sign_out_label aria=sign_out_aria %}
 </div>
 
 <script>

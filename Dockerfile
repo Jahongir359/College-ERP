@@ -33,6 +33,12 @@ COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY . .
 COPY --from=flutter /src/mobile/iceberg_app/build/web/ web/flutter_web/
+# Web translations (uz/ru, plan task P3.0): compile the .po files to .mo; gettext is
+# only needed for this step, so it is removed again to keep the image small.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext \
+    && cd backend && python manage.py compilemessages \
+    && apt-get purge -y gettext && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 RUN cd backend \
     && DJANGO_DEBUG=False DJANGO_SECRET_KEY=collectstatic-only DJANGO_ALLOWED_HOSTS=localhost \
        python manage.py collectstatic --noinput \

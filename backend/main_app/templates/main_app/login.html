@@ -1,12 +1,12 @@
-{% load static %}
+{% load static i18n %}{% get_current_language as current_language %}
 <!DOCTYPE html>
-<html lang="en" data-brand="{{ brand.key|default:'center' }}">
+<html lang="{{ current_language|default:'en' }}" data-brand="{{ brand.key|default:'center' }}">
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{% if brand.key == "school" %}Iceberg School — Sign In{% else %}ICEBERG — Sign In{% endif %}</title>
+  <title>{% if brand.key == "school" %}Iceberg School{% else %}ICEBERG{% endif %} — {% translate "Sign In" %}</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -632,8 +632,14 @@
     }
   </style>
   {% if brand.key == "school" %}<link rel="stylesheet" href="{% static 'dist/css/brand-school-auth.css' %}">{% endif %}
+  <style>
+    .login-lang { position: absolute; top: max(12px, env(safe-area-inset-top)); right: 16px; z-index: 5; }
+  </style>
 </head>
 <body>
+
+  <!-- ── Language switch (P3.0) ── -->
+  {% include "main_app/includes/language_switch.html" with lang_class="login-lang" %}
 
   <!-- ── Logo Hero ── -->
   <div class="logo-hero">
@@ -646,15 +652,15 @@
 
   <!-- ── Login Card ── -->
   <div class="card">
-    <h1 class="card-title">Welcome back</h1>
-    <p class="card-sub">{% if brand.key == "school" %}Sign in to Iceberg School{% else %}Sign in to continue{% endif %}</p>
+    <h1 class="card-title">{% translate "Welcome back" %}</h1>
+    <p class="card-sub">{% if brand.key == "school" %}{% translate "Sign in to Iceberg School" %}{% else %}{% translate "Sign in to continue" %}{% endif %}</p>
 
     {% if request.GET.inactive %}
       <div class="alert alert-info">
         <svg viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 7a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
         </svg>
-        <span>You were signed out due to inactivity. Please sign in again.</span>
+        <span>{% translate "You were signed out due to inactivity. Please sign in again." %}</span>
       </div>
     {% endif %}
 
@@ -679,11 +685,11 @@
       {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
       <div class="field">
-        <label class="field-label" for="id_identifier">Your ID</label>
+        <label class="field-label" for="id_identifier">{% translate "Your ID" %}</label>
         <div class="input-wrap">
           <input type="text" id="id_identifier" name="identifier"
                  value="{{ request.GET.id|default:'' }}"
-                 placeholder="Student ID"
+                 placeholder="{% translate 'Student ID' %}"
                  autocomplete="username" required autofocus
                  spellcheck="false" autocorrect="off" autocapitalize="none"
                  {% for msg in messages %}{% if 'id_error' in msg.extra_tags %}class="input-error"{% endif %}{% endfor %}>
@@ -699,13 +705,13 @@
       </div>
 
       <div class="field">
-        <label class="field-label" for="id_password">Password</label>
+        <label class="field-label" for="id_password">{% translate "Password" %}</label>
         <div class="input-wrap">
           <input type="password" id="id_password" name="password"
-                 placeholder="Your Password"
+                 placeholder="{% translate 'Your Password' %}"
                  autocomplete="current-password" required
                  {% for msg in messages %}{% if 'pw_error' in msg.extra_tags %}class="input-error"{% endif %}{% endfor %}>
-          <button type="button" class="pw-btn" id="pw-toggle" aria-label="Show or hide password">
+          <button type="button" class="pw-btn" id="pw-toggle" aria-label="{% translate 'Show or hide password' %}">
             <svg id="eye-ico" viewBox="0 0 20 20" fill="currentColor" width="17" height="17">
               <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
               <path fill-rule="evenodd" d="M.5 10C1.7 5.9 5.5 3 10 3s8.3 2.9 9.5 7c-1.2 4.1-5 7-9.5 7S1.7 14.1.5 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
@@ -729,16 +735,16 @@
       {% endif %}
 
       <div class="btn-wrap">
-        <button type="submit" class="btn-signin">Sign In</button>
+        <button type="submit" class="btn-signin">{% translate "Sign In" %}</button>
       </div>
       <div class="login-links">
-        <span class="login-link" style="opacity:.5;cursor:default;">Contact admin to reset your password.</span>
+        <span class="login-link" style="opacity:.5;cursor:default;">{% translate "Contact admin to reset your password." %}</span>
       </div>
     </form>
   </div>
 
   {% if brand.key == "school" %}
-  <p class="footer">&copy; {% now "Y" %} Iceberg School · <a class="footer-link" href="{% url 'login_page' %}?brand=center">Iceberg Learning Center sign-in</a></p>
+  <p class="footer">&copy; {% now "Y" %} Iceberg School · <a class="footer-link" href="{% url 'login_page' %}?brand=center">{% translate "Iceberg Learning Center sign-in" %}</a></p>
   {% else %}
   <p class="footer">&copy; {% now "Y" %} Iceberg Study Center</p>
   {% endif %}
