@@ -465,11 +465,16 @@ class LessonApiTests(_ApiFixture, TestCase):
             ({**base, "valid_from": "not-a-date"}, 400),
             ({k: v for k, v in base.items() if k != "period_id"}, 400),
             ({**base, "class_subject_id": self.english_4b.pk}, 404),  # subject of another class
-            ({**base, "period_id": self.other_p1.pk}, 404),  # period of another branch
+            ({**base, "period_id": self.other_p1.pk}, 404),  # hidden: another branch
         ]
         for body, expected in cases:
             with self.subTest(body=body):
                 self.assertEqual(self.api.post(url, body, format="json").status_code, expected)
+        # A super admin sees every period; the model refuses one of another branch.
+        self.as_user(self.super_admin)
+        res = self.api.post(url, {**base, "period_id": self.other_p1.pk}, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("period", res.data)
 
     def test_access(self):
         lesson = self.lesson(self.maths_other, 1, self.other_p1)

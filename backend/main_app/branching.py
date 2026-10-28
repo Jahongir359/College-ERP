@@ -283,8 +283,9 @@ def filter_parents_for_user(user, queryset):
     """Filter a Parent queryset: admins see parents of children in their branches.
 
     A parent with children in several branches is visible to each of those
-    branches' admins (who still see only their own children, see parents.py).
-    A parent sees themself. Teachers and students see no parents here.
+    branches' admins (who still see only their own children, see
+    ``filter_parent_links_for_user``). A parent sees themself. Teachers and
+    students see no parents here.
     """
     if is_super_admin(user):
         return queryset
@@ -296,6 +297,23 @@ def filter_parents_for_user(user, queryset):
     parent = _get_parent(user)
     if parent is not None:
         return queryset.filter(pk=parent.pk)
+
+    return queryset.none()
+
+
+def filter_parent_links_for_user(user, queryset):
+    """Filter a ParentChild queryset: admins see links to children in their
+    branches; a parent sees their own links. Everyone else sees none."""
+    if is_super_admin(user):
+        return queryset
+
+    if get_admin_profile(user) is not None:
+        students = filter_students_for_user(user, Student.objects.all())
+        return queryset.filter(student__in=students)
+
+    parent = _get_parent(user)
+    if parent is not None:
+        return queryset.filter(parent=parent)
 
     return queryset.none()
 

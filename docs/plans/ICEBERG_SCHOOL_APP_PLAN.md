@@ -43,7 +43,8 @@ A task is done only when **all** of these hold:
       page: the right role gets it, every other role and another branch's user gets 403/404, and a
       parent never sees another family's child (section 8.2).
 - [ ] Branch scoping goes through `backend/main_app/branching.py` only (new `filter_*`/`user_can_*`
-      helpers there). No inline branch filters in views, serializers or forms.
+      helpers there). No inline branch filters in views, serializers or forms. New School modules go in
+      `SCHOOL_MODULES` of `tests/test_scoping.py`, which checks this.
 - [ ] Migrations are **additive** and generated with `makemigrations` (new models, new nullable or
       defaulted fields). No renames, no drops, no data loss. A data migration, if any, is reversible.
 - [ ] Learning Center unchanged: the existing suite passes, and Study Center users see no new School
@@ -88,7 +89,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | Phase | What | Status |
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
-| P1 | ERP school data model: years and quarters, classes, subjects, parents | In progress — 7/8 |
+| P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 1/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Open — 0/4 (P3.4, P3.5 dropped) |
@@ -530,8 +531,18 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       the children of their branches (`has_other_children` flags the rest) and can't delete a parent
       who has children elsewhere. Scope: new `branching.filter_parents_for_user` (a 4.2 helper, P1.8
       still reviews the rest).
-- [~] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
-      of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code. — claimed 2026-10-28, branch feat/school-p1.8-scoping-review
+- [x] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
+      of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code. — done
+      2026-10-28, PR #PRNUM (stacked on #36); verified: full suite 333 OK, `InlineBranchFilterGuardTests`,
+      `SchoolHelperScopeTests`, `ParentProfilePhoneTests`. Reviewed P1.1–P1.7 and P2.1. Fixed: child-link
+      scoping moved from `parents.visible_links` to new `branching.filter_parent_links_for_user`; the
+      lesson API no longer filters periods by branch inline (`Lesson.clean` refuses another branch's
+      period, 400); a parent can no longer take another family's phone in `me/` PATCH (D4). Kept on
+      purpose: `?branch=` narrowing of an already scoped list (marked `# scoping-ok`), academic years
+      shared by all branches (P1.1), link-by-login and the duplicate-phone check looking across branches
+      (P1.7, they reveal nothing the admin can't see). The grep is now a test:
+      `tests/test_scoping.py` fails when a module in `SCHOOL_MODULES` filters by branch inline.
+      `filter_marks_for_user` (4.2) waits for the `Mark` model: P2.4.
 
 ### P2 — ERP school features
 
@@ -557,7 +568,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
       P2.8). Done when: test that exactly the linked parents get it.
 - [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
-      teacher limited to own `ClassSubject`, values outside 2–5 rejected. Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
+      teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
+      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
 - [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [ ] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
@@ -733,6 +745,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P1.8 done (PR #PRNUM, stacked on #36 P2.1): scoping review of P1.1–P1.7 and P2.1, guard
+  test `tests/test_scoping.py`, `branching.filter_parent_links_for_user`, parent phone check in `me/`.
+  P1 is complete. Other session's open PRs: #37 (P0.6 demo data; the demo timetable week is mine once
+  #36 and #37 are merged) and #38 (P3.0; it also adds migration 0044, so #36 or #38 renumbers). Next
+  for this thread: the demo week in `school_demo.py`, then P2.2 daily register.
 
 - 2026-10-28 — P2.1 done (PR #36): `BellPeriod`, `Lesson`, clash checks, admin API for periods and
   lessons, `school/timetable/` for every role (migration `0044_timetable`). Built in parallel with P1.7
