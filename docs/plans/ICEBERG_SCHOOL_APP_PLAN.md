@@ -700,7 +700,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       a super admin may change them; branch admins see them read-only. Left out of mockup 16 on purpose:
       the "today's attendance" column (needs P2.2) and the CSV export button (Release 2).
 - [x] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
-      Needs: P2.1. — done 2026-10-28, PR #<pr>; verified: full suite 378 OK,
+      Needs: P2.1. — done 2026-10-28, PR #43; verified: full suite 378 OK,
       `test_school_timetable_pages` (11). Notes: sidebar **School → Timetable** (`/maktab/timetable/
       ?class=`) and **Bell times** (`/maktab/bells/`), views in `school_timetable_views.py`. The grid
       (Mon–Sat × the branch's periods) is one form: each cell picks one of the class's subjects; Save
@@ -854,7 +854,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P3.2 done (PR #<pr>): web timetable editor and bell times (uz/ru/en). Sessions now
+- 2026-10-28 — P3.2 done (PR #43): web timetable editor and bell times (uz/ru/en). Sessions now
   work in parallel worktrees; the pushed `[~]` claim decides who owns a task. Next for this session:
   P3.3 once the PD.9 parents mockup (screen 18) is approved.
 
