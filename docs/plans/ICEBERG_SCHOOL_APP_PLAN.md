@@ -516,7 +516,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       student/parent; `children` is `[]` for non-parents; `class` is the active class of the current
       year (`{id, name, grade_level, letter}` or null). A parent's own `brand` follows the children's
       branches (one brand → that brand, mixed → center).
-- [ ] **P1.7** Admin tools to create parents and link children: form + API. Done when: tests.
+- [~] **P1.7** Admin tools to create parents and link children: form + API. Done when: tests. — claimed 2026-10-28, branch feat/school-p1.7-parent-admin
       (**CSV import** with a dry-run preview moved to Release 2, D16.)
 - [ ] **P1.8** Branch scoping review: every new queryset goes through `branching.py`; add the helpers
       of 4.2 with tests. Done when: `grep` shows no inline branch filters in the new code.
