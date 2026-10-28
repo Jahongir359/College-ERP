@@ -18,7 +18,7 @@ import re
 from django.db import transaction
 
 from . import branching
-from .models import CustomUser, Parent, ParentChild, Student
+from .models import CustomUser, Parent, ParentChild
 
 LOGIN_PREFIX = "PR"
 
@@ -45,9 +45,8 @@ def parent_with_phone(phone, exclude_pk=None):
 
 def visible_links(user, parent):
     """The parent's child links this admin may see (children in their branches)."""
-    students = branching.filter_students_for_user(user, Student.objects.all())
     return (
-        parent.child_links.filter(student__in=students)
+        branching.filter_parent_links_for_user(user, parent.child_links.all())
         .select_related("student__admin", "student__branch")
         .order_by("student__admin__first_name", "student__admin__last_name")
     )

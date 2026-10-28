@@ -2,6 +2,8 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import logout
+from django.utils import translation
+from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.urls import reverse
 from django.shortcuts import redirect
@@ -25,6 +27,7 @@ class LoginCheckMiddleWare(MiddlewareMixin):
             reverse("login_page"),
             reverse("user_login"),
             reverse("user_logout"),
+            reverse("set_language"),
         }
 
         try:
@@ -146,3 +149,40 @@ class BrandCookieMiddleware:
             httponly=True,
             samesite="Lax",
         )
+
+
+class UserLanguageMiddleware:
+    """Pick the web language: the user's saved choice, else the language cookie,
+    else settings.LANGUAGE_CODE (plan task P3.0, decision D17).
+
+    Unlike Django's LocaleMiddleware it ignores the browser's Accept-Language,
+    so nobody's pages change language until they pick one with the switch.
+    Must come after AuthenticationMiddleware.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        language = self._language(request)
+        translation.activate(language)
+        request.LANGUAGE_CODE = translation.get_language()
+        response = self.get_response(request)
+        response.headers.setdefault("Content-Language", request.LANGUAGE_CODE)
+        patch_vary_headers(response, ("Cookie",))
+        return response
+
+    @staticmethod
+    def _language(request):
+        supported = {code for code, _ in settings.LANGUAGES}
+        user = getattr(request, "user", None)
+        try:
+            saved = getattr(user, "language", "") if user and user.is_authenticated else ""
+        except (OperationalError, ProgrammingError):
+            saved = ""  # the column isn't there yet (pre-migrate)
+        if saved in supported:
+            return saved
+        cookie = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, "")
+        if cookie in supported:
+            return cookie
+        return settings.LANGUAGE_CODE

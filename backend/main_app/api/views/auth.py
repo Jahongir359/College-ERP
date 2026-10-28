@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from ... import parents
 from ...models import Parent, Student
 from ..serializers import ChangePasswordSerializer, FcmTokenSerializer, MeSerializer
 
@@ -108,6 +109,15 @@ class MeView(APIView):
         serializer = MeSerializer(
             user, data=request.data, partial=True, context={"request": request}
         )
+        if "phone" in request.data and str(user.user_type) == "4":
+            # One login per family (D4): a parent can't take another family's number.
+            phone = str(request.data["phone"])[:20]
+            own = Parent.objects.filter(admin=user).values_list("pk", flat=True).first()
+            if parents.parent_with_phone(phone, exclude_pk=own) is not None:
+                return Response(
+                    {"phone": ["Another parent already uses this phone number."]},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         if serializer.is_valid():
             serializer.save()
             # Phone lives on the role profile, not CustomUser.

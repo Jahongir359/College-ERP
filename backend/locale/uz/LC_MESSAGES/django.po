@@ -1,0 +1,339 @@
+# Uzbek translations of the Iceberg ERP web pages (plan task P3.0).
+# Update: cd backend && python manage.py makemessages -l uz -l ru --no-location \
+#   --ignore 'staticfiles/*' --ignore 'static/*' --ignore 'media/*'
+# then fill the empty msgstr lines. The build runs compilemessages.
+msgid ""
+msgstr ""
+"Project-Id-Version: Iceberg ERP\n"
+"Language: uz\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "First name"
+msgstr "Ism"
+
+msgid "Last name"
+msgstr "Familiya"
+
+msgid "Phone number"
+msgstr "Telefon raqami"
+
+msgid "Password"
+msgstr "Parol"
+
+msgid "Leave blank to keep the current password."
+msgstr "Joriy parolni saqlash uchun boʻsh qoldiring."
+
+#, python-format
+msgid "Parent %(login)s already uses this phone number. Link the child to that parent instead."
+msgstr "Bu telefon raqami %(login)s ota-onaga tegishli. Farzandni oʻsha ota-onaga bogʻlang."
+
+msgid ""
+"A parent with this phone number already has a login. Ask the parent for their login ID and link "
+"the child to it."
+msgstr ""
+"Bu telefon raqamli ota-onaning logini allaqachon bor. Ota-onadan login ID sini soʻrang va "
+"farzandni unga bogʻlang."
+
+msgid "Child"
+msgstr "Farzand"
+
+msgid "Relation"
+msgstr "Qarindoshlik"
+
+msgid "Mother"
+msgstr "Onasi"
+
+msgid "Father"
+msgstr "Otasi"
+
+msgid "Guardian"
+msgstr "Vasiy"
+
+msgid "Main contact for this child"
+msgstr "Farzand boʻyicha asosiy aloqa"
+
+msgid "Toggle menu"
+msgstr "Menyuni ochish/yopish"
+
+msgid "Toggle navigation menu"
+msgstr "Navigatsiya menyusini ochish/yopish"
+
+msgid "Toggle dark/light mode"
+msgstr "Qorongʻi/yorugʻ rejim"
+
+msgid "Toggle dark or bright theme"
+msgstr "Qorongʻi yoki yorugʻ mavzuni almashtirish"
+
+msgid "Messages"
+msgstr "Xabarlar"
+
+msgid "Open group messages"
+msgstr "Guruh xabarlarini ochish"
+
+msgid "Notifications"
+msgstr "Bildirishnomalar"
+
+msgid "Open notifications"
+msgstr "Bildirishnomalarni ochish"
+
+msgid "My profile"
+msgstr "Mening profilim"
+
+msgid "Open my profile and settings"
+msgstr "Profil va sozlamalarni ochish"
+
+msgid "Logout"
+msgstr "Chiqish"
+
+msgid "Main navigation"
+msgstr "Asosiy navigatsiya"
+
+msgid "Dashboard"
+msgstr "Bosh sahifa"
+
+msgid "Open dashboard"
+msgstr "Bosh sahifani ochish"
+
+msgid "Close"
+msgstr "Yopish"
+
+msgid "Preparing your page…"
+msgstr "Sahifa tayyorlanmoqda…"
+
+msgid "Admin"
+msgstr "Administrator"
+
+msgid "Teacher"
+msgstr "Oʻqituvchi"
+
+msgid "Student"
+msgstr "Oʻquvchi"
+
+msgid "Overview"
+msgstr "Umumiy"
+
+msgid "Profile & Settings"
+msgstr "Profil va sozlamalar"
+
+msgid "People"
+msgstr "Odamlar"
+
+msgid "Students"
+msgstr "Oʻquvchilar"
+
+msgid "Teachers"
+msgstr "Oʻqituvchilar"
+
+msgid "Admins"
+msgstr "Administratorlar"
+
+msgid "Academic Management"
+msgstr "Oʻquv jarayoni"
+
+msgid "Groups & Enrollments"
+msgstr "Guruhlar va qabul"
+
+msgid "Branches"
+msgstr "Filiallar"
+
+msgid "Courses"
+msgstr "Kurslar"
+
+msgid "Attendance"
+msgstr "Davomat"
+
+msgid "Finance"
+msgstr "Moliya"
+
+msgid "Payments"
+msgstr "Toʻlovlar"
+
+msgid "Vocabulary & Content"
+msgstr "Lugʻat va kontent"
+
+msgid "Vocabulary"
+msgstr "Lugʻat"
+
+msgid "Leaderboard"
+msgstr "Reyting"
+
+msgid "Stories"
+msgstr "Hikoyalar"
+
+msgid "Communication"
+msgstr "Aloqa"
+
+msgid "Leads"
+msgstr "Arizalar"
+
+msgid "Student Feedback"
+msgstr "Oʻquvchilar fikri"
+
+msgid "Teacher Feedback"
+msgstr "Oʻqituvchilar fikri"
+
+msgid "Requests"
+msgstr "Soʻrovlar"
+
+msgid "Student Leave"
+msgstr "Oʻquvchilar ruxsati"
+
+msgid "Teacher Leave"
+msgstr "Oʻqituvchilar ruxsati"
+
+msgid "Home"
+msgstr "Bosh sahifa"
+
+msgid "Teaching"
+msgstr "Dars berish"
+
+msgid "Take Attendance"
+msgstr "Davomat olish"
+
+msgid "Update Attendance"
+msgstr "Davomatni tahrirlash"
+
+msgid "Scores"
+msgstr "Baholar"
+
+msgid "Result Files"
+msgstr "Natija fayllari"
+
+msgid "Assignments"
+msgstr "Topshiriqlar"
+
+msgid "Library"
+msgstr "Kutubxona"
+
+msgid "Leave"
+msgstr "Ruxsat"
+
+msgid "Feedback"
+msgstr "Fikr-mulohaza"
+
+msgid "Study"
+msgstr "Oʻqish"
+
+msgid "Progress"
+msgstr "Natijalar dinamikasi"
+
+msgid "Sign Out"
+msgstr "Chiqish"
+
+msgid "Sign out of Iceberg"
+msgstr "Iceberg dan chiqish"
+
+msgid "Language"
+msgstr "Til"
+
+msgid "Sign In"
+msgstr "Kirish"
+
+msgid "Welcome back"
+msgstr "Xush kelibsiz"
+
+msgid "Sign in to Iceberg School"
+msgstr "Iceberg School ga kirish"
+
+msgid "Sign in to continue"
+msgstr "Davom etish uchun kiring"
+
+msgid "You were signed out due to inactivity. Please sign in again."
+msgstr "Faollik boʻlmagani uchun tizimdan chiqarildingiz. Iltimos, qaytadan kiring."
+
+msgid "Your ID"
+msgstr "Login ID"
+
+msgid "Student ID"
+msgstr "Masalan, IC052401"
+
+msgid "Your Password"
+msgstr "Parolingiz"
+
+msgid "Show or hide password"
+msgstr "Parolni koʻrsatish yoki yashirish"
+
+msgid "Contact admin to reset your password."
+msgstr "Parolni tiklash uchun administratorga murojaat qiling."
+
+msgid "Iceberg Learning Center sign-in"
+msgstr "Iceberg Learning Center ga kirish"
+
+msgid "Primary navigation"
+msgstr "Asosiy navigatsiya"
+
+msgid "Open admin dashboard"
+msgstr "Administrator sahifasini ochish"
+
+msgid "Open people management"
+msgstr "Odamlar boʻlimini ochish"
+
+msgid "Open messages"
+msgstr "Xabarlarni ochish"
+
+msgid "Chat"
+msgstr "Chat"
+
+msgid "Open profile and settings"
+msgstr "Profil va sozlamalarni ochish"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Open teacher dashboard"
+msgstr "Oʻqituvchi sahifasini ochish"
+
+msgid "Open attendance"
+msgstr "Davomatni ochish"
+
+msgid "Open scores"
+msgstr "Baholarni ochish"
+
+msgid "Open student dashboard"
+msgstr "Oʻquvchi sahifasini ochish"
+
+msgid "Open results"
+msgstr "Natijalarni ochish"
+
+msgid "Results"
+msgstr "Natijalar"
+
+msgid "Login verification is not configured. Contact the administrator."
+msgstr "Kirishni tekshirish sozlanmagan. Administratorga murojaat qiling."
+
+msgid "Please complete the captcha challenge."
+msgstr "Iltimos, captcha topshirigʻini bajaring."
+
+msgid "Captcha could not be verified. Try again."
+msgstr "Captchani tekshirib boʻlmadi. Qaytadan urinib koʻring."
+
+msgid "Invalid captcha. Try again."
+msgstr "Captcha notoʻgʻri. Qaytadan urinib koʻring."
+
+msgid "Please enter both your ID/email and password."
+msgstr "Iltimos, ID/email va parolni kiriting."
+
+msgid "Too many failed login attempts. Please wait 15 minutes before trying again."
+msgstr "Juda koʻp muvaffaqiyatsiz urinish. Qaytadan urinishdan oldin 15 daqiqa kuting."
+
+msgid "Login is temporarily unavailable. Please try again in a moment."
+msgstr "Kirish vaqtincha ishlamayapti. Birozdan soʻng qaytadan urinib koʻring."
+
+msgid "Account not found."
+msgstr "Hisob topilmadi."
+
+msgid "Incorrect password."
+msgstr "Parol notoʻgʻri."
+
+msgid "ID not found. Please check your ICEBERG login ID."
+msgstr "ID topilmadi. ICEBERG login ID ingizni tekshiring."
+
+msgid "Login failed due to a server issue. Please try again shortly."
+msgstr "Server muammosi tufayli kirib boʻlmadi. Birozdan soʻng qaytadan urinib koʻring."
+
+msgid "Your account role is not configured correctly. Please contact the administrator."
+msgstr "Hisobingiz roli notoʻgʻri sozlangan. Administratorga murojaat qiling."
+

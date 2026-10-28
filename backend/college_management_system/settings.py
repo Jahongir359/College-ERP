@@ -16,6 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 _MANAGEMENT_COMMANDS_ALLOWING_INSECURE_DEFAULTS = {
     "check",
     "collectstatic",
+    "compilemessages",
+    "makemessages",
     "makemigrations",
     "migrate",
     "showmigrations",
@@ -108,6 +110,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Activates the user's chosen web language (uz/ru/en); needs request.user.
+    "main_app.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "main_app.middleware.LoginCheckMiddleWare",
@@ -208,7 +212,19 @@ if "test" in sys.argv:
 # Internationalisation
 # ---------------------------------------------------------------------------
 
-LANGUAGE_CODE = "en-us"
+# Web languages (plan task P3.0, decision D17). English stays the default; each
+# user picks theirs with the header switch (main_app.middleware.UserLanguageMiddleware).
+LANGUAGE_CODE = "en"
+LANGUAGES = [
+    ("uz", "Oʻzbekcha"),
+    ("ru", "Русский"),
+    ("en", "English"),
+]
+LANGUAGE_COOKIE_NAME = "iceberg_language"
+LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60
+# Translations live in backend/locale/<lang>/LC_MESSAGES/django.po; the .mo files are
+# compiled in the build (`python manage.py compilemessages`), never committed.
+LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "Asia/Tashkent"
 USE_I18N = True
 USE_TZ = True

@@ -45,7 +45,8 @@ python -m ruff format --check .
 python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py collectstatic --noinput --dry-run -v 0
-python manage.py test               # 293 tests passing as of 2026-10-28
+python manage.py compilemessages    # web translations (uz/ru); needs gettext, tests need it
+python manage.py test               # 353 tests passing as of 2026-10-28
 ```
 
 Backend tests live in `backend/main_app/tests/` (one file per topic). App tests live in
@@ -73,7 +74,8 @@ when `mobile/iceberg_app/` changes; run the same locally where Flutter is instal
 - `main_app/middleware.py` `LoginCheckMiddleWare` redirects anonymous users to login unless the
   path is on its allow-list — any new public page must be added there (with a test).
 - Every user-facing string must exist in Uzbek, Russian and English (web templates and
-  `mobile/iceberg_app/lib/core/i18n/strings.dart`).
+  `mobile/iceberg_app/lib/core/i18n/strings.dart`). On the web use `{% translate %}` / `gettext`
+  and add the uz and ru text to `backend/locale/*/LC_MESSAGES/django.po` (see plan task P3.0).
 
 ## Working conventions
 
