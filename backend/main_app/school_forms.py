@@ -1,5 +1,5 @@
 """Admin forms for Iceberg School data: parents and their children (P1.7), and
-classes, their students and subjects, and quarters (P3.1).
+classes, their students and subjects, and quarters (P3.1), and bell times (P3.2).
 
 The admin API validates through the parent forms, and the admin pages render
 all of them. Labels and messages use gettext (translated in P3.0's catalogs).
@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from . import branching
 from .models import (
+    BellPeriod,
     Branch,
     ClassSubject,
     Course,
@@ -327,3 +328,34 @@ class TermForm(forms.ModelForm):
             cleaned["name"] = f"{number}-chorak"
             self.instance.name = cleaned["name"]
         return cleaned
+
+
+class BellPeriodForm(forms.ModelForm):
+    """One bell period (dars vaqti) of a school branch. Overlaps are checked by the model."""
+
+    class Meta:
+        model = BellPeriod
+        fields = ["number", "start_time", "end_time"]
+        labels = {"number": _("Period"), "start_time": _("Starts"), "end_time": _("Ends")}
+        widgets = {
+            "number": forms.Select(choices=[(n, str(n)) for n in range(1, 13)]),
+            "start_time": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
+            "end_time": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
+        }
+
+    def __init__(self, *args, branch=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.branch = branch
+        for field in self.visible_fields():
+            field.field.widget.attrs["class"] = "form-control"
+
+    def clean_number(self):
+        number = self.cleaned_data["number"]
+        taken = BellPeriod.objects.filter(  # scoping-ok: uniqueness check inside a chosen branch
+            branch=self.instance.branch, number=number
+        ).exclude(pk=self.instance.pk)
+        if taken.exists():
+            raise forms.ValidationError(
+                _("This branch already has period %(number)s."), params={"number": number}
+            )
+        return number
