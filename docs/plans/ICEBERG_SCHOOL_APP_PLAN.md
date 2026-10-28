@@ -690,7 +690,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       the web is no longer needed, D15; the CSV import preview waits for Release 2). **Part 1 (parents)
       drawn 2026-10-28**, branch docs/school-pd9-parents-mockup: screens 18–18b, content from P1.7 (no
       CSV import, D16); approved 2026-10-28 (owner delegated to the reviewer session), unchanged. **Part 2 (register
-      report) drawn 2026-10-28**, PR #TBD: screen 19, built for P3.7 from the P2.2 register data
+      report) drawn 2026-10-28**, PR #50: screen 19, built for P3.7 from the P2.2 register data
       (`register_summaries`, arrival time, note) and the P2.3 parent notices. Same classes, teachers
       and counts as screen 16. Waiting for approval (PD.8).
 - [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en); a clean
@@ -908,7 +908,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — PD.9 part 2 drawn (PR #TBD): web register report, screen 19
+- 2026-10-28 — PD.9 part 2 drawn (PR #50): web register report, screen 19
   (`python build_mockups.py 19-web-register-report`). Added task **P3.7** (build it); it waits for
   the owner's approval of 19 (PD.8).
 - 2026-10-28 — P2.3 done (PR #47): parents get an in-app `attendance` notice when their child
