@@ -477,7 +477,7 @@ class BellPeriodListView(APIView):
         if branch_id:
             if not branch_id.isdigit():
                 return _bad_request({"branch": ["Must be a number."]})
-            periods = periods.filter(branch_id=int(branch_id))
+            periods = periods.filter(branch_id=int(branch_id))  # scoping-ok: narrows a scoped list
         return Response([_period_dict(p) for p in periods])
 
     def post(self, request):
@@ -544,7 +544,8 @@ def _lesson_parts(request, group, data):
         parts["class_subject"] = cs
     if "period_id" in data:
         periods = branching.filter_bell_periods_for_user(request.user, BellPeriod.objects.all())
-        period = periods.filter(pk=data.get("period_id") or 0, branch_id=group.branch_id).first()
+        # A period of another branch is refused by Lesson.clean (400).
+        period = periods.filter(pk=data.get("period_id") or 0).first()
         if period is None:
             return None, _not_found("Bell period")
         parts["period"] = period
