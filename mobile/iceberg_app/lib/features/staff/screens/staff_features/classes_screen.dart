@@ -10,6 +10,8 @@ class StaffClassesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
+    final brand = context.brand;
     final groups = ref.watch(staffGroupsProvider);
 
     return Scaffold(
@@ -23,8 +25,8 @@ class StaffClassesScreen extends ConsumerWidget {
             onRetry: () => ref.invalidate(staffGroupsProvider),
           ),
           data: (list) => IcePage(
-            title: 'My Classes',
-            subtitle: 'Groups you teach',
+            title: s(brand.teacherGroupsKey),
+            subtitle: s(brand.teacherGroupsHintKey),
             backButton: true,
             onRefresh: () => ref.refresh(staffGroupsProvider.future),
         children: [
@@ -32,8 +34,12 @@ class StaffClassesScreen extends ConsumerWidget {
             IceCard(
               child: EmptyState(
                 icon: Icons.class_outlined,
-                title: 'No groups assigned',
-                message: 'Your groups will appear here once assigned.',
+                title: s(brand.isSchool ? 'No classes assigned' : 'No groups assigned'),
+                message: s(
+                  brand.isSchool
+                      ? 'Your classes will appear here once assigned.'
+                      : 'Your groups will appear here once assigned.',
+                ),
               ),
             )
           else
@@ -51,13 +57,14 @@ class StaffClassesScreen extends ConsumerWidget {
   }
 }
 
-class _ClassCard extends StatelessWidget {
+class _ClassCard extends ConsumerWidget {
   final Map<String, dynamic> group;
   const _ClassCard({required this.group});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     return IceCard(
       padding: const EdgeInsets.all(16),
       onTap: () => showModalBottomSheet(
@@ -109,7 +116,7 @@ class _ClassCard extends StatelessWidget {
                   Text(
                     [
                       group['schedule']?.toString(),
-                      group['room'] != null ? 'Room ${group['room']}' : null,
+                      group['room'] != null ? roomLabel(s, '${group['room']}') : null,
                     ].where((e) => e != null && e.isNotEmpty).join(' · '),
                     style: TextStyle(fontSize: 12, color: t.textLow),
                     maxLines: 1,
@@ -133,6 +140,7 @@ class _RosterSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final detail = ref.watch(groupDetailProvider(groupId));
     return DraggableScrollableSheet(
       expand: false,
@@ -180,7 +188,7 @@ class _RosterSheet extends ConsumerWidget {
                 if (students.isEmpty) {
                   return EmptyState(
                     icon: Icons.person_off_outlined,
-                    title: 'No students enrolled yet',
+                    title: s('No students enrolled yet'),
                   );
                 }
                 return ListView.separated(
