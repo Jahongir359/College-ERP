@@ -699,8 +699,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       enrollment (`is_active=False`) for history. Years and quarters are shared by all branches, so only
       a super admin may change them; branch admins see them read-only. Left out of mockup 16 on purpose:
       the "today's attendance" column (needs P2.2) and the CSV export button (Release 2).
-- [ ] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
-      Needs: P2.1.
+- [~] **P3.2** Admin: bell periods and timetable editor (week grid, clash errors shown inline).
+      Needs: P2.1. — claimed 2026-10-28 by college-erp-41, branch feat/school-p3.2-timetable-editor
+      (WIP: views/templates done; tests, uz/ru strings still to do).
 - [ ] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7.
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,

@@ -80,6 +80,22 @@
         </div>
 
         <div class="nav-item">
+            {% url 'school_timetable' as school_timetable_url %}
+            <a href="{{ school_timetable_url }}" class="nav-link {% if 'maktab/timetable' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-table"></i>
+                <span class="nav-text">{% translate "Timetable" %}</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            {% url 'school_bells' as school_bells_url %}
+            <a href="{{ school_bells_url }}" class="nav-link {% if 'maktab/bells' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-bell"></i>
+                <span class="nav-text">{% translate "Bell times" %}</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
             {% url 'school_years' as school_years_url %}
             <a href="{{ school_years_url }}" class="nav-link {% if 'maktab/years' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-alt"></i>
