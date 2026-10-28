@@ -634,9 +634,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [ ] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
       reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
-- [ ] **P2.7** Parents can see and pay invoices of their children (existing invoice API with
+- [~] **P2.7** Parents can see and pay invoices of their children (existing invoice API with
       `?student=`); class announcements reach parents (stories/notifications target parents of a
-      class). Done when: tests.
+      class). Done when: tests. — claimed 2026-10-28, branch
+      `feat/school-p2.7-parent-invoices`.
 - [ ] **P2.8** Push notifications with FCM HTTP v1 (service-account credentials via env vars, never
       committed): send for notifications, absence, new message. Done when: unit tests with the sender
       mocked; a real push received on a test phone on staging; documented in `docs/DEPLOYMENT.md`.
