@@ -571,9 +571,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       admins `?class=` (required). New helpers `branching.filter_classes_for_user` (plan 4.2),
       `filter_lessons_for_user`, `filter_bell_periods_for_user`. Not checked yet: changing a
       `ClassSubject`'s teacher later can create a teacher clash (P3.2 should re-check on save).
-- [ ] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
+- [~] **P2.2** Daily register: homeroom teacher marks present/absent/late with arrival time and note
       for a class and date; `school/register/` API; reuses `Attendance`/`AttendanceReport` (+ fields).
       Done when: tests incl. "only homeroom teacher of that class", one register per date. Needs: P1.2.
+      — claimed 2026-10-28, branch feat/school-p2.2-register
 - [ ] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
       P2.8). Done when: test that exactly the linked parents get it.
 - [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
@@ -668,7 +669,15 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       offline banner and a clear "not saved, try again" error stay in P4.10.
 - [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
       with store links when older. Tests. (Release 2, D16.)
-
+- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
+      the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
+      avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
+      maroon; English text in uz/ru screens ("My Classes", "Groups you teach", "Present", "Days
+      streak", "Missed total", "Coming Soon"…). Done when: every text on a maroon surface uses the
+      on-primary colour (contrast 4.5:1 or more), those strings come from `strings.dart` in uz/ru/en,
+      before/after screenshots at 390 px light and dark; Study Center screens unchanged. Not in this
+      task: School sign-in colours (P4.2), hiding Study Center-only tabs (P4.9). — claimed 2026-10-28,
+      branch feat/school-p4.13-brand-polish
 ### P5 — Store readiness
 
 - [ ] **P5.1** **Owner** — D-U-N-S number for the organisation, then Google Play developer account (organisation)
