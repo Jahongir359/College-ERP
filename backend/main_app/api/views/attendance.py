@@ -43,6 +43,9 @@ class AttendanceView(APIView):
                     "group_name": r.attendance.group.name if r.attendance.group else None,
                     "status": r.status,
                     "status_display": r.get_status_display(),
+                    # School daily register (P2.2): a late pupil's arrival and the teacher's note.
+                    "arrival_time": r.arrival_time.strftime("%H:%M") if r.arrival_time else None,
+                    "note": r.note,
                 }
                 for r in page
             ]

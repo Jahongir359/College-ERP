@@ -13,6 +13,7 @@ Who may do what is decided in ``branching.py``.
     POST messages/parent/<id>/          {message, attachment?}
 """
 
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from rest_framework import status
@@ -84,8 +85,10 @@ def _thread_dict(request, thread):
         "student": _student_dict(thread.student),
         "teacher": _teacher_dict(thread.teacher, thread.student),
         "parents": [
-            _person(link.parent.admin)
-            for link in thread.student.parent_links.select_related("parent__admin")
+            _person(user)
+            for user in get_user_model().objects.filter(
+                pk__in=branching.parent_user_ids_for_students([thread.student])
+            )
         ],
         "can_post": branching.user_can_post_in_parent_thread(request.user, thread),
         "last_message": last.body[:120] if last else "",
