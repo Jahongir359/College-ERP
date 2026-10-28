@@ -138,6 +138,7 @@ TEMPLATES = [
                 "main_app.context_processors.notification_count",
                 "main_app.context_processors.student_theme",
                 "main_app.context_processors.brand",
+                "main_app.context_processors.school_nav",
             ],
         },
     },

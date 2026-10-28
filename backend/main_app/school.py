@@ -47,3 +47,11 @@ def seed_school_subjects(course_name=SCHOOL_COURSE_NAME):
     missing = [name for name in STANDARD_SUBJECTS if name not in existing]
     Subject.objects.bulk_create(Subject(name=name, course=course) for name in missing)
     return course, len(missing)
+
+
+def school_course():
+    """The default School course (created with the standard subjects if missing)."""
+    course = Course.objects.filter(name=SCHOOL_COURSE_NAME).order_by("pk").first()
+    if course is None:
+        course, _ = seed_school_subjects()
+    return course
