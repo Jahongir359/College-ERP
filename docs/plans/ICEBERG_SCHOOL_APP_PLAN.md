@@ -648,7 +648,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [x] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
       teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
       (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.) — done
-      2026-10-28, PR #TBD; verified: full suite 426 OK, `MarkAccessTests` (access matrix 8.2),
+      2026-10-28, PR #52; verified: full suite 426 OK, `MarkAccessTests` (access matrix 8.2),
       `MarkSavingTests`, `MarkReadingTests`, `FilterMarksForUserTests`. Notes: `Mark` has student,
       class_subject, date (lesson day), value 2–5 (DB check constraint + API), kind lesson/test/exam,
       comment (max 200), given_by; one mark per pupil, subject, date and kind. The quarter is not
@@ -903,7 +903,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P2.4 done (PR #TBD): `Mark` model, `school/marks/` API in `api/marks_views.py`,
+- 2026-10-28 — P2.4 done (PR #52): `Mark` model, `school/marks/` API in `api/marks_views.py`,
   `branching.filter_marks_for_user`. Migration is 0049 in the queue (after P2.6 0047 and P2.8 0048);
   regenerate it when those merge. Next on this line: P2.5 term grades (same session).
 - 2026-10-28 — PD.8: screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session), unchanged (PR #46). P3.3 claimed; it starts
