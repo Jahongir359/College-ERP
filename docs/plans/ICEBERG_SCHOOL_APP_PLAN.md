@@ -652,7 +652,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
       reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
-      — done 2026-10-28, PR #TBD; verified: full suite 429 OK, `test_parent_messages` (24: model,
+      — done 2026-10-28, PR #48; verified: full suite 429 OK, `test_parent_messages` (24: model,
       branching, access matrix 8.2). Notes: `ChatThread` + `kind`, `student`, `teacher` (migration
       `0047_parent_chat_threads`; `group` became nullable, nothing else changed), one thread per
       student and teacher, shared by all the child's linked parents. Only **School classes** count:
@@ -907,7 +907,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-28 — P2.6 done (PR #TBD): teacher ↔ parent threads per student and teacher, API
+- 2026-10-28 — P2.6 done (PR #48): teacher ↔ parent threads per student and teacher, API
   `messages/parent/…`, access matrix tests. Migration `0047_parent_chat_threads` (after P2.2's 0046). The app screens are P4.8.
 
 - 2026-10-28 — PD.8: screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session), unchanged (PR #46). P3.3 claimed; it starts
