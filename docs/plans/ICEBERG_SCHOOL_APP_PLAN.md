@@ -90,7 +90,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 4/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 5/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
@@ -643,8 +643,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `arrival_time` and `note`. No future dates, none outside the class's year; past days can be
       corrected. `school.register_summaries(classes, day)` gives `{class id: {taken, present, late,
       absent}}` for the Classes page "today" column (P3.1 follow-up) and P2.3.
-- [ ] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
-      P2.8). Done when: test that exactly the linked parents get it.
+- [x] **P2.3** Parent notification when a child is marked absent or late (in-app now; push after
+      P2.8). Done when: test that exactly the linked parents get it. — done 2026-10-28, PR #47;
+      verified: full suite 413 OK, `tests/test_register_notices.py`
+      RegisterNoticeTests. Saving the register (`RegisterView.post`) adds an `attendance`
+      `Notification` for each linked parent (`branching.parent_user_ids_for_students`) when a pupil
+      is *newly* absent or late: re-saving the same marks, a new arrival time or note, or a
+      correction to present sends nothing; late ↔ absent sends a new notice. Text is stored in
+      Uzbek (`NOTICE_LANGUAGE`; ru in the .po for later). P2.8 should send push for these rows.
 - [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
       teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
       (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
@@ -652,8 +658,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
       reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
-      — done 2026-10-28, PR #48; verified: full suite 429 OK, `test_parent_messages` (24: model,
-      branching, access matrix 8.2). Notes: `ChatThread` + `kind`, `student`, `teacher` (migration
+      — done 2026-10-28, PR #48; verified: full suite 440 OK, `test_parent_messages` (27: model,
+      branching, access matrix 8.2, protected attachments). Notes: `ChatThread` + `kind`, `student`, `teacher` (migration
       `0047_parent_chat_threads`; `group` became nullable, nothing else changed), one thread per
       student and teacher, shared by all the child's linked parents. Only **School classes** count:
       the homeroom and subject teachers of the child's active, unarchived class
@@ -909,6 +915,11 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 
 - 2026-10-28 — P2.6 done (PR #48): teacher ↔ parent threads per student and teacher, API
   `messages/parent/…`, access matrix tests. Migration `0047_parent_chat_threads` (after P2.2's 0046). The app screens are P4.8.
+  Review fixes: parent-thread attachments (protected `chat_attachments/`) and `ChatMessage.__str__`.
+
+- 2026-10-28 — P2.3 done (PR #47): parents get an in-app `attendance` notice when their child
+  is newly marked absent or late in the register; text stored in Uzbek. Uses
+  `branching.parent_user_ids_for_students` from P2.7. Next: P2.8 push should pick up these notices.
 
 - 2026-10-28 — PD.8: screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session), unchanged (PR #46). P3.3 claimed; it starts
   after #43 (shares urls.py, erpnext_sidebar.html, school_forms.py and the .po files).
