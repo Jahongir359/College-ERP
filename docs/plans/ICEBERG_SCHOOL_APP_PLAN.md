@@ -96,7 +96,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
-| P6 | Pilot and quality | Open — 0/6 |
+| P6 | Pilot and quality | Open — 1/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 | P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
 | P9 | eMaktab connection (future feature, after Release 2, D18) | Future — 0/2 |
@@ -925,8 +925,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P6 — Pilot and quality
 
-- [ ] **P6.1** Written test scripts for admin, homeroom teacher, subject teacher, parent, student
-      (`docs/plans/school_app_test_scripts.md`), each step with the expected result.
+- [x] **P6.1** Written test scripts for admin, homeroom teacher, subject teacher, parent, student
+      (`docs/plans/school_app_test_scripts.md`), each step with the expected result. — done 2026-10-30,
+      PR #60; checked against `main` at `4d5ef6f`: steps not built yet carry their task tag (P4.x,
+      P3.7, PL.x, R2) or open PR (#57, #58), so P6.2 runs only the untagged steps until those land.
 - [ ] **P6.2** Run the scripts on staging on a real Android phone and a real iPhone (via TestFlight);
       log every bug as a GitHub issue with steps.
 - [ ] **P6.3** Pilot with a few real teachers and parents for at least one week on staging or
@@ -990,6 +992,11 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-30 — P6.1 done (PR #60): `docs/plans/school_app_test_scripts.md`, scripts A (admin web),
+  T (homeroom teacher), S (subject teacher), P (parent), St (student) and X (cross-checks) on the
+  `seed_school_demo` data, each step with its expected result and a tag for what is not built yet.
+  Update a step when its feature lands (P4.x, P3.7, PL.1/#58, P2.8/#57).
 
 - 2026-10-30 — PD.5 teacher grade entry drawn (PR #59): screens 20 (marks for a date and kind) and
   20b (quarter grades with the suggestion the teacher confirms, "Baholanmadi"). Needs approval (PD.8)
