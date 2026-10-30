@@ -1005,6 +1005,94 @@ def w_parent_page() -> str:
     return web_shell("Ota-onalar", content, "Ota-onalar")
 
 
+def _bar(rate: int) -> str:
+    return (
+        '<div class="row" style="gap:8px"><span style="flex:1;height:6px;border-radius:999px;background:var(--tint);'
+        f'overflow:hidden;display:block"><span style="display:block;height:6px;width:{rate}%;background:var(--m)"></span></span>'
+        f'<span class="tiny b" style="width:34px;text-align:right">{rate}%</span></div>'
+    )
+
+
+def w_register_report() -> str:
+    # Same classes, teachers and counts as screen 16. (class, homeroom, pupils, taken at, present, late, absent)
+    data = [
+        ("1-A", "Malika Tursunova", 24, "08:09", 23, 0, 1),
+        ("2-A", "Nargiza Olimova", 22, "08:11", 21, 1, 0),
+        ("3-A", "Gulnora Saidova", 30, "08:14", 28, 1, 1),
+        ("4-B", "Shahnoza Ergasheva", 27, None, 0, 0, 0),
+        ("5-A", "Sherzod Aliyev", 25, "08:06", 25, 0, 0),
+        ("7-B", "Dilnoza Rahimova", 29, "08:21", 27, 2, 0),
+        ("9-A", "Bekzod Qodirov", 23, "08:10", 22, 0, 1),
+        ("11-A", "Kamola Yusupova", 18, "08:16", 18, 0, 0),
+    ]
+    rows = ""
+    for c, teacher, n, at, pres, late, absent in data:
+        if at is None:
+            state = '<span class="pill late">Olinmagan</span>'
+            counts = '<td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="tiny muted">—</td>'
+        else:
+            state = f'<span class="pill ok">{i("check")}{at}</span>'
+            counts = (
+                f'<td class="b">{pres}</td><td class="b" style="color:var(--late)">{late or "–"}</td>'
+                f'<td class="b" style="color:var(--abs)">{absent or "–"}</td>'
+                f'<td style="width:120px;padding-right:14px">{_bar(round((pres + late) * 100 / n))}</td>'
+            )
+        rows += (
+            f'<tr style="border-top:1px solid var(--border)"><td style="padding:11px 14px" class="b">{c}</td>'
+            f'<td class="small">{teacher}</td><td class="small">{n}</td><td>{state}</td>{counts}</tr>'
+        )
+    # (pupil, class, status, arrival time, note)
+    marks = [
+        ("Sardor Nazarov", "1-A", "abs", "", "Kasal, onasi xabar berdi"),
+        ("Bekzod Aliyev", "3-A", "abs", "", ""),
+        ("Diyora Tojiyeva", "9-A", "abs", "", "Oilaviy sabab"),
+        ("Aziz Karimov", "3-A", "late", "08:12", "Avtobus"),
+        ("Jasur Toshev", "7-B", "late", "08:20", ""),
+        ("Madina Karimova", "7-B", "late", "08:05", ""),
+        ("Shoira Valiyeva", "2-A", "late", "08:25", "Shifokorda edi"),
+    ]
+    sent = i("send", 'style="width:12px;height:12px"')
+    items = "".join(
+        f'<div style="padding:10px 0;border-top:1px solid var(--border)"><div class="row between">'
+        f'<div><div class="b small">{name}</div><div class="tiny muted">{cls}{" · " + note if note else ""}</div></div>'
+        f'<span class="pill {st}">{"Kelmadi" if st == "abs" else "Kechikdi " + at}</span></div></div>'
+        for name, cls, st, at, note in marks
+    )
+    download = i("upload", 'style="width:18px;height:18px;transform:rotate(180deg)"')
+    content = f"""
+<div class="row between"><div><p class="kicker">Maktab</p><h1 class="serif" style="font-size:30px;color:var(--m);margin-top:4px">Davomat hisoboti</h1></div>
+  <div class="row" style="gap:10px">
+    <span class="pill" style="background:var(--surface);border:1px solid var(--border);padding:11px 14px">{i("cal", 'style="width:16px;height:16px"')}28-oktabr, chorshanba ▾</span>
+    <span class="pill" style="background:var(--surface);border:1px solid var(--border);padding:11px 14px">Sinf: hammasi ▾</span>
+    <div class="btn btn-ghost" style="height:44px;padding:0 16px">{download}CSV yuklab olish</div>
+  </div></div>
+<div class="row" style="gap:12px;margin-top:16px">
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Davomat olingan</div><div class="b" style="font-size:26px">7 / 8 <span class="small muted">sinf</span></div></div>
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Keldi</div><div class="b" style="font-size:26px;color:var(--ok)">164</div></div>
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Kechikdi</div><div class="b" style="font-size:26px;color:var(--late)">4</div></div>
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Kelmadi</div><div class="b" style="font-size:26px;color:var(--abs)">3</div></div>
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Davomat</div><div class="b" style="font-size:26px">98%</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 330px;gap:16px;margin-top:16px;align-items:start">
+  <div>
+    <style>.rr th, .rr td {{ padding-right: 12px; white-space: nowrap; }}</style>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="rr" style="width:100%;border-collapse:collapse;font-size:14px">
+        <thead><tr style="background:var(--tint);text-align:left" class="small muted"><th style="padding:11px 14px">Sinf</th><th>Sinf rahbari</th><th>Oʻquvchi</th><th>Olindi</th><th>Keldi</th><th>Kech</th><th>Yoʻq</th><th>Kelganlar</th></tr></thead>
+        <tbody>{rows}</tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-top:10px">Olinmagan — sinf rahbari bugungi davomatni hali saqlamagan. Davomatni oʻqituvchi ilovada oladi; bu sahifa faqat koʻrish uchun.</p>
+  </div>
+  <div class="card" style="padding:16px 18px">
+    <div class="row between" style="margin-bottom:6px"><div class="b" style="font-size:17px;color:var(--m)">Kelmagan va kechikkanlar</div><span class="tiny b muted">7</span></div>
+    <div class="tiny row" style="gap:5px;color:var(--muted);margin-bottom:8px">{sent}Har birining ota-onasiga ilovada xabar yuborildi</div>
+    {items}
+  </div>
+</div>"""
+    return web_shell("Davomat hisoboti", content, "Davomat hisoboti")
+
+
 SCREENS = [
     ("01-choice", "Tanlov · Choice", s_choice),
     ("02-login-school", "Kirish · School", s_login_school),
@@ -1027,6 +1115,7 @@ WEB_SCREENS = [
     ("17-web-timetable", "Web · Dars jadvali", w_timetable),
     ("18-web-parents", "Web · Ota-onalar", w_parents),
     ("18b-web-parent-page", "Web · Ota-ona sahifasi", w_parent_page),
+    ("19-web-register-report", "Web · Davomat hisoboti", w_register_report),
 ]
 
 
@@ -1090,6 +1179,165 @@ def main(only: list[str]) -> None:
     sheet.save(HERE / "overview.png", optimize=True)
     print("wrote overview.png", sheet.size)
 
+
+# ---------------------------------------------------------------- PD.5: teacher grade entry (Release 2)
+# Built on the P2.4 marks API (school/marks/: value 2–5, kind lesson/test/exam, one mark per pupil,
+# subject, date and kind) and the P2.5 term grades API (school/term-grades/: quarter or year grade,
+# null = "not graded"; the suggestion is school.suggested_grade, the average rounded half up).
+
+GRADE_PUPILS = [
+    ("Abdullayev Jasur", ["5", "4", "5"], "5"),
+    ("Aliyeva Madina", ["4", "4", "5"], "4"),
+    ("Bakirov Sardor", ["3", "4"], "4"),
+    ("Ergasheva Zarina", ["5", "5"], "5"),
+    ("Hasanov Temur", [], None),
+    ("Ismoilova Nodira", ["4", "3", "4"], "4"),
+    ("Karimova Aziza", ["5"], "5"),
+    ("Mahmudov Ulugʻbek", ["2", "3"], "3"),
+]
+
+
+def _mark_chip(v: str, size: int = 30, on: bool = True) -> str:
+    bg = {"5": "var(--ok-bg)", "4": "var(--tint)", "3": "var(--late-bg)", "2": "var(--abs-bg)"}[v]
+    fg = {"5": "var(--ok)", "4": "var(--m)", "3": "var(--late)", "2": "var(--abs)"}[v]
+    if not on:
+        bg, fg = "transparent", "var(--muted)"
+    ring = f"box-shadow:0 0 0 2px {fg};" if on and size > 30 else ""
+    return (
+        f'<span style="width:{size}px;height:{size}px;border-radius:{size // 3}px;display:grid;place-items:center;'
+        f'font-weight:800;font-size:{15 if size > 30 else 13}px;background:{bg};color:{fg};{ring}">{v}</span>'
+    )
+
+
+def _initials(name: str) -> str:
+    return "".join(p[0] for p in name.split()[:2])
+
+
+def s_grade_entry() -> str:
+    # Marks for one date and kind; each pupil gets 2–5 or nothing (tap again to clear).
+    today = {
+        "Abdullayev Jasur": "5",
+        "Aliyeva Madina": "4",
+        "Bakirov Sardor": "",
+        "Ergasheva Zarina": "5",
+        "Hasanov Temur": "",
+        "Ismoilova Nodira": "3",
+        "Karimova Aziza": "",
+        "Mahmudov Ulugʻbek": "4",
+    }
+    rows = ""
+    for name, _old, _q in GRADE_PUPILS:
+        pick = today[name]
+        absent = name == "Hasanov Temur"
+        sub = (
+            '<div class="tiny" style="color:var(--abs)">Bugun yoʻq (davomat)</div>'
+            if absent
+            else ('<div class="tiny muted">Baho qoʻyilmagan</div>' if not pick else "")
+        )
+        chips = "".join(_mark_chip(v, 36, on=(v == pick)) for v in ("2", "3", "4", "5"))
+        rows += (
+            f'<div class="row" style="padding:9px 0;border-bottom:1px solid var(--border);{"opacity:.55" if absent else ""}">'
+            f'<span class="av lg">{_initials(name)}</span><div style="flex:1;min-width:0"><div class="b" style="font-size:14.5px">{name}</div>{sub}</div>'
+            f'<div class="row" style="gap:4px;background:var(--tint);border-radius:14px;padding:3px">{chips}</div></div>'
+        )
+    kinds = "".join(
+        f'<span class="pill" style="{"background:var(--m);color:#fff" if on else "background:var(--tint)"};padding:7px 12px">{label}</span>'
+        for label, on in (("Dars", True), ("Nazorat ishi", False), ("Imtihon", False))
+    )
+    return page(f"""
+{status()}
+<div class="pad">
+  <div class="row" style="gap:10px;margin-top:4px">{i("back")}<div><h1 class="serif" style="font-size:24px;color:var(--m)">Baholash</h1><div class="small muted">2-chorak · Payshanba, 24-oktabr</div></div></div>
+  <div class="card row" style="margin-top:12px;padding:10px 14px;border-radius:16px"><span class="tile" style="width:36px;height:36px;border-radius:11px">{i("book")}</span>
+    <div style="flex:1"><div class="b">3-A · Ona tili</div><div class="tiny muted">Sinf va fan · 30 oʻquvchi</div></div>{i("chev", 'style="transform:rotate(90deg)"')}</div>
+  <div class="row" style="gap:6px;margin-top:10px">{kinds}</div>
+  <p class="tiny muted" style="margin-top:10px">Bahoni bosing; qayta bossangiz oʻchadi. Faqat qoʻyilgan baholar saqlanadi.</p>
+  <div style="margin-top:2px">{rows}</div>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;padding:12px 20px 30px;background:var(--surface);border-top:1px solid var(--border)">
+  <div class="btn btn-m">Saqlash · 5 ta baho</div>
+  <p class="tiny muted" style="text-align:center;margin-top:8px">Ota-onalar va oʻquvchi bahoni ilovada koʻradi</p>
+</div>""")
+
+
+def s_quarter_grades() -> str:
+    from decimal import ROUND_HALF_UP, Decimal
+
+    def suggestion(marks: list[str]) -> tuple[str, str]:
+        avg = Decimal(sum(int(m) for m in marks)) / len(marks)
+        grade = int(avg.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+        return f"{avg.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)}".replace(".", ","), str(
+            grade
+        )
+
+    # Confirmed, waiting for confirmation, changed by the teacher, and not graded.
+    confirmed = {"Abdullayev Jasur", "Aliyeva Madina", "Ergasheva Zarina"}
+    tick = i("check", 'style="width:12px;height:12px;stroke-width:3"')
+    changed = {"Bakirov Sardor": "3"}
+    rows = ""
+    for name, marks, _q in GRADE_PUPILS:
+        marks_html = (
+            "".join(_mark_chip(m, 22) for m in marks)
+            if marks
+            else '<span class="tiny muted">Baho yoʻq</span>'
+        )
+        if not marks:
+            right = '<span class="pill" style="background:var(--tint);color:var(--muted)">Baholanmadi</span>'
+            info = '<div class="tiny muted">Chorakda baho yoʻq · taklif yoʻq</div>'
+        else:
+            avg, grade = suggestion(marks)
+            info = f'<div class="tiny muted">Oʻrtacha {avg} → taklif <b style="color:var(--text)">{grade}</b></div>'
+            if name in confirmed:
+                right = (
+                    f'<div style="text-align:center"><span class="serif" style="font-size:26px;color:var(--m)">{grade}</span>'
+                    f'<div class="tiny" style="color:var(--ok);font-weight:700">{tick} Tasdiqlandi</div></div>'
+                )
+            elif name in changed:
+                right = (
+                    f'<div style="text-align:center"><span class="serif" style="font-size:26px;color:var(--m)">{changed[name]}</span>'
+                    '<div class="tiny" style="color:var(--late);font-weight:700">Oʻzgartirildi</div></div>'
+                )
+            else:
+                right = (
+                    f'<div class="row" style="gap:6px"><span style="width:38px;height:38px;border-radius:12px;display:grid;place-items:center;'
+                    f'border:1.5px dashed var(--gold);color:var(--gold-ink);font-weight:800;font-size:16px">{grade}</span>'
+                    f'<span class="pill" style="background:var(--m);color:#fff;padding:7px 10px">{i("check")}</span></div>'
+                )
+        rows += (
+            '<div class="row" style="padding:10px 0;border-bottom:1px solid var(--border)">'
+            f'<div style="flex:1;min-width:0"><div class="b" style="font-size:14.5px">{name}</div>'
+            f'<div class="row" style="gap:3px;margin:5px 0 3px">{marks_html}</div>{info}</div>{right}</div>'
+        )
+    tabs = "".join(
+        f'<span class="pill" style="{"background:var(--m);color:#fff" if on else "background:var(--tint)"}">{t}</span>'
+        for t, on in (
+            ("1-ch.", False),
+            ("2-chorak", True),
+            ("3-ch.", False),
+            ("4-ch.", False),
+            ("Yillik", False),
+        )
+    )
+    return page(f"""
+{status()}
+<div class="pad">
+  <div class="row" style="gap:10px;margin-top:4px">{i("back")}<div><h1 class="serif" style="font-size:24px;color:var(--m)">Chorak baholari</h1><div class="small muted">3-A · Ona tili</div></div></div>
+  <div class="row" style="gap:5px;margin-top:12px">{tabs}</div>
+  <div class="card row" style="margin-top:12px;padding:10px 14px;border-radius:16px;background:var(--tint);border-color:var(--tint);box-shadow:none">
+    <span style="width:30px;height:30px;border-radius:10px;display:grid;place-items:center;border:1.5px dashed var(--gold);color:var(--gold-ink);font-weight:800">4</span>
+    <div class="tiny" style="flex:1"><b>Taklif</b> — chorakdagi baholar oʻrtachasi, 0,5 dan yuqorisi yuqoriga yaxlitlanadi. Siz tasdiqlaysiz yoki oʻzgartirasiz.</div></div>
+  <div style="margin-top:4px">{rows}</div>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;padding:12px 20px 30px;background:var(--surface);border-top:1px solid var(--border);display:grid;gap:8px">
+  <div class="btn btn-ghost" style="height:46px">Qolgan 3 tasini taklif boʻyicha tasdiqlash</div>
+  <div class="btn btn-m">Saqlash · 2-chorak</div>
+</div>""")
+
+
+SCREENS += [
+    ("20-grade-entry", "Baholash (2-bosqich)", s_grade_entry),
+    ("20b-quarter-grades", "Chorak baholari (2-bosqich)", s_quarter_grades),
+]
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

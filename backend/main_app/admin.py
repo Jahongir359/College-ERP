@@ -24,6 +24,7 @@ from .models import (
     ChatReadState,
     Assignment,
     Submission,
+    DeviceToken,
     Notification,
     RegistrationLead,
 )
@@ -271,6 +272,13 @@ class ChatReadStateAdmin(admin.ModelAdmin):
 admin.site.register(Assignment)
 admin.site.register(Submission)
 admin.site.register(Notification)
+
+
+@admin.register(DeviceToken)
+class DeviceTokenAdmin(admin.ModelAdmin):
+    list_display = ("user", "platform", "updated_at")
+    search_fields = ("user__email",)
+    readonly_fields = ("token", "created_at", "updated_at")
 
 
 @admin.register(RegistrationLead)
