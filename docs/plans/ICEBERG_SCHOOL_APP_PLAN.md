@@ -740,7 +740,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       loading/offline states — done 2026-10-23, PR #27; screens 6, 11–13, 15.
 - [~] **PD.5** Mockups: grades for parent/student (screen 14 done 2026-10-23, PR #27); **teacher grade
       entry still to draw**. (Release 2.) — teacher grade entry drawn 2026-10-30 (screens 20/20b,
-      PR #TBD), waiting for approval (PD.8); then PD.5 is done. Built on the P2.4 marks API (one mark
+      PR #59), waiting for approval (PD.8); then PD.5 is done. Built on the P2.4 marks API (one mark
       per pupil, subject, date and kind) and the P2.5 term grades API (null = not graded).
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
@@ -991,7 +991,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-30 — PD.5 teacher grade entry drawn (PR #TBD): screens 20 (marks for a date and kind) and
+- 2026-10-30 — PD.5 teacher grade entry drawn (PR #59): screens 20 (marks for a date and kind) and
   20b (quarter grades with the suggestion the teacher confirms, "Baholanmadi"). Needs approval (PD.8)
   before P4.7. `overview.png` not re-rendered (it would re-render every screen).
 
