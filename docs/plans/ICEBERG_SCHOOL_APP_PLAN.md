@@ -723,9 +723,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `admin/send-notification/` takes `target="parents"` and `"all"` includes parents of the
       targeted students (`branching.parent_user_ids_for_students`); 12 tests in
       `test_parent_announcements.py`. Paying online stays P8 (D16).
-- [ ] **P2.8** Push notifications with FCM HTTP v1 (service-account credentials via env vars, never
+- [~] **P2.8** Push notifications with FCM HTTP v1 (service-account credentials via env vars, never
       committed): send for notifications, absence, new message. Done when: unit tests with the sender
       mocked; a real push received on a test phone on staging; documented in `docs/DEPLOYMENT.md`.
+      — claimed 2026-10-28, branch feat/school-p2.8-push. Backend, tests and docs done; left: the
+      real push on staging (needs the owner's Firebase key in `FCM_SERVICE_ACCOUNT_JSON` and the app
+      side, P5.9).
 
 ### PD — Design (before P3/P4 code for each screen)
 
@@ -1009,6 +1012,14 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 - 2026-10-30 — P2.5 done (PR #55): quarter and year grades (`TermGrade`, migration
   `0049_term_grade`), `school/term-grades/`, suggestion = average of marks rounded half up. P2.8
   regenerates its migration as 0050 after this. Next for grades: P4.7 app screens (needs PD.5).
+
+- 2026-10-28 — P2.8 backend (branch feat/school-p2.8-push): `DeviceToken` (several devices per user,
+  migration `0050_device_token` after P2.5's 0049), `POST`/`DELETE /api/v1/me/fcm-token/`, `main_app/push.py` with
+  `notify_users(users, title, body, data)`; P2.3's absence notices are pushed with no extra code. Every new `Notification` (also
+  `bulk_create`), group chat and teacher ↔ parent message is pushed after commit on a background thread; titles in
+  the recipient's language; dead tokens deleted. New dependency `google-auth`; env var
+  `FCM_SERVICE_ACCOUNT_JSON` replaces the dead `FCM_SERVER_KEY` in `.do/app.yaml`. A push error never blocks saving. 22 tests.
+  Left: real push on staging (owner key + P5.9 app side).
 
 - 2026-10-28 — PD.9 part 2 drawn (PR #50): web register report, screen 19
   (`python build_mockups.py 19-web-register-report`). Added task **P3.7** (build it). Screen 19
