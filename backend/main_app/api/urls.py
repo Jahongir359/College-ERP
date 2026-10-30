@@ -8,6 +8,7 @@ from . import (
     register_views,
     school_views,
     student_views,
+    term_grades_views,
 )
 
 urlpatterns = [
@@ -356,4 +357,10 @@ urlpatterns = [
     ),
     # ── School gradebook (P2.4) ──────────────────────────────────────────────
     path("school/marks/", marks_views.MarkListView.as_view(), name="api_school_marks"),
+    # ── School quarter and year grades (P2.5) ────────────────────────────────
+    path(
+        "school/term-grades/",
+        term_grades_views.TermGradeListView.as_view(),
+        name="api_school_term_grades",
+    ),
 ]
