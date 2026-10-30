@@ -917,10 +917,11 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [x] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
       pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3. — done
       2026-10-30, PR #58 (**merge after the app's choose-password screen in P4.3**); verified: full suite
-      508 OK, `test_parent_onboarding`. Notes: `CustomUser.must_change_password` is set whenever the
+      559 OK (after merging main with P2.8), `test_parent_onboarding`. Migration
+      `0051_customuser_must_change_password`. Notes: `CustomUser.must_change_password` is set whenever the
       office sets a parent's password (`parents.create_parent`/`update_parent`: new parent, reset, letter)
       and cleared by `me/change-password/`. The API returns it in the login response and `me/`;
-      `api/authentication.py` (the DRF default) answers 403 `password_change_required` to everything except
+      `api/authentication.py` (the DRF default) answers 403 `{"detail": …, "code": "password_change_required"}` to everything except
       `me/`, change-password, logout, fcm-token and app/version until it's changed (the web login sends
       parents to `/app/`, which uses the API). Letters: "Print login letter" on the parent page, "Print
       login letters" for a class (only parents who never signed in), uz/ru/en, each with a new temporary
