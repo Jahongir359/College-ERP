@@ -838,3 +838,81 @@ msgstr "%(name)s %(date)s kuni %(class)s sinfiga kechikib keldi, soat %(time)s d
 #, python-format
 msgid "%(name)s was marked late in class %(class)s on %(date)s."
 msgstr "%(name)s %(date)s kuni %(class)s sinfiga kechikib keldi."
+
+# School register report (P3.7)
+msgid "Register report"
+msgstr "Davomat hisoboti"
+
+msgid "Register taken"
+msgstr "Davomat olingan"
+
+msgid "classes"
+msgstr "sinf"
+
+msgid "Present"
+msgstr "Keldi"
+
+msgid "Late"
+msgstr "Kechikdi"
+
+msgid "Absent"
+msgstr "Kelmadi"
+
+msgid "Taken"
+msgstr "Olindi"
+
+msgid "Came"
+msgstr "Kelganlar"
+
+msgid "Not taken"
+msgstr "Olinmagan"
+
+msgid "Absent and late"
+msgstr "Kelmagan va kechikkanlar"
+
+msgid "Each pupil's parents were told in the app."
+msgstr "Har birining ota-onasiga ilovada xabar yuborildi."
+
+msgid "Class: all"
+msgstr "Sinf: hammasi"
+
+msgid "Download CSV"
+msgstr "CSV yuklab olish"
+
+msgid "Date"
+msgstr "Sana"
+
+msgid "Taken at"
+msgstr "Olingan vaqt"
+
+msgid "Attendance %"
+msgstr "Davomat %"
+
+msgid "Arrival time"
+msgstr "Kelgan vaqti"
+
+msgid "Note"
+msgstr "Izoh"
+
+msgid "Status"
+msgstr "Holat"
+
+msgid "No classes on this date"
+msgstr "Bu sanada sinflar yoʻq"
+
+msgid "Pick a school day inside an academic year."
+msgstr "Oʻquv yili ichidagi maktab kunini tanlang."
+
+msgid "Nobody is absent or late."
+msgstr "Kelmagan yoki kechikkan oʻquvchi yoʻq."
+
+msgid "Not taken — the homeroom teacher hasn't saved this day's register yet. Teachers take the register in the app; this page is read-only."
+msgstr "Olinmagan — sinf rahbari bu kungi davomatni hali saqlamagan. Davomatni oʻqituvchi ilovada oladi; bu sahifa faqat koʻrish uchun."
+
+msgctxt "one pupil"
+msgid "Late"
+msgstr "Kechikdi"
+
+msgctxt "one pupil"
+msgid "Absent"
+msgstr "Kelmadi"

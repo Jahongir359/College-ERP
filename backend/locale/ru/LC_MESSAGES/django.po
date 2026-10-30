@@ -840,3 +840,81 @@ msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s, пришё
 #, python-format
 msgid "%(name)s was marked late in class %(class)s on %(date)s."
 msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s."
+
+# School register report (P3.7)
+msgid "Register report"
+msgstr "Отчёт о посещаемости"
+
+msgid "Register taken"
+msgstr "Посещаемость отмечена"
+
+msgid "classes"
+msgstr "классов"
+
+msgid "Present"
+msgstr "Пришли"
+
+msgid "Late"
+msgstr "Опоздали"
+
+msgid "Absent"
+msgstr "Отсутствуют"
+
+msgid "Taken"
+msgstr "Отмечено"
+
+msgid "Came"
+msgstr "Явка"
+
+msgid "Not taken"
+msgstr "Не отмечено"
+
+msgid "Absent and late"
+msgstr "Отсутствующие и опоздавшие"
+
+msgid "Each pupil's parents were told in the app."
+msgstr "Родителям каждого ученика отправлено уведомление в приложении."
+
+msgid "Class: all"
+msgstr "Класс: все"
+
+msgid "Download CSV"
+msgstr "Скачать CSV"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Taken at"
+msgstr "Время отметки"
+
+msgid "Attendance %"
+msgstr "Посещаемость, %"
+
+msgid "Arrival time"
+msgstr "Время прихода"
+
+msgid "Note"
+msgstr "Примечание"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "No classes on this date"
+msgstr "В этот день нет классов"
+
+msgid "Pick a school day inside an academic year."
+msgstr "Выберите учебный день внутри учебного года."
+
+msgid "Nobody is absent or late."
+msgstr "Отсутствующих и опоздавших нет."
+
+msgid "Not taken — the homeroom teacher hasn't saved this day's register yet. Teachers take the register in the app; this page is read-only."
+msgstr "Не отмечено — классный руководитель ещё не сохранил посещаемость за этот день. Учителя отмечают посещаемость в приложении; эта страница только для просмотра."
+
+msgctxt "one pupil"
+msgid "Late"
+msgstr "Опоздание"
+
+msgctxt "one pupil"
+msgid "Absent"
+msgstr "Отсутствует"
