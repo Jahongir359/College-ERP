@@ -876,7 +876,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 - [x] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
       pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3. — done
-      2026-10-30, PR #PRNUM (**merge after the app's choose-password screen in P4.3**); verified: full suite
+      2026-10-30, PR #58 (**merge after the app's choose-password screen in P4.3**); verified: full suite
       508 OK, `test_parent_onboarding`. Notes: `CustomUser.must_change_password` is set whenever the
       office sets a parent's password (`parents.create_parent`/`update_parent`: new parent, reset, letter)
       and cleared by `me/change-password/`. The API returns it in the login response and `me/`;
@@ -964,7 +964,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-30 — PL.1 done (PR #PRNUM, draft until P4.3): printed parent login letters and the
+- 2026-10-30 — PL.1 done (PR #58, draft until P4.3): printed parent login letters and the
   first-login password change (API flag + 403 gate). Migration renumbers to 0051 after #55 and P2.8.
 - 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
   login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
