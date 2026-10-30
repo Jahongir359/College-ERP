@@ -258,23 +258,79 @@ html[data-brand="school"].platform-apple[data-theme="dark"] {
    (so re-pointing variables alone can't reach them). Keep them grouped by
    the surface they style. */
 
-/* Sidebar (base.html inline <style> + iceberg.css, both !important) */
+/* Sidebar (base.html inline <style> + iceberg.css, both !important).
+   Light mode follows mockup 16: light #FBF7F6 panel, dark text, soft maroon
+   highlight on the active item (text/bg 16.5:1, active maroon on tint 13.4:1).
+   Dark mode keeps a dark maroon panel with light text. */
 html[data-brand="school"] .erpnext-sidebar,
 html[data-brand="school"] .platform-apple .erpnext-sidebar,
 html[data-brand="school"].platform-apple .erpnext-sidebar {
-  background: linear-gradient(180deg, #4C0909 0%, #3E0707 60%, #2E0505 100%) !important;
+  background: var(--brand-bg) !important;
+  border-right: 1px solid var(--brand-border) !important;
 }
-html[data-brand="school"] .dark-mode .erpnext-sidebar,
-html[data-brand="school"].dark-mode .erpnext-sidebar {
+html[data-brand="school"] .erpnext-sidebar .sidebar-header,
+html[data-brand="school"] .erpnext-sidebar .sidebar-footer {
+  background: transparent !important;
+  border-color: var(--brand-border) !important;
+}
+html[data-brand="school"] .erpnext-sidebar .sidebar-user-info h6 { color: var(--brand-text) !important; }
+html[data-brand="school"] .erpnext-sidebar .sidebar-user-info small { color: var(--brand-muted) !important; }
+html[data-brand="school"] .erpnext-sidebar .nav-section-title {
+  color: var(--brand-muted) !important;
+  border-color: var(--brand-border) !important;
+}
+html[data-brand="school"] .erpnext-sidebar .nav-link { color: var(--brand-text) !important; }
+html[data-brand="school"] .erpnext-sidebar .nav-icon { color: var(--brand-muted) !important; }
+html[data-brand="school"] .erpnext-sidebar .nav-link:hover {
+  color: var(--brand-primary) !important;
+  background: rgba(76, 9, 9, .05) !important;
+}
+html[data-brand="school"] .erpnext-sidebar .nav-link.active {
+  color: var(--brand-primary) !important;
+  background: rgba(76, 9, 9, .07) !important;
+  box-shadow: none !important;
+}
+html[data-brand="school"] .erpnext-sidebar .nav-link.active::before { background: var(--brand-primary); }
+html[data-brand="school"] .erpnext-sidebar .nav-link.active .nav-icon,
+html[data-brand="school"] .sidebar-role-badge.role-admin {
+  color: var(--brand-primary) !important;
+}
+html[data-brand="school"] .erpnext-sidebar .sidebar-logout-btn {
+  color: var(--brand-primary) !important;
+  background: #FFFFFF !important;
+  border-color: var(--brand-border) !important;
+}
+html[data-brand="school"] .erpnext-sidebar .sidebar-logout-btn:hover {
+  background: var(--brand-tint) !important;
+}
+
+html[data-brand="school"].dark-mode .erpnext-sidebar,
+html[data-brand="school"][data-theme="dark"] .erpnext-sidebar,
+html[data-brand="school"] .dark-mode .erpnext-sidebar {
   background: linear-gradient(180deg, #1D0E0E 0%, #2A1010 60%, #3A1414 100%) !important;
 }
-html[data-brand="school"] .erpnext-sidebar .nav-link.active .nav-icon,
-html[data-brand="school"] .nav-link.active .nav-icon,
-html[data-brand="school"] .sidebar-role-badge.role-admin {
-  color: #F2B8B0 !important;
+html[data-brand="school"].dark-mode .erpnext-sidebar .sidebar-user-info h6,
+html[data-brand="school"].dark-mode .erpnext-sidebar .nav-link,
+html[data-brand="school"].dark-mode .erpnext-sidebar .nav-link.active,
+html[data-brand="school"].dark-mode .erpnext-sidebar .nav-link:hover {
+  color: var(--brand-text) !important;
 }
-html[data-brand="school"] .nav-link.active {
-  border-left-color: #F2B8B0;
+html[data-brand="school"].dark-mode .erpnext-sidebar .sidebar-user-info small,
+html[data-brand="school"].dark-mode .erpnext-sidebar .nav-section-title,
+html[data-brand="school"].dark-mode .erpnext-sidebar .nav-icon {
+  color: var(--brand-muted) !important;
+}
+html[data-brand="school"].dark-mode .erpnext-sidebar .nav-link.active {
+  background: rgba(242, 184, 176, .12) !important;
+}
+html[data-brand="school"].dark-mode .erpnext-sidebar .nav-link.active::before { background: var(--brand-primary-ink); }
+html[data-brand="school"].dark-mode .erpnext-sidebar .nav-link.active .nav-icon,
+html[data-brand="school"].dark-mode .sidebar-role-badge.role-admin {
+  color: var(--brand-primary-ink) !important;
+}
+html[data-brand="school"].dark-mode .erpnext-sidebar .sidebar-logout-btn {
+  color: var(--brand-text) !important;
+  background: transparent !important;
 }
 html[data-brand="school"] .nav-submenu .nav-link.active {
   color: var(--brand-primary-hover) !important;
@@ -408,6 +464,245 @@ html[data-brand="school"] .profile-cover {
     radial-gradient(circle at 82% 16%, rgba(242, 184, 176, .22), transparent 12rem),
     linear-gradient(135deg, #3E0707 0%, #7A1F1F 58%, #2E0505 100%);
 }
+
+/* Page background (mobile-adaptive.css): plain warm gradient, no teal glow. */
+html[data-brand="school"] body,
+html[data-brand="school"] .ice-page,
+html[data-brand="school"] .erpnext-main {
+  background: linear-gradient(180deg, var(--ice-page-bg-2) 0%, var(--ice-page-bg) 100%) !important;
+}
+
+/* Page title: no teal/green underline (mockup 16). */
+html[data-brand="school"] .page-title::after {
+  background: var(--brand-primary);
+}
+/* iceberg-bold.css paints dark titles with a blue→cyan text gradient. */
+html[data-brand="school"] .dark-mode .page-title,
+html[data-brand="school"].dark-mode .page-title {
+  background: none;
+  -webkit-text-fill-color: var(--brand-text);
+}
+
+/* Page eyebrow ("MAKTAB") and the year · quarter chip in the navbar
+   (mockup 16). Eyebrow #8A5A1F on bg 5.5:1, dark #E0B97A 10.7:1; chip text on tint 16.0:1. */
+html[data-brand="school"] .page-eyebrow { color: #8A5A1F; }
+html[data-brand="school"].dark-mode .page-eyebrow,
+html[data-brand="school"][data-theme="dark"] .page-eyebrow { color: #E0B97A; }
+html[data-brand="school"] .navbar-period-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--brand-tint);
+  color: var(--brand-text);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  html[data-brand="school"] .navbar-period-chip { display: none; }
+}
+
+/* Admin manage pages (admin-manage-mobile.css): page header card, primary
+   buttons, row actions, table. Mockup 16: warm white card with the tint,
+   maroon icon, solid maroon buttons, "Open →" as a maroon text link. */
+html[data-brand="school"] {
+  --ice-manage-navy: var(--brand-primary);
+  --ice-manage-navy-2: var(--brand-primary-deep);
+  --ice-manage-cyan: var(--brand-accent-2);
+  --ice-manage-cyan-2: var(--brand-primary-hover);
+  --ice-manage-bg: var(--brand-bg);
+  --ice-manage-surface-2: var(--brand-tint);
+  --ice-manage-border: var(--brand-border);
+  --ice-manage-text: var(--brand-text);
+  --ice-manage-muted: var(--brand-muted);
+  --ice-manage-shadow: 0 18px 44px rgba(76, 9, 9, .08);
+  --ice-manage-shadow-soft: 0 10px 28px rgba(76, 9, 9, .06);
+}
+html[data-brand="school"] .ice-manage-hero {
+  border-color: var(--brand-border);
+  background: linear-gradient(135deg, #FFFFFF 0%, var(--brand-tint) 100%);
+}
+html[data-brand="school"] .ice-manage-hero__icon,
+html[data-brand="school"] .ice-manage-card__avatar {
+  background: var(--brand-primary);
+  box-shadow: none;
+}
+html[data-brand="school"] .ice-manage-add-btn {
+  background: var(--brand-primary);
+  box-shadow: 0 6px 18px rgba(76, 9, 9, .22);
+}
+html[data-brand="school"] .ice-manage-add-btn:hover,
+html[data-brand="school"] .ice-manage-add-btn:focus {
+  background: var(--brand-primary-hover);
+  filter: none;
+}
+html[data-brand="school"] .ice-manage-count {
+  border-color: var(--brand-border);
+  color: var(--brand-primary);
+  background: var(--brand-tint);
+}
+html[data-brand="school"] .ice-manage-action {
+  border-color: var(--brand-border);
+  background: var(--brand-tint);
+}
+html[data-brand="school"].dark-mode .ice-manage-action,
+html[data-brand="school"][data-theme="dark"] .ice-manage-action {
+  color: var(--brand-primary-ink);
+  background: rgba(242, 184, 176, .10);
+}
+html[data-brand="school"] .ice-manage-action--primary {
+  color: var(--brand-primary);
+  background: transparent;
+  border-color: transparent;
+  font-weight: 800;
+}
+html[data-brand="school"] .ice-manage-action--primary:hover,
+html[data-brand="school"] .ice-manage-action--primary:focus {
+  color: var(--brand-primary-hover);
+  text-decoration: underline;
+}
+html[data-brand="school"] .ice-manage-table th {
+  background: var(--brand-tint);
+  color: var(--brand-text);
+}
+html[data-brand="school"] .ice-manage-table tbody tr:hover {
+  background: rgba(76, 9, 9, .03);
+}
+html[data-brand="school"] .ice-manage-search__input:focus {
+  border-color: var(--brand-primary-hover);
+  box-shadow: 0 0 0 4px var(--brand-focus);
+}
+html[data-brand="school"].dark-mode .ice-manage-hero,
+html[data-brand="school"][data-theme="dark"] .ice-manage-hero {
+  background: linear-gradient(135deg, #1D0E0E 0%, #251212 100%);
+}
+html[data-brand="school"].dark-mode .ice-manage-table th,
+html[data-brand="school"][data-theme="dark"] .ice-manage-table th {
+  background: #251212;
+}
+html[data-brand="school"].dark-mode .ice-manage-action--primary,
+html[data-brand="school"][data-theme="dark"] .ice-manage-action--primary {
+  color: var(--brand-primary-ink);
+}
+html[data-brand="school"].dark-mode .ice-manage-page,
+html[data-brand="school"][data-theme="dark"] .ice-manage-page {
+  --ice-manage-surface: rgba(29, 14, 14, .94);
+  --ice-manage-surface-2: #251212;
+  --ice-manage-border: var(--brand-border);
+}
+
+/* Admin dashboard (admin-dashboard-2026.css hard-codes a cyan rgba for glows,
+   icon tiles, badges and hovers): soft maroon tints instead. */
+html[data-brand="school"] .admin-dashboard::before {
+  background: radial-gradient(circle at 18% 8%, rgba(76, 9, 9, .05), transparent 30rem);
+}
+html[data-brand="school"] .admin-command__glow { background: rgba(242, 184, 176, .22); }
+html[data-brand="school"] .admin-primary-action { box-shadow: 0 14px 34px rgba(46, 5, 5, .22); }
+html[data-brand="school"] .admin-metric-card::after { background: rgba(76, 9, 9, .06); }
+html[data-brand="school"] .admin-card:hover { border-color: var(--brand-border-strong); }
+html[data-brand="school"] .admin-link,
+html[data-brand="school"] .admin-soft-badge,
+html[data-brand="school"] .admin-activity-item__icon,
+html[data-brand="school"] .admin-metric-card__icon,
+html[data-brand="school"] .admin-quick-action span,
+html[data-brand="school"] .admin-class-row__date,
+html[data-brand="school"] .admin-metric-card--skeleton .admin-metric-card__icon {
+  background: var(--brand-tint);
+  box-shadow: none;
+}
+html[data-brand="school"] .admin-quick-action:focus,
+html[data-brand="school"] .admin-class-row:hover {
+  background: rgba(76, 9, 9, .04);
+  border-color: var(--brand-border);
+}
+html[data-brand="school"] .admin-quick-action:focus span { background: rgba(76, 9, 9, .10); }
+html[data-brand="school"] .admin-spark span {
+  background: linear-gradient(180deg, var(--brand-accent-2), var(--brand-primary));
+}
+html[data-brand="school"] .admin-chart-skeleton span {
+  background: linear-gradient(90deg, var(--brand-tint), rgba(255, 255, 255, .55), var(--brand-tint));
+}
+html[data-brand="school"].dark-mode .admin-dashboard::before,
+html[data-brand="school"][data-theme="dark"] .admin-dashboard::before {
+  background: radial-gradient(circle at 18% 8%, rgba(242, 184, 176, .05), transparent 30rem);
+}
+html[data-brand="school"].dark-mode .admin-metric-card::after,
+html[data-brand="school"][data-theme="dark"] .admin-metric-card::after {
+  background: rgba(242, 184, 176, .06);
+}
+html[data-brand="school"].dark-mode .admin-link,
+html[data-brand="school"].dark-mode .admin-soft-badge,
+html[data-brand="school"].dark-mode .admin-activity-item__icon,
+html[data-brand="school"].dark-mode .admin-metric-card__icon,
+html[data-brand="school"].dark-mode .admin-quick-action span,
+html[data-brand="school"].dark-mode .admin-class-row__date,
+html[data-brand="school"][data-theme="dark"] .admin-link,
+html[data-brand="school"][data-theme="dark"] .admin-soft-badge,
+html[data-brand="school"][data-theme="dark"] .admin-activity-item__icon,
+html[data-brand="school"][data-theme="dark"] .admin-metric-card__icon,
+html[data-brand="school"][data-theme="dark"] .admin-quick-action span,
+html[data-brand="school"][data-theme="dark"] .admin-class-row__date {
+  background: rgba(242, 184, 176, .12);
+}
+
+/* Empty chart state (iceberg-reliability.css): slate → warm. */
+html[data-brand="school"] .ice-chart-state {
+  border-color: var(--brand-border-strong);
+  color: var(--brand-muted);
+  background: var(--brand-tint);
+}
+html[data-brand="school"].dark-mode .ice-chart-state,
+html[data-brand="school"][data-theme="dark"] .ice-chart-state {
+  border-color: var(--brand-border);
+  color: var(--brand-muted);
+  background: rgba(242, 184, 176, .04);
+}
+
+/* Loader and progress glows */
+html[data-brand="school"] .page-progress { box-shadow: 0 0 10px rgba(163, 58, 58, .45); }
+html[data-brand="school"] .app-loader__spinner { box-shadow: 0 0 18px rgba(76, 9, 9, .25); }
+
+/* Phone bottom bar (glowing-bottom-nav.css): maroon instead of lime. */
+html[data-brand="school"] {
+  --glow-nav-light-active: var(--brand-primary);
+  --glow-nav-light-text: var(--brand-muted);
+  --glow-nav-lime: var(--brand-primary);
+  --glow-nav-lime-bg: rgba(76, 9, 9, .08);
+  --glow-nav-dark-bg: rgba(20, 8, 8, .94);
+  --glow-nav-dark-border: rgba(242, 184, 176, .18);
+  --glow-nav-dark-text: var(--brand-muted);
+}
+html[data-brand="school"] .glow-bottom-nav__link.is-active {
+  box-shadow: inset 0 0 0 1px rgba(76, 9, 9, .14);
+}
+html[data-brand="school"] .glow-bottom-nav__link.is-active .glow-bottom-nav__icon {
+  filter: none;
+}
+html[data-brand="school"].dark-mode .glow-bottom-nav__link.is-active,
+html[data-brand="school"][data-theme="dark"] .glow-bottom-nav__link.is-active {
+  background: rgba(242, 184, 176, .12);
+  box-shadow: inset 0 0 0 1px rgba(242, 184, 176, .20);
+}
+
+/* Navbar wordmark: base.html shows the horizontal School logo instead of the
+   "ICEBERG" text; swap the maroon and white versions with the theme. */
+html[data-brand="school"] .navbar-brand-logo {
+  display: block;
+  flex: none;
+  height: 34px;
+  width: auto;
+  max-width: none;
+}
+@media (max-width: 480px) {
+  html[data-brand="school"] .navbar-brand-logo { height: 26px; }
+}
+html[data-brand="school"] .navbar-brand-logo--dark { display: none; }
+html[data-brand="school"].dark-mode .navbar-brand-logo--light,
+html[data-brand="school"][data-theme="dark"] .navbar-brand-logo--light { display: none; }
+html[data-brand="school"].dark-mode .navbar-brand-logo--dark,
+html[data-brand="school"][data-theme="dark"] .navbar-brand-logo--dark { display: block; }
 
 /* Theme-picker previews (profile hub) show the school's own dark palette */
 html[data-brand="school"] .theme-preview--bright span:first-child,

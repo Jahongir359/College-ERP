@@ -1,6 +1,21 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">
+  {{ group.branch.name }} · {{ group.session }}
+  · {% translate "Homeroom teacher" %}: {% if group.teacher %}{{ group.teacher.admin.get_full_name }}{% else %}{% translate "Not set" %}{% endif %}
+  {% if group.room %}· {{ group.room }}{% endif %}
+</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  <a href="{% url 'school_classes' %}" class="ice-manage-action">← {% translate "All classes" %}</a>
+  <a href="{% url 'school_timetable' %}?class={{ group.pk }}" class="ice-manage-action">{% translate "Timetable" %}</a>
+  <a href="{% url 'school_class_edit' group.pk %}" class="ice-manage-add-btn">
+    <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit class" %}
+  </a>
+</div>
+{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
@@ -9,26 +24,6 @@
 
 {% block content %}
 <div class="ice-manage-page">
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-door-open"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">{{ group.name }}</h2>
-        <p class="ice-manage-hero__subtitle">
-          {{ group.branch.name }} · {{ group.session }}
-          · {% translate "Homeroom teacher" %}: {% if group.teacher %}{{ group.teacher.admin.get_full_name }}{% else %}{% translate "Not set" %}{% endif %}
-          {% if group.room %}· {{ group.room }}{% endif %}
-        </p>
-      </div>
-    </div>
-    <div class="ice-manage-hero__actions">
-      <a href="{% url 'school_classes' %}" class="ice-manage-action">← {% translate "All classes" %}</a>
-      <a href="{% url 'school_timetable' %}?class={{ group.pk }}" class="ice-manage-action">{% translate "Timetable" %}</a>
-      <a href="{% url 'school_class_edit' group.pk %}" class="ice-manage-add-btn">
-        <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit class" %}
-      </a>
-    </div>
-  </section>
 
   <!-- ── Students ── -->
   <section class="school-section" aria-labelledby="students-title">

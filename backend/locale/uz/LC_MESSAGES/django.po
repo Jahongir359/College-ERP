@@ -383,6 +383,10 @@ msgstr "Qizil katak — toʻqnashuv: oʻqituvchi yoki xona shu vaqtda band. Saql
 msgid "Years and quarters are shared by all branches."
 msgstr "Oʻquv yillari va choraklar barcha filiallar uchun umumiy."
 
+#, python-format
+msgid "Quarter %(number)s"
+msgstr "%(number)s-chorak"
+
 msgid "Only a super admin can change them."
 msgstr "Ularni faqat bosh administrator oʻzgartira oladi."
 

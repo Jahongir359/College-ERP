@@ -48,4 +48,25 @@ def school_nav(request):
     from .models import Branch
 
     branches = branching.get_accessible_branches(user)
-    return {"show_school_nav": branches.filter(brand=Branch.BRAND_SCHOOL).exists()}
+    show = branches.filter(brand=Branch.BRAND_SCHOOL).exists()
+    return {"show_school_nav": show, "school_period": school_period_label() if show else ""}
+
+
+def school_period_label():
+    """``"2026–2027 · 1-chorak"`` for the School navbar chip (mockup 16): the
+    current academic year and the quarter today falls in (or the last one
+    that started). Empty when no academic year exists."""
+    from django.utils import timezone
+    from django.utils.translation import gettext as _
+
+    from .models import Session
+
+    year = Session.current()
+    if year is None:
+        return ""
+    today = timezone.localdate()
+    term = year.terms.filter(start_date__lte=today).order_by("-start_date").first()
+    if term is None:
+        return str(year)
+    name = term.name or _("Quarter %(number)s") % {"number": term.number}
+    return f"{year} · {name}"

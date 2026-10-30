@@ -1,6 +1,18 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">
+  {% translate "Years and quarters are shared by all branches." %}
+  {% if not can_edit %}{% translate "Only a super admin can change them." %}{% endif %}
+</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  {% if can_edit %}<a href="{% url 'add_session' %}" class="ice-manage-add-btn">
+    <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New academic year" %}
+  </a>{% endif %}
+</div>
+{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
@@ -9,25 +21,6 @@
 
 {% block content %}
 <div class="ice-manage-page">
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-calendar-alt"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">{% translate "Academic year" %}</h2>
-        <p class="ice-manage-hero__subtitle">
-          {% translate "Years and quarters are shared by all branches." %}
-          {% if not can_edit %}{% translate "Only a super admin can change them." %}{% endif %}
-        </p>
-      </div>
-    </div>
-    {% if can_edit %}
-    <div class="ice-manage-hero__actions">
-      <a href="{% url 'add_session' %}" class="ice-manage-add-btn">
-        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New academic year" %}
-      </a>
-    </div>
-    {% endif %}
-  </section>
 
   {% for year in years %}
   <section class="school-section" aria-labelledby="year-{{ year.pk }}">

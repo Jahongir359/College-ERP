@@ -209,11 +209,20 @@
             </button>
             <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}"
                class="navbar-brand" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;">
+                {% if brand.key == "school" %}
+                <img class="navbar-brand-logo navbar-brand-logo--light" src="{% static brand.logo_on_light %}" alt="{{ brand.display_name }}">
+                <img class="navbar-brand-logo navbar-brand-logo--dark" src="{% static brand.logo_on_dark %}" alt="" aria-hidden="true">
+                {% else %}
                 <span class="navbar-logo-text">ICEBERG</span>
+                {% endif %}
             </a>
         </div>
 
         <div class="navbar-user">
+            <!-- School year · quarter chip (P3.6, mockup 16): School admins only -->
+            {% if school_period and brand.key == "school" %}
+            <span class="navbar-period-chip">{{ school_period }}</span>
+            {% endif %}
             <!-- Language switch (admins, P3.0): uz / ru / en, saved per user -->
             {% if user.user_type == '1' %}
             {% include "main_app/includes/language_switch.html" with lang_class="navbar-lang-switch" %}
@@ -280,9 +289,11 @@
     <main class="erpnext-main ice-page" id="main-content">
         <div class="page-header ice-page-header">
             <div class="page-header-content">
+                {% block page_eyebrow %}{% endblock page_eyebrow %}
                 <h1 class="page-title">{% block page_title %}{% translate "Dashboard" %}{% endblock page_title %}</h1>
                 {% block page_subtitle %}{% if page_subtitle %}<p class="page-subtitle">{{ page_subtitle }}</p>{% endif %}{% endblock page_subtitle %}
             </div>
+            {% block page_actions %}{% endblock page_actions %}
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
