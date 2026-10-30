@@ -52,7 +52,14 @@ class FirstLoginApiTests(_ParentFixture):
         self.assertTrue(user["must_change_password"])
         response = api.get(reverse("api_notifications"))
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.data["detail"].code, "password_change_required")
+        # The exact body the app's P4.3 screen relies on.
+        self.assertEqual(
+            response.json(),
+            {
+                "detail": "Change your password before continuing.",
+                "code": "password_change_required",
+            },
+        )
         self.assertTrue(api.get(reverse("api_me")).data["must_change_password"])
 
         new = "My-own-pass-2026"
@@ -142,7 +149,7 @@ class PasswordChangeGateTests(_ParentFixture):
             with self.subTest(url=url):
                 response = api.get(url)
                 self.assertEqual(response.status_code, 403)
-                self.assertEqual(response.data["detail"].code, "password_change_required")
+                self.assertEqual(response.json()["code"], "password_change_required")
         self.assertEqual(api.get(reverse("api_me")).status_code, 200)
         self.assertEqual(api.get(reverse("api_app_version")).status_code, 200)
         response = api.post(reverse("api_fcm_token"), {"token": "device-1"}, format="json")

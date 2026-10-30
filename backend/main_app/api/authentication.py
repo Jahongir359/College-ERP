@@ -22,9 +22,16 @@ ALLOWED_BEFORE_CHANGE = {
 
 
 class PasswordChangeRequired(APIException):
+    """403 with ``code`` in the body, so the app can tell it from other 403s:
+    ``{"detail": "Change your password before continuing.", "code": "password_change_required"}``.
+    """
+
     status_code = status.HTTP_403_FORBIDDEN
     default_detail = "Change your password before continuing."
     default_code = "password_change_required"
+
+    def __init__(self):
+        super().__init__({"detail": self.default_detail, "code": self.default_code})
 
 
 class PasswordChangeJWTAuthentication(JWTAuthentication):

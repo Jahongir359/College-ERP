@@ -925,3 +925,22 @@ msgid_plural "%(n)s parents in %(name)s have not signed in yet."
 msgstr[0] "%(n)s родитель из %(name)s ещё не входил."
 msgstr[1] "%(n)s родителя из %(name)s ещё не входили."
 msgstr[2] "%(n)s родителей из %(name)s ещё не входили."
+
+# Push notification titles (P2.8)
+msgid "New result"
+msgstr "Новый результат"
+
+msgid "Announcement"
+msgstr "Объявление"
+
+msgid "Homework"
+msgstr "Домашнее задание"
+
+msgid "Payment"
+msgstr "Оплата"
+
+msgid "Notification"
+msgstr "Уведомление"
+
+msgid "Sent an attachment"
+msgstr "Отправил(а) файл"

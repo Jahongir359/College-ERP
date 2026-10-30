@@ -8,7 +8,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from ... import parents
-from ...models import Parent, Student
+from ...models import DeviceToken, Parent, Student
 from ..serializers import ChangePasswordSerializer, FcmTokenSerializer, MeSerializer
 
 
@@ -159,12 +159,30 @@ class ChangePasswordView(APIView):
 
 
 class FcmTokenView(APIView):
+    """Register (POST) or forget (DELETE, on logout) this device's push token."""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = FcmTokenSerializer(data=request.data)
         if serializer.is_valid():
-            request.user.fcm_token = serializer.validated_data["token"]
+            token = serializer.validated_data["token"]
+            # A token belongs to one install; if another account used this phone
+            # before, the token moves to the user who is signed in now.
+            DeviceToken.objects.update_or_create(
+                token=token,
+                defaults={"user": request.user, "platform": serializer.validated_data["platform"]},
+            )
+            request.user.fcm_token = token
             request.user.save(update_fields=["fcm_token"])
             return Response({"detail": "FCM token updated."})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        token = str(request.data.get("token") or "")
+        if token:
+            DeviceToken.objects.filter(user=request.user, token=token).delete()
+            if request.user.fcm_token == token:
+                request.user.fcm_token = ""
+                request.user.save(update_fields=["fcm_token"])
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -264,6 +264,9 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class FcmTokenSerializer(serializers.Serializer):
     token = serializers.CharField(max_length=512)
+    platform = serializers.ChoiceField(
+        choices=["android", "ios", "web"], required=False, allow_blank=True, default=""
+    )
 
 
 # ---------------------------------------------------------------------------

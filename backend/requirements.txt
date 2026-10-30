@@ -20,8 +20,11 @@ Pillow>=9.0.0
 # QR codes on printed parent login letters (PL.1); pure Python, no dependencies
 segno==1.6.6
 
-# HTTP requests (Firebase notifications)
+# HTTP requests (FCM push, CAPTCHA)
 requests>=2.27.0
+
+# Service-account OAuth2 token for FCM HTTP v1 push (P2.8)
+google-auth==2.62.0
 
 # Environment variable loading from .env
 python-dotenv>=0.19.0

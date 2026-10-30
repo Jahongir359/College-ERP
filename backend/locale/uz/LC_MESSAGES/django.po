@@ -921,3 +921,22 @@ msgid "%(n)s parent in %(name)s has not signed in yet."
 msgid_plural "%(n)s parents in %(name)s have not signed in yet."
 msgstr[0] "%(name)s sinfidagi %(n)s ota-ona hali kirmagan."
 msgstr[1] "%(name)s sinfidagi %(n)s ota-ona hali kirmagan."
+
+# Push notification titles (P2.8)
+msgid "New result"
+msgstr "Yangi natija"
+
+msgid "Announcement"
+msgstr "Eʼlon"
+
+msgid "Homework"
+msgstr "Uy vazifasi"
+
+msgid "Payment"
+msgstr "Toʻlov"
+
+msgid "Notification"
+msgstr "Bildirishnoma"
+
+msgid "Sent an attachment"
+msgstr "Fayl yubordi"

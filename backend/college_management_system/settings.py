@@ -389,6 +389,12 @@ CAPTCHA_SECRET_KEY = os.environ.get("CAPTCHA_SECRET_KEY", "")
 # Authorization: Bearer <REGISTRATION_LEADS_API_TOKEN>
 REGISTRATION_LEADS_API_TOKEN = os.environ.get("REGISTRATION_LEADS_API_TOKEN", "").strip()
 
+# Push notifications (FCM HTTP v1, P2.8): the Firebase service-account key as one JSON
+# string. Empty = push off. Never commit it; set it as a secret env var.
+FCM_SERVICE_ACCOUNT_JSON = os.environ.get("FCM_SERVICE_ACCOUNT_JSON", "").strip()
+# Tests send on the calling thread instead of a background one.
+FCM_SEND_INLINE = False
+
 # Iceberg School brand (see docs/plans/ICEBERG_SCHOOL_BRAND_PLAN.md). While off,
 # every request resolves to the Learning Center brand, so nothing changes.
 SCHOOL_BRAND_ENABLED = os.environ.get("SCHOOL_BRAND_ENABLED", "False").strip().lower() in (
