@@ -480,6 +480,8 @@ class S {
     '{d} October': '{d}-oktabr',
     '{d} November': '{d}-noyabr',
     '{d} December': '{d}-dekabr',
+    'Could not load the register': 'Davomat yuklanmadi',
+    'Check your connection and try again.': 'Internetni tekshirib, qayta urinib koʻring.',
   };
 
   static const _ru = <String, String>{
@@ -958,6 +960,8 @@ class S {
     '{d} October': '{d} октября',
     '{d} November': '{d} ноября',
     '{d} December': '{d} декабря',
+    'Could not load the register': 'Не удалось загрузить журнал',
+    'Check your connection and try again.': 'Проверьте подключение и попробуйте ещё раз.',
   };
 
   static const _ko = <String, String>{
@@ -1433,6 +1437,8 @@ class S {
     '{d} October': '10월 {d}일',
     '{d} November': '11월 {d}일',
     '{d} December': '12월 {d}일',
+    'Could not load the register': '출석부를 불러오지 못했습니다',
+    'Check your connection and try again.': '연결을 확인하고 다시 시도하세요.',
   };
 
   /// Translate [key] (the English string doubles as the key).

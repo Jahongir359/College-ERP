@@ -37,6 +37,18 @@ final registerProvider =
   return apiGet('/school/register/$id/$day/');
 });
 
+/// Saves one class's register for a day (POST). A provider so tests can fake
+/// the network.
+typedef RegisterSaver = Future<void> Function(
+    int classId, String day, List<Map<String, dynamic>> records);
+
+final registerSaverProvider = Provider<RegisterSaver>(
+  (_) => (classId, day, records) => ApiClient.instance.dio.post(
+        '/school/register/$classId/$day/',
+        data: {'records': records},
+      ),
+);
+
 /// "Thursday, 24 October" in the app language, via strings.dart templates.
 String registerDayTitle(S s, DateTime d) {
   const weekdays = [
@@ -92,17 +104,21 @@ class _Mark {
   _Mark(this.status, this.arrival, this.note);
 }
 
+/// Always starts with "not saved, try again"; adds the server's reason, if any.
 String _apiError(Object e, S s) {
+  final notSaved = s('Could not save the register. Try again.');
   if (e is DioException) {
     final data = e.response?.data;
     if (data is Map) {
       final detail = data['detail'] ?? data['date'] ?? data['records'];
-      if (detail is String) return detail;
-      if (detail is List && detail.isNotEmpty) return '${detail.first}';
-      if (detail is Map && detail.isNotEmpty) return '${detail.values.first}';
+      String? reason;
+      if (detail is String) reason = detail;
+      if (detail is List && detail.isNotEmpty) reason = '${detail.first}';
+      if (detail is Map && detail.isNotEmpty) reason = '${detail.values.first}';
+      if (reason != null && reason.isNotEmpty) return '$notSaved\n$reason';
     }
   }
-  return s('Could not save the register. Try again.');
+  return notSaved;
 }
 
 // ─── Register screen ─────────────────────────────────────────────────────────
@@ -143,7 +159,7 @@ class _StaffRegisterScreenState extends ConsumerState<StaffRegisterScreen> {
   Future<void> _save(List pupils) async {
     final s = ref.read(stringsProvider);
     setState(() => _saving = true);
-    final records = [
+    final records = <Map<String, dynamic>>[
       for (final p in pupils.cast<Map<String, dynamic>>())
         if (_markOf(p).status != 'present' || _markOf(p).note.isNotEmpty)
           {
@@ -154,10 +170,8 @@ class _StaffRegisterScreenState extends ConsumerState<StaffRegisterScreen> {
           },
     ];
     try {
-      await ApiClient.instance.dio.post(
-        '/school/register/${widget.classId}/${_isoDay(widget.day)}/',
-        data: {'records': records},
-      );
+      await ref
+          .read(registerSaverProvider)(widget.classId, _isoDay(widget.day), records);
       ref.invalidate(myRegistersProvider);
       ref.invalidate(registerProvider(_key));
       if (!mounted) return;
@@ -212,9 +226,21 @@ class _StaffRegisterScreenState extends ConsumerState<StaffRegisterScreen> {
         bottom: false,
         child: register.when(
           loading: () => const PageSkeleton(),
-          error: (e, _) => ErrorState(
-            error: e,
-            onRetry: () => ref.invalidate(registerProvider(_key)),
+          error: (e, _) => IcePage(
+            title: s('Register'),
+            subtitle: registerDayTitle(s, widget.day),
+            backButton: true,
+            children: [
+              EmptyState(
+                icon: Icons.wifi_off_rounded,
+                title: s('Could not load the register'),
+                message: s('Check your connection and try again.'),
+                action: IceButton(
+                  s('Retry'),
+                  onPressed: () => ref.invalidate(registerProvider(_key)),
+                ),
+              ),
+            ],
           ),
           data: (d) => _body(context, s, d),
         ),

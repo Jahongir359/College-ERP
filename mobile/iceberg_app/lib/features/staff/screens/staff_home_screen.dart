@@ -147,7 +147,8 @@ class _Dashboard extends ConsumerWidget {
           innerRef.refresh(staffStatsProvider.future),
           innerRef.refresh(staffGroupsProvider.future),
           innerRef.refresh(storiesProvider.future),
-          innerRef.refresh(myRegistersProvider.future),
+          if (context.brand.isSchool)
+            innerRef.refresh(myRegistersProvider.future),
         ]);
       },
       child: ListView(
