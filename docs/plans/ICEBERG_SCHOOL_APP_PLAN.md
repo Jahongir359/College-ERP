@@ -712,7 +712,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [x] **PD.4** Mockups: timetable, teacher home, register and the late-arrival sheet, plus empty/error/
       loading/offline states — done 2026-10-23, PR #27; screens 6, 11–13, 15.
 - [~] **PD.5** Mockups: grades for parent/student (screen 14 done 2026-10-23, PR #27); **teacher grade
-      entry still to draw**. (Release 2.)
+      entry still to draw**. (Release 2.) — teacher grade entry (screens 20/20b) claimed 2026-10-30,
+      branch `docs/school-pd5-grade-entry`.
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
 - [~] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
