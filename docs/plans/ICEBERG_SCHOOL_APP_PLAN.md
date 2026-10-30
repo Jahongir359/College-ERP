@@ -90,7 +90,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 5/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 6/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
@@ -653,9 +653,22 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       is *newly* absent or late: re-saving the same marks, a new arrival time or note, or a
       correction to present sends nothing; late ↔ absent sends a new notice. Text is stored in
       Uzbek (`NOTICE_LANGUAGE`; ru in the .po for later). P2.8 should send push for these rows.
-- [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
+- [x] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
       teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
-      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
+      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.) — done
+      2026-10-28, PR #52; verified: full suite 461 OK, `MarkAccessTests` (access matrix 8.2),
+      `MarkSavingTests`, `MarkReadingTests`, `FilterMarksForUserTests`. Notes: `Mark` has student,
+      class_subject, date (lesson day), value 2–5 (DB check constraint + API), kind lesson/test/exam,
+      comment (max 200), given_by; one mark per pupil, subject, date and kind. The quarter is not
+      stored: it is the `Term` whose dates contain `date` (D18). `GET school/marks/` for a pupil or
+      parent (`?student=`, `?term=`; default the quarter containing today, the whole year on a holiday)
+      returns the child's marks by subject (screen 14); for a teacher or admin it needs
+      `?class_subject=` and returns every pupil. `POST school/marks/` `{class_subject, date, kind?,
+      records: [{student_id, value, comment?}]}` by the subject's teacher only; `value: null` removes a
+      mark. Dates in the future, outside the year or between quarters are refused. A homeroom teacher
+      doesn't see other teachers' marks (4.2). New helpers `branching.filter_marks_for_user`,
+      `user_can_view_subject_marks`, `user_can_give_marks`. API messages are English like the register
+      API; app wording comes with P4.7.
 - [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
 - [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
@@ -764,9 +777,17 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       teacher on the class page is now refused when the new teacher is busy at one of its lesson times
       (the open point from P2.1). Bell period model messages are now translatable (`gettext_lazy`).
       Room per lesson is kept but not edited in the grid (the class room is used; the API can set it).
-- [~] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7. — claimed 2026-10-28,
-      branch feat/school-p3.3-parents-admin (#43 merged; build from screens 18–18b; CSV
-      import screen is Release 2, D16).
+- [x] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7. — done 2026-10-28,
+      PR #53; verified: full suite 423 OK, `test_school_parent_pages` (access incl. other-branch 404 on
+      every action, duplicate phone, link by login ID + phone, unlinking the last child, uz/ru).
+      Notes: **Maktab → Ota-onalar** (`/maktab/parents/`), views in `school_parent_views.py`, built from
+      screens 18–18b on the P1.7 rules in `parents.py` (shared with the API; the login ID + phone
+      lookup moved there as `parent_by_login_and_phone`, so a mismatch is only "Parent not found").
+      Reset password makes a temporary one shown once on the page (never in a message or cookie).
+      Children in branches the admin can't see show only as "+N in another branch". The CSV import
+      screen is Release 2 (D16). These tables stay visible below 1025 px (`school-table-wrap`):
+      `admin-manage-mobile.css` hides `.ice-manage-table-wrap` there, which also hides the P3.1/P3.2
+      tables on phones (for P3.6).
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
@@ -796,6 +817,15 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       for each new screen.
 - [-] **P4.11** Offline queue for the register and messages — dropped 2026-10-26 (D16, keep it simple). The
       offline banner and a clear "not saved, try again" error stay in P4.10.
+- [~] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
+      with store links when older. Tests. (Release 2, D16.) — **backend half done** 2026-10-28, PR #51;
+      verified: `tests/test_app_version.py` AppVersionTests. Public `GET /api/v1/app/version/` (no
+      token, under `/api/` so the login middleware lets it through) returns `min_app_version` and
+      per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
+      (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
+      = `0.0.0` (never blocks). **Still open:** the app's "update" screen (after P4.13).
+- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
+
 - [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
       with store links when older. Tests. (Release 2, D16.)
 - [x] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
@@ -925,6 +955,16 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
+  login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
+
+- 2026-10-28 — P2.4 done (PR #52): `Mark` model, `school/marks/` API in `api/marks_views.py`,
+  `branching.filter_marks_for_user`. Migration `0048_mark` (after P2.6's 0047). Next on this line: P2.5 term grades (same session).
+
+- 2026-10-28 — P4.12 backend half (PR #51): `GET /api/v1/app/version/` for the app's start-up
+  check, env vars in `.env.example` and `DEPLOYMENT.md`. P4.12 stays `[~]` until the app screen
+  (mobile/, after P4.13) compares its version and shows the store link.
 
 - 2026-10-28 — P2.6 done (PR #48): teacher ↔ parent threads per student and teacher, API
   `messages/parent/…`, access matrix tests. Migration `0047_parent_chat_threads` (after P2.2's 0046). The app screens are P4.8.

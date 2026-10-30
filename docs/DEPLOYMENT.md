@@ -145,6 +145,11 @@ See `/.env.example` for a complete, commented list of all environment variables.
 | `EMAIL_HOST_USER` | No | SMTP sender email |
 | `EMAIL_HOST_PASSWORD` | No | SMTP password / App Password |
 | `CORS_ALLOWED_ORIGINS` | No | Comma-separated CORS origins |
+| `MIN_APP_VERSION` | No | Oldest supported app version, like `1.2.0`; older apps ask for an update (`GET /api/v1/app/version/`). Blank = no minimum |
+| `MIN_APP_VERSION_ANDROID` | No | Overrides `MIN_APP_VERSION` for the Android app |
+| `MIN_APP_VERSION_IOS` | No | Overrides `MIN_APP_VERSION` for the iPhone app |
+| `APP_STORE_URL_ANDROID` | No | Google Play page the app's "update" screen opens |
+| `APP_STORE_URL_IOS` | No | App Store page the app's "update" screen opens |
 | `CSRF_TRUSTED_ORIGINS` | No | Comma-separated trusted origins |
 | `REGISTRATION_LEADS_API_TOKEN` | No | Token for public registration API |
 | `RECOVERY_ADMIN_EMAIL` | No | Fallback admin login email |

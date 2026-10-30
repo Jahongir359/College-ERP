@@ -124,6 +124,29 @@ class ParentChildForm(_AdminForm):
         )
 
 
+class ParentLinkEditForm(ParentChildForm):
+    """Change the relation and main contact of a child already linked (no child picker)."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        del self.fields["student"]
+
+
+class ParentLinkByLoginForm(ParentChildForm):
+    """Link a child to a parent of another branch: login ID and phone must both match (D4)."""
+
+    login_id = forms.CharField(
+        label=_("Login ID"), max_length=30, widget=forms.TextInput(attrs={"placeholder": "PR500"})
+    )
+    phone = forms.CharField(
+        label=_("Phone number"),
+        max_length=20,
+        widget=forms.TextInput(attrs={"placeholder": "+998 90 123 45 67"}),
+    )
+
+    field_order = ["login_id", "phone", "student", "relation", "is_primary"]
+
+
 # ── Classes (P3.1) ───────────────────────────────────────────────────────────
 
 

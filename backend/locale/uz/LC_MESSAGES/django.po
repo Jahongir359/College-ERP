@@ -689,6 +689,143 @@ msgstr "Server muammosi tufayli kirib boʻlmadi. Birozdan soʻng qaytadan urinib
 msgid "Your account role is not configured correctly. Please contact the administrator."
 msgstr "Hisobingiz roli notoʻgʻri sozlangan. Administratorga murojaat qiling."
 
+
+# Parents pages (P3.3)
+
+msgid "Parents"
+msgstr "Ota-onalar"
+
+msgid "Parent"
+msgstr "Ota-ona"
+
+msgid "New parent"
+msgstr "Yangi ota-ona"
+
+msgid "All parents"
+msgstr "Barcha ota-onalar"
+
+msgid "Search parents"
+msgstr "Ota-onalarni qidirish"
+
+msgid "Name, login ID or phone…"
+msgstr "Ism, login ID yoki telefon…"
+
+msgid "Search"
+msgstr "Qidirish"
+
+msgid "Children"
+msgstr "Farzandlari"
+
+msgid "Details"
+msgstr "Maʼlumotlar"
+
+msgid "Saved."
+msgstr "Saqlandi."
+
+msgid "Main contact"
+msgstr "Asosiy aloqa"
+
+msgid "main contact for this child"
+msgstr "farzand boʻyicha asosiy aloqa"
+
+msgid "dashed: a child in another branch (not shown)"
+msgstr "punktir — boshqa filialdagi farzand (koʻrsatilmaydi)"
+
+msgid "One login per family: a parent sees all their children in the app."
+msgstr "Har bir oilaga bitta login: ota-ona ilovada barcha farzandlarini koʻradi."
+
+msgid "Link by login ID"
+msgstr "Login ID orqali ulash"
+
+msgid "No parents found"
+msgstr "Ota-onalar topilmadi"
+
+msgid "No parents yet"
+msgstr "Hali ota-onalar yoʻq"
+
+msgid "Create a parent together with their first child."
+msgstr "Ota-onani birinchi farzandi bilan birga yarating."
+
+msgid "One phone number, one parent."
+msgstr "Bitta raqam — bitta ota-ona."
+
+msgid "The login ID (PR…) is given automatically."
+msgstr "Login ID (PR…) avtomatik beriladi."
+
+msgid "First child"
+msgstr "Birinchi farzand"
+
+msgid "Parent registered in another branch?"
+msgstr "Ota-ona boshqa filialda roʻyxatdan oʻtganmi?"
+
+msgid "Don't open a second login: if the login ID and phone number both match, the child is linked to that parent."
+msgstr "Ikkinchi login ochmang: login ID va telefon raqami mos kelsa, farzand shu ota-onaga ulanadi."
+
+msgid "Link"
+msgstr "Ulash"
+
+msgid "Link child"
+msgstr "Farzand ulash"
+
+msgid "Unlink"
+msgstr "Uzish"
+
+msgid "Unlink this child from the parent?"
+msgstr "Bu farzandni ota-onadan uzasizmi?"
+
+msgid "No children linked."
+msgstr "Bogʻlangan farzand yoʻq."
+
+msgid "Reset password"
+msgstr "Parolni tiklash"
+
+msgid "Give this parent a new password? The old one stops working."
+msgstr "Ota-onaga yangi parol berilsinmi? Eskisi ishlamay qoladi."
+
+msgid "New password"
+msgstr "Yangi parol"
+
+msgid "Give it to the parent now; it is shown only once."
+msgstr "Uni hozir ota-onaga bering: u faqat bir marta koʻrsatiladi."
+
+msgid "“Reset password” gives a new temporary password; hand it to the parent."
+msgstr "“Parolni tiklash” yangi vaqtinchalik parol beradi; uni ota-onaga topshiring."
+
+msgid "Delete this parent login? Their children stay."
+msgstr "Ota-ona loginini oʻchirasizmi? Farzandlari qoladi."
+
+msgid "Parent not found. Check the login ID and the phone number."
+msgstr "Ota-ona topilmadi. Login ID va telefon raqamini tekshiring."
+
+#, python-format
+msgid "%(child)s linked to parent %(login)s."
+msgstr "%(child)s %(login)s ota-onaga ulandi."
+
+#, python-format
+msgid "Parent %(name)s created. Login ID: %(login)s."
+msgstr "%(name)s ota-ona yaratildi. Login ID: %(login)s."
+
+msgid "This parent also has children in another branch, so the login can't be deleted. Unlink your children instead."
+msgstr "Bu ota-onaning boshqa filialda ham farzandi bor, shuning uchun loginini oʻchirib boʻlmaydi. Oʻz farzandlaringizni uzing."
+
+#, python-format
+msgid "Parent %(name)s deleted."
+msgstr "%(name)s ota-ona oʻchirildi."
+
+#, python-format
+msgid "%(child)s linked."
+msgstr "%(child)s ulandi."
+
+#, python-format
+msgid "%(child)s unlinked."
+msgstr "%(child)s uzildi."
+
+#, python-format
+msgid "+%(n)s in another branch"
+msgid_plural "+%(n)s in other branches"
+msgstr[0] "+%(n)s boshqa filialda"
+msgstr[1] "+%(n)s boshqa filiallarda"
+
 # School register notices to parents (P2.3)
 #, python-format
 msgid "%(name)s was marked absent in class %(class)s on %(date)s."

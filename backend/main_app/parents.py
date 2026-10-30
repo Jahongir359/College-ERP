@@ -14,6 +14,7 @@ Rules:
 """
 
 import re
+import secrets
 
 from django.db import transaction
 
@@ -41,6 +42,32 @@ def parent_with_phone(phone, exclude_pk=None):
         if phone_digits(phone) == digits:
             return Parent.objects.select_related("admin").get(pk=pk)
     return None
+
+
+def parent_by_login_and_phone(login_id, phone):
+    """The parent with this login ID *and* phone (compared by digits), or None.
+
+    Used to link a child to a parent of another branch (D4). Both must match, so
+    a mistyped login ID can't hand a child's data to another family, and a
+    mismatch tells the caller nothing about who exists.
+    """
+    login_id = (login_id or "").strip()
+    digits = phone_digits(phone)
+    if not login_id or not digits:
+        return None
+    parent = Parent.objects.select_related("admin").filter(admin__login_id__iexact=login_id).first()
+    if parent is None or phone_digits(parent.phone) != digits:
+        return None
+    return parent
+
+
+# No 0/O, 1/l/I: the office reads the password out or writes it on paper.
+_PASSWORD_CHARS = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+
+def temporary_password(length=10):
+    """A random password for the office to hand to a parent after a reset."""
+    return "".join(secrets.choice(_PASSWORD_CHARS) for _ in range(length))
 
 
 def visible_links(user, parent):
