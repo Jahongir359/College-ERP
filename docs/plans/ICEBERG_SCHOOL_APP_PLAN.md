@@ -361,6 +361,8 @@ money is shown as `[summa]` because prices are not decided.
 | 17 | Web — timetable editor with clash | [17-web-timetable.png](school-app-mockups/17-web-timetable.png) | P3.2 |
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
+| 20 | Teacher grade entry — Release 2: class subject picker, date and kind (Dars / Nazorat ishi / Imtihon), 2–5 per pupil (tap again to clear), pupils absent today dimmed | [20-grade-entry.png](school-app-mockups/20-grade-entry.png) | P4.7 |
+| 20b | Teacher quarter grades — Release 2: tabs 1–4 + Yillik, marks and average per pupil, suggestion (average rounded half up, `school.suggested_grade`) confirmed or changed by the teacher, "Baholanmadi" (not graded) | [20b-quarter-grades.png](school-app-mockups/20b-quarter-grades.png) | P4.7 |
 
 Navigation per role (bottom tabs, at most five):
 
@@ -712,8 +714,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [x] **PD.4** Mockups: timetable, teacher home, register and the late-arrival sheet, plus empty/error/
       loading/offline states — done 2026-10-23, PR #27; screens 6, 11–13, 15.
 - [~] **PD.5** Mockups: grades for parent/student (screen 14 done 2026-10-23, PR #27); **teacher grade
-      entry still to draw**. (Release 2.) — teacher grade entry (screens 20/20b) claimed 2026-10-30,
-      branch `docs/school-pd5-grade-entry`.
+      entry still to draw**. (Release 2.) — teacher grade entry drawn 2026-10-30 (screens 20/20b,
+      PR #TBD), waiting for approval (PD.8); then PD.5 is done. Built on the P2.4 marks API (one mark
+      per pupil, subject, date and kind) and the P2.5 term grades API (null = not graded).
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
 - [~] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
@@ -954,6 +957,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-30 — PD.5 teacher grade entry drawn (PR #TBD): screens 20 (marks for a date and kind) and
+  20b (quarter grades with the suggestion the teacher confirms, "Baholanmadi"). Needs approval (PD.8)
+  before P4.7. `overview.png` not re-rendered (it would re-render every screen).
 
 - 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
   login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
