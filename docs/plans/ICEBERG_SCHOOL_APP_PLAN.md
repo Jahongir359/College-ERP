@@ -923,7 +923,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 - [x] **P6.1** Written test scripts for admin, homeroom teacher, subject teacher, parent, student
       (`docs/plans/school_app_test_scripts.md`), each step with the expected result. — done 2026-10-30,
-      PR #TBD; checked against `main` at `4d5ef6f`: steps not built yet carry their task tag (P4.x,
+      PR #60; checked against `main` at `4d5ef6f`: steps not built yet carry their task tag (P4.x,
       P3.7, PL.x, R2) or open PR (#57, #58), so P6.2 runs only the untagged steps until those land.
 - [ ] **P6.2** Run the scripts on staging on a real Android phone and a real iPhone (via TestFlight);
       log every bug as a GitHub issue with steps.
@@ -989,7 +989,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-30 — P6.1 done (PR #TBD): `docs/plans/school_app_test_scripts.md`, scripts A (admin web),
+- 2026-10-30 — P6.1 done (PR #60): `docs/plans/school_app_test_scripts.md`, scripts A (admin web),
   T (homeroom teacher), S (subject teacher), P (parent), St (student) and X (cross-checks) on the
   `seed_school_demo` data, each step with its expected result and a tag for what is not built yet.
   Update a step when its feature lands (P4.x, P3.7, PL.1/#58, P2.8/#57).
