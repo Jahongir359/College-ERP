@@ -695,3 +695,23 @@ def user_can_give_marks(user, class_subject):
     if staff is None or class_subject is None:
         return False
     return class_subject.teacher_id == staff.id and class_subject.group.is_class
+
+
+# ── Quarter and year grades (plan task P2.5) ─────────────────────────────────
+
+
+def filter_term_grades_for_user(user, queryset):
+    """Filter a TermGrade queryset: the same people who see the marks (plan 4.2)."""
+    return filter_marks_for_user(user, queryset)
+
+
+def user_can_give_term_grades(user, class_subject):
+    """True for the subject's teacher and for admins of the class's branch (plan 4.3).
+
+    The office may correct a quarter or year grade; other teachers may not.
+    """
+    if class_subject is None or not class_subject.group.is_class:
+        return False
+    if _user_type(user) == "1":
+        return user_can_access_group(user, class_subject.group)
+    return user_can_give_marks(user, class_subject)

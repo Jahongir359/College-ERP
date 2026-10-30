@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -518,6 +520,19 @@ class FeedbackStaff(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class NotificationQuerySet(models.QuerySet):
+    def bulk_create(self, objs, *args, **kwargs):
+        # bulk_create skips post_save, so push the new rows from here (P2.8).
+        created = super().bulk_create(objs, *args, **kwargs)
+        from .push import push_notifications
+
+        try:
+            push_notifications(created)
+        except Exception:
+            logging.getLogger("main_app.push").exception("Push for bulk notifications failed.")
+        return created
+
+
 class Notification(models.Model):
     ATTENDANCE = "attendance"
     RESULT = "result"
@@ -547,6 +562,8 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    objects = NotificationQuerySet.as_manager()
+
     class Meta:
         ordering = ["-created_at"]
         indexes = [
@@ -555,6 +572,31 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"[{self.category}] → {self.recipient.email}: {self.message[:50]}"
+
+
+class DeviceToken(models.Model):
+    """FCM registration token of one app install; a user can have several (P2.8)."""
+
+    PLATFORM_ANDROID = "android"
+    PLATFORM_IOS = "ios"
+    PLATFORM_WEB = "web"
+    PLATFORM_CHOICES = [
+        (PLATFORM_ANDROID, "Android"),
+        (PLATFORM_IOS, "iOS"),
+        (PLATFORM_WEB, "Web"),
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="device_tokens")
+    token = models.CharField(max_length=512, unique=True)
+    platform = models.CharField(max_length=10, choices=PLATFORM_CHOICES, blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return f"{self.user.email} [{self.platform or '?'}] {self.token[:12]}…"
 
 
 class RegistrationLead(models.Model):
@@ -1843,3 +1885,78 @@ class Mark(models.Model):
 
     def __str__(self):
         return f"{self.student} · {self.class_subject} · {self.date}: {self.value}"
+
+
+class TermGrade(models.Model):
+    """A pupil's quarter or year grade (2–5) in one class subject (plan P2.5, decision D3).
+
+    ``term`` is the quarter; a row without a term is the year grade. ``value``
+    null means "not graded". The teacher confirms the grade; the average of
+    the marks is only a suggestion (``school.suggested_grade``).
+    """
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="term_grades")
+    class_subject = models.ForeignKey(
+        ClassSubject, on_delete=models.CASCADE, related_name="term_grades"
+    )
+    term = models.ForeignKey(
+        Term, on_delete=models.CASCADE, null=True, blank=True, related_name="grades"
+    )
+    value = models.PositiveSmallIntegerField(
+        null=True, blank=True, validators=[MinValueValidator(2), MaxValueValidator(5)]
+    )
+    given_by = models.ForeignKey(
+        CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["student", "class_subject"])]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "class_subject", "term"],
+                condition=Q(term__isnull=False),
+                name="one_term_grade_per_pupil_subject_term",
+            ),
+            models.UniqueConstraint(
+                fields=["student", "class_subject"],
+                condition=Q(term__isnull=True),
+                name="one_year_grade_per_pupil_subject",
+            ),
+            models.CheckConstraint(
+                condition=Q(value__isnull=True) | (Q(value__gte=2) & Q(value__lte=5)),
+                name="term_grade_value_2_to_5",
+            ),
+        ]
+
+    def __str__(self):
+        period = self.term or "year"
+        return f"{self.student} · {self.class_subject} · {period}: {self.value or '—'}"
+
+
+# A push bug must never stop a notification or message from being saved.
+@receiver(post_save, sender=Notification)
+def push_new_notification(sender, instance, created, **kwargs):
+    if created:
+        from .push import push_notifications
+
+        try:
+            push_notifications([instance])
+        except Exception:
+            logging.getLogger("main_app.push").exception(
+                "Push for notification %s failed.", instance.pk
+            )
+
+
+@receiver(post_save, sender=ChatMessage)
+def push_new_chat_message(sender, instance, created, **kwargs):
+    if created:
+        from .push import push_chat_message
+
+        try:
+            push_chat_message(instance)
+        except Exception:
+            logging.getLogger("main_app.push").exception(
+                "Push for chat message %s failed.", instance.pk
+            )

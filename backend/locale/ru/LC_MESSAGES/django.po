@@ -840,3 +840,22 @@ msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s, пришё
 #, python-format
 msgid "%(name)s was marked late in class %(class)s on %(date)s."
 msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s."
+
+# Push notification titles (P2.8)
+msgid "New result"
+msgstr "Новый результат"
+
+msgid "Announcement"
+msgstr "Объявление"
+
+msgid "Homework"
+msgstr "Домашнее задание"
+
+msgid "Payment"
+msgstr "Оплата"
+
+msgid "Notification"
+msgstr "Уведомление"
+
+msgid "Sent an attachment"
+msgstr "Отправил(а) файл"

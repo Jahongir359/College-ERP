@@ -43,6 +43,7 @@ SCHOOL_MODULES = (
     "api/school_views.py",
     "api/register_views.py",
     "api/marks_views.py",
+    "api/term_grades_views.py",
     "api/family.py",
     "api/parent_messages.py",
     "parents.py",
