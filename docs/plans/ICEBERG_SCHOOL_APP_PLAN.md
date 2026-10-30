@@ -789,8 +789,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
-- [ ] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
-      desktop in the PR.
+- [~] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
+      desktop in the PR. — claimed 2026-10-30, branch `feat/school-p3.6-brand` (takes over the
+      unpushed work on `feat/school-p3.6-web-brand`).
 
 ### P4 — App
 
