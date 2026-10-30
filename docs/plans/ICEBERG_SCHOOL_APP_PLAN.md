@@ -90,9 +90,9 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 6/8 |
-| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
+| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 5/9 (mockups 1–19 drawn) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -361,6 +361,7 @@ money is shown as `[summa]` because prices are not decided.
 | 17 | Web — timetable editor with clash | [17-web-timetable.png](school-app-mockups/17-web-timetable.png) | P3.2 |
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
+| 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note — **approved 2026-10-30 (owner delegated to the reviewer session)** | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
 
 Navigation per role (bottom tabs, at most five):
 
@@ -667,8 +668,21 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       doesn't see other teachers' marks (4.2). New helpers `branching.filter_marks_for_user`,
       `user_can_view_subject_marks`, `user_can_give_marks`. API messages are English like the register
       API; app wording comes with P4.7.
-- [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
-      confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
+- [x] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
+      confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.) — done 2026-10-30, PR #55;
+      verified: full suite 507 OK, `TermGradeAccessTests` (access matrix 8.2), `TermGradeSavingTests`,
+      `TermGradeSuggestionTests`, `SuggestedGradeTests`. Notes: `TermGrade` (migration
+      `0049_term_grade`) has student, class_subject, term (null = the year grade), value 2–5 or null
+      (= not graded; DB check constraint + API) and given_by (a user, since the office may correct
+      grades); one grade per pupil, subject and quarter, and one year grade. `school.suggested_grade`
+      averages and rounds half up (4.50 → 5). `GET school/term-grades/` for a pupil or parent
+      (`?student=`) gives every subject's confirmed quarter grades and year grade, never suggestions;
+      for a teacher or admin it needs `?class_subject=&term=<id>|year` and returns every pupil with the
+      saved grade and a suggestion (quarter: from that quarter's marks; year: from the quarter grades).
+      `POST {class_subject, term, records: [{student_id, value}]}` by the subject's teacher **or an
+      admin of the class's branch** (plan 4.3); pupils left out keep their grade. New helpers
+      `branching.filter_term_grades_for_user` (same as marks) and `user_can_give_term_grades`. API in
+      `api/term_grades_views.py`; messages English like P2.4; the app screens are P4.7.
 - [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
       reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
       — done 2026-10-28, PR #48; verified: full suite 440 OK, `test_parent_messages` (27: model,
@@ -715,10 +729,13 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       entry still to draw**. (Release 2.)
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
-- [~] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
+- [x] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
       the web is no longer needed, D15; the CSV import preview waits for Release 2). **Part 1 (parents)
       drawn 2026-10-28**, branch docs/school-pd9-parents-mockup: screens 18–18b, content from P1.7 (no
-      CSV import, D16); approved 2026-10-28 (owner delegated to the reviewer session), unchanged. Part 2 (register report) still to draw.
+      CSV import, D16); approved 2026-10-28 (owner delegated to the reviewer session), unchanged. **Part 2 (register
+      report) drawn 2026-10-28**, PR #50: screen 19, built for P3.7 from the P2.2 register data
+      (`register_summaries`, arrival time, note) and the P2.3 parent notices. Same classes, teachers
+      and counts as screen 16. **Approved 2026-10-30** (owner delegated to the reviewer session).
 - [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en); a clean
       transparent Study Center wordmark replacing the defective `iceberg-wordmark.png`.
 - [~] **PD.8** **Owner** approves the mockups in section 6.0 (and later PD.5, PD.7, PD.9; record the date per screen here). Code tasks for a screen
@@ -728,7 +745,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       saqlanadi va keyin yuboriladi" (offline register dropped, D16); **16 (web classes)** no "CSV
       yuklash" button until Release 2 (CSV import moved, D16). Also: the grades tabs (14) list all four
       quarters plus Yillik; Uzbek UI text uses the modifier letter ʻ (Oʻquvchilar), as in the code.
-      Still to approve when drawn: PD.5 (teacher grade entry), PD.7, PD.9 part 2.
+      **Screen 19 approved 2026-10-30 (owner delegated to the reviewer session)**, unchanged.
+      Still to approve when drawn: PD.5 (teacher grade entry), PD.7.
       **Screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session)**, unchanged.
 
 ### P3 — Web screens (admins and teachers)
@@ -792,6 +810,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [~] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
       desktop in the PR. — claimed 2026-10-30, branch `feat/school-p3.6-brand` (takes over the
       unpushed work on `feat/school-p3.6-web-brand`).
+- [ ] **P3.7** Admin: register report page (screen 19, approved 2026-10-30): for a date and
+      optional class, which classes took the register (time, homeroom teacher), present/late/absent
+      counts and rate per class, the list of absent and late pupils with arrival time and note, CSV
+      export of the same rows. Read-only (teachers take the register in the app, D15); data from
+      `Attendance`/`AttendanceReport` and `school.register_summaries`, scoped through
+      `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
+      branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
+      Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
 
 ### P4 — App
 
@@ -823,10 +849,6 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
       (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
       = `0.0.0` (never blocks). **Still open:** the app's "update" screen (after P4.13).
-- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
-
-- [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
-      with store links when older. Tests. (Release 2, D16.)
 - [x] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
       the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
       avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
@@ -954,6 +976,14 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-30 — P2.5 done (PR #55): quarter and year grades (`TermGrade`, migration
+  `0049_term_grade`), `school/term-grades/`, suggestion = average of marks rounded half up. P2.8
+  regenerates its migration as 0050 after this. Next for grades: P4.7 app screens (needs PD.5).
+
+- 2026-10-28 — PD.9 part 2 drawn (PR #50): web register report, screen 19
+  (`python build_mockups.py 19-web-register-report`). Added task **P3.7** (build it). Screen 19
+  approved 2026-10-30 (PD.8, reviewer session), so P3.7 is free to claim.
 
 - 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
   login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
