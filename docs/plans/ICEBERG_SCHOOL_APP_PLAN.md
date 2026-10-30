@@ -848,7 +848,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests.
 - [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6.
-- [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
+- [~] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1. — claimed 2026-10-30,
+      branch feat/school-p4.5-timetable-app (student and teacher views; the parent view after P4.4)
 - [ ] **P4.6** Teacher register screen (fast: everyone present by default, tap to change). Needs: P2.2.
 - [ ] **P4.7** Grades screens (marks list, term grades) for student/parent; gradebook entry for
       teachers. Needs: P2.4, P2.5. (Release 2.)
