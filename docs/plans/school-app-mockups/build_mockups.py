@@ -1180,5 +1180,164 @@ def main(only: list[str]) -> None:
     print("wrote overview.png", sheet.size)
 
 
+# ---------------------------------------------------------------- PD.5: teacher grade entry (Release 2)
+# Built on the P2.4 marks API (school/marks/: value 2–5, kind lesson/test/exam, one mark per pupil,
+# subject, date and kind) and the P2.5 term grades API (school/term-grades/: quarter or year grade,
+# null = "not graded"; the suggestion is school.suggested_grade, the average rounded half up).
+
+GRADE_PUPILS = [
+    ("Abdullayev Jasur", ["5", "4", "5"], "5"),
+    ("Aliyeva Madina", ["4", "4", "5"], "4"),
+    ("Bakirov Sardor", ["3", "4"], "4"),
+    ("Ergasheva Zarina", ["5", "5"], "5"),
+    ("Hasanov Temur", [], None),
+    ("Ismoilova Nodira", ["4", "3", "4"], "4"),
+    ("Karimova Aziza", ["5"], "5"),
+    ("Mahmudov Ulugʻbek", ["2", "3"], "3"),
+]
+
+
+def _mark_chip(v: str, size: int = 30, on: bool = True) -> str:
+    bg = {"5": "var(--ok-bg)", "4": "var(--tint)", "3": "var(--late-bg)", "2": "var(--abs-bg)"}[v]
+    fg = {"5": "var(--ok)", "4": "var(--m)", "3": "var(--late)", "2": "var(--abs)"}[v]
+    if not on:
+        bg, fg = "transparent", "var(--muted)"
+    ring = f"box-shadow:0 0 0 2px {fg};" if on and size > 30 else ""
+    return (
+        f'<span style="width:{size}px;height:{size}px;border-radius:{size // 3}px;display:grid;place-items:center;'
+        f'font-weight:800;font-size:{15 if size > 30 else 13}px;background:{bg};color:{fg};{ring}">{v}</span>'
+    )
+
+
+def _initials(name: str) -> str:
+    return "".join(p[0] for p in name.split()[:2])
+
+
+def s_grade_entry() -> str:
+    # Marks for one date and kind; each pupil gets 2–5 or nothing (tap again to clear).
+    today = {
+        "Abdullayev Jasur": "5",
+        "Aliyeva Madina": "4",
+        "Bakirov Sardor": "",
+        "Ergasheva Zarina": "5",
+        "Hasanov Temur": "",
+        "Ismoilova Nodira": "3",
+        "Karimova Aziza": "",
+        "Mahmudov Ulugʻbek": "4",
+    }
+    rows = ""
+    for name, _old, _q in GRADE_PUPILS:
+        pick = today[name]
+        absent = name == "Hasanov Temur"
+        sub = (
+            '<div class="tiny" style="color:var(--abs)">Bugun yoʻq (davomat)</div>'
+            if absent
+            else ('<div class="tiny muted">Baho qoʻyilmagan</div>' if not pick else "")
+        )
+        chips = "".join(_mark_chip(v, 36, on=(v == pick)) for v in ("2", "3", "4", "5"))
+        rows += (
+            f'<div class="row" style="padding:9px 0;border-bottom:1px solid var(--border);{"opacity:.55" if absent else ""}">'
+            f'<span class="av lg">{_initials(name)}</span><div style="flex:1;min-width:0"><div class="b" style="font-size:14.5px">{name}</div>{sub}</div>'
+            f'<div class="row" style="gap:4px;background:var(--tint);border-radius:14px;padding:3px">{chips}</div></div>'
+        )
+    kinds = "".join(
+        f'<span class="pill" style="{"background:var(--m);color:#fff" if on else "background:var(--tint)"};padding:7px 12px">{label}</span>'
+        for label, on in (("Dars", True), ("Nazorat ishi", False), ("Imtihon", False))
+    )
+    return page(f"""
+{status()}
+<div class="pad">
+  <div class="row" style="gap:10px;margin-top:4px">{i("back")}<div><h1 class="serif" style="font-size:24px;color:var(--m)">Baholash</h1><div class="small muted">2-chorak · Payshanba, 24-oktabr</div></div></div>
+  <div class="card row" style="margin-top:12px;padding:10px 14px;border-radius:16px"><span class="tile" style="width:36px;height:36px;border-radius:11px">{i("book")}</span>
+    <div style="flex:1"><div class="b">3-A · Ona tili</div><div class="tiny muted">Sinf va fan · 30 oʻquvchi</div></div>{i("chev", 'style="transform:rotate(90deg)"')}</div>
+  <div class="row" style="gap:6px;margin-top:10px">{kinds}</div>
+  <p class="tiny muted" style="margin-top:10px">Bahoni bosing; qayta bossangiz oʻchadi. Faqat qoʻyilgan baholar saqlanadi.</p>
+  <div style="margin-top:2px">{rows}</div>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;padding:12px 20px 30px;background:var(--surface);border-top:1px solid var(--border)">
+  <div class="btn btn-m">Saqlash · 5 ta baho</div>
+  <p class="tiny muted" style="text-align:center;margin-top:8px">Ota-onalar va oʻquvchi bahoni ilovada koʻradi</p>
+</div>""")
+
+
+def s_quarter_grades() -> str:
+    from decimal import ROUND_HALF_UP, Decimal
+
+    def suggestion(marks: list[str]) -> tuple[str, str]:
+        avg = Decimal(sum(int(m) for m in marks)) / len(marks)
+        grade = int(avg.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+        return f"{avg.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)}".replace(".", ","), str(
+            grade
+        )
+
+    # Confirmed, waiting for confirmation, changed by the teacher, and not graded.
+    confirmed = {"Abdullayev Jasur", "Aliyeva Madina", "Ergasheva Zarina"}
+    tick = i("check", 'style="width:12px;height:12px;stroke-width:3"')
+    changed = {"Bakirov Sardor": "3"}
+    rows = ""
+    for name, marks, _q in GRADE_PUPILS:
+        marks_html = (
+            "".join(_mark_chip(m, 22) for m in marks)
+            if marks
+            else '<span class="tiny muted">Baho yoʻq</span>'
+        )
+        if not marks:
+            right = '<span class="pill" style="background:var(--tint);color:var(--muted)">Baholanmadi</span>'
+            info = '<div class="tiny muted">Chorakda baho yoʻq · taklif yoʻq</div>'
+        else:
+            avg, grade = suggestion(marks)
+            info = f'<div class="tiny muted">Oʻrtacha {avg} → taklif <b style="color:var(--text)">{grade}</b></div>'
+            if name in confirmed:
+                right = (
+                    f'<div style="text-align:center"><span class="serif" style="font-size:26px;color:var(--m)">{grade}</span>'
+                    f'<div class="tiny" style="color:var(--ok);font-weight:700">{tick} Tasdiqlandi</div></div>'
+                )
+            elif name in changed:
+                right = (
+                    f'<div style="text-align:center"><span class="serif" style="font-size:26px;color:var(--m)">{changed[name]}</span>'
+                    '<div class="tiny" style="color:var(--late);font-weight:700">Oʻzgartirildi</div></div>'
+                )
+            else:
+                right = (
+                    f'<div class="row" style="gap:6px"><span style="width:38px;height:38px;border-radius:12px;display:grid;place-items:center;'
+                    f'border:1.5px dashed var(--gold);color:var(--gold-ink);font-weight:800;font-size:16px">{grade}</span>'
+                    f'<span class="pill" style="background:var(--m);color:#fff;padding:7px 10px">{i("check")}</span></div>'
+                )
+        rows += (
+            '<div class="row" style="padding:10px 0;border-bottom:1px solid var(--border)">'
+            f'<div style="flex:1;min-width:0"><div class="b" style="font-size:14.5px">{name}</div>'
+            f'<div class="row" style="gap:3px;margin:5px 0 3px">{marks_html}</div>{info}</div>{right}</div>'
+        )
+    tabs = "".join(
+        f'<span class="pill" style="{"background:var(--m);color:#fff" if on else "background:var(--tint)"}">{t}</span>'
+        for t, on in (
+            ("1-ch.", False),
+            ("2-chorak", True),
+            ("3-ch.", False),
+            ("4-ch.", False),
+            ("Yillik", False),
+        )
+    )
+    return page(f"""
+{status()}
+<div class="pad">
+  <div class="row" style="gap:10px;margin-top:4px">{i("back")}<div><h1 class="serif" style="font-size:24px;color:var(--m)">Chorak baholari</h1><div class="small muted">3-A · Ona tili</div></div></div>
+  <div class="row" style="gap:5px;margin-top:12px">{tabs}</div>
+  <div class="card row" style="margin-top:12px;padding:10px 14px;border-radius:16px;background:var(--tint);border-color:var(--tint);box-shadow:none">
+    <span style="width:30px;height:30px;border-radius:10px;display:grid;place-items:center;border:1.5px dashed var(--gold);color:var(--gold-ink);font-weight:800">4</span>
+    <div class="tiny" style="flex:1"><b>Taklif</b> — chorakdagi baholar oʻrtachasi, 0,5 dan yuqorisi yuqoriga yaxlitlanadi. Siz tasdiqlaysiz yoki oʻzgartirasiz.</div></div>
+  <div style="margin-top:4px">{rows}</div>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;padding:12px 20px 30px;background:var(--surface);border-top:1px solid var(--border);display:grid;gap:8px">
+  <div class="btn btn-ghost" style="height:46px">Qolgan 3 tasini taklif boʻyicha tasdiqlash</div>
+  <div class="btn btn-m">Saqlash · 2-chorak</div>
+</div>""")
+
+
+SCREENS += [
+    ("20-grade-entry", "Baholash (2-bosqich)", s_grade_entry),
+    ("20b-quarter-grades", "Chorak baholari (2-bosqich)", s_quarter_grades),
+]
+
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
