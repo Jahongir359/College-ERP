@@ -818,7 +818,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
-- [ ] **P3.7** Admin: register report page (screen 19, approved 2026-10-30): for a date and
+- [~] **P3.7** Admin: register report page — claimed 2026-10-30, branch feat/school-p3.7-register-report — (screen 19, approved 2026-10-30): for a date and
       optional class, which classes took the register (time, homeroom teacher), present/late/absent
       counts and rate per class, the list of absent and late pupils with arrival time and note, CSV
       export of the same rows. Read-only (teachers take the register in the app, D15); data from
