@@ -220,7 +220,7 @@
 
         <div class="navbar-user">
             <!-- School year · quarter chip (P3.6, mockup 16): School admins only -->
-            {% if school_period and brand.key == "school" %}
+            {% if brand.key == "school" and school_period %}
             <span class="navbar-period-chip">{{ school_period }}</span>
             {% endif %}
             <!-- Language switch (admins, P3.0): uz / ru / en, saved per user -->

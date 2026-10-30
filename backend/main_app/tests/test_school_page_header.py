@@ -110,3 +110,21 @@ class SchoolPageHeaderTests(_SchoolFixture):
         with _today():
             html = self.html(reverse("school_classes"))
         self.assertNotIn("navbar-period-chip", html)
+
+    @override_settings(SCHOOL_BRAND_ENABLED=False)
+    def test_period_is_not_queried_on_center_branded_pages(self):
+        # The admin sees a School branch (Maktab nav on) but the page is
+        # Center-branded: the year/quarter lookup must never run.
+        self.client.force_login(self.school_admin)
+        with mock.patch("main_app.context_processors.school_period_label") as label:
+            self.html(reverse("admin_home"))
+        label.assert_not_called()
+
+    def test_period_is_looked_up_once_on_school_pages(self):
+        self.client.force_login(self.school_admin)
+        with mock.patch(
+            "main_app.context_processors.school_period_label", return_value="2026–2027"
+        ) as label:
+            html = self.html(reverse("school_classes"))
+        label.assert_called_once()
+        self.assertIn("2026–2027", html)

@@ -48,8 +48,13 @@ def school_nav(request):
     from .models import Branch
 
     branches = branching.get_accessible_branches(user)
+    from django.utils.functional import SimpleLazyObject
+
     show = branches.filter(brand=Branch.BRAND_SCHOOL).exists()
-    return {"show_school_nav": show, "school_period": school_period_label() if show else ""}
+    # Lazy: only School-branded pages read it (base.html checks the brand
+    # first), so Learning Center pages run no extra queries.
+    period = SimpleLazyObject(school_period_label) if show else ""
+    return {"show_school_nav": show, "school_period": period}
 
 
 def school_period_label():
