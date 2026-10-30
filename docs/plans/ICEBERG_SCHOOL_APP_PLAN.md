@@ -526,7 +526,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       PE in "Sport zali", Informatika in "Informatika xonasi"; a class that already has lessons is
       kept. **Still open:** marks (P2.4, Release 2), "staging seeded" (needs P0.5).
 - [~] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
-      Needs: P0.4. — **code half done** 2026-10-30, PR #TBD (branch `feat/school-p0.7-backup`);
+      Needs: P0.4. — **code half done** 2026-10-30, PR #56 (branch `feat/school-p0.7-backup`);
       verified: full suite 502 OK, `test_backup_db` (12), and a real round trip on PostgreSQL 16
       (demo school seeded, `backup_db`, `pg_restore` into a fresh database: users 31, lessons 70,
       parent links 13, migrations 88 equal on both; `migrate --check` clean), plus pg_dump 15
@@ -965,7 +965,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-30 — P0.7 code half (PR #TBD): `manage.py backup_db` and the backup and restore guide
+- 2026-10-30 — P0.7 code half (PR #56): `manage.py backup_db` and the backup and restore guide
   (`docs/DEPLOYMENT.md` section 7), tested with a real PostgreSQL 16 dump and restore. P0.7 stays
   `[~]` until the owner schedules it on the host (P0.4) and records a restore test.
 
