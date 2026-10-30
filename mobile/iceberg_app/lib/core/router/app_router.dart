@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -41,6 +42,7 @@ import '../../features/staff/screens/staff_profile_screen.dart';
 import '../../shared/screens/profile_hub_screen.dart';
 import '../../shared/screens/messages_screen.dart';
 import '../theme/brand.dart';
+import '../../features/debug/component_sheet_screen.dart';
 
 /// Where the router sends [auth]'s user when they open [path]; null means stay.
 /// Kept as a plain function so the role rules can be unit-tested.
@@ -90,8 +92,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     refreshListenable: authListenable,
     redirect: (context, state) =>
-        roleRedirect(ref.read(authProvider), state.matchedLocation),
+        // Debug builds only: the component sheet opens for anyone (PD.1).
+        kDebugMode && state.matchedLocation == componentSheetPath
+        ? null
+        : roleRedirect(ref.read(authProvider), state.matchedLocation),
     routes: [
+      if (kDebugMode)
+        GoRoute(
+          path: componentSheetPath,
+          builder: (_, state) => ComponentSheetScreen.fromState(state),
+        ),
       GoRoute(path: '/splash', builder: (_, __) => const _SplashScreen()),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/coming-soon', builder: (_, __) => const ComingSoonScreen()),

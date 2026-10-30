@@ -46,6 +46,40 @@ html[data-brand="school"] {
   --brand-focus: rgba(76, 9, 9, .35);
   --brand-primary-ink: #F2B8B0;    /* light ink on maroon/dark surfaces (sidebar) */
 
+  /* Design rules (app plan section 6.2, task PD.1), same values as the app's
+     SchoolColors / IceType / IceSpace. Gold is the one School highlight:
+     achievements, top grades, the active child chip. --brand-gold is a fill
+     or ring only, never text on white; text uses --brand-gold-ink. */
+  --brand-gold: #C9973F;
+  --brand-gold-ink: #8A5A12;       /* 5.9:1 on white */
+  --brand-gold-soft: #E9C77E;
+  /* Fonts: ERP pages keep Inter. Fraunces is for School display text where
+     a page loads it; otherwise the serif fallback applies. */
+  --brand-font-body: "Inter", system-ui, sans-serif;
+  --brand-font-display: "Fraunces", Georgia, serif;
+  /* Type scale (display, title, heading, body, label, caption) */
+  --brand-text-display: 28px;
+  --brand-text-title: 22px;
+  --brand-text-heading: 18px;
+  --brand-text-body: 16px;
+  --brand-text-label: 14px;
+  --brand-text-caption: 12px;
+  --brand-leading-tight: 1.3;
+  --brand-leading-body: 1.5;
+  /* Spacing on a 4 px grid */
+  --brand-space-xxs: 4px;
+  --brand-space-xs: 8px;
+  --brand-space-sm: 12px;
+  --brand-space-md: 16px;
+  --brand-space-lg: 20px;
+  --brand-space-xl: 24px;
+  --brand-space-xxl: 32px;
+  --brand-tap-min: 48px;
+  /* Shapes: cards, chips/inputs, bottom sheets */
+  --brand-radius-card: 24px;
+  --brand-radius-chip: 14px;
+  --brand-radius-sheet: 32px;
+
   /* Re-point iceberg.css aliases so existing var() rules turn maroon. */
   --navy: var(--brand-primary);
   --navy-mid: var(--brand-primary-hover);
@@ -186,6 +220,7 @@ html[data-brand="school"] .dark-mode {
   --brand-muted: #BFA5A2;
   --brand-muted-2: #9C8380;
   --brand-focus: rgba(242, 184, 176, .28);
+  --brand-gold-ink: #E9C77E;          /* gold text on dark surfaces, 11.5:1 */
 
   --bg: var(--brand-bg);
   --surface: #1D0E0E;
