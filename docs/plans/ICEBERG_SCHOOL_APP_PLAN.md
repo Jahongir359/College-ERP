@@ -90,10 +90,10 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 4/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 6/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 5/9 (mockups 1–19 drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/6 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 1/10 (P4.11 dropped, P4.12 Release 2) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
+| P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 0/6 |
@@ -280,7 +280,7 @@ GET  school/marks/?student=&term=      POST school/marks/ teacher (own ClassSubj
 GET  school/term-grades/?student=      POST teacher/admin
 GET  school/calendar/                   current session, terms, holidays
 GET  parent/children/                   parent: children + today summary
-GET/POST messages/parent/<thread>/      teacher ↔ parent threads
+GET/POST messages/parent/               teacher ↔ parent threads (+ contacts/, <thread>/)
 ```
 Existing endpoints that parents also need (`assignments/`, `invoices/`, `notifications/`,
 `student/attendance/summary/`) accept `?student=<id>` for parents, checked by `user_can_access_student`.
@@ -361,7 +361,7 @@ money is shown as `[summa]` because prices are not decided.
 | 17 | Web — timetable editor with clash | [17-web-timetable.png](school-app-mockups/17-web-timetable.png) | P3.2 |
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
-| 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
+| 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note — **approved 2026-10-30 (owner delegated to the reviewer session)** | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
 
 Navigation per role (bottom tabs, at most five):
 
@@ -652,13 +652,43 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       is *newly* absent or late: re-saving the same marks, a new arrival time or note, or a
       correction to present sends nothing; late ↔ absent sends a new notice. Text is stored in
       Uzbek (`NOTICE_LANGUAGE`; ru in the .po for later). P2.8 should send push for these rows.
-- [ ] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
+- [x] **P2.4** Gradebook: `Mark` (2–5) by subject teacher; `school/marks/` API. Done when: tests incl.
       teacher limited to own `ClassSubject`, values outside 2–5 rejected; `branching.filter_marks_for_user`
-      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.)
+      (plan 4.2, left from P1.8). Needs: P1.3. (Release 2 unless D2/D3 say otherwise.) — done
+      2026-10-28, PR #52; verified: full suite 461 OK, `MarkAccessTests` (access matrix 8.2),
+      `MarkSavingTests`, `MarkReadingTests`, `FilterMarksForUserTests`. Notes: `Mark` has student,
+      class_subject, date (lesson day), value 2–5 (DB check constraint + API), kind lesson/test/exam,
+      comment (max 200), given_by; one mark per pupil, subject, date and kind. The quarter is not
+      stored: it is the `Term` whose dates contain `date` (D18). `GET school/marks/` for a pupil or
+      parent (`?student=`, `?term=`; default the quarter containing today, the whole year on a holiday)
+      returns the child's marks by subject (screen 14); for a teacher or admin it needs
+      `?class_subject=` and returns every pupil. `POST school/marks/` `{class_subject, date, kind?,
+      records: [{student_id, value, comment?}]}` by the subject's teacher only; `value: null` removes a
+      mark. Dates in the future, outside the year or between quarters are refused. A homeroom teacher
+      doesn't see other teachers' marks (4.2). New helpers `branching.filter_marks_for_user`,
+      `user_can_view_subject_marks`, `user_can_give_marks`. API messages are English like the register
+      API; app wording comes with P4.7.
 - [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
       confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
-- [ ] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
+- [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
       reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
+      — done 2026-10-28, PR #48; verified: full suite 440 OK, `test_parent_messages` (27: model,
+      branching, access matrix 8.2, protected attachments). Notes: `ChatThread` + `kind`, `student`, `teacher` (migration
+      `0047_parent_chat_threads`; `group` became nullable, nothing else changed), one thread per
+      student and teacher, shared by all the child's linked parents. Only **School classes** count:
+      the homeroom and subject teachers of the child's active, unarchived class
+      (`branching.teachers_for_student`); Study Center groups get no parent threads. API in
+      `api/parent_messages.py`: `messages/parent/` (GET `?student=`, POST `{student, teacher}` opens
+      or creates; teachers leave `teacher` out), `messages/parent/contacts/` (parent: the child's
+      teachers, homeroom first, with subjects; teacher: their students who have a parent, with any
+      open `thread_id`), `messages/parent/<id>/` (GET marks read, POST `{message, attachment?}`).
+      Messages have the group-chat shape plus `sender_role`. Access: parents 404 on another family's
+      child, students 403, teachers only their own threads; branch admins **read** their branches'
+      threads (`can_post: false`). New helpers `filter_parent_threads_for_user`,
+      `user_can_post_in_parent_thread`, `user_can_start_parent_thread`,
+      `user_can_message_about_student` (subject teachers too, which `filter_students_for_user`
+      doesn't cover). The group chat (`messages/`, web chat, unread badge) is unchanged. For P2.8:
+      send the push from `ParentThreadDetailView.post` to the other side of the thread.
 - [x] **P2.7** Parents can see and pay invoices of their children (existing invoice API with
       `?student=`); class announcements reach parents (stories/notifications target parents of a
       class). Done when: tests. — done 2026-10-28, PR #45; verified: invoices with `?student=`
@@ -692,7 +722,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       CSV import, D16); approved 2026-10-28 (owner delegated to the reviewer session), unchanged. **Part 2 (register
       report) drawn 2026-10-28**, PR #50: screen 19, built for P3.7 from the P2.2 register data
       (`register_summaries`, arrival time, note) and the P2.3 parent notices. Same classes, teachers
-      and counts as screen 16. Waiting for approval (PD.8).
+      and counts as screen 16. **Approved 2026-10-30** (owner delegated to the reviewer session).
 - [ ] **PD.7** App icon (one icon for both brands), splash, store screenshot templates (uz/ru/en); a clean
       transparent Study Center wordmark replacing the defective `iceberg-wordmark.png`.
 - [~] **PD.8** **Owner** approves the mockups in section 6.0 (and later PD.5, PD.7, PD.9; record the date per screen here). Code tasks for a screen
@@ -702,7 +732,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       saqlanadi va keyin yuboriladi" (offline register dropped, D16); **16 (web classes)** no "CSV
       yuklash" button until Release 2 (CSV import moved, D16). Also: the grades tabs (14) list all four
       quarters plus Yillik; Uzbek UI text uses the modifier letter ʻ (Oʻquvchilar), as in the code.
-      Still to approve: **19 (register report, drawn)**; when drawn: PD.5 (teacher grade entry), PD.7.
+      **Screen 19 approved 2026-10-30 (owner delegated to the reviewer session)**, unchanged.
+      Still to approve when drawn: PD.5 (teacher grade entry), PD.7.
       **Screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session)**, unchanged.
 
 ### P3 — Web screens (admins and teachers)
@@ -749,13 +780,21 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       teacher on the class page is now refused when the new teacher is busy at one of its lesson times
       (the open point from P2.1). Bell period model messages are now translatable (`gettext_lazy`).
       Room per lesson is kept but not edited in the grid (the class room is used; the API can set it).
-- [~] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7. — claimed 2026-10-28,
-      branch feat/school-p3.3-parents-admin (#43 merged; build from screens 18–18b; CSV
-      import screen is Release 2, D16).
+- [x] **P3.3** Admin: parents list, link children, CSV import screen. Needs: P1.7. — done 2026-10-28,
+      PR #53; verified: full suite 423 OK, `test_school_parent_pages` (access incl. other-branch 404 on
+      every action, duplicate phone, link by login ID + phone, unlinking the last child, uz/ru).
+      Notes: **Maktab → Ota-onalar** (`/maktab/parents/`), views in `school_parent_views.py`, built from
+      screens 18–18b on the P1.7 rules in `parents.py` (shared with the API; the login ID + phone
+      lookup moved there as `parent_by_login_and_phone`, so a mismatch is only "Parent not found").
+      Reset password makes a temporary one shown once on the page (never in a message or cookie).
+      Children in branches the admin can't see show only as "+N in another branch". The CSV import
+      screen is Release 2 (D16). These tables stay visible below 1025 px (`school-table-wrap`):
+      `admin-manage-mobile.css` hides `.ice-manage-table-wrap` there, which also hides the P3.1/P3.2
+      tables on phones (for P3.6).
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
-- [ ] **P3.7** Admin: register report page (screen 19, after its PD.8 approval): for a date and
+- [ ] **P3.7** Admin: register report page (screen 19, approved 2026-10-30): for a date and
       optional class, which classes took the register (time, homeroom teacher), present/late/absent
       counts and rate per class, the list of absent and late pupils with arrival time and note, CSV
       export of the same rows. Read-only (teachers take the register in the app, D15); data from
@@ -789,9 +828,18 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       for each new screen.
 - [-] **P4.11** Offline queue for the register and messages — dropped 2026-10-26 (D16, keep it simple). The
       offline banner and a clear "not saved, try again" error stay in P4.10.
+- [~] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
+      with store links when older. Tests. (Release 2, D16.) — **backend half done** 2026-10-28, PR #51;
+      verified: `tests/test_app_version.py` AppVersionTests. Public `GET /api/v1/app/version/` (no
+      token, under `/api/` so the login middleware lets it through) returns `min_app_version` and
+      per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
+      (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
+      = `0.0.0` (never blocks). **Still open:** the app's "update" screen (after P4.13).
+- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
+
 - [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
       with store links when older. Tests. (Release 2, D16.)
-- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
+- [x] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
       the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
       avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
       maroon; English text in uz/ru screens ("My Classes", "Groups you teach", "Present", "Days
@@ -799,7 +847,18 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       on-primary colour (contrast 4.5:1 or more), those strings come from `strings.dart` in uz/ru/en,
       before/after screenshots at 390 px light and dark; Study Center screens unchanged. Not in this
       task: School sign-in colours (P4.2), hiding Study Center-only tabs (P4.9), the web admin pages
-      (brand layer, other thread). — claimed 2026-10-28, branch feat/school-p4.13-brand-polish
+      (brand layer, other thread). — done 2026-10-28, PR #49; verified: `flutter analyze` (no new
+      issues), `flutter test` 18 OK (`test/school_brand_readability_test.dart`: contrast 4.5:1+ on both
+      hero colours, Study Center tokens unchanged, uz/ru keys), screenshots at 390 px light and dark
+      against the demo school: `docs/plans/school-app-screens/p4.13-before-after.png`; the Study Center
+      login renders pixel-identical. Notes: `IceTokens.onHero` swaps accent/mint to the School dark ones
+      on hero gradients when the School accent is maroon (else returns the same tokens); `IceCard(hero:)`
+      applies it to its children (`IceOnHero`), and screens use `t.onHero.*` for colours they pick
+      themselves. The Coming Soon wall (what parents see until P4.3) uses the user's brand. Teacher
+      class list says "Sinflar / Классы" for the School (`IceBrand.teacherGroupsKey`); `roomLabel()`
+      stops "Xona Xona 1A". Left for later: month and weekday names are English in every language
+      (`DateFormat` has no locale anywhere in the app), and the unreachable `/staff/more` page has no
+      Scaffold.
 ### P5 — Store readiness
 
 - [ ] **P5.1** **Owner** — D-U-N-S number for the organisation, then Google Play developer account (organisation)
@@ -909,8 +968,28 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
 - 2026-10-28 — PD.9 part 2 drawn (PR #50): web register report, screen 19
-  (`python build_mockups.py 19-web-register-report`). Added task **P3.7** (build it); it waits for
-  the owner's approval of 19 (PD.8).
+  (`python build_mockups.py 19-web-register-report`). Added task **P3.7** (build it). Screen 19
+  approved 2026-10-30 (PD.8, reviewer session), so P3.7 is free to claim.
+
+- 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
+  login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
+
+- 2026-10-28 — P2.4 done (PR #52): `Mark` model, `school/marks/` API in `api/marks_views.py`,
+  `branching.filter_marks_for_user`. Migration `0048_mark` (after P2.6's 0047). Next on this line: P2.5 term grades (same session).
+
+- 2026-10-28 — P4.12 backend half (PR #51): `GET /api/v1/app/version/` for the app's start-up
+  check, env vars in `.env.example` and `DEPLOYMENT.md`. P4.12 stays `[~]` until the app screen
+  (mobile/, after P4.13) compares its version and shows the store link.
+
+- 2026-10-28 — P2.6 done (PR #48): teacher ↔ parent threads per student and teacher, API
+  `messages/parent/…`, access matrix tests. Migration `0047_parent_chat_threads` (after P2.2's 0046). The app screens are P4.8.
+  Review fixes: parent-thread attachments (protected `chat_attachments/`) and `ChatMessage.__str__`.
+
+- 2026-10-28 — P4.13 done (PR #49, app only): School hero cards, the pupil profile and attendance,
+  the teacher class list and the parent Coming Soon wall are readable on maroon and in uz/ru
+  (before/after image in `docs/plans/school-app-screens/`). New colours on a hero card: use
+  `t.onHero`. Follow-up worth a task: localised dates (`DateFormat` with the app language).
+
 - 2026-10-28 — P2.3 done (PR #47): parents get an in-app `attendance` notice when their child
   is newly marked absent or late in the register; text stored in Uzbek. Uses
   `branching.parent_user_ids_for_students` from P2.7. Next: P2.8 push should pick up these notices.

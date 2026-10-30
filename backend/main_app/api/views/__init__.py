@@ -1,6 +1,7 @@
 # Re-export every public class so that `from . import views` in urls.py
 # continues to work unchanged after the monolith was split into sub-modules.
 from .auth import LoginView, LogoutView, MeView, ChangePasswordView, FcmTokenView
+from .app_version import AppVersionView
 from .courses import CourseListView, GroupListView, GroupDetailView
 from .attendance import AttendanceView
 from .results import ResultView
@@ -49,6 +50,7 @@ from .content import (
 )
 
 __all__ = [
+    "AppVersionView",
     "LoginView",
     "LogoutView",
     "MeView",

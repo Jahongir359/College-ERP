@@ -323,16 +323,10 @@ class ParentLinkByLoginView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request):
-        login_id = str(request.data.get("login_id") or "").strip()
-        digits = parents.phone_digits(str(request.data.get("phone") or ""))
-        parent = None
-        if login_id and digits:
-            parent = (
-                Parent.objects.select_related("admin")
-                .filter(admin__login_id__iexact=login_id)
-                .first()
-            )
-        if parent is None or parents.phone_digits(parent.phone) != digits:
+        parent = parents.parent_by_login_and_phone(
+            str(request.data.get("login_id") or ""), str(request.data.get("phone") or "")
+        )
+        if parent is None:
             return _not_found("Parent with this login ID and phone")
         return _link(request, parent)
 

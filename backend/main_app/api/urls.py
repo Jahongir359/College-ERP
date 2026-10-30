@@ -1,8 +1,18 @@
 from django.urls import path
 
-from . import views, admin_views, register_views, school_views, student_views
+from . import (
+    views,
+    admin_views,
+    marks_views,
+    parent_messages,
+    register_views,
+    school_views,
+    student_views,
+)
 
 urlpatterns = [
+    # ── App start (no login) ──────────────────────────────────────────────────
+    path("app/version/", views.AppVersionView.as_view(), name="api_app_version"),
     # ── Auth ─────────────────────────────────────────────────────────────────
     path("auth/login/", views.LoginView.as_view(), name="api_login"),
     path("auth/logout/", views.LogoutView.as_view(), name="api_logout"),
@@ -256,6 +266,21 @@ urlpatterns = [
         register_views.RegisterView.as_view(),
         name="api_school_register",
     ),
+    path(
+        "messages/parent/",
+        parent_messages.ParentThreadListView.as_view(),
+        name="api_parent_threads",
+    ),
+    path(
+        "messages/parent/contacts/",
+        parent_messages.ParentContactsView.as_view(),
+        name="api_parent_thread_contacts",
+    ),
+    path(
+        "messages/parent/<int:pk>/",
+        parent_messages.ParentThreadDetailView.as_view(),
+        name="api_parent_thread",
+    ),
     path("admin/subjects/", admin_views.SubjectListView.as_view(), name="api_admin_subjects"),
     path(
         "admin/subjects/<int:pk>/",
@@ -329,4 +354,6 @@ urlpatterns = [
         admin_views.AdminAdminDetailView.as_view(),
         name="api_admin_admin_detail",
     ),
+    # ── School gradebook (P2.4) ──────────────────────────────────────────────
+    path("school/marks/", marks_views.MarkListView.as_view(), name="api_school_marks"),
 ]

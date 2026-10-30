@@ -443,21 +443,22 @@ class _AssignmentPreview extends StatelessWidget {
 }
 
 // ── Lesson card (Upcoming Lessons on the dashboard) ──────────────────────────
-class _LessonCard extends StatelessWidget {
+class _LessonCard extends ConsumerWidget {
   final Map<String, dynamic> group;
   final bool highlight;
   const _LessonCard({required this.group, this.highlight = false});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final name = group['name']?.toString() ?? 'Class';
     final course = group['course_name']?.toString() ?? '';
     final room = group['room']?.toString() ?? '';
     final schedule = group['schedule']?.toString() ?? '';
     final meta = [
       if (course.isNotEmpty) course,
-      if (room.isNotEmpty) 'Room $room',
+      if (room.isNotEmpty) roomLabel(s, room),
     ].join(' · ');
 
     return IceCard(
@@ -506,7 +507,7 @@ class _LessonCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          'NEXT',
+                          s('Next').toUpperCase(),
                           style: TextStyle(
                             color: t.onAccent,
                             fontSize: 9,

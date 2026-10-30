@@ -83,7 +83,7 @@ class _QuickAction extends StatelessWidget {
 }
 
 // ── Schedule card ─────────────────────────────────────────────────────────────
-class _ScheduleCard extends StatelessWidget {
+class _ScheduleCard extends ConsumerWidget {
   final Map<String, dynamic> group;
   final String time;
   final bool isNow;
@@ -96,12 +96,13 @@ class _ScheduleCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     final name = group['name']?.toString() ?? 'Group';
     final subtitle = [
       group['course_name']?.toString(),
-      group['room'] != null ? 'Room ${group['room']}' : null,
+      group['room'] != null ? roomLabel(s, '${group['room']}') : null,
     ].where((e) => e != null && e.isNotEmpty).join(' · ');
 
     return IceCard(

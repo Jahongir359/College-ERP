@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/api/api_providers.dart';
+import '../../../core/i18n/strings.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../shared/widgets/ice_kit.dart';
@@ -54,7 +55,7 @@ class _StudentAttendanceScreenState
     final teachers = (d['teachers'] as List?) ?? [];
 
     final groupName = _groupId == null
-        ? 'All courses'
+        ? s('All courses')
         : (groups.firstWhere(
                 (g) => g['id'] == _groupId,
                 orElse: () => {'name': ''},
@@ -81,7 +82,7 @@ class _StudentAttendanceScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MicroLabel('Overall rate', color: t.mint),
+              MicroLabel(s('Overall rate'), color: t.onHero.mint),
               const SizedBox(height: 8),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -94,14 +95,14 @@ class _StudentAttendanceScreenState
                       fontSize: 40,
                       height: 1.0,
                       fontWeight: FontWeight.w800,
-                      color: t.accent,
+                      color: t.onHero.accent,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
                     child: Text(
-                      'Present',
+                      s('Present'),
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -119,21 +120,21 @@ class _StudentAttendanceScreenState
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: t.accent.withValues(alpha: 0.1),
+                  color: t.onHero.accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: t.accent.withValues(alpha: 0.25)),
+                  border: Border.all(color: t.onHero.accent.withValues(alpha: 0.25)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.verified_outlined, size: 18, color: t.accent),
+                    Icon(Icons.verified_outlined, size: 18, color: t.onHero.accent),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        _encouragement(overall),
+                        _encouragement(s, overall),
                         style: TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
-                          color: t.accent,
+                          color: t.onHero.accent,
                         ),
                       ),
                     ),
@@ -152,7 +153,7 @@ class _StudentAttendanceScreenState
               child: StatCard(
                 icon: Icons.local_fire_department_outlined,
                 value: '$streak',
-                label: streak == 1 ? 'Day streak' : 'Days streak',
+                label: streak == 1 ? s('Day streak') : s('Days streak'),
               ),
             ),
             const SizedBox(width: 14),
@@ -161,7 +162,7 @@ class _StudentAttendanceScreenState
                 icon: Icons.warning_amber_rounded,
                 iconColor: t.coral,
                 value: '$missed',
-                label: 'Missed total',
+                label: s('Missed total'),
               ),
             ),
           ],
@@ -209,11 +210,11 @@ class _StudentAttendanceScreenState
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _LegendDot(color: t.accent, label: 'Present'),
+                  _LegendDot(color: t.accent, label: s('Present')),
                   const SizedBox(width: 14),
-                  _LegendDot(color: t.sky, label: 'Late'),
+                  _LegendDot(color: t.sky, label: s('Late')),
                   const SizedBox(width: 14),
-                  _LegendDot(color: t.coral, label: 'Absent'),
+                  _LegendDot(color: t.coral, label: s('Absent')),
                 ],
               ),
               const SizedBox(height: 14),
@@ -233,7 +234,7 @@ class _StudentAttendanceScreenState
                   Icon(Icons.trending_up_rounded, size: 19, color: t.accent),
                   const SizedBox(width: 8),
                   Text(
-                    '12-Week Trend',
+                    s('12-Week Trend'),
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
@@ -264,13 +265,13 @@ class _StudentAttendanceScreenState
         const SizedBox(height: 22),
 
         // ── Quick actions ────────────────────────────────────────────────
-        const SectionHeader('Quick Actions'),
+        SectionHeader(s('Quick Actions')),
         Row(
           children: [
             Expanded(
               child: _QuickAction(
                 icon: Icons.description_outlined,
-                label: 'Export Report',
+                label: s('Export Report'),
                 onTap: () => _exportReport(context, d),
               ),
             ),
@@ -278,7 +279,7 @@ class _StudentAttendanceScreenState
             Expanded(
               child: _QuickAction(
                 icon: Icons.mail_outline_rounded,
-                label: 'Email Teacher',
+                label: s('Email Teacher'),
                 onTap: () => _emailTeacher(context, teachers),
               ),
             ),
@@ -288,12 +289,12 @@ class _StudentAttendanceScreenState
     );
   }
 
-  String _encouragement(double? rate) {
-    if (rate == null) return 'No attendance recorded yet.';
-    if (rate >= 95) return 'Excellent consistency! Keep it up.';
-    if (rate >= 85) return 'Great attendance — almost perfect!';
-    if (rate >= 70) return 'Good effort. A few more days on time!';
-    return 'Attendance needs attention — you can do this!';
+  String _encouragement(S s, double? rate) {
+    if (rate == null) return s('No attendance recorded yet.');
+    if (rate >= 95) return s('Excellent consistency! Keep it up.');
+    if (rate >= 85) return s('Great attendance — almost perfect!');
+    if (rate >= 70) return s('Good effort. A few more days on time!');
+    return s('Attendance needs attention — you can do this!');
   }
 
   void _exportReport(BuildContext context, Map<String, dynamic> d) {
@@ -416,7 +417,7 @@ class _StudentAttendanceScreenState
 }
 
 // ─── Pieces ──────────────────────────────────────────────────────────────────
-class _FilterButton extends StatelessWidget {
+class _FilterButton extends ConsumerWidget {
   final List groups;
   final int? selected;
   final ValueChanged<int?> onChanged;
@@ -428,8 +429,9 @@ class _FilterButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.ice;
+    final s = ref.watch(stringsProvider);
     return PopupMenuButton<int?>(
       color: t.card,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -437,7 +439,7 @@ class _FilterButton extends StatelessWidget {
       itemBuilder: (_) => [
         PopupMenuItem(
           value: -1,
-          child: Text('All courses', style: TextStyle(color: t.textHi)),
+          child: Text(s('All courses'), style: TextStyle(color: t.textHi)),
         ),
         ...groups.map(
           (g) => PopupMenuItem(
@@ -458,7 +460,7 @@ class _FilterButton extends StatelessWidget {
             Icon(Icons.tune_rounded, size: 15, color: t.textMid),
             const SizedBox(width: 6),
             Text(
-              'Filter',
+              s('Filter'),
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
@@ -629,6 +631,7 @@ class _MonthCalendar extends StatelessWidget {
     List<Map<String, dynamic>> recs,
   ) {
     final t = context.ice;
+    final s = ProviderScope.containerOf(context).read(stringsProvider);
     showModalBottomSheet(
       context: context,
       backgroundColor: t.card,
@@ -660,7 +663,7 @@ class _MonthCalendar extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          r['group_name'] ?? 'Class',
+                          r['group_name'] ?? s('Class'),
                           style: TextStyle(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w600,
@@ -670,9 +673,9 @@ class _MonthCalendar extends StatelessWidget {
                       ),
                       StatusBadge(
                         switch (r['status']) {
-                          1 => 'Present',
-                          2 => 'Late',
-                          _ => 'Absent',
+                          1 => s('Present'),
+                          2 => s('Late'),
+                          _ => s('Absent'),
                         },
                         tone: switch (r['status']) {
                           1 => BadgeTone.accent,

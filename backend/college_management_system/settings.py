@@ -397,6 +397,17 @@ SCHOOL_BRAND_ENABLED = os.environ.get("SCHOOL_BRAND_ENABLED", "False").strip().l
     "yes",
 )
 
+# Oldest app version still supported (plan task P4.12). The app reads it from
+# GET /api/v1/app/version/ before login and asks for an update when it is older.
+# The _ANDROID / _IOS values override MIN_APP_VERSION for one store (store review
+# can hold one platform back). Blank or malformed means "0.0.0": never blocks.
+MIN_APP_VERSION = os.environ.get("MIN_APP_VERSION", "").strip()
+MIN_APP_VERSION_ANDROID = os.environ.get("MIN_APP_VERSION_ANDROID", "").strip()
+MIN_APP_VERSION_IOS = os.environ.get("MIN_APP_VERSION_IOS", "").strip()
+# Store pages the app's "update" screen opens; blank until the listings exist (P5).
+APP_STORE_URL_ANDROID = os.environ.get("APP_STORE_URL_ANDROID", "").strip()
+APP_STORE_URL_IOS = os.environ.get("APP_STORE_URL_IOS", "").strip()
+
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     # Full SMTP — used in production when credentials are configured.
     EMAIL_BACKEND = "main_app.mail_backends.CompatibleSMTPEmailBackend"

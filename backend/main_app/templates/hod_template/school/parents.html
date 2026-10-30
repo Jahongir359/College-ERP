@@ -1,0 +1,128 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="ice-manage-page">
+  <section class="ice-manage-hero">
+    <div class="ice-manage-hero__main">
+      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-user-friends"></i></span>
+      <div class="ice-manage-hero__copy">
+        <h2 class="ice-manage-hero__title">{% translate "Parents" %}</h2>
+        <p class="ice-manage-hero__subtitle">{% translate "One login per family: a parent sees all their children in the app." %}</p>
+      </div>
+    </div>
+    <div class="ice-manage-hero__actions">
+      <a href="?panel=link" class="ice-manage-action{% if panel == 'link' %} ice-manage-action--primary{% endif %}">
+        <i class="fas fa-link" aria-hidden="true"></i> {% translate "Link by login ID" %}
+      </a>
+      <a href="?panel=new" class="ice-manage-add-btn">
+        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New parent" %}
+      </a>
+    </div>
+  </section>
+
+  <div class="school-split">
+    <div>
+      <form method="get" class="school-filter-row">
+        <label class="ice-manage-search" aria-label="{% translate 'Search parents' %}">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <input type="search" name="q" value="{{ search }}" class="ice-manage-search__input" placeholder="{% translate 'Name, login ID or phone…' %}" autocomplete="off">
+        </label>
+        <label class="visually-hidden" for="class-filter">{% translate "Class" %}</label>
+        <select id="class-filter" name="class" class="ice-manage-filter__select" onchange="this.form.submit()">
+          <option value="">{% translate "All classes" %}</option>
+          {% for c in classes %}
+          <option value="{{ c.pk }}" {% if c.pk == group.pk %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+        {% if panel == 'link' %}<input type="hidden" name="panel" value="link">{% endif %}
+        <button type="submit" class="ice-manage-action">{% translate "Search" %}</button>
+      </form>
+
+      <div class="ice-manage-table-wrap school-table-wrap">
+        <table class="ice-manage-table">
+          <thead>
+            <tr>
+              <th>{% translate "Parent" %}</th>
+              <th>{% translate "Phone number" %}</th>
+              <th>{% translate "Children" %}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for parent in parents %}
+            <tr>
+              <td><strong>{{ parent.admin.get_full_name }}</strong><div class="school-muted">{{ parent.admin.login_id }}</div></td>
+              <td class="school-nowrap">{{ parent.phone|default:"—" }}</td>
+              <td>
+                <div class="school-chips">
+                  {% for link in parent.visible_links %}
+                  <span class="school-chip">
+                    {% if link.is_primary %}<i class="fas fa-star school-star" title="{% translate 'Main contact for this child' %}" aria-label="{% translate 'Main contact for this child' %}"></i>{% endif %}
+                    {{ link.student.admin.first_name }} · {{ link.class_name|default:link.student.branch.name|default:"—" }}
+                  </span>
+                  {% endfor %}
+                  {% if parent.hidden_count %}
+                  <span class="school-chip school-chip--other">{% blocktranslate count n=parent.hidden_count %}+{{ n }} in another branch{% plural %}+{{ n }} in other branches{% endblocktranslate %}</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                <div class="ice-manage-actions">
+                  <a href="{% url 'school_parent_detail' parent.pk %}" class="ice-manage-action ice-manage-action--primary">{% translate "Open" %} →</a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4">
+                <div class="ice-manage-empty">
+                  <i class="fas fa-user-friends" aria-hidden="true"></i>
+                  {% if search or group %}
+                  <strong>{% translate "No parents found" %}</strong>
+                  {% else %}
+                  <strong>{% translate "No parents yet" %}</strong>
+                  <span>{% translate "Create a parent together with their first child." %}</span>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="school-muted school-note"><i class="fas fa-star school-star" aria-hidden="true"></i> {% translate "main contact for this child" %} · {% translate "dashed: a child in another branch (not shown)" %}</p>
+    </div>
+
+    <aside class="school-panel">
+      {% if panel == 'link' %}
+      {% include "hod_template/school/parent_link_form.html" %}
+      {% else %}
+      <h3 class="school-panel__title">{% translate "New parent" %}</h3>
+      <form method="post" class="school-stack">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="new">
+        {{ form.non_field_errors }}
+        <div class="school-pair">
+          {% include "hod_template/school/_field.html" with field=form.first_name %}
+          {% include "hod_template/school/_field.html" with field=form.last_name %}
+        </div>
+        {% include "hod_template/school/_field.html" with field=form.phone help=_("One phone number, one parent.") %}
+        {% include "hod_template/school/_field.html" with field=form.password help=_("The login ID (PR…) is given automatically.") %}
+        <p class="school-kicker">{% translate "First child" %}</p>
+        {% include "hod_template/school/_field.html" with field=child_form.student %}
+        {% include "hod_template/school/_field.html" with field=child_form.relation %}
+        <label class="school-check">{{ child_form.is_primary }} {{ child_form.is_primary.label }}</label>
+        <button type="submit" class="ice-manage-add-btn school-submit">{% translate "Save" %}</button>
+      </form>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock content %}

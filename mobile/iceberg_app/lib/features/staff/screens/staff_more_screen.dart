@@ -102,10 +102,10 @@ class StaffMoreScreen extends ConsumerWidget {
                 width: 58,
                 height: 58,
                 decoration: BoxDecoration(
-                  color: t.accent.withValues(alpha: 0.18),
+                  color: t.onHero.accent.withValues(alpha: 0.18),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: t.accent.withValues(alpha: 0.5),
+                    color: t.onHero.accent.withValues(alpha: 0.5),
                     width: 2,
                   ),
                 ),
@@ -113,7 +113,7 @@ class StaffMoreScreen extends ConsumerWidget {
                   child: Text(
                     initials,
                     style: TextStyle(
-                      color: t.accent,
+                      color: t.onHero.accent,
                       fontWeight: FontWeight.w900,
                       fontSize: 20,
                     ),
