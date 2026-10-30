@@ -5,7 +5,7 @@ Step-by-step checks for the five School roles: **admin**, **homeroom teacher**, 
 staging on a real Android phone and a real iPhone and logs every failed step as a GitHub issue
 (title `P6.2: <script id> <step>`, with the steps, what you saw, a screenshot, phone and app version).
 
-Written 2026-10-30 against `main` at `cbef0fc` plus the open PRs. Update a step when its feature
+Written 2026-10-30 against `main` at `4d5ef6f` plus the open PRs. Update a step when its feature
 changes.
 
 ## How to read the steps
@@ -26,6 +26,9 @@ first-login password change (PL.1, draft until P4.3 ships).
 Run every script in **Uzbek**. Then repeat the steps marked 🌐 in **Russian** and **English** to
 check the language: every label is translated, with no English left in uz/ru, and Uzbek uses the
 letter ʻ (Oʻquvchilar, not O'quvchilar).
+
+Messages in the Expected column are quoted in English, as in the code; in Uzbek or Russian you see
+their translation (a message still in English there is a bug).
 
 ## Setup (once per staging database)
 
@@ -172,7 +175,7 @@ Admins work only on the web (D15). Desktop browser first, then repeat A1–A3 at
 |---|---|---|
 | A9.1 | **Stories**: add a story for the group **7-B**, and one school-wide. | Saved. Parents of 7-B pupils and 7-B pupils see both in the app (checked in P5.3, St1.6); parents of 1-A only see the school-wide one. |
 | A9.2 | **Payments** (Moliya → Toʻlovlar), this month, demo branch. | 12 invoices of 3,000,000 soʻm: 3 paid, 1 partly paid, 8 unpaid. |
-| A9.3 | Record a payment of 3,000,000 for Malika Karimova's invoice (if unpaid). | Invoice paid; receipt available. Checked by the parent in P5.4. |
+| A9.3 | Record a payment of 3,000,000 for **Otabek Saidov**'s invoice (the seed already paid Malika's, Aziz's and Kamola's, and half of Javohir's). | Invoice paid; receipt available. Checked by the parent in P5.4. |
 | A9.4 | Look for a way to send a notification to **parents** on the web. | **Gap:** not on the web today. Parents can be targeted only through the admin API (`target="parents"`, P2.7). Log it as an issue for the owner to decide. |
 
 ---
@@ -266,7 +269,7 @@ browser at `/app/`).
 | P1.2 | **On `main` today:** sign in in the app. | A "Coming soon" screen in the School brand and the user's language (parent screens not built yet). |
 | P1.3 | **[P4.2] [P4.3]** First launch → Iceberg School → sign in. | School brand; Home (P2). |
 | P1.4 | **[PR #58] + [P4.3]** Sign in as the parent whose password the office set in A6.4 (or one from A7). | The app asks to **choose your own password** before anything else. Until then nothing else opens. After choosing, Home opens; the old temporary password no longer works. |
-| P1.5 | "Parolni unutdingizmi?" on the login screen. | Explains: ask the school office (SMS reset comes with PL.2). |
+| P1.5 | "Parolni unutdingizmi?" on the login screen. **[PL.2]** (no such link on `main` today) | Explains: ask the school office (SMS reset comes with PL.2). |
 
 ### P2 Home and child switcher **[P4.4]** (screens 4–5)
 
@@ -300,7 +303,7 @@ browser at `/app/`).
 | P5.1 | **Vazifalar**. | Homework of the selected child by due date (empty state with a helpful sentence if none). |
 | P5.2 | Other family's data: look for any pupil other than Aziz and Malika anywhere in the app. | Never shown. |
 | P5.3 | Announcements after A9.1. | `DEMO-PR01` sees the 7-B story (Malika) and the school-wide one. `DEMO-PR03` (1-A only) sees only the school-wide one. |
-| P5.4 | Payments, child Malika. | This month's invoice of 3,000,000 soʻm with its status; after A9.3, paid with a receipt. No online "Toʻlash" button yet (P8). |
+| P5.4 | Payments, child Malika. Then sign in as `DEMO-PR08`, child Otabek. | Malika: this month's invoice of 3,000,000 soʻm, paid (seed). Otabek: paid with a receipt after A9.3. No online "Toʻlash" button yet (P8). |
 
 ### P6 Messages with teachers **[P4.8]** (screen 10)
 
@@ -327,7 +330,7 @@ Sign in as `DEMO-IC05` (Malika, 7-B), then `DEMO-IC08` (Otabek) where noted.
 |---|---|---|
 | St1.1 | Sign in (choice → School → login). **[P4.2] [P4.3]** | School brand; Uzbek. On `main` today the existing student home opens and is readable on maroon in uz/ru (P4.13). 🌐 |
 | St1.2 | Tabs. **[P4.9]** | Asosiy · Jadval · Vazifalar · Baholar (R2) · Profil; no Study Center-only tabs. |
-| St1.3 | Attendance as `DEMO-IC08` after T2.4. | Today **late**, arrival 08:20, note "avtobus". |
+| St1.3 | Attendance as `DEMO-IC08` after T2.4. | Today **late** in the attendance calendar (on `main`). Arrival 08:20 and note "avtobus" are in the API but not shown on the screen yet **[P4.4]**. |
 | St1.4 | Timetable. **[P4.5]** | 7-B's week, today selected. |
 | St1.5 | Marks. **[R2] [P4.7]** | Malika: Algebra 5 (T5.2); she doesn't see other pupils' marks. |
 | St1.6 | Stories after A9.1. | The 7-B story and the school-wide one. |
@@ -340,7 +343,7 @@ Sign in as `DEMO-IC05` (Malika, 7-B), then `DEMO-IC08` (Otabek) where noted.
 
 | # | Do | Expected |
 |---|---|---|
-| X1 | Sign out and in again on each phone. | Language and brand are remembered; no crash. |
-| X2 | Airplane mode on any screen. | Offline banner; after reconnecting, the screen loads again with "Qayta urinish" (P4.10). |
+| X1 | Sign out and in again on each phone. | Language is remembered; no crash. Brand remembered **[P4.2] [P4.3]**. |
+| X2 | Airplane mode, open any screen that loads data. | On `main`: "Internet aloqasi yoʻq" (no internet connection) with **Qayta urinish**; after reconnecting, tapping it loads the screen. The same on every new School screen **[P4.10]**. |
 | X3 | A Study Center student and teacher sign in. | Study Center look and tabs, unchanged by the School work. |
 | X4 | Time a parent's Home opening on a mid-range Android on mobile data. | Under ~2 s after sign-in (P6.5 measures the server side properly). |
