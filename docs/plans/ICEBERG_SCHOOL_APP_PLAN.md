@@ -667,8 +667,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       doesn't see other teachers' marks (4.2). New helpers `branching.filter_marks_for_user`,
       `user_can_view_subject_marks`, `user_can_give_marks`. API messages are English like the register
       API; app wording comes with P4.7.
-- [ ] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
-      confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.)
+- [~] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
+      confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.) — claimed 2026-10-30, branch
+      feat/school-p2.5-term-grades
 - [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
       reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
       — done 2026-10-28, PR #48; verified: full suite 440 OK, `test_parent_messages` (27: model,
