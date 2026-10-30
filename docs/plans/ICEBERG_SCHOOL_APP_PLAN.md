@@ -822,10 +822,6 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
       (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
       = `0.0.0` (never blocks). **Still open:** the app's "update" screen (after P4.13).
-- [~] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
-
-- [ ] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
-      with store links when older. Tests. (Release 2, D16.)
 - [x] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
       the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
       avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
