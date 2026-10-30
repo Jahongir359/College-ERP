@@ -844,7 +844,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       analyze 0 warnings, flutter test 8 OK (`test/role_redirect_test.dart`), web build OK.
       `strings.dart` (1,199 lines of translations) stays one file.
 - [x] **P4.2** Choice screen `/choose` + router redirects (first launch → choose → login; change link
-      on login) + widget tests for the redirects. Wording per D7. — done 2026-10-30, PR #PRNUM; verified:
+      on login) + widget tests for the redirects. Wording per D7. — done 2026-10-30, PR #61; verified:
       flutter analyze 0 warnings, flutter test 26 OK (`test/choose_screen_test.dart`,
       `test/role_redirect_test.dart`), web build OK; screenshots at 390 px:
       `docs/plans/school-app-screens/p4.2-choice-login.png`. Notes: `lastBrandProvider` now holds
@@ -1003,7 +1003,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-30 — P4.2 done (PR #PRNUM): first launch shows `/choose` (School | Study Center, UZ/RU/EN
+- 2026-10-30 — P4.2 done (PR #61): first launch shows `/choose` (School | Study Center, UZ/RU/EN
   pills), the pick brands the login and is remembered; the login links back. Next: P4.3 on its own
   branch (password-change screen for PL.1 first, then the brand notice).
 
