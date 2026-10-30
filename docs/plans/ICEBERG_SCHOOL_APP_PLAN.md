@@ -910,8 +910,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P6 — Pilot and quality
 
-- [ ] **P6.1** Written test scripts for admin, homeroom teacher, subject teacher, parent, student
-      (`docs/plans/school_app_test_scripts.md`), each step with the expected result.
+- [~] **P6.1** Written test scripts for admin, homeroom teacher, subject teacher, parent, student
+      (`docs/plans/school_app_test_scripts.md`), each step with the expected result. — claimed 2026-10-30, branch
+      docs/school-p6.1-test-scripts.
 - [ ] **P6.2** Run the scripts on staging on a real Android phone and a real iPhone (via TestFlight);
       log every bug as a GitHub issue with steps.
 - [ ] **P6.3** Pilot with a few real teachers and parents for at least one week on staging or
