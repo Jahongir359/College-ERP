@@ -437,6 +437,14 @@ class S {
     'Your classes will appear here once assigned.': 'Sinflar biriktirilgach shu yerda koʻrinadi.',
     'due': 'qarz',
     'Next': 'Keyingi',
+
+    // ── Choice screen (P4.2) ────────────────────────────────────────────
+    'Which Iceberg are you signing in to?': 'Qaysi Icebergʼga kirasiz?',
+    'Choose one. Next time the app opens there.': 'Tanlang — keyingi safar ilova shu yerdan ochiladi.',
+    'Private school · Grades 1–11': 'Xususiy maktab · 1–11-sinflar',
+    'IELTS, CEFR, SAT and subject courses': 'IELTS, CEFR, SAT va fan kurslari',
+    'You can change this on the sign-in screen': 'Tanlovni kirish sahifasida oʻzgartirish mumkin',
+    'Choose another': 'Boshqa tanlash',
   };
 
   static const _ru = <String, String>{
@@ -872,6 +880,14 @@ class S {
     'Your classes will appear here once assigned.': 'Классы появятся здесь после назначения.',
     'due': 'к оплате',
     'Next': 'Следующий',
+
+    // ── Choice screen (P4.2) ────────────────────────────────────────────
+    'Which Iceberg are you signing in to?': 'В какой Iceberg вы входите?',
+    'Choose one. Next time the app opens there.': 'Выберите — в следующий раз приложение откроется сразу здесь.',
+    'Private school · Grades 1–11': 'Частная школа · 1–11 классы',
+    'IELTS, CEFR, SAT and subject courses': 'IELTS, CEFR, SAT и предметные курсы',
+    'You can change this on the sign-in screen': 'Выбор можно изменить на странице входа',
+    'Choose another': 'Выбрать другое',
   };
 
   static const _ko = <String, String>{
@@ -1304,6 +1320,14 @@ class S {
     'Your classes will appear here once assigned.': '학급이 배정되면 여기에 표시됩니다.',
     'due': '미납',
     'Next': '다음',
+
+    // ── Choice screen (P4.2) ────────────────────────────────────────────
+    'Which Iceberg are you signing in to?': '어느 Iceberg에 로그인하시나요?',
+    'Choose one. Next time the app opens there.': '하나를 선택하세요. 다음에는 앱이 바로 그곳에서 열립니다.',
+    'Private school · Grades 1–11': '사립학교 · 1–11학년',
+    'IELTS, CEFR, SAT and subject courses': 'IELTS, CEFR, SAT 및 교과 과정',
+    'You can change this on the sign-in screen': '로그인 화면에서 변경할 수 있습니다',
+    'Choose another': '다른 곳 선택',
   };
 
   /// Translate [key] (the English string doubles as the key).

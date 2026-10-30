@@ -93,7 +93,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 5/9 (mockups 1–19 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
+| P4 | App: choice screen, parent role, School screens | In progress — 3/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -843,8 +843,15 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       2026-10-26, PR #31; verified: screens moved into `part` files (line-for-line identical), flutter
       analyze 0 warnings, flutter test 8 OK (`test/role_redirect_test.dart`), web build OK.
       `strings.dart` (1,199 lines of translations) stays one file.
-- [~] **P4.2** Choice screen `/choose` + router redirects (first launch → choose → login; change link
-      on login) + widget tests for the redirects. Wording per D7. — claimed 2026-10-30, branch feat/school-p4.2-choose
+- [x] **P4.2** Choice screen `/choose` + router redirects (first launch → choose → login; change link
+      on login) + widget tests for the redirects. Wording per D7. — done 2026-10-30, PR #PRNUM; verified:
+      flutter analyze 0 warnings, flutter test 26 OK (`test/choose_screen_test.dart`,
+      `test/role_redirect_test.dart`), web build OK; screenshots at 390 px:
+      `docs/plans/school-app-screens/p4.2-choice-login.png`. Notes: `lastBrandProvider` now holds
+      `BrandChoice {brand, chosen, loaded}`; "chosen" = the `ice_brand` key exists, so a device that
+      already showed a brand skips `/choose`. `roleRedirect(..., brandChosen:)`: null keeps the splash.
+      The School login uses the School dark tokens and the white crest wordmark; the Study Center login
+      is unchanged apart from the "Iceberg Study Center · Boshqa tanlash" link.
 - [~] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — claimed 2026-10-30, branch feat/school-p4.2-choose.
 - [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6.
@@ -995,6 +1002,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-30 — P4.2 done (PR #PRNUM): first launch shows `/choose` (School | Study Center, UZ/RU/EN
+  pills), the pick brands the login and is remembered; the login links back. Next: P4.3 on its own
+  branch (password-change screen for PL.1 first, then the brand notice).
 
 - 2026-10-30 — P6.1 done (PR #60): `docs/plans/school_app_test_scripts.md`, scripts A (admin web),
   T (homeroom teacher), S (subject teacher), P (parent), St (student) and X (cross-checks) on the
