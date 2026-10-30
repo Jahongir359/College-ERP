@@ -668,7 +668,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `user_can_view_subject_marks`, `user_can_give_marks`. API messages are English like the register
       API; app wording comes with P4.7.
 - [x] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
-      confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.) — done 2026-10-30, PR #TBD;
+      confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.) — done 2026-10-30, PR #55;
       verified: full suite 507 OK, `TermGradeAccessTests` (access matrix 8.2), `TermGradeSavingTests`,
       `TermGradeSuggestionTests`, `SuggestedGradeTests`. Notes: `TermGrade` (migration
       `0049_term_grade`) has student, class_subject, term (null = the year grade), value 2–5 or null
@@ -967,7 +967,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-30 — P2.5 done (PR #TBD): quarter and year grades (`TermGrade`, migration
+- 2026-10-30 — P2.5 done (PR #55): quarter and year grades (`TermGrade`, migration
   `0049_term_grade`), `school/term-grades/`, suggestion = average of marks rounded half up. P2.8
   regenerates its migration as 0050 after this. Next for grades: P4.7 app screens (needs PD.5).
 
