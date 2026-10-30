@@ -101,3 +101,23 @@ def register_summaries(classes, day):
             "absent": row["absent"],
         }
     return summary
+
+
+# ── Quarter and year grades (plan task P2.5) ─────────────────────────────────
+
+
+def suggested_grade(values):
+    """The average of ``values`` (2–5) and the grade it rounds to, half up.
+
+    ``[5, 4, 4]`` → ``(Decimal("4.33"), 4)``; ``[5, 4]`` → ``(Decimal("4.50"), 5)``.
+    Returns ``(None, None)`` when there is nothing to average. It is only a
+    suggestion: the teacher confirms the quarter or year grade.
+    """
+    from decimal import ROUND_HALF_UP, Decimal
+
+    values = [v for v in values if v is not None]
+    if not values:
+        return None, None
+    average = Decimal(sum(values)) / len(values)
+    grade = int(average.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    return average.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP), grade
