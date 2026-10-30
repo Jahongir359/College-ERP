@@ -799,9 +799,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       2026-10-26, PR #31; verified: screens moved into `part` files (line-for-line identical), flutter
       analyze 0 warnings, flutter test 8 OK (`test/role_redirect_test.dart`), web build OK.
       `strings.dart` (1,199 lines of translations) stays one file.
-- [ ] **P4.2** Choice screen `/choose` + router redirects (first launch → choose → login; change link
-      on login) + widget tests for the redirects. Wording per D7.
-- [ ] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests.
+- [~] **P4.2** Choice screen `/choose` + router redirects (first launch → choose → login; change link
+      on login) + widget tests for the redirects. Wording per D7. — claimed 2026-10-30, branch feat/school-p4.2-choose
+- [~] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — claimed 2026-10-30, branch feat/school-p4.2-choose.
 - [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6.
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
