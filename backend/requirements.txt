@@ -17,8 +17,11 @@ dj-database-url==0.5.0
 # Image handling (profile pictures)
 Pillow>=9.0.0
 
-# HTTP requests (Firebase notifications)
+# HTTP requests (FCM push, CAPTCHA)
 requests>=2.27.0
+
+# Service-account OAuth2 token for FCM HTTP v1 push (P2.8)
+google-auth==2.62.0
 
 # Environment variable loading from .env
 python-dotenv>=0.19.0

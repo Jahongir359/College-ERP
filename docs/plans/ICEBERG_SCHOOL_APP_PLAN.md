@@ -96,7 +96,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
-| P6 | Pilot and quality | Open — 0/6 |
+| P6 | Pilot and quality | Open — 1/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 | P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
 | P9 | eMaktab connection (future feature, after Release 2, D18) | Future — 0/2 |
@@ -362,6 +362,8 @@ money is shown as `[summa]` because prices are not decided.
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
 | 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note — **approved 2026-10-30 (owner delegated to the reviewer session)** | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
+| 20 | Teacher grade entry — Release 2: class subject picker, date and kind (Dars / Nazorat ishi / Imtihon), 2–5 per pupil (tap again to clear), pupils absent today dimmed | [20-grade-entry.png](school-app-mockups/20-grade-entry.png) | P4.7 |
+| 20b | Teacher quarter grades — Release 2: tabs 1–4 + Yillik, marks and average per pupil, suggestion (average rounded half up, `school.suggested_grade`) confirmed or changed by the teacher, "Baholanmadi" (not graded) | [20b-quarter-grades.png](school-app-mockups/20b-quarter-grades.png) | P4.7 |
 
 Navigation per role (bottom tabs, at most five):
 
@@ -721,9 +723,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `admin/send-notification/` takes `target="parents"` and `"all"` includes parents of the
       targeted students (`branching.parent_user_ids_for_students`); 12 tests in
       `test_parent_announcements.py`. Paying online stays P8 (D16).
-- [ ] **P2.8** Push notifications with FCM HTTP v1 (service-account credentials via env vars, never
+- [~] **P2.8** Push notifications with FCM HTTP v1 (service-account credentials via env vars, never
       committed): send for notifications, absence, new message. Done when: unit tests with the sender
       mocked; a real push received on a test phone on staging; documented in `docs/DEPLOYMENT.md`.
+      — claimed 2026-10-28, branch feat/school-p2.8-push. Backend, tests and docs done; left: the
+      real push on staging (needs the owner's Firebase key in `FCM_SERVICE_ACCOUNT_JSON` and the app
+      side, P5.9).
 
 ### PD — Design (before P3/P4 code for each screen)
 
@@ -737,7 +742,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [x] **PD.4** Mockups: timetable, teacher home, register and the late-arrival sheet, plus empty/error/
       loading/offline states — done 2026-10-23, PR #27; screens 6, 11–13, 15.
 - [~] **PD.5** Mockups: grades for parent/student (screen 14 done 2026-10-23, PR #27); **teacher grade
-      entry still to draw**. (Release 2.)
+      entry still to draw**. (Release 2.) — teacher grade entry drawn 2026-10-30 (screens 20/20b,
+      PR #59), waiting for approval (PD.8); then PD.5 is done. Built on the P2.4 marks API (one mark
+      per pupil, subject, date and kind) and the P2.5 term grades API (null = not graded).
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
 - [x] **PD.9** Mockups still to draw: web parents list and register report (the teacher register page on
@@ -927,8 +934,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### P6 — Pilot and quality
 
-- [ ] **P6.1** Written test scripts for admin, homeroom teacher, subject teacher, parent, student
-      (`docs/plans/school_app_test_scripts.md`), each step with the expected result.
+- [x] **P6.1** Written test scripts for admin, homeroom teacher, subject teacher, parent, student
+      (`docs/plans/school_app_test_scripts.md`), each step with the expected result. — done 2026-10-30,
+      PR #60; checked against `main` at `4d5ef6f`: steps not built yet carry their task tag (P4.x,
+      P3.7, PL.x, R2) or open PR (#57, #58), so P6.2 runs only the untagged steps until those land.
 - [ ] **P6.2** Run the scripts on staging on a real Android phone and a real iPhone (via TestFlight);
       log every bug as a GitHub issue with steps.
 - [ ] **P6.3** Pilot with a few real teachers and parents for at least one week on staging or
@@ -997,6 +1006,15 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   web pages on the School brand, MAKTAB eyebrow over one title, year · quarter chip, tables kept on
   phones. New School web pages: use the `page_eyebrow`/`page_actions` blocks and `school-admin.css`.
 
+- 2026-10-30 — P6.1 done (PR #60): `docs/plans/school_app_test_scripts.md`, scripts A (admin web),
+  T (homeroom teacher), S (subject teacher), P (parent), St (student) and X (cross-checks) on the
+  `seed_school_demo` data, each step with its expected result and a tag for what is not built yet.
+  Update a step when its feature lands (P4.x, P3.7, PL.1/#58, P2.8/#57).
+
+- 2026-10-30 — PD.5 teacher grade entry drawn (PR #59): screens 20 (marks for a date and kind) and
+  20b (quarter grades with the suggestion the teacher confirms, "Baholanmadi"). Needs approval (PD.8)
+  before P4.7. `overview.png` not re-rendered (it would re-render every screen).
+
 - 2026-10-30 — P0.7 code half (PR #56): `manage.py backup_db` and the backup and restore guide
   (`docs/DEPLOYMENT.md` section 7), tested with a real PostgreSQL 16 dump and restore. P0.7 stays
   `[~]` until the owner schedules it on the host (P0.4) and records a restore test.
@@ -1004,6 +1022,14 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 - 2026-10-30 — P2.5 done (PR #55): quarter and year grades (`TermGrade`, migration
   `0049_term_grade`), `school/term-grades/`, suggestion = average of marks rounded half up. P2.8
   regenerates its migration as 0050 after this. Next for grades: P4.7 app screens (needs PD.5).
+
+- 2026-10-28 — P2.8 backend (branch feat/school-p2.8-push): `DeviceToken` (several devices per user,
+  migration `0050_device_token` after P2.5's 0049), `POST`/`DELETE /api/v1/me/fcm-token/`, `main_app/push.py` with
+  `notify_users(users, title, body, data)`; P2.3's absence notices are pushed with no extra code. Every new `Notification` (also
+  `bulk_create`), group chat and teacher ↔ parent message is pushed after commit on a background thread; titles in
+  the recipient's language; dead tokens deleted. New dependency `google-auth`; env var
+  `FCM_SERVICE_ACCOUNT_JSON` replaces the dead `FCM_SERVER_KEY` in `.do/app.yaml`. A push error never blocks saving. 22 tests.
+  Left: real push on staging (owner key + P5.9 app side).
 
 - 2026-10-28 — PD.9 part 2 drawn (PR #50): web register report, screen 19
   (`python build_mockups.py 19-web-register-report`). Added task **P3.7** (build it). Screen 19
