@@ -90,7 +90,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 |---|---|---|
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
-| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 6/8 |
+| P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 4/9 (mockups 1–17 drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 3/5 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
@@ -667,9 +667,21 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       doesn't see other teachers' marks (4.2). New helpers `branching.filter_marks_for_user`,
       `user_can_view_subject_marks`, `user_can_give_marks`. API messages are English like the register
       API; app wording comes with P4.7.
-- [~] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
-      confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.) — claimed 2026-10-30, branch
-      feat/school-p2.5-term-grades
+- [x] **P2.5** Term and year grades: `TermGrade`, average helper (shown as a suggestion, teacher
+      confirms). Done when: tests. Needs: P2.4, P1.1. (Release 2.) — done 2026-10-30, PR #TBD;
+      verified: full suite 507 OK, `TermGradeAccessTests` (access matrix 8.2), `TermGradeSavingTests`,
+      `TermGradeSuggestionTests`, `SuggestedGradeTests`. Notes: `TermGrade` (migration
+      `0049_term_grade`) has student, class_subject, term (null = the year grade), value 2–5 or null
+      (= not graded; DB check constraint + API) and given_by (a user, since the office may correct
+      grades); one grade per pupil, subject and quarter, and one year grade. `school.suggested_grade`
+      averages and rounds half up (4.50 → 5). `GET school/term-grades/` for a pupil or parent
+      (`?student=`) gives every subject's confirmed quarter grades and year grade, never suggestions;
+      for a teacher or admin it needs `?class_subject=&term=<id>|year` and returns every pupil with the
+      saved grade and a suggestion (quarter: from that quarter's marks; year: from the quarter grades).
+      `POST {class_subject, term, records: [{student_id, value}]}` by the subject's teacher **or an
+      admin of the class's branch** (plan 4.3); pupils left out keep their grade. New helpers
+      `branching.filter_term_grades_for_user` (same as marks) and `user_can_give_term_grades`. API in
+      `api/term_grades_views.py`; messages English like P2.4; the app screens are P4.7.
 - [x] **P2.6** Teacher ↔ parent messaging: `ChatThread.kind="parent"` per student and teacher;
       reuses the chat UI and read states. Done when: access tests (parent only own child's threads).
       — done 2026-10-28, PR #48; verified: full suite 440 OK, `test_parent_messages` (27: model,
@@ -954,6 +966,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-30 — P2.5 done (PR #TBD): quarter and year grades (`TermGrade`, migration
+  `0049_term_grade`), `school/term-grades/`, suggestion = average of marks rounded half up. P2.8
+  regenerates its migration as 0050 after this. Next for grades: P4.7 app screens (needs PD.5).
 
 - 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
   login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
