@@ -570,6 +570,18 @@ def user_can_view_register(user, group):
     return filter_classes_for_user(user, Group.objects.filter(pk=group.pk)).exists()
 
 
+def filter_homeroom_classes_for_user(user, queryset):
+    """The school classes whose register this user takes: a teacher's homeroom classes.
+
+    Everyone else (admins, subject teachers without a homeroom, pupils, parents)
+    gets none. Pairs with ``user_can_take_register`` (plan P4.6).
+    """
+    staff = _get_staff(user)
+    if staff is None:
+        return queryset.none()
+    return queryset.filter(kind=Group.KIND_CLASS, teacher=staff, is_archived=False)
+
+
 def user_can_take_register(user, group):
     """True only for the homeroom teacher of a school class (plan P2.2).
 
