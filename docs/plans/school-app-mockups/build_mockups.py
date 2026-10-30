@@ -1005,6 +1005,94 @@ def w_parent_page() -> str:
     return web_shell("Ota-onalar", content, "Ota-onalar")
 
 
+def _bar(rate: int) -> str:
+    return (
+        '<div class="row" style="gap:8px"><span style="flex:1;height:6px;border-radius:999px;background:var(--tint);'
+        f'overflow:hidden;display:block"><span style="display:block;height:6px;width:{rate}%;background:var(--m)"></span></span>'
+        f'<span class="tiny b" style="width:34px;text-align:right">{rate}%</span></div>'
+    )
+
+
+def w_register_report() -> str:
+    # Same classes, teachers and counts as screen 16. (class, homeroom, pupils, taken at, present, late, absent)
+    data = [
+        ("1-A", "Malika Tursunova", 24, "08:09", 23, 0, 1),
+        ("2-A", "Nargiza Olimova", 22, "08:11", 21, 1, 0),
+        ("3-A", "Gulnora Saidova", 30, "08:14", 28, 1, 1),
+        ("4-B", "Shahnoza Ergasheva", 27, None, 0, 0, 0),
+        ("5-A", "Sherzod Aliyev", 25, "08:06", 25, 0, 0),
+        ("7-B", "Dilnoza Rahimova", 29, "08:21", 27, 2, 0),
+        ("9-A", "Bekzod Qodirov", 23, "08:10", 22, 0, 1),
+        ("11-A", "Kamola Yusupova", 18, "08:16", 18, 0, 0),
+    ]
+    rows = ""
+    for c, teacher, n, at, pres, late, absent in data:
+        if at is None:
+            state = '<span class="pill late">Olinmagan</span>'
+            counts = '<td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="tiny muted">—</td>'
+        else:
+            state = f'<span class="pill ok">{i("check")}{at}</span>'
+            counts = (
+                f'<td class="b">{pres}</td><td class="b" style="color:var(--late)">{late or "–"}</td>'
+                f'<td class="b" style="color:var(--abs)">{absent or "–"}</td>'
+                f'<td style="width:120px;padding-right:14px">{_bar(round((pres + late) * 100 / n))}</td>'
+            )
+        rows += (
+            f'<tr style="border-top:1px solid var(--border)"><td style="padding:11px 14px" class="b">{c}</td>'
+            f'<td class="small">{teacher}</td><td class="small">{n}</td><td>{state}</td>{counts}</tr>'
+        )
+    # (pupil, class, status, arrival time, note)
+    marks = [
+        ("Sardor Nazarov", "1-A", "abs", "", "Kasal, onasi xabar berdi"),
+        ("Bekzod Aliyev", "3-A", "abs", "", ""),
+        ("Diyora Tojiyeva", "9-A", "abs", "", "Oilaviy sabab"),
+        ("Aziz Karimov", "3-A", "late", "08:12", "Avtobus"),
+        ("Jasur Toshev", "7-B", "late", "08:20", ""),
+        ("Madina Karimova", "7-B", "late", "08:05", ""),
+        ("Shoira Valiyeva", "2-A", "late", "08:25", "Shifokorda edi"),
+    ]
+    sent = i("send", 'style="width:12px;height:12px"')
+    items = "".join(
+        f'<div style="padding:10px 0;border-top:1px solid var(--border)"><div class="row between">'
+        f'<div><div class="b small">{name}</div><div class="tiny muted">{cls}{" · " + note if note else ""}</div></div>'
+        f'<span class="pill {st}">{"Kelmadi" if st == "abs" else "Kechikdi " + at}</span></div></div>'
+        for name, cls, st, at, note in marks
+    )
+    download = i("upload", 'style="width:18px;height:18px;transform:rotate(180deg)"')
+    content = f"""
+<div class="row between"><div><p class="kicker">Maktab</p><h1 class="serif" style="font-size:30px;color:var(--m);margin-top:4px">Davomat hisoboti</h1></div>
+  <div class="row" style="gap:10px">
+    <span class="pill" style="background:var(--surface);border:1px solid var(--border);padding:11px 14px">{i("cal", 'style="width:16px;height:16px"')}28-oktabr, chorshanba ▾</span>
+    <span class="pill" style="background:var(--surface);border:1px solid var(--border);padding:11px 14px">Sinf: hammasi ▾</span>
+    <div class="btn btn-ghost" style="height:44px;padding:0 16px">{download}CSV yuklab olish</div>
+  </div></div>
+<div class="row" style="gap:12px;margin-top:16px">
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Davomat olingan</div><div class="b" style="font-size:26px">7 / 8 <span class="small muted">sinf</span></div></div>
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Keldi</div><div class="b" style="font-size:26px;color:var(--ok)">164</div></div>
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Kechikdi</div><div class="b" style="font-size:26px;color:var(--late)">4</div></div>
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Kelmadi</div><div class="b" style="font-size:26px;color:var(--abs)">3</div></div>
+  <div class="card" style="flex:1;padding:14px 18px"><div class="small muted">Davomat</div><div class="b" style="font-size:26px">98%</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 330px;gap:16px;margin-top:16px;align-items:start">
+  <div>
+    <style>.rr th, .rr td {{ padding-right: 12px; white-space: nowrap; }}</style>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="rr" style="width:100%;border-collapse:collapse;font-size:14px">
+        <thead><tr style="background:var(--tint);text-align:left" class="small muted"><th style="padding:11px 14px">Sinf</th><th>Sinf rahbari</th><th>Oʻquvchi</th><th>Olindi</th><th>Keldi</th><th>Kech</th><th>Yoʻq</th><th>Kelganlar</th></tr></thead>
+        <tbody>{rows}</tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-top:10px">Olinmagan — sinf rahbari bugungi davomatni hali saqlamagan. Davomatni oʻqituvchi ilovada oladi; bu sahifa faqat koʻrish uchun.</p>
+  </div>
+  <div class="card" style="padding:16px 18px">
+    <div class="row between" style="margin-bottom:6px"><div class="b" style="font-size:17px;color:var(--m)">Kelmagan va kechikkanlar</div><span class="tiny b muted">7</span></div>
+    <div class="tiny row" style="gap:5px;color:var(--muted);margin-bottom:8px">{sent}Har birining ota-onasiga ilovada xabar yuborildi</div>
+    {items}
+  </div>
+</div>"""
+    return web_shell("Davomat hisoboti", content, "Davomat hisoboti")
+
+
 SCREENS = [
     ("01-choice", "Tanlov · Choice", s_choice),
     ("02-login-school", "Kirish · School", s_login_school),
@@ -1027,6 +1115,7 @@ WEB_SCREENS = [
     ("17-web-timetable", "Web · Dars jadvali", w_timetable),
     ("18-web-parents", "Web · Ota-onalar", w_parents),
     ("18b-web-parent-page", "Web · Ota-ona sahifasi", w_parent_page),
+    ("19-web-register-report", "Web · Davomat hisoboti", w_register_report),
 ]
 
 
