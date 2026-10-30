@@ -148,3 +148,18 @@
 @media (max-width: 640px) {
   .school-pair { grid-template-columns: 1fr; }
 }
+
+/* Login letters (PL.1) */
+.school-letter-form { flex-wrap: nowrap; align-items: center; }
+.school-letter-form .school-letter-lang { min-width: 0; width: auto; padding-right: 26px; }
+.school-letters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px dashed #E9C77E;
+  border-radius: 14px;
+  font-size: 14px;
+}

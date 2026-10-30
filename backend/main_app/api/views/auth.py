@@ -153,6 +153,7 @@ class ChangePasswordView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user.set_password(serializer.validated_data["new_password"])
+        user.must_change_password = False  # their own password now (PL.1)
         user.save()
         return Response({"detail": "Password changed successfully."})
 

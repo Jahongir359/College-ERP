@@ -148,8 +148,9 @@ See `/.env.example` for a complete, commented list of all environment variables.
 | `MIN_APP_VERSION` | No | Oldest supported app version, like `1.2.0`; older apps ask for an update (`GET /api/v1/app/version/`). Blank = no minimum |
 | `MIN_APP_VERSION_ANDROID` | No | Overrides `MIN_APP_VERSION` for the Android app |
 | `MIN_APP_VERSION_IOS` | No | Overrides `MIN_APP_VERSION` for the iPhone app |
-| `APP_STORE_URL_ANDROID` | No | Google Play page the app's "update" screen opens |
-| `APP_STORE_URL_IOS` | No | App Store page the app's "update" screen opens |
+| `APP_STORE_URL_ANDROID` | No | Google Play page the app's "update" screen opens; also printed on parent login letters |
+| `APP_STORE_URL_IOS` | No | App Store page the app's "update" screen opens; also printed on parent login letters |
+| `APP_DOWNLOAD_URL` | No | Page the QR code on printed parent login letters opens (one link for both phones, e.g. a page with both store buttons). Blank: this site's `/download/` |
 | `CSRF_TRUSTED_ORIGINS` | No | Comma-separated trusted origins |
 | `REGISTRATION_LEADS_API_TOKEN` | No | Token for public registration API |
 | `RECOVERY_ADMIN_EMAIL` | No | Fallback admin login email |

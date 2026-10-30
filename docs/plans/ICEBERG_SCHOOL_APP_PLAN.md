@@ -874,8 +874,18 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### PL — Launch readiness (non-code and support)
 
-- [ ] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
-      pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3.
+- [x] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
+      pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3. — done
+      2026-10-30, PR #PRNUM (**merge after the app's choose-password screen in P4.3**); verified: full suite
+      508 OK, `test_parent_onboarding`. Notes: `CustomUser.must_change_password` is set whenever the
+      office sets a parent's password (`parents.create_parent`/`update_parent`: new parent, reset, letter)
+      and cleared by `me/change-password/`. The API returns it in the login response and `me/`;
+      `api/authentication.py` (the DRF default) answers 403 `password_change_required` to everything except
+      `me/`, change-password, logout, fcm-token and app/version until it's changed (the web login sends
+      parents to `/app/`, which uses the API). Letters: "Print login letter" on the parent page, "Print
+      login letters" for a class (only parents who never signed in), uz/ru/en, each with a new temporary
+      password and a QR (segno) to `APP_DOWNLOAD_URL` (blank: `/download/`). Demo parents aren't flagged.
+      The SMS with login ID and store link (D14) and SMS resets (D13) are PL.2.
 - [ ] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
       with an audit log). Tests.
 - [ ] **PL.3** One-page guides in uz/ru: for parents (install, log in, what each tab shows) and for
@@ -954,6 +964,8 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-10-30 — PL.1 done (PR #PRNUM, draft until P4.3): printed parent login letters and the
+  first-login password change (API flag + 403 gate). Migration renumbers to 0051 after #55 and P2.8.
 - 2026-10-28 — P3.3 done (PR #53): admin parents list, new parent, parent page, link by
   login ID + phone. Next for the web: P3.6 (also: P3.1/P3.2 tables vanish below 1025 px, see P3.3).
 

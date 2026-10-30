@@ -840,3 +840,88 @@ msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s, пришё
 #, python-format
 msgid "%(name)s was marked late in class %(class)s on %(date)s."
 msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s."
+
+# Parent login letters (PL.1)
+
+#, python-format
+msgid "Every parent in %(name)s has already signed in."
+msgstr "Все родители класса %(name)s уже входили в приложение."
+
+msgid "Letter language"
+msgstr "Язык письма"
+
+msgid "Print login letter"
+msgstr "Распечатать письмо со входом"
+
+msgid "Print a login letter? It gives this parent a new temporary password; the old one stops working."
+msgstr "Распечатать письмо со входом? Родитель получит новый временный пароль; старый перестанет работать."
+
+msgid "Login letters"
+msgstr "Письма со входом"
+
+msgid "Back"
+msgstr "Назад"
+
+msgid "Print"
+msgstr "Печать"
+
+msgid "Each letter has a new temporary password; the old ones no longer work. Print now: these passwords are not shown again."
+msgstr "В каждом письме новый временный пароль; старые больше не работают. Распечатайте сейчас: эти пароли больше не будут показаны."
+
+msgid "Your login to the Iceberg app"
+msgstr "Ваш вход в приложение Iceberg"
+
+#, python-format
+msgid "Dear %(name)s, in the app you can see your child's timetable, attendance, homework and payments, and write to the teachers."
+msgstr "Уважаемый(ая) %(name)s, в приложении вы увидите расписание, посещаемость, домашние задания и оплаты вашего ребёнка, а также сможете писать учителям."
+
+msgid "Your children at school"
+msgstr "Ваши дети в школе"
+
+msgid "Install the app."
+msgstr "Установите приложение."
+
+msgid "Scan the code with your phone's camera and open the link."
+msgstr "Наведите камеру телефона на код и откройте ссылку."
+
+msgid "Open the app and choose “Iceberg School”."
+msgstr "Откройте приложение и выберите «Iceberg School»."
+
+msgid "Sign in with:"
+msgstr "Войдите с этими данными:"
+
+msgid "Temporary password"
+msgstr "Временный пароль"
+
+msgid "Choose your own password."
+msgstr "Придумайте свой пароль."
+
+msgid "The app asks for it right after the first sign-in. Don't share it with anyone."
+msgstr "Приложение попросит его сразу после первого входа. Никому его не сообщайте."
+
+#, python-format
+msgid "No smartphone? You can also sign in from a browser: %(url)s"
+msgstr "Нет смартфона? Можно войти и через браузер: %(url)s"
+
+msgid "Lost this letter or forgot your password? Ask the school office for a new one."
+msgstr "Потеряли письмо или забыли пароль? Попросите новый в канцелярии школы."
+
+msgid "Print login letters"
+msgstr "Распечатать письма со входом"
+
+msgid "Print login letters for the parents who have not signed in yet? Each gets a new temporary password."
+msgstr "Распечатать письма для родителей, которые ещё не входили? Каждый получит новый временный пароль."
+
+#, python-format
+msgid "%(n)s login letter"
+msgid_plural "%(n)s login letters"
+msgstr[0] "%(n)s письмо"
+msgstr[1] "%(n)s письма"
+msgstr[2] "%(n)s писем"
+
+#, python-format
+msgid "%(n)s parent in %(name)s has not signed in yet."
+msgid_plural "%(n)s parents in %(name)s have not signed in yet."
+msgstr[0] "%(n)s родитель из %(name)s ещё не входил."
+msgstr[1] "%(n)s родителя из %(name)s ещё не входили."
+msgstr[2] "%(n)s родителей из %(name)s ещё не входили."
