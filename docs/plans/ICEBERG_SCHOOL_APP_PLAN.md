@@ -805,7 +805,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6.
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
-- [ ] **P4.6** Teacher register screen (fast: everyone present by default, tap to change). Needs: P2.2.
+- [~] **P4.6** Teacher register screen (fast: everyone present by default, tap to change). Needs: P2.2.
+      — claimed 2026-10-30 (college-erp-c0, assigned by the reviewer college-erp-4e), branch
+      feat/school-p4.6-register-app.
 - [ ] **P4.7** Grades screens (marks list, term grades) for student/parent; gradebook entry for
       teachers. Needs: P2.4, P2.5. (Release 2.)
 - [ ] **P4.8** Parent: homework, payments, messages with teachers, notifications. Needs: P2.6, P2.7.
