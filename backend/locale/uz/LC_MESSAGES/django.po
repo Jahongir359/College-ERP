@@ -838,3 +838,22 @@ msgstr "%(name)s %(date)s kuni %(class)s sinfiga kechikib keldi, soat %(time)s d
 #, python-format
 msgid "%(name)s was marked late in class %(class)s on %(date)s."
 msgstr "%(name)s %(date)s kuni %(class)s sinfiga kechikib keldi."
+
+# Push notification titles (P2.8)
+msgid "New result"
+msgstr "Yangi natija"
+
+msgid "Announcement"
+msgstr "Eʼlon"
+
+msgid "Homework"
+msgstr "Uy vazifasi"
+
+msgid "Payment"
+msgstr "Toʻlov"
+
+msgid "Notification"
+msgstr "Bildirishnoma"
+
+msgid "Sent an attachment"
+msgstr "Fayl yubordi"

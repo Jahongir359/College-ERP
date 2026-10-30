@@ -157,3 +157,28 @@ See `/.env.example` for a complete, commented list of all environment variables.
 | `SPACES_KEY` / `SPACES_SECRET` | No | DigitalOcean Spaces credentials for media |
 | `SPACES_BUCKET` | No | Spaces bucket name |
 | `SPACES_REGION` | No | Spaces region (e.g. `fra1`) |
+| `FCM_SERVICE_ACCOUNT_JSON` | No | Firebase service-account key (one-line JSON) for app push; empty = push off. See section 7 |
+
+## 7. Push notifications (FCM HTTP v1)
+
+The app gets push messages for new notifications (absence, results, payments, announcements…)
+and new group chat messages. The backend sends them with the FCM HTTP v1 API
+(`backend/main_app/push.py`); the app registers its token at `POST /api/v1/me/fcm-token/`
+(`{"token": "…", "platform": "android|ios|web"}`) and forgets it on logout with
+`DELETE /api/v1/me/fcm-token/` (`{"token": "…"}`). Tokens are stored per device in `DeviceToken`;
+ones FCM reports as dead are deleted automatically.
+
+Setup:
+
+1. Firebase console → project → Project settings → Service accounts → **Generate new private key**.
+   This downloads a JSON file. Never commit it.
+2. Put the whole file on one line in the `FCM_SERVICE_ACCOUNT_JSON` secret, e.g.
+   `jq -c . service-account.json`, and paste the output into App Platform → Settings →
+   Environment variables (type **Secret**). For a VPS, add it to the env file the service reads.
+3. Redeploy. With the variable empty, push is off and nothing is sent (the default in dev and tests).
+4. Check on staging: sign in on a test phone, then send yourself a notification from the admin
+   pages; the phone should show it within seconds. Failed sends are logged as warnings by the
+   `main_app.push` logger.
+
+The service account only needs the "Firebase Cloud Messaging API Admin" role. If the key leaks,
+delete it in Google Cloud → IAM → Service accounts → Keys and create a new one.
