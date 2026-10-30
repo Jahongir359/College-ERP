@@ -727,9 +727,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### PD — Design (before P3/P4 code for each screen)
 
-- [ ] **PD.1** Design rules in code: bundle Fraunces (School display text), School gold highlight token, type scale and spacing constants in
+- [~] **PD.1** Design rules in code: bundle Fraunces (School display text), School gold highlight token, type scale and spacing constants in
       `IceTokens` (app) and brand CSS (web) per section 6.2; a small "component sheet" screen in debug
-      builds showing buttons, chips, cards, status pills, empty/error states in both brands, light/dark.
+      builds showing buttons, chips, cards, status pills, empty/error states in both brands, light/dark. — claimed 2026-10-30, branch feat/school-pd1-design-tokens
 - [x] **PD.2** Mockups: choice screen and login (both brands) — done 2026-10-23, PR #27; screens 1–3 in
       section 6.0 (Uzbek; ru/en and dark are checked with real screenshots in the build PR, 0.1).
 - [x] **PD.3** Mockups: parent home with child switcher (light and dark), attendance calendar, homework,
