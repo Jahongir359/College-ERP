@@ -528,8 +528,19 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       clash-free Mon–Sat week, each subject as many times as its weekly hours, grade 1 within 4 periods,
       PE in "Sport zali", Informatika in "Informatika xonasi"; a class that already has lessons is
       kept. **Still open:** marks (P2.4, Release 2), "staging seeded" (needs P0.5).
-- [ ] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
-      Needs: P0.4.
+- [~] **P0.7** Backups: daily database backup with a tested restore, written in `docs/DEPLOYMENT.md`.
+      Needs: P0.4. — **code half done** 2026-10-30, PR #56 (branch `feat/school-p0.7-backup`);
+      verified: full suite 519 OK, `test_backup_db` (12), and a real round trip on PostgreSQL 16
+      (demo school seeded, `backup_db`, `pg_restore` into a fresh database: users 31, lessons 70,
+      parent links 13, migrations 88 equal on both; `migrate --check` clean), plus pg_dump 15
+      against the 16 server refusing with the version message and exit 1. Notes: `manage.py
+      backup_db [--output-dir] [--keep N] [--pg-dump]` (env `BACKUP_DIR`, `BACKUP_KEEP`, `PG_DUMP`);
+      pg_dump custom format for PostgreSQL, SQLite's backup API for SQLite; `.partial` until
+      complete; non-zero exit on any failure. The Docker image has **no** `pg_dump` on purpose
+      (Debian's 15 can't dump a 16/17 server): run it where a matching client is installed.
+      Guide: `docs/DEPLOYMENT.md` section 7 (two layers, scheduling example, restore, monthly
+      restore test). **Still open (owner, after P0.4):** schedule it daily on the chosen host
+      with an off-site copy, and record the first restore test here.
 - [ ] **P0.8** Monitoring: uptime checks for `app.iceberglc.com` and `iceberglc.com`, error alerts (e.g.
       Sentry or the host's alerts) to the owner's Telegram or email; documented. Needs: P0.4.
 
@@ -983,6 +994,10 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 - 2026-10-30 — PD.5 teacher grade entry drawn (PR #TBD): screens 20 (marks for a date and kind) and
   20b (quarter grades with the suggestion the teacher confirms, "Baholanmadi"). Needs approval (PD.8)
   before P4.7. `overview.png` not re-rendered (it would re-render every screen).
+
+- 2026-10-30 — P0.7 code half (PR #56): `manage.py backup_db` and the backup and restore guide
+  (`docs/DEPLOYMENT.md` section 7), tested with a real PostgreSQL 16 dump and restore. P0.7 stays
+  `[~]` until the owner schedules it on the host (P0.4) and records a restore test.
 
 - 2026-10-30 — P2.5 done (PR #55): quarter and year grades (`TermGrade`, migration
   `0049_term_grade`), `school/term-grades/`, suggestion = average of marks rounded half up. P2.8
