@@ -866,7 +866,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       token, under `/api/` so the login middleware lets it through) returns `min_app_version` and
       per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
       (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
-      = `0.0.0` (never blocks). — **app half done** 2026-10-31, PR #TBD; verified:
+      = `0.0.0` (never blocks). — **app half done** 2026-10-31, PR #67; verified:
       `test/app_update_test.dart` (10 tests) + backend AppVersionTests; screenshot
       `docs/plans/school-app-screens/p4.12-update.png` (uz light, ru dark, 390 px). `lib/core/update/
       app_update.dart`: `UpdateGate` in `MaterialApp.builder` asks `app/version/` once at start-up
@@ -1003,7 +1003,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-31 — P4.12 done (PR #TBD): the app's "update" screen (`UpdateGate`, `package_info_plus`)
+- 2026-10-31 — P4.12 done (PR #67): the app's "update" screen (`UpdateGate`, `package_info_plus`)
   on top of the PR #51 endpoint; fails open. To force an update, set `MIN_APP_VERSION[_ANDROID|_IOS]`
   and the store URLs on the server. P4 board recounted: 3/12.
 
