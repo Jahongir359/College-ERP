@@ -826,7 +826,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
       branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
       Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
-      — done 2026-10-31, PR #PRNUM; verified: full suite 530 OK, `RegisterReportAccessTests`,
+      — done 2026-10-31, PR #63; verified: full suite 530 OK, `RegisterReportAccessTests`,
       `RegisterReportContentTests`, `RegisterReportCsvTests`; page `/maktab/register/`
       (`school_register_report_views.py`); screenshot next to the mockup:
       `docs/plans/school-app-screens/p3.7-register-report.png`.
@@ -991,7 +991,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-31 — P3.7 done (PR #PRNUM): admin register report `/maktab/register/` (Maktab →
+- 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
   Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
   CSV export; read-only, scoped by `branching.filter_classes_for_user`. For P3.6: the hero icon and
   CSV button still use the shared teal `ice-manage-hero` styles, and the active sidebar item is
