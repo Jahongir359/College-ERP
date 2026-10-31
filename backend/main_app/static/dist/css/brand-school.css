@@ -728,6 +728,17 @@ html[data-brand="school"] .app-loader__text {
 }
 
 
+/* Selects in dark mode: storefront-ui.css paints every .dark-mode select navy
+   (#0f172a, !important); School uses its warm dark input colours instead
+   (e.g. the class filter on Maktab → Parents). */
+html[data-brand="school"][data-theme="dark"] select,
+html[data-brand="school"].dark-mode select,
+html[data-brand="school"] .dark-mode select {
+  background-color: var(--brand-input-bg) !important;
+  color: var(--brand-text) !important;
+  border-color: var(--brand-border-strong) !important;
+}
+
 /* ── 4. Login page ───────────────────────────────────────────────────────── */
 /* Phase 3: logo tile, glow, button and focus overrides for main_app/login.html
    go here (plan 7.2 point 4). */

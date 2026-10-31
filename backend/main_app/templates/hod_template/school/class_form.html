@@ -2,6 +2,9 @@
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+{% endblock custom_css %}
 
 {% block content %}
 <div class="ice-form-card">
