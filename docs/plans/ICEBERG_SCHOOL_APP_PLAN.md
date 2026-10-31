@@ -854,7 +854,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       The School login uses the School dark tokens and the white crest wordmark; the Study Center login
       is unchanged apart from the "Iceberg Study Center · Boshqa tanlash" link.
 - [x] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — done 2026-10-31,
-      PR #PRNUM; verified: flutter analyze 0 warnings, flutter test TESTCOUNT OK
+      PR #PRNUM; verified: flutter analyze 0 warnings, flutter test 47 OK
       (`test/change_password_test.dart`, `test/brand_notice_test.dart`), web build OK; School login next
       to mockup 02 at 390 px: `docs/plans/school-app-screens/p4.3-school-login.png`. Also the **app half
       of PL.1**: `IceUser.mustChangePassword` (`must_change_password` from login and `me/`) holds every
