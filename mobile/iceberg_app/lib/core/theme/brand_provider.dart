@@ -6,35 +6,66 @@ import 'brand.dart';
 
 const _brandPrefKey = 'ice_brand';
 
-/// The last brand this device showed, so the splash and login screens keep a
-/// School user's look after they sign out.
-class LastBrandNotifier extends StateNotifier<IceBrand> {
-  LastBrandNotifier() : super(IceBrand.center) {
+/// What this device remembers about the brand before anyone signs in.
+class BrandChoice {
+  const BrandChoice({
+    this.brand = IceBrand.center,
+    this.chosen = false,
+    this.loaded = false,
+  });
+
+  final IceBrand brand;
+
+  /// A brand was picked on `/choose` (or remembered from an earlier sign-in),
+  /// so signed-out users go straight to the login screen.
+  final bool chosen;
+
+  /// Read from storage. Until then the router keeps the splash screen.
+  final bool loaded;
+}
+
+/// The last brand this device showed: picked on the choice screen, then
+/// replaced by the account's brand after sign-in, so the splash and login
+/// screens keep a School user's look after they sign out.
+class LastBrandNotifier extends StateNotifier<BrandChoice> {
+  LastBrandNotifier() : super(const BrandChoice()) {
     _load();
   }
 
   Future<void> _load() async {
-    final p = await SharedPreferences.getInstance();
-    if (!mounted) return;
-    state = IceBrand.fromApi(p.getString(_brandPrefKey));
+    String? saved;
+    try {
+      final p = await SharedPreferences.getInstance();
+      saved = p.getString(_brandPrefKey);
+    } catch (_) {
+      // Unreadable storage: treat as a first launch rather than hang on the
+      // splash screen.
+    }
+    // A choice made while storage was still loading wins.
+    if (!mounted || state.chosen) return;
+    state = BrandChoice(
+      brand: IceBrand.fromApi(saved),
+      chosen: saved != null,
+      loaded: true,
+    );
   }
 
   Future<void> remember(IceBrand brand) async {
-    if (state == brand) return;
-    state = brand;
+    if (state.chosen && state.brand == brand) return;
+    state = BrandChoice(brand: brand, chosen: true, loaded: true);
     final p = await SharedPreferences.getInstance();
     await p.setString(_brandPrefKey, brand.name);
   }
 }
 
-final lastBrandProvider = StateNotifierProvider<LastBrandNotifier, IceBrand>(
+final lastBrandProvider = StateNotifierProvider<LastBrandNotifier, BrandChoice>(
   (_) => LastBrandNotifier(),
 );
 
 /// The brand to render: the signed-in user's (from the server), otherwise the
-/// last one this device showed. Users cannot choose it.
+/// one this device last showed or the person picked on `/choose`.
 final brandProvider = Provider<IceBrand>((ref) {
   final user = ref.watch(authProvider.select((s) => s.user));
   if (user != null) return IceBrand.fromApi(user.brand);
-  return ref.watch(lastBrandProvider);
+  return ref.watch(lastBrandProvider.select((c) => c.brand));
 });
