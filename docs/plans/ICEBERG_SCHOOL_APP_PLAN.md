@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 5/6 (P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 5/7 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 3/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -834,6 +834,13 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
       branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
       Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
+- [~] **P3.8** Admin: School board (`/maktab/`), the School admin's home page on the web: counts
+      (pupils, classes, teachers, parents), today's register (classes taken / not taken, link to the
+      register report), parents who haven't signed in yet, the current year and quarter (or a link to
+      set one up), quick links. Scoped through `branching.py`; uz/ru/en; light and dark. Done when:
+      access tests (branch admin sees own branch only, teachers/pupils get no page, anonymous → login),
+      empty states (no School branch, no classes, no current year), screenshot. Added 2026-10-31
+      (owner). — claimed 2026-10-31, branch `feat/school-board`.
 - [x] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
       desktop in the PR. — done 2026-10-30, PR #64; verified: full suite,
       `test_school_page_header` (eyebrow, one title, year · quarter chip, Center admin page unchanged,
