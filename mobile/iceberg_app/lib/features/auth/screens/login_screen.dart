@@ -61,6 +61,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
     final brand = ref.watch(brandProvider);
+    // The School gets its own light page (mockup 02); the Study Center keeps
+    // its dark login exactly as before.
+    if (brand.isSchool) {
+      t = IceTokens.light(brand: brand);
+      return _schoolLogin(s, brand);
+    }
     t = IceTokens.dark(brand: brand);
     return Scaffold(
       backgroundColor: t.bg,
@@ -176,6 +182,128 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
+  /// Iceberg School sign-in (mockup 02): a maroon header with the crest and
+  /// wordmark, a white card over it, and a maroon button with white text.
+  Widget _schoolLogin(S s, IceBrand brand) {
+    return Scaffold(
+      backgroundColor: SchoolColors.bg,
+      body: Stack(
+        children: [
+          Container(
+            height: 330,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  SchoolColors.primaryHover,
+                  SchoolColors.primary,
+                  SchoolColors.primaryDeep,
+                ],
+              ),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
+            ),
+          ),
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 96,
+                        height: 96,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.22),
+                          ),
+                        ),
+                        child: Image.asset(
+                          IceBrandLogo.schoolCrestAsset,
+                          errorBuilder: (_, __, ___) => const SizedBox(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Image.asset(
+                        'assets/images/brand/school/logo-h-white.png',
+                        height: 44,
+                        semanticLabel: brand.appTitle,
+                        errorBuilder: (_, __, ___) => Text(
+                          brand.appTitle,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      Container(
+                            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: SchoolColors.border),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: SchoolColors.primary.withValues(
+                                    alpha: 0.10,
+                                  ),
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 14),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  s('Welcome'),
+                                  style: const TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w800,
+                                    color: SchoolColors.text,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  s('Please sign in to your account'),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: SchoolColors.muted,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                _form(s),
+                              ],
+                            ),
+                          )
+                          .animate(delay: 150.ms)
+                          .slideY(
+                            begin: 0.08,
+                            duration: 450.ms,
+                            curve: Curves.easeOutCubic,
+                          )
+                          .fadeIn(duration: 350.ms),
+                      const SizedBox(height: 18),
+                      _changeBrand(s, brand),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _wordmark() => Text(
     'ICEBERG',
     style: TextStyle(
@@ -200,7 +328,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           key: const ValueKey('login-change-brand'),
           onPressed: _loading ? null : () => context.go('/choose'),
           style: TextButton.styleFrom(
-            foregroundColor: t.textHi,
+            foregroundColor: t.isDark ? t.textHi : t.accentInk,
             padding: const EdgeInsets.symmetric(horizontal: 4),
             minimumSize: const Size(0, 40),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,

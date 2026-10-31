@@ -92,8 +92,8 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 3/11 (P4.11 dropped, P4.12 Release 2) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 5/6 (P3.4, P3.5 dropped) |
+| P4 | App: choice screen, parent role, School screens | In progress — 4/12 (P4.11 dropped) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -834,8 +834,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
       branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
       Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
-- [ ] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
-      desktop in the PR.
+- [x] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
+      desktop in the PR. — done 2026-10-30, PR #64; verified: full suite,
+      `test_school_page_header` (eyebrow, one title, year · quarter chip, Center admin page unchanged,
+      no period lookup on Center-branded pages), screenshots of all 8 Maktab pages at 390 and 1440 px
+      in uz/ru/en, light and dark. Notes: brand layer in `brand-school.css` (light sidebar, maroon
+      buttons, School wordmark), page header blocks `page_eyebrow`/`page_actions` in `base.html`
+      (empty for every other page), `school_period` in `context_processors.school_nav` is lazy. The
+      P3.1/P3.2 tables now stay visible and scroll sideways below 1025 px (`school-admin.css`).
 
 ### P4 — App
 
@@ -853,7 +859,19 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       already showed a brand skips `/choose`. `roleRedirect(..., brandChosen:)`: null keeps the splash.
       The School login uses the School dark tokens and the white crest wordmark; the Study Center login
       is unchanged apart from the "Iceberg Study Center · Boshqa tanlash" link.
-- [~] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — claimed 2026-10-30, branch feat/school-p4.3-account-brand.
+- [x] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — done 2026-10-31,
+      PR #68; verified: flutter analyze 0 warnings, flutter test 47 OK
+      (`test/change_password_test.dart`, `test/brand_notice_test.dart`), web build OK; School login next
+      to mockup 02 at 390 px: `docs/plans/school-app-screens/p4.3-school-login.png`. Also the **app half
+      of PL.1**: `IceUser.mustChangePassword` (`must_change_password` from login and `me/`) holds every
+      role on `/change-password` (back blocked, log out allowed) until `POST me/change-password/`
+      succeeds, then `me/` is reloaded and the user goes home; a 403 with `code ==
+      "password_change_required"` on any call (`ApiClient.onPasswordChangeRequired`) sends the user
+      there and re-checks `me/`. The 400 for `old_password` may be a string or a list (both handled).
+      Brand: after sign-in the account's brand wins; if it differs from the device's pick on `/choose`,
+      `BrandWatcher` (in `MaterialApp.builder`) shows one SnackBar and remembers the account brand, so it
+      shows once. The School login is now the light mockup-02 page (maroon header, white card, maroon
+      button with white text); the Study Center login is unchanged.
 - [~] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6. — claimed 2026-10-31 (college-erp-c0, assigned by the coordinator),
       branch feat/school-p4.4-parent-shell.
@@ -1004,6 +1022,13 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-31 — P4.3 done (PR #68, after #61): the app's "choose your password" screen for PL.1
+  and the brand-from-account notice. PL.1 (#58) can merge after this. Next on this line: P4.4 (parent shell).
+
+- 2026-10-30 — P3.6 done (PR #64; takeover of the unpushed `feat/school-p3.6-web-brand` work): all Maktab
+  web pages on the School brand, MAKTAB eyebrow over one title, year · quarter chip, tables kept on
+  phones. New School web pages: use the `page_eyebrow`/`page_actions` blocks and `school-admin.css`.
 
 - 2026-10-30 — P4.2 done (PR #61): first launch shows `/choose` (School | Study Center, UZ/RU/EN
   pills), the pick brands the login and is remembered; the login links back. The School login keeps the dark
