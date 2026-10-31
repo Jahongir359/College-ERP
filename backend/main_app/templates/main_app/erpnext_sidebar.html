@@ -96,6 +96,14 @@
         </div>
 
         <div class="nav-item">
+            {% url 'school_register_report' as school_register_report_url %}
+            <a href="{{ school_register_report_url }}" class="nav-link {% if 'maktab/register' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-clipboard-check"></i>
+                <span class="nav-text">{% translate "Register report" %}</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
             {% url 'school_parents' as school_parents_url %}
             <a href="{{ school_parents_url }}" class="nav-link {% if 'maktab/parents' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-friends"></i>
