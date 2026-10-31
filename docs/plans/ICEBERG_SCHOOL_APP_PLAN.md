@@ -93,7 +93,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
+| P4 | App: choice screen, parent role, School screens | In progress — 3/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -850,9 +850,15 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6.
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
-- [~] **P4.6** Teacher register screen (fast: everyone present by default, tap to change). Needs: P2.2.
-      — claimed 2026-10-30 (college-erp-c0, assigned by the reviewer college-erp-4e), branch
-      feat/school-p4.6-register-app.
+- [x] **P4.6** Teacher register screen (fast: everyone present by default, tap to change). Needs: P2.2.
+      — done 2026-10-31; verified: full suite 546 OK (`MyRegistersTests`, scoping helper test),
+      flutter test 31 OK (`test/register_screen_test.dart`), analyze 0 warnings, web build OK.
+      Notes: `/staff/register/<class>?date=` screen (`features/staff/screens/register/`), late sheet
+      (arrival time, Now/−5/−10, note), note sheet, "not saved, try again" on a failed save with the
+      marks kept; teacher-home reminder card (School homeroom teachers only). New
+      `GET school/register/?date=` (homeroom classes with the day's state, for the reminder) and
+      `branching.filter_homeroom_classes_for_user`. Mockup 12's offline footer left out (D16).
+      Screenshots: `school-app-screens/p4.6-register.png`.
 - [ ] **P4.7** Grades screens (marks list, term grades) for student/parent; gradebook entry for
       teachers. Needs: P2.4, P2.5. (Release 2.)
 - [ ] **P4.8** Parent: homework, payments, messages with teachers, notifications. Needs: P2.6, P2.7.
@@ -998,6 +1004,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-31 — P4.6 done (PR TBD): teacher register screen and the teacher-home reminder in the app,
+  plus `GET school/register/` (the user's homeroom classes with today's state). Weekday and month
+  names for the register title are in `strings.dart` (`registerDayTitle`); P4.5 can reuse them.
 
 - 2026-10-30 — PD.5 done: screens 20/20b (teacher grade entry, quarter grades) approved by the
   coordinator on the owner's behalf. P4.7 (Release 2) can be built against them.
