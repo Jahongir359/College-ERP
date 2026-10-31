@@ -1010,6 +1010,11 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-10-31 — P2.8 push safety fixes from QA's review of #57 (branch fix/school-push-safety):
+  FCM `INVALID_ARGUMENT` no longer deletes device tokens (only `UNREGISTERED`, 404 and
+  `SENDER_ID_MISMATCH` do; it is logged), and committed pushes go to one shared worker thread
+  instead of one thread per notification (monthly invoices). P2.8 stays `[~]` until the real phone test.
+
 - 2026-10-30 — P3.6 done (PR #64; takeover of the unpushed `feat/school-p3.6-web-brand` work): all Maktab
   web pages on the School brand, MAKTAB eyebrow over one title, year · quarter chip, tables kept on
   phones. New School web pages: use the `page_eyebrow`/`page_actions` blocks and `school-admin.css`.

@@ -154,6 +154,26 @@ class NotificationPushTests(PushTestCase):
             Notification.objects.create(recipient=self.user, message="Hi")
         self.assertFalse(DeviceToken.objects.filter(user=self.user).exists())
 
+    def test_invalid_argument_keeps_the_token_and_is_logged(self):
+        # FCM also says INVALID_ARGUMENT for a bad payload: never delete tokens for it.
+        bad = {
+            "error": {"status": "INVALID_ARGUMENT", "details": [{"errorCode": "INVALID_ARGUMENT"}]}
+        }
+        self.post.side_effect = [_response(400, bad), _response(400, bad)]
+        with self.assertLogs("main_app.push", "WARNING") as logs:
+            with self.captureOnCommitCallbacks(execute=True):
+                Notification.objects.create(recipient=self.user, message="Hi")
+        self.assertEqual(len(logs.records), 2)
+        self.assertIn("INVALID_ARGUMENT", logs.output[0])
+        self.assertEqual(DeviceToken.objects.filter(user=self.user).count(), 2)
+
+    def test_sender_id_mismatch_deletes_the_token(self):
+        mismatch = {"error": {"details": [{"errorCode": "SENDER_ID_MISMATCH"}]}}
+        self.post.side_effect = [_response(403, mismatch), _response()]
+        with self.captureOnCommitCallbacks(execute=True):
+            Notification.objects.create(recipient=self.user, message="Hi")
+        self.assertEqual(DeviceToken.objects.filter(user=self.user).count(), 1)
+
     def test_other_errors_keep_the_token_and_do_not_raise(self):
         self.post.side_effect = [_response(500), requests.ConnectionError("down")]
         with self.assertLogs("main_app.push", "WARNING") as logs:
@@ -345,3 +365,88 @@ class ParentChatPushTests(PushTestCase):
                 Notification.objects.create(recipient=self.mum, message="Hi")
                 Notification.objects.bulk_create([Notification(recipient=self.dad, message="Hi")])
         self.assertEqual(Notification.objects.filter(message="Hi").count(), 2)
+
+
+class _FakeThread:
+    """Records starts instead of running, so a test can run the worker itself."""
+
+    started = []
+
+    def __init__(self, target, name=None, daemon=None):
+        self.target = target
+
+    def start(self):
+        _FakeThread.started.append(self)
+
+
+@override_settings(FCM_SERVICE_ACCOUNT_JSON=FAKE_ACCOUNT, FCM_SEND_INLINE=False)
+class PushWorkerTests(PushTestCase):
+    """One worker per burst of commits, not one thread per notification."""
+
+    def setUp(self):
+        super().setUp()
+        _FakeThread.started = []
+        thread_patch = mock.patch.object(push.threading, "Thread", _FakeThread)
+        thread_patch.start()
+        self.addCleanup(thread_patch.stop)
+        self.addCleanup(self._reset_worker)
+        self._reset_worker()
+        self.users = []
+        for i in range(5):
+            user = _make_user(f"push-many-{i}@iceberg.internal", "3", f"ST9200{i}")
+            DeviceToken.objects.create(user=user, token=f"device-{i}")
+            self.users.append(user)
+
+    @staticmethod
+    def _reset_worker():
+        push._pending.clear()
+        push._worker = None
+
+    def test_many_notifications_in_one_transaction_start_one_worker(self):
+        send = mock.patch.object(push, "send_messages", wraps=push.send_messages)
+        with send as send_messages:
+            with self.captureOnCommitCallbacks(execute=True):
+                for user in self.users:  # like generate_invoices_for_month
+                    Notification.objects.create(recipient=user, message="Invoice")
+            self.assertEqual(len(_FakeThread.started), 1)
+            self.post.assert_not_called()  # nothing sent on the request thread
+            with mock.patch.object(push.connection, "close"):
+                _FakeThread.started[0].target()
+            send_messages.assert_called_once()
+        self.assertEqual({s[0] for s in self.sent()}, {f"device-{i}" for i in range(5)})
+        self.assertIsNone(push._worker)  # the slot is free for the next commit
+
+    def test_a_running_worker_picks_up_later_commits(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            Notification.objects.create(recipient=self.users[0], message="First")
+        with self.captureOnCommitCallbacks(execute=True):
+            Notification.objects.create(recipient=self.users[1], message="Second")
+        self.assertEqual(len(_FakeThread.started), 1)
+        with mock.patch.object(push.connection, "close"):
+            _FakeThread.started[0].target()
+        self.assertEqual({s[0] for s in self.sent()}, {"device-0", "device-1"})
+
+    def test_a_failing_batch_does_not_stop_the_worker(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            Notification.objects.create(recipient=self.users[0], message="Hi")
+        with mock.patch.object(push, "_send_batches", side_effect=RuntimeError("boom")):
+            with self.assertLogs("main_app.push", "ERROR"):
+                with mock.patch.object(push.connection, "close") as close:
+                    _FakeThread.started[0].target()
+        close.assert_called_once()
+        self.assertIsNone(push._worker)
+
+    def test_rolled_back_savepoint_sends_nothing(self):
+        from django.db import transaction
+
+        with self.captureOnCommitCallbacks(execute=True):
+            try:
+                with transaction.atomic():
+                    Notification.objects.create(recipient=self.users[0], message="Gone")
+                    raise RuntimeError("roll back")
+            except RuntimeError:
+                pass
+            Notification.objects.create(recipient=self.users[1], message="Kept")
+        with mock.patch.object(push.connection, "close"):
+            _FakeThread.started[0].target()
+        self.assertEqual([s[0] for s in self.sent()], ["device-1"])

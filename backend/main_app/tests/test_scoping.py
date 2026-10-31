@@ -52,6 +52,7 @@ SCHOOL_MODULES = (
     "school_timetable_views.py",
     "school_demo.py",
     "school_forms.py",
+    "push.py",
 )
 
 _CALL = re.compile(r"\.(?:filter|exclude|get)\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)", re.S)
