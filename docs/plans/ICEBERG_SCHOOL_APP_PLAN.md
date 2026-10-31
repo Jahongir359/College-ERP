@@ -854,8 +854,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [ ] **P4.7** Grades screens (marks list, term grades) for student/parent; gradebook entry for
       teachers. Needs: P2.4, P2.5. (Release 2.)
 - [ ] **P4.8** Parent: homework, payments, messages with teachers, notifications. Needs: P2.6, P2.7.
-- [ ] **P4.9** Hide Study Center-only features for School users per D11 (navigation by brand). Also hide
-      library, leave requests and feedback for School users to keep the School app simple (D16).
+- [~] **P4.9** Hide Study Center-only features for School users per D11 (navigation by brand). Also hide
+      library, leave requests and feedback for School users to keep the School app simple (D16). — claimed
+      2026-10-31, branch `feat/school-p4.9-brand-nav`.
 - [ ] **P4.10** Strings for every new screen in uz/ru/en; empty, loading and error states; widget tests
       for each new screen.
 - [-] **P4.11** Offline queue for the register and messages — dropped 2026-10-26 (D16, keep it simple). The
