@@ -80,6 +80,7 @@ class SchoolPageHeaderTests(_SchoolFixture):
             reverse("school_bells"),
             reverse("school_parents"),
             reverse("school_parent_detail", args=[parent.pk]),
+            reverse("school_board"),
         ]
         for url in urls:
             with self.subTest(url=url), _today():
