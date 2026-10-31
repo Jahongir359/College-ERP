@@ -1216,9 +1216,8 @@ def admin_notify_student(request):
 def _notify_user(recipient, message):
     """Create an in-app announcement for ``recipient``.
 
-    The old code also POSTed to the legacy FCM ``/fcm/send`` endpoint, which
-    Google shut down in 2024, so no push was ever delivered. Mobile push needs
-    the FCM HTTP v1 API (service-account credentials) — tracked separately.
+    The new ``Notification`` is pushed to the recipient's devices by
+    ``main_app.push`` (FCM HTTP v1, P2.8).
     """
     message = (message or "").strip()
     if not message:

@@ -384,6 +384,10 @@ msgstr "Красная ячейка — конфликт: учитель или 
 msgid "Years and quarters are shared by all branches."
 msgstr "Учебные годы и четверти общие для всех филиалов."
 
+#, python-format
+msgid "Quarter %(number)s"
+msgstr "%(number)s-я четверть"
+
 msgid "Only a super admin can change them."
 msgstr "Изменять их может только главный администратор."
 
@@ -918,3 +922,21 @@ msgstr "Опоздание"
 msgctxt "one pupil"
 msgid "Absent"
 msgstr "Отсутствует"
+# Push notification titles (P2.8)
+msgid "New result"
+msgstr "Новый результат"
+
+msgid "Announcement"
+msgstr "Объявление"
+
+msgid "Homework"
+msgstr "Домашнее задание"
+
+msgid "Payment"
+msgstr "Оплата"
+
+msgid "Notification"
+msgstr "Уведомление"
+
+msgid "Sent an attachment"
+msgstr "Отправил(а) файл"

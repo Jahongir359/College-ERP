@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_state.dart';
 import '../../../core/i18n/strings.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../core/theme/brand.dart';
+import '../../../core/theme/brand_provider.dart';
 
-/// ICEBERG login — dark navy/teal hero with the lime accent, shared by all
-/// roles (the API routes each role to its own shell after sign-in).
+/// ICEBERG login — dark hero in the brand picked on `/choose` (navy for the
+/// Study Center, maroon for the School), shared by all roles (the API routes
+/// each role to its own shell after sign-in).
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
   @override
@@ -25,8 +28,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _obscure = true;
   String? _error;
 
-  // Login renders before any role/theme is known — use the dark brand palette.
-  final IceTokens t = IceTokens.dark();
+  // Login renders before any role/theme is known — use the dark palette of
+  // the brand picked on /choose.
+  late IceTokens t;
 
   @override
   void dispose() {
@@ -56,6 +60,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
+    final brand = ref.watch(brandProvider);
+    t = IceTokens.dark(brand: brand);
     return Scaffold(
       backgroundColor: t.bg,
       body: Container(
@@ -100,15 +106,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         .scale(duration: 500.ms, curve: Curves.easeOutBack)
                         .fadeIn(duration: 300.ms),
                     const SizedBox(height: 18),
-                    Text(
-                      'ICEBERG',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 6,
-                        color: t.mint,
-                      ),
-                    ),
+                    if (brand.isSchool)
+                      Image.asset(
+                        'assets/images/brand/school/logo-h-white.png',
+                        height: 44,
+                        semanticLabel: brand.appTitle,
+                        errorBuilder: (_, __, ___) => _wordmark(),
+                      )
+                    else
+                      _wordmark(),
                     const SizedBox(height: 30),
 
                     // ── Card ────────────────────────────────────────────────
@@ -158,6 +164,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           curve: Curves.easeOutCubic,
                         )
                         .fadeIn(duration: 350.ms),
+                    const SizedBox(height: 18),
+                    _changeBrand(s, brand),
                   ],
                 ),
               ),
@@ -165,6 +173,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _wordmark() => Text(
+    'ICEBERG',
+    style: TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 6,
+      color: t.mint,
+    ),
+  );
+
+  /// "Iceberg School · Choose another" — back to /choose.
+  Widget _changeBrand(S s, IceBrand brand) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          '${brand.appTitle} · ',
+          style: TextStyle(fontSize: 13.5, color: t.textMid),
+        ),
+        TextButton(
+          key: const ValueKey('login-change-brand'),
+          onPressed: _loading ? null : () => context.go('/choose'),
+          style: TextButton.styleFrom(
+            foregroundColor: t.textHi,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            minimumSize: const Size(0, 40),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            s('Choose another'),
+            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800),
+          ),
+        ),
+      ],
     );
   }
 

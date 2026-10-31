@@ -1,6 +1,18 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "One login per family: a parent sees all their children in the app." %}</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  <a href="?panel=link" class="ice-manage-action{% if panel == 'link' %} ice-manage-action--primary{% endif %}">
+    <i class="fas fa-link" aria-hidden="true"></i> {% translate "Link by login ID" %}
+  </a>
+  <a href="?panel=new" class="ice-manage-add-btn">
+    <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New parent" %}
+  </a>
+</div>
+{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
@@ -9,24 +21,6 @@
 
 {% block content %}
 <div class="ice-manage-page">
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-user-friends"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">{% translate "Parents" %}</h2>
-        <p class="ice-manage-hero__subtitle">{% translate "One login per family: a parent sees all their children in the app." %}</p>
-      </div>
-    </div>
-    <div class="ice-manage-hero__actions">
-      <a href="?panel=link" class="ice-manage-action{% if panel == 'link' %} ice-manage-action--primary{% endif %}">
-        <i class="fas fa-link" aria-hidden="true"></i> {% translate "Link by login ID" %}
-      </a>
-      <a href="?panel=new" class="ice-manage-add-btn">
-        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New parent" %}
-      </a>
-    </div>
-  </section>
-
   <div class="school-split">
     <div>
       <form method="get" class="school-filter-row">
