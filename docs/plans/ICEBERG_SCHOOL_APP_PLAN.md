@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 5/9 (mockups 1–19 drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 5/6 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -818,7 +818,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
-- [~] **P3.7** Admin: register report page — claimed 2026-10-30, branch feat/school-p3.7-register-report — (screen 19, approved 2026-10-30): for a date and
+- [x] **P3.7** Admin: register report page (screen 19, approved 2026-10-30): for a date and
       optional class, which classes took the register (time, homeroom teacher), present/late/absent
       counts and rate per class, the list of absent and late pupils with arrival time and note, CSV
       export of the same rows. Read-only (teachers take the register in the app, D15); data from
@@ -826,6 +826,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
       branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
       Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
+      — done 2026-10-31, PR #PRNUM; verified: full suite 530 OK, `RegisterReportAccessTests`,
+      `RegisterReportContentTests`, `RegisterReportCsvTests`; page `/maktab/register/`
+      (`school_register_report_views.py`); screenshot next to the mockup:
+      `docs/plans/school-app-screens/p3.7-register-report.png`.
 - [ ] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
       desktop in the PR.
 
@@ -986,6 +990,12 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-31 — P3.7 done (PR #PRNUM): admin register report `/maktab/register/` (Maktab →
+  Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
+  CSV export; read-only, scoped by `branching.filter_classes_for_user`. For P3.6: the hero icon and
+  CSV button still use the shared teal `ice-manage-hero` styles, and the active sidebar item is
+  maroon on maroon under the School brand (shared styles, same on the other School pages).
 
 - 2026-10-30 — P0.7 code half (PR #56): `manage.py backup_db` and the backup and restore guide
   (`docs/DEPLOYMENT.md` section 7), tested with a real PostgreSQL 16 dump and restore. P0.7 stays
