@@ -1014,7 +1014,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-31 — Web audit fixes B1, M1 (PR #PRNUM): new students and teachers always get a branch (one-branch
+- 2026-10-31 — Web audit fixes B1, M1 (PR #71): new students and teachers always get a branch (one-branch
   admins get theirs, locked; super admins and admins of several branches must choose one they can
   see, `branching.assignable_branches`/`admin_only_branch`); edits can't clear or move it out of
   scope; the group form only lists and accepts teachers the admin can see. Also: edit student/teacher
