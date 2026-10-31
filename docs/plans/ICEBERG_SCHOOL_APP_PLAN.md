@@ -93,7 +93,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
+| P4 | App: choice screen, parent role, School screens | In progress — 3/12 (P4.11 dropped) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -860,14 +860,19 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       for each new screen.
 - [-] **P4.11** Offline queue for the register and messages — dropped 2026-10-26 (D16, keep it simple). The
       offline banner and a clear "not saved, try again" error stay in P4.10.
-- [~] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
+- [x] **P4.12** Minimum app version: API returns `min_app_version`; the app shows an "update" screen
       with store links when older. Tests. (Release 2, D16.) — **backend half done** 2026-10-28, PR #51;
       verified: `tests/test_app_version.py` AppVersionTests. Public `GET /api/v1/app/version/` (no
       token, under `/api/` so the login middleware lets it through) returns `min_app_version` and
       per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
       (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
-      = `0.0.0` (never blocks). **Still open:** the app's "update" screen (after P4.13).
-      — app half claimed 2026-10-30, branch feat/school-p4.12-update-screen.
+      = `0.0.0` (never blocks). — **app half done** 2026-10-31, PR #TBD; verified:
+      `test/app_update_test.dart` (10 tests) + backend AppVersionTests; screenshot
+      `docs/plans/school-app-screens/p4.12-update.png` (uz light, ru dark, 390 px). `lib/core/update/
+      app_update.dart`: `UpdateGate` in `MaterialApp.builder` asks `app/version/` once at start-up
+      (8 s timeout) and shows the "update" screen with the store button when the installed version
+      (`package_info_plus`) is older than the platform's minimum. Fails open: web, no answer, an error
+      or a malformed version let the app through.
 - [x] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
       the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
       avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
@@ -997,6 +1002,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-31 — P4.12 done (PR #TBD): the app's "update" screen (`UpdateGate`, `package_info_plus`)
+  on top of the PR #51 endpoint; fails open. To force an update, set `MIN_APP_VERSION[_ANDROID|_IOS]`
+  and the store URLs on the server. P4 board recounted: 3/12.
 
 - 2026-10-30 — PD.5 done: screens 20/20b (teacher grade entry, quarter grades) approved by the
   coordinator on the owner's behalf. P4.7 (Release 2) can be built against them.
