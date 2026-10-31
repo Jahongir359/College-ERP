@@ -70,6 +70,14 @@ flutter:
           weight: 800
         - asset: assets/fonts/Inter-Black.ttf
           weight: 900
+    # School display text only (plan section 6.2). Fraunces 72pt SuperSoft
+    # SemiBold from github.com/undercasetype/Fraunces, SIL Open Font License
+    # 1.1 (assets/fonts/Fraunces-OFL.txt). Latin only: Cyrillic and ʻ fall
+    # back to Inter (IceType.displayFallback).
+    - family: Fraunces
+      fonts:
+        - asset: assets/fonts/Fraunces-SemiBold.ttf
+          weight: 600
     - family: Roboto
       fonts:
         - asset: assets/fonts/Roboto-Regular.ttf

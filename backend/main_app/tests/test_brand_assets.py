@@ -64,6 +64,30 @@ class SchoolBrandStylesheetTests(SimpleTestCase):
         ]:
             self.assertRegex(self.css, rf"{re.escape(token)}:\s*{re.escape(value)};")
 
+    def test_defines_design_rule_tokens(self):
+        """PD.1: gold highlight, type scale, spacing and shapes (app plan 6.2)."""
+        for token, value in [
+            ("--brand-gold", "#C9973F"),
+            ("--brand-gold-ink", "#8A5A12"),
+            ("--brand-gold-soft", "#E9C77E"),
+            ("--brand-text-display", "28px"),
+            ("--brand-text-title", "22px"),
+            ("--brand-text-heading", "18px"),
+            ("--brand-text-body", "16px"),
+            ("--brand-text-label", "14px"),
+            ("--brand-text-caption", "12px"),
+            ("--brand-space-xxs", "4px"),
+            ("--brand-space-md", "16px"),
+            ("--brand-space-xxl", "32px"),
+            ("--brand-tap-min", "48px"),
+            ("--brand-radius-card", "24px"),
+            ("--brand-radius-chip", "14px"),
+            ("--brand-radius-sheet", "32px"),
+        ]:
+            self.assertRegex(self.css, rf"{re.escape(token)}:\s*{re.escape(value)};")
+        # Dark mode reads gold text in the soft gold.
+        self.assertRegex(self.css, r"--brand-gold-ink:\s*#E9C77E;")
+
 
 class SchoolBrandLogoTests(SimpleTestCase):
     def test_logo_crops_are_static_files(self):

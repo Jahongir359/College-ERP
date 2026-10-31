@@ -206,6 +206,27 @@ class IceTokens extends ThemeExtension<IceTokens> {
   Color get skySoft => sky.withValues(alpha: 0.16);
   Color get amberSoft => amber.withValues(alpha: 0.16);
 
+  // ── Shapes (plan 6.2): cards, chips/inputs, bottom sheets ────────────────
+  static const double r = 24;
+  static const double rSm = 14;
+  static const double rLg = 32;
+
+  // ── Highlight (plan 6.2) ─────────────────────────────────────────────────
+  // School: gold, for achievements, top grades and the active child chip.
+  // The Learning Center has no separate highlight, so it keeps its accent.
+
+  /// Highlight fill or ring. Never text on a light surface.
+  Color get highlight => brand.isSchool ? SchoolColors.gold : accent;
+
+  /// Highlight for text and icons on the page background.
+  Color get highlightInk => brand.isSchool
+      ? (isDark ? SchoolColors.goldSoft : SchoolColors.goldInk)
+      : accentInk;
+
+  /// Soft highlight fill (e.g. avatar circles with maroon initials).
+  Color get highlightSoft =>
+      brand.isSchool ? SchoolColors.goldSoft : accentSoft;
+
   LinearGradient get heroGradient => LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
