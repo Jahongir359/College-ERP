@@ -89,13 +89,13 @@ def _post(url, payload, access_token):
 
 
 def _is_dead_token(response):
-    if response.status_code == 404:
-        return True
+    # Only FCM's own error codes count: a bare 404 (wrong URL, proxy) says
+    # nothing about the token and must not delete it.
     try:
         details = response.json().get("error", {}).get("details", [])
     except ValueError:
         return False
-    return any(d.get("errorCode") in DEAD_TOKEN_ERRORS for d in details)
+    return any(isinstance(d, dict) and d.get("errorCode") in DEAD_TOKEN_ERRORS for d in details)
 
 
 def send_messages(messages):
@@ -145,7 +145,8 @@ def send_messages(messages):
 # Batches committed but not sent yet, and the one worker thread that sends
 # them. Every committed transaction adds its batches here; a worker is started
 # only when none is running, so a transaction that creates N notifications
-# (e.g. monthly invoices) starts at most one thread, not N.
+# (e.g. monthly invoices) starts at most one thread, not N. The worker is a
+# daemon, so batches still waiting when gunicorn restarts are lost: acceptable for push.
 _pending = []
 _pending_lock = threading.Lock()
 _worker = None
@@ -193,11 +194,19 @@ def _enqueue(batches):
         return
     with _pending_lock:
         _pending.extend(batches)
-        if _worker is not None:
+        if _worker is not None and _worker.is_alive():
             return
         _worker = threading.Thread(target=_work, name="fcm-push", daemon=True)
         worker = _worker
-    worker.start()
+    try:
+        worker.start()
+    except Exception:
+        # No thread (e.g. the process is out of threads): free the slot so the
+        # next commit tries again; the batches stay queued for it.
+        with _pending_lock:
+            if _worker is worker:
+                _worker = None
+        logger.exception("Could not start the push worker.")
 
 
 def _build_messages(users, title, body, data):

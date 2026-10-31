@@ -146,13 +146,20 @@ class NotificationPushTests(PushTestCase):
         self.post.assert_not_called()
 
     def test_dead_tokens_are_deleted(self):
-        self.post.side_effect = [
-            _response(404),
-            _response(400, {"error": {"details": [{"errorCode": "UNREGISTERED"}]}}),
-        ]
+        unregistered = {"error": {"details": [{"errorCode": "UNREGISTERED"}]}}
+        self.post.side_effect = [_response(404, unregistered), _response(400, unregistered)]
         with self.captureOnCommitCallbacks(execute=True):
             Notification.objects.create(recipient=self.user, message="Hi")
         self.assertFalse(DeviceToken.objects.filter(user=self.user).exists())
+
+    def test_bare_404_keeps_the_token_and_is_logged(self):
+        # A 404 without FCM's error code (wrong URL, a proxy) says nothing about the token.
+        self.post.side_effect = [_response(404), _response(404, {"error": {"details": "x"}})]
+        with self.assertLogs("main_app.push", "WARNING") as logs:
+            with self.captureOnCommitCallbacks(execute=True):
+                Notification.objects.create(recipient=self.user, message="Hi")
+        self.assertEqual(len(logs.records), 2)
+        self.assertEqual(DeviceToken.objects.filter(user=self.user).count(), 2)
 
     def test_invalid_argument_keeps_the_token_and_is_logged(self):
         # FCM also says INVALID_ARGUMENT for a bad payload: never delete tokens for it.
@@ -378,6 +385,9 @@ class _FakeThread:
     def start(self):
         _FakeThread.started.append(self)
 
+    def is_alive(self):
+        return self in _FakeThread.started
+
 
 @override_settings(FCM_SERVICE_ACCOUNT_JSON=FAKE_ACCOUNT, FCM_SEND_INLINE=False)
 class PushWorkerTests(PushTestCase):
@@ -435,6 +445,30 @@ class PushWorkerTests(PushTestCase):
                     _FakeThread.started[0].target()
         close.assert_called_once()
         self.assertIsNone(push._worker)
+
+    def test_a_worker_that_cannot_start_frees_the_slot(self):
+        with mock.patch.object(_FakeThread, "start", side_effect=RuntimeError("no threads")):
+            with self.assertLogs("main_app.push", "ERROR"):
+                with self.captureOnCommitCallbacks(execute=True):
+                    Notification.objects.create(recipient=self.users[0], message="First")
+        self.assertIsNone(push._worker)
+        # The next commit starts a worker, which also sends the batch still queued.
+        with self.captureOnCommitCallbacks(execute=True):
+            Notification.objects.create(recipient=self.users[1], message="Second")
+        self.assertEqual(len(_FakeThread.started), 1)
+        with mock.patch.object(push.connection, "close"):
+            _FakeThread.started[0].target()
+        self.assertEqual({s[0] for s in self.sent()}, {"device-0", "device-1"})
+
+    def test_a_dead_worker_is_replaced(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            Notification.objects.create(recipient=self.users[0], message="First")
+        _FakeThread.started.clear()  # the thread died without freeing the slot
+        self.assertIsNotNone(push._worker)
+        with self.captureOnCommitCallbacks(execute=True):
+            Notification.objects.create(recipient=self.users[1], message="Second")
+        self.assertEqual(len(_FakeThread.started), 1)
+        self.assertIs(push._worker, _FakeThread.started[0])
 
     def test_rolled_back_savepoint_sends_nothing(self):
         from django.db import transaction
