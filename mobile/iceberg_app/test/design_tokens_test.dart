@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iceberg_app/core/auth/auth_state.dart';
+import 'package:iceberg_app/core/router/app_router.dart';
 import 'package:iceberg_app/core/theme/brand.dart';
 import 'package:iceberg_app/core/theme/ice_tokens.dart';
 import 'package:iceberg_app/core/theme/ice_type.dart';
@@ -21,6 +26,25 @@ void main() {
       expect(SchoolColors.gold, const Color(0xFFC9973F));
       expect(SchoolColors.goldInk, const Color(0xFF8A5A12));
       expect(SchoolColors.goldSoft, const Color(0xFFE9C77E));
+    });
+
+    test('gold matches docs/brand/iceberg-school/tokens.json', () {
+      final json =
+          jsonDecode(
+                File(
+                  '../../docs/brand/iceberg-school/tokens.json',
+                ).readAsStringSync(),
+              )
+              as Map<String, dynamic>;
+      final school = json['brands']['school'] as Map<String, dynamic>;
+      Color hex(String v) => Color(int.parse('FF${v.substring(1)}', radix: 16));
+      expect(hex(school['light']['gold']), SchoolColors.gold);
+      expect(hex(school['light']['goldInk']), SchoolColors.goldInk);
+      expect(hex(school['light']['goldSoft']), SchoolColors.goldSoft);
+      expect(
+        hex(school['dark']['goldInk']),
+        IceTokens.dark(brand: IceBrand.school).highlightInk,
+      );
     });
 
     test('School themes expose gold as the highlight', () {
@@ -175,7 +199,9 @@ void main() {
           tester.view.devicePixelRatio = 1;
           addTearDown(tester.view.reset);
           await tester.pumpWidget(
-            MaterialApp(home: ComponentSheetScreen(school: school, dark: dark)),
+            MaterialApp(
+              home: ComponentSheetScreen(school: school, dark: dark),
+            ),
           );
           await tester.pump();
           expect(tester.takeException(), isNull);
@@ -187,5 +213,68 @@ void main() {
         });
       }
     }
+  });
+
+  group('component sheet route is debug-only', () {
+    IceUser user(String type) => IceUser(
+      id: 1,
+      email: 'u@example.com',
+      loginId: 'U1',
+      firstName: 'Test',
+      lastName: 'User',
+      userType: type,
+      brand: 'school',
+    );
+    final auths = {
+      'signed out': AuthState.unauth(),
+      'teacher': AuthState.auth(user('2')),
+      'parent': AuthState.auth(user('4')),
+      'admin': AuthState.auth(user('1')),
+    };
+
+    test('the guard is the compile-time kDebugMode', () {
+      // Release and profile builds compile with kDebugMode == false, which is
+      // the `debug: false` case below.
+      expect(kDebugMode, isTrue, reason: 'tests run in debug mode');
+    });
+
+    test('release: no route, and the path gets the normal role redirect', () {
+      expect(debugRoutes(debug: false), isEmpty);
+      auths.forEach((name, auth) {
+        expect(
+          appRedirect(auth, componentSheetPath, debug: false),
+          roleRedirect(auth, componentSheetPath),
+          reason: name,
+        );
+        expect(
+          appRedirect(auth, componentSheetPath, debug: false),
+          isNotNull,
+          reason: name,
+        );
+      });
+    });
+
+    test('debug: the route exists and opens for anyone', () {
+      final routes = debugRoutes(debug: true);
+      expect(routes, hasLength(1));
+      expect((routes.single as GoRoute).path, componentSheetPath);
+      auths.forEach((name, auth) {
+        expect(appRedirect(auth, componentSheetPath, debug: true), isNull);
+      });
+    });
+
+    test('every other path behaves exactly like roleRedirect', () {
+      for (final debug in [true, false]) {
+        auths.forEach((name, auth) {
+          for (final path in ['/login', '/student/home', '/staff/home']) {
+            expect(
+              appRedirect(auth, path, debug: debug),
+              roleRedirect(auth, path),
+              reason: '$name $path',
+            );
+          }
+        });
+      }
+    });
   });
 }

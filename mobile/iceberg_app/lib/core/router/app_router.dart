@@ -78,6 +78,23 @@ String? roleRedirect(AuthState auth, String path) {
   return null;
 }
 
+/// [roleRedirect] plus one debug-only exception (PD.1): in debug builds the
+/// component sheet opens for anyone. [debug] defaults to the compile-time
+/// [kDebugMode], so release and profile builds keep [roleRedirect] exactly.
+String? appRedirect(AuthState auth, String path, {bool debug = kDebugMode}) {
+  if (debug && path == componentSheetPath) return null;
+  return roleRedirect(auth, path);
+}
+
+/// Routes that exist only in debug builds (none in release or profile).
+List<RouteBase> debugRoutes({bool debug = kDebugMode}) => [
+  if (debug)
+    GoRoute(
+      path: componentSheetPath,
+      builder: (_, state) => ComponentSheetScreen.fromState(state),
+    ),
+];
+
 /// Routing by role:
 ///   - Student (user_type 3) → full /student/* experience
 ///   - Staff   (user_type 2) → teacher portal /staff/*
@@ -92,16 +109,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     refreshListenable: authListenable,
     redirect: (context, state) =>
-        // Debug builds only: the component sheet opens for anyone (PD.1).
-        kDebugMode && state.matchedLocation == componentSheetPath
-        ? null
-        : roleRedirect(ref.read(authProvider), state.matchedLocation),
+        appRedirect(ref.read(authProvider), state.matchedLocation),
     routes: [
-      if (kDebugMode)
-        GoRoute(
-          path: componentSheetPath,
-          builder: (_, state) => ComponentSheetScreen.fromState(state),
-        ),
+      ...debugRoutes(),
       GoRoute(path: '/splash', builder: (_, __) => const _SplashScreen()),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/coming-soon', builder: (_, __) => const ComingSoonScreen()),
