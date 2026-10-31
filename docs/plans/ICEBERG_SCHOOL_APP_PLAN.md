@@ -993,9 +993,10 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 
 - 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
   Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
-  CSV export; read-only, scoped by `branching.filter_classes_for_user`. For P3.6: the hero icon and
-  CSV button still use the shared teal `ice-manage-hero` styles, and the active sidebar item is
-  maroon on maroon under the School brand (shared styles, same on the other School pages).
+  CSV export; read-only, scoped by `branching.filter_classes_for_user`. Uses the P3.6 page header
+  (eyebrow, one title, "Download CSV" in `page_actions`), so the teal hero and the maroon-on-maroon
+  sidebar item seen before #64 are gone. CSV cells starting with = + - @ tab or CR get a leading
+  apostrophe (CSV injection), tested.
 
 - 2026-10-30 — P0.7 code half (PR #56): `manage.py backup_db` and the backup and restore guide
   (`docs/DEPLOYMENT.md` section 7), tested with a real PostgreSQL 16 dump and restore. P0.7 stays

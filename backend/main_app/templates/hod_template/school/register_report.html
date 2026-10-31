@@ -1,6 +1,15 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ day|date:"j E Y, l" }}</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  <a href="?date={{ day|date:'Y-m-d' }}{% if group %}&amp;class={{ group.pk }}{% endif %}&amp;export=csv" class="ice-manage-add-btn">
+    <i class="fas fa-download" aria-hidden="true"></i> {% translate "Download CSV" %}
+  </a>
+</div>
+{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
@@ -10,22 +19,6 @@
 
 {% block content %}
 <div class="ice-manage-page">
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-clipboard-check"></i></span>
-      <div class="ice-manage-hero__copy">
-        <p class="school-kicker">{% translate "School" %}</p>
-        <h2 class="ice-manage-hero__title">{% translate "Register report" %}</h2>
-        <p class="ice-manage-hero__subtitle">{{ day|date:"j E Y, l" }}</p>
-      </div>
-    </div>
-    <div class="ice-manage-hero__actions">
-      <a href="?date={{ day|date:'Y-m-d' }}{% if group %}&amp;class={{ group.pk }}{% endif %}&amp;export=csv" class="ice-manage-add-btn">
-        <i class="fas fa-download" aria-hidden="true"></i> {% translate "Download CSV" %}
-      </a>
-    </div>
-  </section>
-
   <form method="get" class="school-filter-row school-report-filters">
     <label class="school-field">
       <span class="sr-only">{% translate "Date" %}</span>

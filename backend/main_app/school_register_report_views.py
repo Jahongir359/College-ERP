@@ -118,12 +118,33 @@ def register_report(request):
     return render(request, "hod_template/school/register_report.html", report)
 
 
+# A cell starting with one of these is read as a formula by Excel and
+# LibreOffice (CSV injection); a leading apostrophe makes it plain text.
+_FORMULA_START = ("=", "+", "-", "@", "\t", "\r")
+
+
+def _safe(value):
+    if isinstance(value, str) and value.startswith(_FORMULA_START):
+        return "'" + value
+    return value
+
+
+class _SafeWriter:
+    """``csv.writer`` that neutralises formula-like text cells."""
+
+    def __init__(self, response):
+        self._writer = csv.writer(response)
+
+    def writerow(self, row):
+        self._writer.writerow([_safe(v) for v in row])
+
+
 def _report_csv(report):
     day = report["day"]
     response = HttpResponse(content_type="text/csv; charset=utf-8")
     response["Content-Disposition"] = f'attachment; filename="register-{day:%Y-%m-%d}.csv"'
     response.write("﻿")  # so Excel reads Uzbek and Russian letters as UTF-8
-    writer = csv.writer(response)
+    writer = _SafeWriter(response)
     writer.writerow(
         [
             _("Date"),

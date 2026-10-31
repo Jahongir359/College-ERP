@@ -182,3 +182,21 @@ class RegisterReportCsvTests(_ReportFixture):
         self.assertNotIn("5-B", text)
         self.assertNotIn("Kamola", text)
         self.assertIn("5-B", str(self.csv(self.super_admin)))
+
+    def test_formula_like_text_is_neutralised(self):
+        """CSV injection: text starting with = + - @ tab or CR opens as plain text."""
+        notes = ['=HYPERLINK("http://x")', "+1+1", "-2+3", "@SUM(A1)", "\tx", "\rx"]
+        report = AttendanceReport.objects.get(attendance=self.register, student=self.bekzod)
+        rows = []
+        for note in notes:
+            report.note = note
+            report.save(update_fields=["note"])
+            with translation.override("en"):
+                rows = self.csv(self.branch_admin)
+            bekzod = next(r for r in rows if r[2:3] == ["Bekzod Aliyev"])
+            self.assertEqual(bekzod[-1], "'" + note)
+        # Ordinary text and numbers are unchanged.
+        aziz = next(r for r in rows if r[2:3] == ["Aziz Karimov"])
+        self.assertEqual(aziz[-1], "Avtobus")
+        by_class = {r[1]: r for r in rows[: rows.index([])]}
+        self.assertEqual(by_class["3-A"][5:], ["1", "1", "1", "67"])
