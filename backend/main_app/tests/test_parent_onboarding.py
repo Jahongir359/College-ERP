@@ -1,5 +1,7 @@
 """Parent onboarding (PL.1): printed login letters and the first-login password change."""
 
+from unittest import mock
+
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -165,6 +167,16 @@ class PasswordChangeGateTests(_ParentFixture):
         self.assertEqual(again.get(reverse("api_notifications")).status_code, 403)
         self.assertEqual(again.get(reverse("api_me")).status_code, 200)
 
+    def test_login_is_allowed_with_a_stale_token(self):
+        # The app may still send the old Authorization header when it signs in again.
+        api, _ = self.jwt(self.mum.admin.login_id)
+        response = api.post(
+            reverse("api_login"),
+            {"identifier": self.mum.admin.login_id, "password": PASSWORD},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_web_login_sends_the_parent_to_the_app(self):
         """The web session isn't gated itself: parents land on /app/, the app's web
         build, which uses the API and so meets the same password change."""
@@ -282,3 +294,44 @@ class ClassLettersTests(_ParentFixture):
             CustomUser.objects.get(pk=self.far_parent.admin_id).check_password(PASSWORD)
         )
         self.assertEqual(self.client.get(self.url).status_code, 405)
+
+    def test_app_sign_in_counts_as_signed_in(self):
+        # Signing in through the app's API records last_login, so the class letters skip
+        # that parent and their password is not replaced.
+        self.client.force_login(self.school_admin)
+        response = APIClient().post(
+            reverse("api_login"),
+            {"identifier": self.mum.admin.login_id, "password": PASSWORD},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        mum = CustomUser.objects.get(pk=self.mum.admin_id)
+        self.assertIsNotNone(mum.last_login)
+        self.assertTrue(mum.must_change_password)  # signed in, not changed yet: still skipped
+        response = self.client.post(self.url)
+        self.assertRedirects(
+            response,
+            reverse("school_parents") + f"?class={self.class_7b.pk}",
+            fetch_redirect_response=False,
+        )
+        self.assertTrue(CustomUser.objects.get(pk=self.mum.admin_id).check_password(PASSWORD))
+
+    def test_parent_with_own_password_is_skipped(self):
+        # Accounts from before PL.1 may have no last_login although they use the app; they
+        # have no office-set password pending, so no class letter replaces it.
+        CustomUser.objects.filter(pk=self.mum.admin_id).update(must_change_password=False)
+        self.client.force_login(self.school_admin)
+        html = self.html(reverse("school_parents") + f"?class={self.class_7b.pk}")
+        self.assertNotIn("has not signed in yet", html)
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(CustomUser.objects.get(pk=self.mum.admin_id).check_password(PASSWORD))
+
+    def test_letters_are_all_or_nothing(self):
+        self.client.force_login(self.school_admin)
+        with mock.patch(
+            "main_app.school_parent_views.render", side_effect=RuntimeError("template broke")
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(self.url)
+        self.assertTrue(CustomUser.objects.get(pk=self.mum.admin_id).check_password(PASSWORD))

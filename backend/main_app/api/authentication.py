@@ -13,6 +13,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # URL names (api/urls.py) a user may call before changing the password.
 ALLOWED_BEFORE_CHANGE = {
+    "api_login",
     "api_me",
     "api_change_password",
     "api_logout",

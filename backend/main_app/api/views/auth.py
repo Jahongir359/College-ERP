@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import update_last_login
 from django.core.exceptions import PermissionDenied as DjangoPermissionDenied
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -58,6 +59,8 @@ class LoginView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        # Record the sign-in: class login letters skip parents who have signed in (PL.1).
+        update_last_login(None, user)
         refresh = RefreshToken.for_user(user)
         return Response(
             {

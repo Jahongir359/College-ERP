@@ -10,6 +10,7 @@ with the admin API of P1.7. CSV import is Release 2 (D16).
 import segno
 from django.conf import settings
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Count, Prefetch, Q
 from django.http import Http404
 from django.shortcuts import redirect, render
@@ -167,7 +168,7 @@ def parent_list(request):
         "child_form": child_form,
         "link_form": link_form,
         # Letters for a class go only to parents who never signed in (see class_letters).
-        "letters_waiting": sum(1 for p in rows if p.admin.last_login is None) if group else 0,
+        "letters_waiting": sum(1 for p in rows if _letter_due(p.admin)) if group else 0,
     }
     return render(request, "hod_template/school/parents.html", context)
 
@@ -302,6 +303,14 @@ def _letter_language(request):
     return language if language in dict(settings.LANGUAGES) else translation.get_language()
 
 
+def _letter_due(user):
+    """A class letter goes only to a parent who has never signed in and still has a
+    password the office set. Both are checked because the app's login did not record
+    ``last_login`` before PL.1: a parent already using the app may have none, but their
+    ``must_change_password`` is false (accounts made before PL.1, or they chose their own)."""
+    return user.last_login is None and user.must_change_password
+
+
 def _letters(request, parents_list):
     """Give each parent a new temporary password and render one printable letter each.
 
@@ -310,30 +319,34 @@ def _letters(request, parents_list):
     """
     url = _download_url(request)
     qr = mark_safe(segno.make(url, error="m").svg_inline(scale=4, dark="#1F1515"))
-    letters = []
-    for parent in parents_list:
-        password = parents.temporary_password()
-        parents.update_parent(parent, password=password)
-        links = list(parents.visible_links(request.user, parent))
-        class_of = _class_names([link.student_id for link in links])
-        children = [
-            (link.student.admin.get_full_name(), class_of.get(link.student_id)) for link in links
-        ]
-        branch = next((link.student.branch for link in links if link.student.branch_id), None)
-        letters.append(
-            {"parent": parent, "password": password, "children": children, "branch": branch}
-        )
-    context = {
-        "letters": letters,
-        "qr": qr,
-        "download_url": url,
-        "web_url": request.build_absolute_uri("/app/"),
-        "store_android": settings.APP_STORE_URL_ANDROID,
-        "store_ios": settings.APP_STORE_URL_IOS,
-        "back_url": request.POST.get("next") or reverse("school_parents"),
-    }
-    with translation.override(_letter_language(request)):
-        response = render(request, "hod_template/school/parent_letters.html", context)
+    # All passwords are replaced and the page rendered together, or nothing changes:
+    # a failure half-way must not leave parents with passwords nobody printed.
+    with transaction.atomic():
+        letters = []
+        for parent in parents_list:
+            password = parents.temporary_password()
+            parents.update_parent(parent, password=password)
+            links = list(parents.visible_links(request.user, parent))
+            class_of = _class_names([link.student_id for link in links])
+            children = [
+                (link.student.admin.get_full_name(), class_of.get(link.student_id))
+                for link in links
+            ]
+            branch = next((link.student.branch for link in links if link.student.branch_id), None)
+            letters.append(
+                {"parent": parent, "password": password, "children": children, "branch": branch}
+            )
+        context = {
+            "letters": letters,
+            "qr": qr,
+            "download_url": url,
+            "web_url": request.build_absolute_uri("/app/"),
+            "store_android": settings.APP_STORE_URL_ANDROID,
+            "store_ios": settings.APP_STORE_URL_IOS,
+            "back_url": request.POST.get("next") or reverse("school_parents"),
+        }
+        with translation.override(_letter_language(request)):
+            response = render(request, "hod_template/school/parent_letters.html", context)
     add_never_cache_headers(response)  # the page shows passwords: don't keep it in a cache
     return response
 
@@ -349,7 +362,8 @@ def parent_letter(request, pk):
 @require_POST
 def class_letters(request, class_pk):
     """Letters for a whole class, for the parent meeting (D14). Only parents who have
-    never signed in get one, so a family already using the app keeps its password;
+    never signed in and still have an office-set password get one (``_letter_due``), so a
+    family already using the app keeps its password;
     for them the office prints a single letter from the parent page."""
     group = (
         branching.filter_classes_for_user(request.user, Group.objects.all())
@@ -364,6 +378,7 @@ def class_letters(request, class_pk):
             child_links__student__enrollment__group=group,
             child_links__student__enrollment__is_active=True,
             admin__last_login__isnull=True,
+            admin__must_change_password=True,
         )
         .distinct()
         .order_by("admin__last_name", "admin__first_name")
