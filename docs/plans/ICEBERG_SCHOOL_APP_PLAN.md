@@ -851,7 +851,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       unpaid invoice. Needs: P1.6.
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
 - [x] **P4.6** Teacher register screen (fast: everyone present by default, tap to change). Needs: P2.2.
-      — done 2026-10-31; verified: full suite 546 OK (`MyRegistersTests`, scoping helper test),
+      — done 2026-10-31, PR #66; verified: full suite 546 OK (`MyRegistersTests`, scoping helper test),
       flutter test 31 OK (`test/register_screen_test.dart`), analyze 0 warnings, web build OK.
       Notes: `/staff/register/<class>?date=` screen (`features/staff/screens/register/`), late sheet
       (arrival time, Now/−5/−10, note), note sheet, "not saved, try again" on a failed save with the
@@ -1005,7 +1005,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-31 — P4.6 done (PR TBD): teacher register screen and the teacher-home reminder in the app,
+- 2026-10-31 — P4.6 done (PR #66): teacher register screen and the teacher-home reminder in the app,
   plus `GET school/register/` (the user's homeroom classes with today's state). Weekday and month
   names for the register title are in `strings.dart` (`registerDayTitle`); P4.5 can reuse them.
 
