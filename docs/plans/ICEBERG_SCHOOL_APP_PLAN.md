@@ -95,7 +95,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
-| PL | Launch readiness: onboarding, support, training, consent | Open — 1/7 |
+| PL | Launch readiness: onboarding, support, training, consent | In progress — 1/7 |
 | P6 | Pilot and quality | Open — 1/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 | P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
@@ -926,7 +926,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       login, `me/`, change-password, logout, fcm-token and app/version until it's changed (the web login sends
       parents to `/app/`, which uses the API). Letters: "Print login letter" on the parent page, "Print
       login letters" for a class (only parents who never signed in and still have an office-set
-      password; the app's login records `last_login`), uz/ru/en, each with a new temporary
+      password: `school_parent_views._letter_due`, `last_login` empty and `must_change_password` true;
+      the app's login now records `last_login` via `update_last_login`), uz/ru/en, each with a new temporary
       password and a QR (segno) to `APP_DOWNLOAD_URL` (blank: `/download/`). Demo parents aren't flagged.
       The SMS with login ID and store link (D14) and SMS resets (D13) are PL.2.
 - [ ] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
