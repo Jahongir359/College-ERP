@@ -174,6 +174,9 @@ class CustomUser(AbstractUser):
     avatar = models.CharField(max_length=10, blank=True, default="")
     address = models.TextField(blank=True, default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
+    # Set when an admin gives the password (new parent, reset, login letter); the API then
+    # allows only me/, change-password and logout until the user picks their own (PL.1).
+    must_change_password = models.BooleanField(default=False)
     # Web language chosen with the header switch ("uz", "ru", "en"); blank = default (P3.0).
     language = models.CharField(max_length=5, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)

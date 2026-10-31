@@ -95,7 +95,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
-| PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
+| PL | Launch readiness: onboarding, support, training, consent | In progress — 1/7 |
 | P6 | Pilot and quality | Open — 1/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 | P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
@@ -915,8 +915,21 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### PL — Launch readiness (non-code and support)
 
-- [ ] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
-      pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3.
+- [x] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
+      pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3. — done
+      2026-10-30, PR #58 (**merge after the app's choose-password screen in P4.3**); verified: full suite
+      563 OK (2026-10-31, after merging main with P2.8 and the QA fixes), `test_parent_onboarding`. Migration
+      `0051_customuser_must_change_password`. Notes: `CustomUser.must_change_password` is set whenever the
+      office sets a parent's password (`parents.create_parent`/`update_parent`: new parent, reset, letter)
+      and cleared by `me/change-password/`. The API returns it in the login response and `me/`;
+      `api/authentication.py` (the DRF default) answers 403 `{"detail": …, "code": "password_change_required"}` to everything except
+      login, `me/`, change-password, logout, fcm-token and app/version until it's changed (the web login sends
+      parents to `/app/`, which uses the API). Letters: "Print login letter" on the parent page, "Print
+      login letters" for a class (only parents who never signed in and still have an office-set
+      password: `school_parent_views._letter_due`, `last_login` empty and `must_change_password` true;
+      the app's login now records `last_login` via `update_last_login`), uz/ru/en, each with a new temporary
+      password and a QR (segno) to `APP_DOWNLOAD_URL` (blank: `/download/`). Demo parents aren't flagged.
+      The SMS with login ID and store link (D14) and SMS resets (D13) are PL.2.
 - [ ] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
       with an audit log). Tests.
 - [ ] **PL.3** One-page guides in uz/ru: for parents (install, log in, what each tab shows) and for
@@ -996,6 +1009,11 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-31 — PL.1 done (PR #58): printed parent login letters and the first-login password change
+  (API flag + 403 gate with `code` in the body). Migration `0051_customuser_must_change_password`
+  (after P2.8's 0050). QA fixes: the app's login records `last_login`; class letters go only to
+  parents who never signed in **and** still have an office-set password; `api_login` allowed.
 
 - 2026-10-30 — PD.5 done: screens 20/20b (teacher grade entry, quarter grades) approved by the
   coordinator on the owner's behalf. P4.7 (Release 2) can be built against them.

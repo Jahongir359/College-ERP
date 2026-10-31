@@ -127,6 +127,7 @@ def create_parent(first_name, last_name, phone, password, student, relation, is_
         first_name=first_name,
         last_name=last_name,
         login_id=login_id,
+        must_change_password=True,  # the office chose it; the parent picks their own (PL.1)
     )
     parent = user.parent
     parent.phone = phone
@@ -144,6 +145,7 @@ def update_parent(parent, first_name=None, last_name=None, phone=None, password=
         user.last_name = last_name
     if password:
         user.set_password(password)
+        user.must_change_password = True  # set by the office: temporary until changed (PL.1)
     user.save()
     if phone is not None:
         parent.phone = phone

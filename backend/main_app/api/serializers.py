@@ -147,8 +147,10 @@ class MeSerializer(serializers.ModelSerializer):
             "brand_name",
             "role",
             "children",
+            # True until the user replaces a password the office gave them (PL.1).
+            "must_change_password",
         ]
-        read_only_fields = ["id", "email", "login_id", "user_type"]
+        read_only_fields = ["id", "email", "login_id", "user_type", "must_change_password"]
 
     def get_role(self, obj):
         return self.ROLE_NAMES.get(str(obj.user_type))

@@ -1,0 +1,118 @@
+{% load static i18n %}<!doctype html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>{% translate "Login letters" %}</title>
+  <style>
+    /* Plain print page (PL.1): no sidebar, one A4 letter per parent. */
+    :root { --m: #4C0909; --gold: #8A5A12; --text: #1F1515; --muted: #5A4747; --border: #E8DCDA; --tint: #F8F1F0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text); background: #EFE7E5; }
+    .toolbar { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      padding: 12px 16px; background: #fff; border-bottom: 1px solid var(--border); }
+    .toolbar strong { margin-right: auto; }
+    .toolbar a, .toolbar button { font: inherit; font-weight: 700; padding: 9px 16px; border-radius: 10px; cursor: pointer;
+      border: 1px solid var(--border); background: #fff; color: var(--m); text-decoration: none; }
+    .toolbar button { background: var(--m); color: #fff; border-color: var(--m); }
+    .warn { width: 100%; margin: 0; font-size: 13px; color: var(--muted); }
+    .letter { width: 210mm; min-height: 297mm; margin: 16px auto; padding: 18mm 18mm 14mm; background: #fff; }
+    .head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8mm; border-bottom: 2px solid var(--m); }
+    .head img { height: 15mm; }
+    .head span { font-size: 12px; color: var(--muted); text-align: right; }
+    h1 { margin: 9mm 0 2mm; font-size: 24px; color: var(--m); }
+    .lead { margin: 0 0 6mm; font-size: 14.5px; line-height: 1.5; }
+    .kids { margin: 0 0 7mm; padding: 4mm 5mm; border-radius: 3mm; background: var(--tint); font-size: 14px; }
+    .kids ul { margin: 2mm 0 0; padding-left: 5mm; }
+    ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+    ol.steps > li { counter-increment: s; position: relative; margin: 0 0 6mm; padding-left: 11mm; font-size: 14.5px; line-height: 1.5; }
+    ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 7.5mm; height: 7.5mm; border-radius: 50%;
+      display: grid; place-items: center; background: var(--m); color: #fff; font-weight: 800; font-size: 13px; }
+    .qr-row { display: flex; gap: 6mm; align-items: center; margin-top: 3mm; }
+    .qr-row svg { width: 34mm; height: 34mm; flex: none; }
+    .url { font-family: "SFMono-Regular", Consolas, monospace; font-size: 12.5px; word-break: break-all; }
+    .small { font-size: 12px; color: var(--muted); }
+    .creds { display: grid; grid-template-columns: auto 1fr; gap: 2mm 6mm; margin-top: 3mm; padding: 5mm 6mm;
+      border: 1.5px dashed var(--gold); border-radius: 3mm; }
+    .creds dt { font-size: 13px; color: var(--muted); align-self: center; }
+    .creds dd { margin: 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 22px; font-weight: 700; letter-spacing: .06em; }
+    .foot { margin-top: 8mm; padding-top: 4mm; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+    @media screen and (max-width: 820px) {
+      .letter { width: auto; min-height: 0; margin: 12px; padding: 20px 16px; }
+      .qr-row { flex-direction: column; align-items: flex-start; }
+    }
+    @media print {
+      @page { size: A4; margin: 0; }
+      body { background: #fff; }
+      .toolbar { display: none; }
+      .letter { margin: 0; page-break-after: always; break-after: page; }
+      .letter:last-child { page-break-after: auto; break-after: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <strong>{% blocktranslate count n=letters|length %}{{ n }} login letter{% plural %}{{ n }} login letters{% endblocktranslate %}</strong>
+    <a href="{{ back_url }}">← {% translate "Back" %}</a>
+    <button type="button" onclick="window.print()">{% translate "Print" %}</button>
+    <p class="warn">{% translate "Each letter has a new temporary password; the old ones no longer work. Print now: these passwords are not shown again." %}</p>
+  </div>
+
+  {% for letter in letters %}
+  <section class="letter">
+    <div class="head">
+      <img src="{% static 'dist/img/brand/school/logo-h-maroon.png' %}" alt="Iceberg School">
+      <span>{% if letter.branch %}{{ letter.branch.name }}<br>{% endif %}{% now "d.m.Y" %}</span>
+    </div>
+
+    <h1>{% translate "Your login to the Iceberg app" %}</h1>
+    <p class="lead">
+      {% blocktranslate with name=letter.parent.admin.get_full_name %}Dear {{ name }}, in the app you can see your child's timetable, attendance, homework and payments, and write to the teachers.{% endblocktranslate %}
+    </p>
+
+    {% if letter.children %}
+    <div class="kids">
+      <strong>{% translate "Your children at school" %}</strong>
+      <ul>
+        {% for name, class_name in letter.children %}<li>{{ name }}{% if class_name %} — {{ class_name }}{% endif %}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <ol class="steps">
+      <li>
+        <strong>{% translate "Install the app." %}</strong>
+        {% translate "Scan the code with your phone's camera and open the link." %}
+        <div class="qr-row">
+          {{ qr }}
+          <div>
+            <div class="url">{{ download_url }}</div>
+            {% if store_android %}<div class="small">Google Play: <span class="url">{{ store_android }}</span></div>{% endif %}
+            {% if store_ios %}<div class="small">App Store: <span class="url">{{ store_ios }}</span></div>{% endif %}
+          </div>
+        </div>
+      </li>
+      <li><strong>{% translate "Open the app and choose “Iceberg School”." %}</strong></li>
+      <li>
+        <strong>{% translate "Sign in with:" %}</strong>
+        <dl class="creds">
+          <dt>{% translate "Login ID" %}</dt><dd>{{ letter.parent.admin.login_id }}</dd>
+          <dt>{% translate "Temporary password" %}</dt><dd>{{ letter.password }}</dd>
+        </dl>
+      </li>
+      <li>
+        <strong>{% translate "Choose your own password." %}</strong>
+        {% translate "The app asks for it right after the first sign-in. Don't share it with anyone." %}
+      </li>
+    </ol>
+
+    <div class="foot">
+      {% blocktranslate with url=web_url %}No smartphone? You can also sign in from a browser: {{ url }}{% endblocktranslate %}<br>
+      {% translate "Lost this letter or forgot your password? Ask the school office for a new one." %}
+    </div>
+  </section>
+  {% endfor %}
+</body>
+</html>
