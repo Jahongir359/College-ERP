@@ -6,6 +6,7 @@ import 'core/router/app_router.dart';
 import 'core/settings/app_settings.dart';
 import 'core/theme/brand_provider.dart';
 import 'core/theme/ice_tokens.dart';
+import 'core/update/app_update.dart';
 
 final sharedPrefsProvider = Provider<SharedPreferences>(
   (ref) => throw UnimplementedError(),
@@ -73,7 +74,8 @@ class IcebergApp extends ConsumerWidget {
             decorationColor: Colors.transparent,
             decorationThickness: 0,
           ),
-          child: child ?? const SizedBox.shrink(),
+          // Too old an app version shows the "update" screen instead (P4.12).
+          child: UpdateGate(child: child ?? const SizedBox.shrink()),
         );
       },
     );

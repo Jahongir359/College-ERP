@@ -437,6 +437,11 @@ class S {
     'Your classes will appear here once assigned.': 'Sinflar biriktirilgach shu yerda koʻrinadi.',
     'due': 'qarz',
     'Next': 'Keyingi',
+
+    // ── App update screen (P4.12) ────────────────────────────────────────
+    'Update required': 'Yangilash kerak',
+    'This version of the app is no longer supported. Please install the latest version to continue.': 'Ilovaning bu versiyasi endi qoʻllab-quvvatlanmaydi. Davom etish uchun eng soʻnggi versiyasini oʻrnating.',
+    'Update': 'Yangilash',
   };
 
   static const _ru = <String, String>{
@@ -872,6 +877,11 @@ class S {
     'Your classes will appear here once assigned.': 'Классы появятся здесь после назначения.',
     'due': 'к оплате',
     'Next': 'Следующий',
+
+    // ── App update screen (P4.12) ────────────────────────────────────────
+    'Update required': 'Требуется обновление',
+    'This version of the app is no longer supported. Please install the latest version to continue.': 'Эта версия приложения больше не поддерживается. Установите последнюю версию, чтобы продолжить.',
+    'Update': 'Обновить',
   };
 
   static const _ko = <String, String>{
@@ -1304,6 +1314,11 @@ class S {
     'Your classes will appear here once assigned.': '학급이 배정되면 여기에 표시됩니다.',
     'due': '미납',
     'Next': '다음',
+
+    // ── App update screen (P4.12) ────────────────────────────────────────
+    'Update required': '업데이트 필요',
+    'This version of the app is no longer supported. Please install the latest version to continue.': '이 버전의 앱은 더 이상 지원되지 않습니다. 계속하려면 최신 버전을 설치하세요.',
+    'Update': '업데이트',
   };
 
   /// Translate [key] (the English string doubles as the key).

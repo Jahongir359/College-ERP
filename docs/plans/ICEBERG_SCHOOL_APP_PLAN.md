@@ -866,6 +866,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       per platform `android`/`ios` `{min_app_version, store_url}` from env vars `MIN_APP_VERSION`
       (+ `_ANDROID` / `_IOS` overrides) and `APP_STORE_URL_ANDROID` / `_IOS`. Blank or malformed
       = `0.0.0` (never blocks). **Still open:** the app's "update" screen (after P4.13).
+      — app half claimed 2026-10-30, branch feat/school-p4.12-update-screen.
 - [x] **P4.13** Existing screens readable and in the user's language under the School brand. Found in
       the 2026-10-28 screenshots of the running app (demo school, `SCHOOL_BRAND_ENABLED=True`): the
       avatar letter on the pupil and teacher home cards and "No attendance recorded yet" are dark red on
