@@ -1,6 +1,15 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% if year %}{{ year }}{% else %}{% translate "No academic year yet." %}{% endif %}</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  <a href="{% url 'school_class_add' %}" class="ice-manage-add-btn">
+    <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New class" %}
+  </a>
+</div>
+{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
@@ -9,20 +18,6 @@
 
 {% block content %}
 <div class="ice-manage-page" data-manage-search-scope>
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-door-open"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">{% translate "Classes" %}</h2>
-        <p class="ice-manage-hero__subtitle">{% if year %}{{ year }}{% else %}{% translate "No academic year yet." %}{% endif %}</p>
-      </div>
-    </div>
-    <div class="ice-manage-hero__actions">
-      <a href="{% url 'school_class_add' %}" class="ice-manage-add-btn">
-        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "New class" %}
-      </a>
-    </div>
-  </section>
 
   {% if years|length > 1 %}
   <form method="get" class="ice-manage-filter">

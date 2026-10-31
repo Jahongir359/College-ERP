@@ -1,6 +1,29 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'school_parents' %}">{% translate "School" %} · {% translate "Parents" %}</a></p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "Login ID" %}: {{ parent.admin.login_id }}</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  <a href="{% url 'school_parents' %}" class="ice-manage-action">← {% translate "All parents" %}</a>
+  <form method="post" action="{% url 'school_parent_reset_password' parent.pk %}" class="school-inline-form">
+    {% csrf_token %}
+    <button type="submit" class="ice-manage-action"
+            data-confirm="{% translate 'Give this parent a new password? The old one stops working.' %}"
+            onclick="return confirm(this.dataset.confirm)">
+      <i class="fas fa-key" aria-hidden="true"></i> {% translate "Reset password" %}
+    </button>
+  </form>
+  <form method="post" action="{% url 'school_parent_delete' parent.pk %}" class="school-inline-form">
+    {% csrf_token %}
+    <button type="submit" class="ice-manage-action ice-manage-action--danger"
+            data-confirm="{% translate 'Delete this parent login? Their children stay.' %}"
+            onclick="return confirm(this.dataset.confirm)">
+      {% translate "Delete" %}
+    </button>
+  </form>
+</div>
+{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
@@ -9,35 +32,6 @@
 
 {% block content %}
 <div class="ice-manage-page">
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-user-friends"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">{{ parent.admin.get_full_name }}</h2>
-        <p class="ice-manage-hero__subtitle">{% translate "Login ID" %}: {{ parent.admin.login_id }}</p>
-      </div>
-    </div>
-    <div class="ice-manage-hero__actions">
-      <a href="{% url 'school_parents' %}" class="ice-manage-action">← {% translate "All parents" %}</a>
-      <form method="post" action="{% url 'school_parent_reset_password' parent.pk %}" class="school-inline-form">
-        {% csrf_token %}
-        <button type="submit" class="ice-manage-action"
-                data-confirm="{% translate 'Give this parent a new password? The old one stops working.' %}"
-                onclick="return confirm(this.dataset.confirm)">
-          <i class="fas fa-key" aria-hidden="true"></i> {% translate "Reset password" %}
-        </button>
-      </form>
-      <form method="post" action="{% url 'school_parent_delete' parent.pk %}" class="school-inline-form">
-        {% csrf_token %}
-        <button type="submit" class="ice-manage-action ice-manage-action--danger"
-                data-confirm="{% translate 'Delete this parent login? Their children stay.' %}"
-                onclick="return confirm(this.dataset.confirm)">
-          {% translate "Delete" %}
-        </button>
-      </form>
-    </div>
-  </section>
-
   {% if new_password %}
   <div class="school-password" role="status">
     <strong>{% translate "New password" %}: <code>{{ new_password }}</code></strong>

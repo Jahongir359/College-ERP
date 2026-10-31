@@ -1,6 +1,13 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}{% if group %}<p class="page-subtitle">{{ group.name }} · {{ group.branch.name }} · {{ group.session }}</p>{% endif %}{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  {% if group %}<a href="{% url 'school_class_detail' group.pk %}" class="ice-manage-action">{% translate "Class page" %}</a>{% endif %}
+</div>
+{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
@@ -9,20 +16,6 @@
 
 {% block content %}
 <div class="ice-manage-page">
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-table"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">{% translate "Timetable" %}{% if group %} · {{ group.name }}{% endif %}</h2>
-        <p class="ice-manage-hero__subtitle">{% if group %}{{ group.branch.name }} · {{ group.session }}{% endif %}</p>
-      </div>
-    </div>
-    {% if group %}
-    <div class="ice-manage-hero__actions">
-      <a href="{% url 'school_class_detail' group.pk %}" class="ice-manage-action">{% translate "Class page" %}</a>
-    </div>
-    {% endif %}
-  </section>
 
   {% if not group %}
   <div class="ice-manage-empty">

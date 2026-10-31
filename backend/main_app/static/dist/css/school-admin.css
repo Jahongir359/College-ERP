@@ -1,4 +1,43 @@
 /* Maktab admin pages (plan task P3.1, mockup 16). Builds on admin-manage-mobile.css. */
+
+/* Page header (P3.6): eyebrow over one title, actions on the right; the
+   breadcrumb takes the full row below. */
+.page-header:has(> .page-actions) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: 16px;
+}
+.page-header:has(> .page-actions) > nav { grid-column: 1 / -1; }
+.page-eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.page-eyebrow a { color: inherit; text-decoration: none; }
+.page-eyebrow a:hover { text-decoration: underline; }
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+@media (max-width: 640px) {
+  .page-header:has(> .page-actions) { grid-template-columns: minmax(0, 1fr); row-gap: 12px; }
+  .page-actions { justify-content: flex-start; }
+}
+
+/* admin-manage-mobile.css hides .ice-manage-table-wrap below 1025px in favour
+   of a card list; Maktab pages have no card list, so keep their tables and let
+   them scroll sideways. */
+@media (max-width: 1024px) {
+  .ice-manage-page .ice-manage-table-wrap { display: block; }
+  .ice-manage-page .ice-manage-table { min-width: 560px; }
+}
+
 .school-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -87,7 +126,7 @@
 /* Parents list and parent page (P3.3, mockups 18 and 18b) */
 .school-split { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
 .school-split--detail { grid-template-columns: 300px minmax(0, 1fr); }
-.school-split > div { display: grid; gap: 16px; align-content: start; }
+.school-split > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-content: start; }
 .school-filter-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .school-filter-row .ice-manage-search { flex: 1 1 240px; margin: 0; }
 .school-filter-row .ice-manage-filter__select { flex: 0 1 180px; width: auto; margin: 0; }
@@ -143,7 +182,8 @@
 }
 .school-password code { font-size: 18px; letter-spacing: .06em; color: inherit; background: none; }
 @media (max-width: 960px) {
-  .school-split, .school-split--detail { grid-template-columns: 1fr; }
+  /* minmax(0, …): a plain 1fr track grows to its widest child (the children table). */
+  .school-split, .school-split--detail { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
   .school-pair { grid-template-columns: 1fr; }
