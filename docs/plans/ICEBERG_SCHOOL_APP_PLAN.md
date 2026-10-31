@@ -91,11 +91,11 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
-| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 5/9 (mockups 1–19 drawn) |
+| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
-| PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
+| PL | Launch readiness: onboarding, support, training, consent | Open — 1/7 |
 | P6 | Pilot and quality | Open — 1/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 | P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
@@ -362,8 +362,8 @@ money is shown as `[summa]` because prices are not decided.
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
 | 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note — **approved 2026-10-30 (owner delegated to the reviewer session)** | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
-| 20 | Teacher grade entry — Release 2: class subject picker, date and kind (Dars / Nazorat ishi / Imtihon), 2–5 per pupil (tap again to clear), pupils absent today dimmed | [20-grade-entry.png](school-app-mockups/20-grade-entry.png) | P4.7 |
-| 20b | Teacher quarter grades — Release 2: tabs 1–4 + Yillik, marks and average per pupil, suggestion (average rounded half up, `school.suggested_grade`) confirmed or changed by the teacher, "Baholanmadi" (not graded) | [20b-quarter-grades.png](school-app-mockups/20b-quarter-grades.png) | P4.7 |
+| 20 | Teacher grade entry — Release 2 — **approved 2026-10-30 (owner delegated to the coordinator session)**: class subject picker, date and kind (Dars / Nazorat ishi / Imtihon), 2–5 per pupil (tap again to clear), pupils absent today dimmed | [20-grade-entry.png](school-app-mockups/20-grade-entry.png) | P4.7 |
+| 20b | Teacher quarter grades — Release 2 — **approved 2026-10-30 (owner delegated to the coordinator session)**: tabs 1–4 + Yillik, marks and average per pupil, suggestion (average rounded half up, `school.suggested_grade`) confirmed or changed by the teacher, "Baholanmadi" (not graded) | [20b-quarter-grades.png](school-app-mockups/20b-quarter-grades.png) | P4.7 |
 
 Navigation per role (bottom tabs, at most five):
 
@@ -741,9 +741,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       payments, messages — done 2026-10-23, PR #27; screens 4–10.
 - [x] **PD.4** Mockups: timetable, teacher home, register and the late-arrival sheet, plus empty/error/
       loading/offline states — done 2026-10-23, PR #27; screens 6, 11–13, 15.
-- [~] **PD.5** Mockups: grades for parent/student (screen 14 done 2026-10-23, PR #27); **teacher grade
-      entry still to draw**. (Release 2.) — teacher grade entry drawn 2026-10-30 (screens 20/20b,
-      PR #59), waiting for approval (PD.8); then PD.5 is done. Built on the P2.4 marks API (one mark
+- [x] **PD.5** Mockups: grades for parent/student (screen 14 done 2026-10-23, PR #27) and teacher grade
+      entry (screens 20/20b, PR #59). (Release 2.) — done 2026-10-30; approved 2026-10-30 (owner
+      delegated to the coordinator session). Built on the P2.4 marks API (one mark
       per pupil, subject, date and kind) and the P2.5 term grades API (null = not graded).
 - [x] **PD.6** Mockups: web "Maktab" classes list and timetable editor with clash display — done
       2026-10-23, PR #27; screens 16–17.
@@ -764,7 +764,8 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       yuklash" button until Release 2 (CSV import moved, D16). Also: the grades tabs (14) list all four
       quarters plus Yillik; Uzbek UI text uses the modifier letter ʻ (Oʻquvchilar), as in the code.
       **Screen 19 approved 2026-10-30 (owner delegated to the reviewer session)**, unchanged.
-      Still to approve when drawn: PD.5 (teacher grade entry), PD.7.
+      **Screens 20 and 20b (PD.5) approved 2026-10-30 (owner delegated to the coordinator session)**, unchanged.
+      Still to approve when drawn: PD.7.
       **Screens 18–18b approved 2026-10-28 (owner delegated to the reviewer session)**, unchanged.
 
 ### P3 — Web screens (admins and teachers)
@@ -922,9 +923,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       office sets a parent's password (`parents.create_parent`/`update_parent`: new parent, reset, letter)
       and cleared by `me/change-password/`. The API returns it in the login response and `me/`;
       `api/authentication.py` (the DRF default) answers 403 `{"detail": …, "code": "password_change_required"}` to everything except
-      `me/`, change-password, logout, fcm-token and app/version until it's changed (the web login sends
+      login, `me/`, change-password, logout, fcm-token and app/version until it's changed (the web login sends
       parents to `/app/`, which uses the API). Letters: "Print login letter" on the parent page, "Print
-      login letters" for a class (only parents who never signed in), uz/ru/en, each with a new temporary
+      login letters" for a class (only parents who never signed in and still have an office-set
+      password; the app's login records `last_login`), uz/ru/en, each with a new temporary
       password and a QR (segno) to `APP_DOWNLOAD_URL` (blank: `/download/`). Demo parents aren't flagged.
       The SMS with login ID and store link (D14) and SMS resets (D13) are PL.2.
 - [ ] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
@@ -1007,8 +1009,13 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-30 — PL.1 done (PR #58, draft until P4.3): printed parent login letters and the
-  first-login password change (API flag + 403 gate with `code` in the body). Migration `0051_customuser_must_change_password` (after P2.8's 0050).
+- 2026-10-31 — PL.1 done (PR #58): printed parent login letters and the first-login password change
+  (API flag + 403 gate with `code` in the body). Migration `0051_customuser_must_change_password`
+  (after P2.8's 0050). QA fixes: the app's login records `last_login`; class letters go only to
+  parents who never signed in **and** still have an office-set password; `api_login` allowed.
+
+- 2026-10-30 — PD.5 done: screens 20/20b (teacher grade entry, quarter grades) approved by the
+  coordinator on the owner's behalf. P4.7 (Release 2) can be built against them.
 
 - 2026-10-30 — P6.1 done (PR #60): `docs/plans/school_app_test_scripts.md`, scripts A (admin web),
   T (homeroom teacher), S (subject teacher), P (parent), St (student) and X (cross-checks) on the
