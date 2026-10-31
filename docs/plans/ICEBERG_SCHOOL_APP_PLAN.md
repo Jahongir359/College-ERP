@@ -834,7 +834,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
       branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
       Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
-      — done 2026-10-31, PR #63; verified: full suite 530 OK, `RegisterReportAccessTests`,
+      — done 2026-10-31, PR #63; verified: full suite 562 OK, `RegisterReportAccessTests`,
       `RegisterReportContentTests`, `RegisterReportCsvTests`; page `/maktab/register/`
       (`school_register_report_views.py`); screenshot next to the mockup:
       `docs/plans/school-app-screens/p3.7-register-report.png`.
@@ -1019,7 +1019,8 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   CSV export; read-only, scoped by `branching.filter_classes_for_user`. Uses the P3.6 page header
   (eyebrow, one title, "Download CSV" in `page_actions`), so the teal hero and the maroon-on-maroon
   sidebar item seen before #64 are gone. CSV cells starting with = + - @ tab or CR get a leading
-  apostrophe (CSV injection), tested.
+  apostrophe (CSV injection), tested. Dark mode: `erpnext-style.css` forces every dark span to the
+  text colour with `!important`, so coloured spans on School pages need `!important` in dark rules.
 
 - 2026-10-30 — P3.6 done (PR #64; takeover of the unpushed `feat/school-p3.6-web-brand` work): all Maktab
   web pages on the School brand, MAKTAB eyebrow over one title, year · quarter chip, tables kept on
