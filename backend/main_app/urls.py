@@ -29,6 +29,7 @@ from . import (
     school_admin_views,
     school_board_views,
     school_parent_views,
+    school_register_report_views,
     school_timetable_views,
     staff_views,
     student_views,
@@ -104,6 +105,11 @@ urlpatterns = [
         "maktab/bells/<int:pk>/delete/",
         school_timetable_views.bell_delete,
         name="school_bell_delete",
+    ),
+    path(
+        "maktab/register/",
+        school_register_report_views.register_report,
+        name="school_register_report",
     ),
     path("maktab/parents/", school_parent_views.parent_list, name="school_parents"),
     path(

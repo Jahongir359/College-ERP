@@ -1,0 +1,139 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ day|date:"j E Y, l" }}</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  <a href="?date={{ day|date:'Y-m-d' }}{% if group %}&amp;class={{ group.pk }}{% endif %}&amp;export=csv" class="ice-manage-add-btn">
+    <i class="fas fa-download" aria-hidden="true"></i> {% translate "Download CSV" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-register-report.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="ice-manage-page">
+  <form method="get" class="school-filter-row school-report-filters">
+    <label class="school-field">
+      <span class="sr-only">{% translate "Date" %}</span>
+      <input type="date" name="date" value="{{ day|date:'Y-m-d' }}" class="form-control" onchange="this.form.submit()">
+    </label>
+    <select name="class" class="ice-manage-filter__select" aria-label="{% translate 'Class' %}" onchange="this.form.submit()">
+      <option value="">{% translate "Class: all" %}</option>
+      {% for c in all_classes %}
+      <option value="{{ c.pk }}" {% if group and c.pk == group.pk %}selected{% endif %}>{{ c.name }}{% if show_branch %} · {{ c.branch.name }}{% endif %}</option>
+      {% endfor %}
+    </select>
+    <noscript><button type="submit" class="btn btn-secondary">{% translate "Show" %}</button></noscript>
+  </form>
+
+  <div class="school-stats">
+    <div class="school-stat">
+      <span class="school-stat__label">{% translate "Register taken" %}</span>
+      <span class="school-stat__value">{{ taken_count }} / {{ rows|length }} <small>{% translate "classes" %}</small></span>
+    </div>
+    <div class="school-stat">
+      <span class="school-stat__label">{% translate "Present" %}</span>
+      <span class="school-stat__value report-present">{{ present }}</span>
+    </div>
+    <div class="school-stat">
+      <span class="school-stat__label">{% translate "Late" %}</span>
+      <span class="school-stat__value report-late">{{ late }}</span>
+    </div>
+    <div class="school-stat">
+      <span class="school-stat__label">{% translate "Absent" %}</span>
+      <span class="school-stat__value report-absent">{{ absent }}</span>
+    </div>
+    <div class="school-stat">
+      <span class="school-stat__label">{% translate "Attendance" %}</span>
+      <span class="school-stat__value">{% if rate is not None %}{{ rate }}%{% else %}—{% endif %}</span>
+    </div>
+  </div>
+
+  <div class="school-split school-report-split school-section">
+    <div>
+      <div class="ice-manage-table-wrap school-table-wrap">
+        <table class="ice-manage-table">
+          <thead>
+            <tr>
+              <th>{% translate "Class" %}</th>
+              {% if show_branch %}<th>{% translate "Branch" %}</th>{% endif %}
+              <th>{% translate "Homeroom teacher" %}</th>
+              <th>{% translate "Students" %}</th>
+              <th>{% translate "Taken" %}</th>
+              <th>{% translate "Present" %}</th>
+              <th>{% translate "Late" %}</th>
+              <th>{% translate "Absent" %}</th>
+              <th>{% translate "Came" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+            <tr>
+              <td><strong>{{ r.group.name }}</strong></td>
+              {% if show_branch %}<td>{{ r.group.branch.name }}</td>{% endif %}
+              <td>{{ r.teacher|default:"—" }}</td>
+              <td>{{ r.pupils }}</td>
+              {% if r.taken %}
+              <td><span class="report-badge report-badge--ok"><i class="fas fa-check" aria-hidden="true"></i> {{ r.taken_at|time:"H:i" }}</span></td>
+              <td><strong>{{ r.present }}</strong></td>
+              <td class="report-late">{{ r.late|default:"–" }}</td>
+              <td class="report-absent">{{ r.absent|default:"–" }}</td>
+              <td class="school-nowrap">
+                <span class="report-bar" aria-hidden="true"><span style="width: {{ r.rate|default:0 }}%"></span></span>
+                {{ r.rate }}%
+              </td>
+              {% else %}
+              <td><span class="report-badge report-badge--wait">{% translate "Not taken" %}</span></td>
+              <td>—</td><td>—</td><td>—</td><td>—</td>
+              {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9">
+                <div class="ice-manage-empty">
+                  <i class="fas fa-door-open" aria-hidden="true"></i>
+                  <strong>{% translate "No classes on this date" %}</strong>
+                  <span>{% translate "Pick a school day inside an academic year." %}</span>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="school-help">{% translate "Not taken — the homeroom teacher hasn't saved this day's register yet. Teachers take the register in the app; this page is read-only." %}</p>
+    </div>
+
+    <aside class="school-panel">
+      <h3 class="school-panel__title">{% translate "Absent and late" %} <span class="school-muted">{{ pupils|length }}</span></h3>
+      {% if pupils %}
+      <p class="school-help"><i class="fas fa-paper-plane" aria-hidden="true"></i> {% translate "Each pupil's parents were told in the app." %}</p>
+      <ul class="report-pupils">
+        {% for p in pupils %}
+        <li>
+          <div>
+            <strong>{{ p.student.admin.get_full_name }}</strong>
+            <span class="school-muted">{{ p.attendance.group.name }}{% if p.note %} · {{ p.note }}{% endif %}</span>
+          </div>
+          {% if p.status == 2 %}
+          <span class="report-badge report-badge--late">{% translate "Late" context "one pupil" %}{% if p.arrival_time %} {{ p.arrival_time|time:"H:i" }}{% endif %}</span>
+          {% else %}
+          <span class="report-badge report-badge--absent">{% translate "Absent" context "one pupil" %}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="school-note school-muted">{% translate "Nobody is absent or late." %}</p>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock content %}

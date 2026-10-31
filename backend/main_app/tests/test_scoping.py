@@ -51,6 +51,7 @@ SCHOOL_MODULES = (
     "school_admin_views.py",
     "school_board_views.py",
     "school_timetable_views.py",
+    "school_register_report_views.py",
     "school_demo.py",
     "school_forms.py",
 )
