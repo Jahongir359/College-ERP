@@ -36,6 +36,7 @@ import '../../features/staff/screens/staff_more_screen.dart';
 import '../../features/staff/screens/staff_placeholder_screens.dart';
 import '../../features/staff/screens/staff_feature_screens.dart';
 import '../../features/staff/screens/staff_profile_screen.dart';
+import '../../features/staff/screens/register/register_screen.dart';
 
 // Shared
 import '../../shared/screens/profile_hub_screen.dart';
@@ -159,6 +160,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/staff/notifications', builder: (_, __) => const StaffNotificationsScreen()),
       GoRoute(path: '/staff/settings',      builder: (_, __) => const StudentSettingsScreen()),
       GoRoute(path: '/staff/messages',      builder: (_, __) => const MessagesScreen()),
+      GoRoute(
+        path: '/staff/register/:id',
+        builder: (_, state) => StaffRegisterScreen(
+          classId: int.parse(state.pathParameters['id']!),
+          day: DateTime.tryParse(state.uri.queryParameters['date'] ?? '') ??
+              DateTime.now(),
+        ),
+      ),
 
       // ── Student shell (5 bottom-nav branches) ────────────────────────────
       StatefulShellRoute.indexedStack(

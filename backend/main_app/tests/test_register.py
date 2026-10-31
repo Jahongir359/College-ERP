@@ -277,3 +277,67 @@ class RegisterSummaryTests(_RegisterFixture):
         )
         other_day = register_summaries(classes, date(2000, 1, 3))
         self.assertFalse(other_day[self.class_3a.pk]["taken"])
+
+
+class MyRegistersTests(_RegisterFixture):
+    """school/register/ lists the classes whose register the user takes (P4.6)."""
+
+    def list_for(self, user, **params):
+        self.as_user(user)
+        return self.api.get(reverse("api_school_my_registers"), params)
+
+    def test_homeroom_teacher_gets_their_class_with_todays_state(self):
+        res = self.list_for(self.homeroom.admin)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.data["classes"],
+            [
+                {
+                    "id": self.class_3a.pk,
+                    "name": "3-A",
+                    "pupils": 3,
+                    "can_edit": True,
+                    "taken": False,
+                    "present": 0,
+                    "late": 0,
+                    "absent": 0,
+                }
+            ],
+        )
+        self.save(self.homeroom.admin, [{"student_id": self.aziz.pk, "status": "late"}])
+        row = self.list_for(self.homeroom.admin).data["classes"][0]
+        self.assertEqual((row["taken"], row["present"], row["late"]), (True, 2, 1))
+
+    def test_nobody_else_gets_a_class(self):
+        cases = [
+            ("subject teacher", self.subject_teacher.admin),
+            ("super admin", self.super_admin),
+            ("branch admin", self.branch_admin),
+            ("pupil", self.aziz.admin),
+            ("parent", self.parent),
+        ]
+        for name, user in cases:
+            with self.subTest(name):
+                res = self.list_for(user)
+                self.assertEqual(res.status_code, 200)
+                self.assertEqual(res.data["classes"], [])
+        # The homeroom teacher of another class gets only that class.
+        names = [c["name"] for c in self.list_for(self.outsider.admin).data["classes"]]
+        self.assertEqual(names, ["5-B"])
+        self.as_user(None)
+        self.assertEqual(self.api.get(reverse("api_school_my_registers")).status_code, 401)
+
+    def test_course_groups_and_archived_classes_are_left_out(self):
+        Group.objects.create(
+            name="IELTS", course=self.course, branch=self.school, teacher=self.homeroom
+        )
+        archived = self.make_class("4-B", self.school, self.homeroom)
+        archived.is_archived = True
+        archived.save()
+        names = [c["name"] for c in self.list_for(self.homeroom.admin).data["classes"]]
+        self.assertEqual(names, ["3-A"])
+
+    def test_date_parameter(self):
+        res = self.list_for(self.homeroom.admin, date=str(self.today + timedelta(days=1)))
+        self.assertFalse(res.data["classes"][0]["can_edit"])
+        self.assertEqual(self.list_for(self.homeroom.admin, date="tomorrow").status_code, 400)

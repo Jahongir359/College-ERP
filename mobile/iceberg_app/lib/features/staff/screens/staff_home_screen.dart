@@ -13,6 +13,7 @@ import '../../../core/theme/brand.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/ice_kit.dart';
+import 'register/register_screen.dart';
 
 part 'staff_home/home_widgets.dart';
 
@@ -146,6 +147,8 @@ class _Dashboard extends ConsumerWidget {
           innerRef.refresh(staffStatsProvider.future),
           innerRef.refresh(staffGroupsProvider.future),
           innerRef.refresh(storiesProvider.future),
+          if (context.brand.isSchool)
+            innerRef.refresh(myRegistersProvider.future),
         ]);
       },
       child: ListView(
@@ -269,6 +272,9 @@ class _Dashboard extends ConsumerWidget {
             ),
           ).animate().fadeIn(duration: 350.ms).moveY(begin: 14, end: 0),
           const SizedBox(height: 14),
+
+          // ── Daily register reminder (School homeroom teachers) ───────
+          const RegisterReminder(),
 
           // ── Today's Schedule (visible on open) ────────────────────────
           SectionHeader(

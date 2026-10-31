@@ -193,6 +193,24 @@ class SchoolHelperScopeTests(_SchoolFixture, TestCase):
         classes = branching.filter_classes_for_user(_reload(self.kid.admin), Group.objects.all())
         self.assertFalse(classes.exists())
 
+    def test_filter_homeroom_classes_for_user(self):
+        def visible(user):
+            return set(
+                branching.filter_homeroom_classes_for_user(_reload(user), Group.objects.all())
+            )
+
+        cases = [
+            ("homeroom teacher", self.homeroom.admin, {self.class_7b}),
+            ("subject teacher", self.subject_teacher.admin, set()),
+            ("super admin", self.super_admin, set()),
+            ("branch admin", self.branch_admin, set()),
+            ("student", self.kid.admin, set()),
+            ("parent", self.parent_user, set()),
+        ]
+        for name, user, expected in cases:
+            with self.subTest(name):
+                self.assertEqual(visible(user), expected)
+
     def test_filter_parent_links_for_user(self):
         def visible(user):
             return set(

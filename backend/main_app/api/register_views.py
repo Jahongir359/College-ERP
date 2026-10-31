@@ -16,6 +16,7 @@ marks again sends nothing, and a correction back to present sends nothing.
 from datetime import date, datetime
 
 from django.db import transaction
+from django.db.models import Count
 from django.utils import timezone, translation
 from django.utils.translation import gettext as _
 from rest_framework import status
@@ -33,7 +34,7 @@ from ..models import (
     Staff,
     Student,
 )
-from ..school import REGISTER_STATUS_NAMES, REGISTER_STATUSES
+from ..school import REGISTER_STATUS_NAMES, REGISTER_STATUSES, register_summaries
 
 NOTE_MAX = AttendanceReport._meta.get_field("note").max_length
 
@@ -100,6 +101,45 @@ def _check_day(group, day):
     if session and not session.start_year <= day <= session.end_year:
         return "This date is outside the class's academic year."
     return None
+
+
+class MyRegistersView(APIView):
+    """GET /api/v1/school/register/?date=YYYY-MM-DD
+
+    The classes whose register the user takes (a teacher's homeroom classes)
+    with that day's state, for the app's teacher home and register screen. The
+    date defaults to today. Other users get an empty list.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        raw = request.query_params.get("date")
+        try:
+            day = date.fromisoformat(raw) if raw else timezone.localdate()
+        except ValueError:
+            return _bad_request({"date": ["Use the format YYYY-MM-DD."]})
+        classes = branching.filter_homeroom_classes_for_user(
+            request.user, Group.objects.all()
+        ).order_by("grade_level", "letter", "name")
+        summary = register_summaries(classes, day)
+        pupils = dict(
+            Enrollment.objects.filter(group__in=classes, is_active=True)
+            .values("group_id")
+            .annotate(n=Count("pk"))
+            .values_list("group_id", "n")
+        )
+        rows = [
+            {
+                "id": group.pk,
+                "name": group.name,
+                "pupils": pupils.get(group.pk, 0),
+                "can_edit": _check_day(group, day) is None,
+                **summary[group.pk],
+            }
+            for group in classes.select_related("session")
+        ]
+        return Response({"date": day, "classes": rows})
 
 
 class RegisterView(APIView):

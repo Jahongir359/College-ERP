@@ -263,6 +263,11 @@ urlpatterns = [
     ),
     # ── School daily register (P2.2) ─────────────────────────────────────────
     path(
+        "school/register/",
+        register_views.MyRegistersView.as_view(),
+        name="api_school_my_registers",
+    ),
+    path(
         "school/register/<int:pk>/<str:day>/",
         register_views.RegisterView.as_view(),
         name="api_school_register",
