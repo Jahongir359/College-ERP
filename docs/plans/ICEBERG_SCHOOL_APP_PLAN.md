@@ -854,8 +854,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       The School login uses the School dark tokens and the white crest wordmark; the Study Center login
       is unchanged apart from the "Iceberg Study Center · Boshqa tanlash" link.
 - [~] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — claimed 2026-10-30, branch feat/school-p4.3-account-brand.
-- [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
-      unpaid invoice. Needs: P1.6.
+- [~] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
+      unpaid invoice. Needs: P1.6. — claimed 2026-10-31 (college-erp-c0, assigned by the coordinator),
+      branch feat/school-p4.4-parent-shell.
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
 - [ ] **P4.6** Teacher register screen (fast: everyone present by default, tap to change). Needs: P2.2.
 - [ ] **P4.7** Grades screens (marks list, term grades) for student/parent; gradebook entry for
