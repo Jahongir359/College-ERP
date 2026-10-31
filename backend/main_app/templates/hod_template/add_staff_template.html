@@ -86,6 +86,11 @@
           {{ form.specialization }}
           {% if form.specialization.errors %}<div class="ice-field-error">{{ form.specialization.errors.0 }}</div>{% endif %}
         </div>
+        <div class="ice-field">
+          <label for="{{ form.branch.id_for_label }}">{{ form.branch.label }}<span class="ice-field-req">*</span></label>
+          {{ form.branch }}
+          {% if form.branch.errors %}<div class="ice-field-error">{{ form.branch.errors.0 }}</div>{% endif %}
+        </div>
         <div class="ice-field span-2">
           <label>{{ form.profile_pic.label }}</label>
           {{ form.profile_pic }}
