@@ -93,7 +93,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
+| P4 | App: choice screen, parent role, School screens | In progress — 4/12 (P4.11 dropped) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
