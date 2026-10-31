@@ -33,10 +33,16 @@ class LastBrandNotifier extends StateNotifier<BrandChoice> {
   }
 
   Future<void> _load() async {
-    final p = await SharedPreferences.getInstance();
+    String? saved;
+    try {
+      final p = await SharedPreferences.getInstance();
+      saved = p.getString(_brandPrefKey);
+    } catch (_) {
+      // Unreadable storage: treat as a first launch rather than hang on the
+      // splash screen.
+    }
     // A choice made while storage was still loading wins.
     if (!mounted || state.chosen) return;
-    final saved = p.getString(_brandPrefKey);
     state = BrandChoice(
       brand: IceBrand.fromApi(saved),
       chosen: saved != null,

@@ -130,7 +130,7 @@ void main() {
     expect(find.text('Iceberg Study Center'), findsOneWidget);
   });
 
-  test('choice strings exist in uz and ru', () {
+  test('choice strings exist in uz, ru and ko', () {
     const keys = [
       'Which Iceberg are you signing in to?',
       'Choose one. Next time the app opens there.',
@@ -139,7 +139,7 @@ void main() {
       'You can change this on the sign-in screen',
       'Choose another',
     ];
-    for (final lang in ['uz', 'ru']) {
+    for (final lang in ['uz', 'ru', 'ko']) {
       for (final k in keys) {
         expect(S(lang)(k), isNot(k), reason: '$lang: $k');
       }
