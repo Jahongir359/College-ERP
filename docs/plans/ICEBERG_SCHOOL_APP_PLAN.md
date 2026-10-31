@@ -854,7 +854,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       The School login uses the School dark tokens and the white crest wordmark; the Study Center login
       is unchanged apart from the "Iceberg Study Center · Boshqa tanlash" link.
 - [x] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — done 2026-10-31,
-      PR #PRNUM; verified: flutter analyze 0 warnings, flutter test 47 OK
+      PR #68; verified: flutter analyze 0 warnings, flutter test 47 OK
       (`test/change_password_test.dart`, `test/brand_notice_test.dart`), web build OK; School login next
       to mockup 02 at 390 px: `docs/plans/school-app-screens/p4.3-school-login.png`. Also the **app half
       of PL.1**: `IceUser.mustChangePassword` (`must_change_password` from login and `me/`) holds every
@@ -1016,7 +1016,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-31 — P4.3 done (PR #PRNUM, after #61): the app's "choose your password" screen for PL.1
+- 2026-10-31 — P4.3 done (PR #68, after #61): the app's "choose your password" screen for PL.1
   and the brand-from-account notice. PL.1 (#58) can merge after this. Next on this line: P4.4 (parent shell).
 
 - 2026-10-30 — P4.2 done (PR #61): first launch shows `/choose` (School | Study Center, UZ/RU/EN
