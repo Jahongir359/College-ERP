@@ -575,73 +575,73 @@ def _admin_profile_context(user):
 
     branch_names = ", ".join(admin_profile.branches.values_list("name", flat=True)[:2])
     if admin_profile.is_super_admin:
-        branch_label = "All branches"
+        branch_label = _("All branches")
     elif branch_names:
         extra = max(admin_profile.branches.count() - 2, 0)
         branch_label = branch_names + (f" +{extra}" if extra else "")
     else:
-        branch_label = "Branch not assigned"
+        branch_label = _("Branch not assigned")
 
     meta = [
-        {"icon": "fa-envelope", "text": user.email or "Email not set"},
+        {"icon": "fa-envelope", "text": user.email or _("Email not set")},
         {
             "icon": "fa-shield-alt",
-            "text": "Super Admin" if admin_profile.is_super_admin else "Branch Admin",
+            "text": _("Super Admin") if admin_profile.is_super_admin else _("Branch Admin"),
         },
         {"icon": "fa-map-marker-alt", "text": branch_label},
     ]
     stats = [
-        {"label": "Students", "value": students_qs.count(), "icon": "fa-user-graduate"},
-        {"label": "Teachers", "value": staff_qs.count(), "icon": "fa-chalkboard-teacher"},
-        {"label": "Groups", "value": groups_qs.count(), "icon": "fa-layer-group"},
-        {"label": "Branches", "value": branches_qs.count(), "icon": "fa-building"},
+        {"label": _("Students"), "value": students_qs.count(), "icon": "fa-user-graduate"},
+        {"label": _("Teachers"), "value": staff_qs.count(), "icon": "fa-chalkboard-teacher"},
+        {"label": _("Groups"), "value": groups_qs.count(), "icon": "fa-layer-group"},
+        {"label": _("Branches"), "value": branches_qs.count(), "icon": "fa-building"},
     ]
     role_rows = [
         _reverse_row(
-            "Branch / Center Settings",
+            _("Branch / Center Settings"),
             branch_label,
             "fa-building",
             "manage_branch",
             "icon-hover-folder",
         ),
         _reverse_row(
-            "User Management Shortcuts",
-            "Teachers, students, and accounts",
+            _("User Management Shortcuts"),
+            _("Teachers, students, and accounts"),
             "fa-users-cog",
             "manage_staff",
             "icon-hover-rotate",
         ),
         _reverse_row(
-            "Teacher Settings",
-            f"{staff_qs.count()} teachers",
+            _("Teacher Settings"),
+            _("%(count)s teachers") % {"count": staff_qs.count()},
             "fa-chalkboard-teacher",
             "manage_staff",
             "icon-hover-pulse",
         ),
         _reverse_row(
-            "Student Settings",
-            f"{students_qs.count()} students",
+            _("Student Settings"),
+            _("%(count)s students") % {"count": students_qs.count()},
             "fa-user-graduate",
             "manage_student",
             "icon-hover-bounce",
         ),
         _reverse_row(
-            "Course / Group Settings",
-            "Courses, groups, enrollments",
+            _("Course / Group Settings"),
+            _("Courses, groups, enrollments"),
             "fa-layer-group",
             "manage_group",
             "icon-hover-folder",
         ),
         _reverse_row(
-            "System Preferences",
-            "Leaderboard rules and seasons",
+            _("System Preferences"),
+            _("Leaderboard rules and seasons"),
             "fa-sliders-h",
             "admin_leaderboard_settings",
             "icon-hover-rotate",
         ),
         _reverse_row(
-            "Reports / Dashboard Preferences",
-            "Attendance and stories",
+            _("Reports / Dashboard Preferences"),
+            _("Attendance and stories"),
             "fa-chart-line",
             "admin_view_attendance",
             "icon-hover-pulse",
@@ -649,12 +649,12 @@ def _admin_profile_context(user):
     ]
     return {
         "role_profile": admin_profile,
-        "role_label": "Admin",
+        "role_label": _("Admin"),
         "role_icon": "fa-user-shield",
         "form": AdminForm(instance=admin_profile),
         "profile_meta": meta,
         "profile_stats": stats,
-        "role_group_label": "Administration",
+        "role_group_label": _("Administration"),
         "role_rows": role_rows,
         "current_theme": "system",
         "theme_save_url": "",
@@ -690,7 +690,7 @@ def profile_settings_hub(request):
         def save_fn():
             return _save_student_profile(profile, form)
     else:
-        messages.error(request, "Your account role is not configured correctly.")
+        messages.error(request, _("Your account role is not configured correctly."))
         logout(request)
         return redirect(reverse("login_page"))
 
@@ -700,35 +700,37 @@ def profile_settings_hub(request):
         if form.is_valid():
             try:
                 save_fn()
-                messages.success(request, "Profile updated.")
+                messages.success(request, _("Profile updated."))
                 return redirect(reverse("profile_hub"))
             except Exception as exc:
                 logger.exception("Profile hub update failed for user pk=%s", request.user.pk)
-                messages.error(request, f"Could not update your profile: {exc}")
+                messages.error(
+                    request, _("Could not update your profile: %(error)s") % {"error": exc}
+                )
         else:
-            messages.error(request, "Please fix the highlighted profile fields.")
+            messages.error(request, _("Please fix the highlighted profile fields."))
 
     # One row per distinct destination — several earlier rows all opened the
     # same edit panel under different names.
     account_rows = [
         _settings_row(
-            "Personal Information",
-            "Name, contact details, birthday, and profile basics",
+            _("Personal Information"),
+            _("Name, contact details, birthday, and profile basics"),
             "fa-user",
             kind="details",
             details_id="edit-profile",
             focus="#id_first_name",
         ),
         _settings_row(
-            "Change Profile Avatar",
-            "Choose a profile sticker",
+            _("Change Profile Avatar"),
+            _("Choose a profile sticker"),
             "fa-camera",
             anim="icon-hover-camera",
             kind="avatar",
         ),
         _settings_row(
-            "Change Password",
-            request.user.email or request.user.login_id or "Account credentials",
+            _("Change Password"),
+            request.user.email or request.user.login_id or _("Account credentials"),
             "fa-key",
             anim="icon-hover-rotate",
             kind="details",
@@ -739,8 +741,8 @@ def profile_settings_hub(request):
 
     preference_rows = [
         _settings_row(
-            "Theme / Appearance",
-            "Dark, bright, or system mode",
+            _("Theme / Appearance"),
+            _("Dark, bright, or system mode"),
             "fa-palette",
             anim="icon-hover-rotate",
             kind="appearance",
@@ -750,15 +752,15 @@ def profile_settings_hub(request):
         preference_rows.extend(
             [
                 _reverse_row(
-                    "Notifications",
-                    "Announcements and alerts",
+                    _("Notifications"),
+                    _("Announcements and alerts"),
                     "fa-bell",
                     "staff_view_notification",
                     "icon-hover-bell",
                 ),
                 _reverse_row(
-                    "Messages",
-                    "Group chat and conversations",
+                    _("Messages"),
+                    _("Group chat and conversations"),
                     "fa-comments",
                     "messages",
                     "icon-hover-wiggle",
@@ -769,15 +771,15 @@ def profile_settings_hub(request):
         preference_rows.extend(
             [
                 _reverse_row(
-                    "Notifications",
-                    "Announcements and alerts",
+                    _("Notifications"),
+                    _("Announcements and alerts"),
                     "fa-bell",
                     "student_view_notification",
                     "icon-hover-bell",
                 ),
                 _reverse_row(
-                    "Messages",
-                    "Group chat and conversations",
+                    _("Messages"),
+                    _("Group chat and conversations"),
                     "fa-comments",
                     "messages",
                     "icon-hover-wiggle",
@@ -787,8 +789,8 @@ def profile_settings_hub(request):
     else:
         preference_rows.append(
             _reverse_row(
-                "Messages",
-                "Team and group conversations",
+                _("Messages"),
+                _("Team and group conversations"),
                 "fa-comments",
                 "messages",
                 "icon-hover-wiggle",
@@ -799,22 +801,22 @@ def profile_settings_hub(request):
     if user_type == "1":
         support_rows = [
             _reverse_row(
-                "Help & Support",
-                "Review student feedback",
+                _("Help & Support"),
+                _("Review student feedback"),
                 "fa-circle-question",
                 "student_feedback_message",
                 "icon-hover-rotate",
             ),
             _reverse_row(
-                "Teacher Feedback",
-                "Review teacher messages",
+                _("Teacher Feedback"),
+                _("Review teacher messages"),
                 "fa-comment-dots",
                 "staff_feedback_message",
                 "icon-hover-wiggle",
             ),
             _reverse_row(
-                "Registration Leads",
-                "Follow up with interested students",
+                _("Registration Leads"),
+                _("Follow up with interested students"),
                 "fa-user-clock",
                 "manage_registration_leads",
                 "icon-hover-pulse",
@@ -823,15 +825,15 @@ def profile_settings_hub(request):
     elif user_type == "2":
         support_rows = [
             _reverse_row(
-                "Help & Feedback",
-                "Contact admin",
+                _("Help & Feedback"),
+                _("Contact admin"),
                 "fa-circle-question",
                 "staff_feedback",
                 "icon-hover-rotate",
             ),
             _reverse_row(
-                "Apply for Leave",
-                "Request time off",
+                _("Apply for Leave"),
+                _("Request time off"),
                 "fa-plane-departure",
                 "staff_apply_leave",
                 "icon-hover-bounce",
@@ -840,15 +842,15 @@ def profile_settings_hub(request):
     else:
         support_rows = [
             _reverse_row(
-                "Help & Feedback",
-                "Contact your teacher or admin",
+                _("Help & Feedback"),
+                _("Contact your teacher or admin"),
                 "fa-circle-question",
                 "student_feedback",
                 "icon-hover-rotate",
             ),
             _reverse_row(
-                "Apply for Leave",
-                "Request time off",
+                _("Apply for Leave"),
+                _("Request time off"),
                 "fa-plane-departure",
                 "student_apply_leave",
                 "icon-hover-bounce",
@@ -856,8 +858,8 @@ def profile_settings_hub(request):
         ]
     support_rows.append(
         _settings_row(
-            "About Iceberg",
-            "Central profile and settings hub for College ERP",
+            _("About Iceberg"),
+            _("Central profile and settings hub for College ERP"),
             "fa-info-circle",
             anim="icon-hover-rotate",
             kind="static",
@@ -867,7 +869,7 @@ def profile_settings_hub(request):
     ctx.update(
         {
             "form": form,
-            "page_title": "My Profile / Settings",
+            "page_title": _("My Profile / Settings"),
             "open_edit_panel": open_edit_panel,
             "dashboard_url": reverse(
                 "admin_home"
@@ -877,10 +879,10 @@ def profile_settings_hub(request):
                 else "student_home"
             ),
             "settings_groups": [
-                {"label": "Account", "rows": account_rows},
-                {"label": "Preferences", "rows": preference_rows},
+                {"label": _("Account"), "rows": account_rows},
+                {"label": _("Preferences"), "rows": preference_rows},
                 {"label": ctx["role_group_label"], "rows": ctx["role_rows"]},
-                {"label": "Support", "rows": support_rows},
+                {"label": _("Support"), "rows": support_rows},
             ],
         }
     )

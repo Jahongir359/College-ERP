@@ -1014,6 +1014,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-01 — Web audit M2 part 1 (i18n): admin Dashboard, Students, Teachers, Groups (list, add, edit),
+  Payments and the admin Profile now render in uz/ru; their form labels and success/error messages use
+  gettext (English wording unchanged). Still English: Student/Invoice status choices from the models, chart
+  empty-state texts in the dashboard scripts, and the pages listed in the PR for part 2.
 - 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
   Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
   CSV export; read-only, scoped by `branching.filter_classes_for_user`. Uses the P3.6 page header

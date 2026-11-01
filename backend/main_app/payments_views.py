@@ -14,6 +14,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext
 from django.views.decorators.http import require_POST
 
 from . import branching, payments
@@ -105,7 +106,7 @@ def admin_payments(request):
     overdue_count = sum(1 for inv in active if inv.is_overdue)
 
     context = {
-        "page_title": "Payments",
+        "page_title": gettext("Payments"),
         "invoices": invoices,
         "period": period,
         "month_value": period.strftime("%Y-%m"),
@@ -376,15 +377,19 @@ def admin_cancel_invoice(request, invoice_id):
     if invoice.paid_amount > 0:
         messages.error(
             request,
-            "This invoice already has payments. Void the payments first (super admin only).",
+            gettext(
+                "This invoice already has payments. Void the payments first (super admin only)."
+            ),
         )
     elif invoice.status == Invoice.STATUS_CANCELLED:
-        messages.info(request, "Invoice is already cancelled.")
+        messages.info(request, gettext("Invoice is already cancelled."))
     else:
         invoice.status = Invoice.STATUS_CANCELLED
         invoice.save(update_fields=["status", "updated_at"])
         messages.success(
-            request, f"Invoice for {invoice.student} ({invoice.period_label}) cancelled."
+            request,
+            gettext("Invoice for %(student)s (%(period)s) cancelled.")
+            % {"student": invoice.student, "period": invoice.period_label},
         )
     return redirect(f"{reverse('admin_payments')}?month={invoice.period:%Y-%m}")
 
@@ -401,12 +406,15 @@ def admin_void_payment(request, payment_id):
 
         raise Http404("Payment not found.")
     if not branching.is_super_admin(request.user):
-        messages.error(request, "Only the super admin can void payments.")
+        messages.error(request, gettext("Only the super admin can void payments."))
         return redirect(f"{reverse('admin_payments')}?month={invoice.period:%Y-%m}")
     receipt = payment.receipt_no
     payment.delete()
     invoice.refresh_status()
-    messages.success(request, f"Payment {receipt} voided. Invoice balance restored.")
+    messages.success(
+        request,
+        gettext("Payment %(receipt)s voided. Invoice balance restored.") % {"receipt": receipt},
+    )
     return redirect(f"{reverse('admin_payments')}?month={invoice.period:%Y-%m}")
 
 
@@ -415,9 +423,11 @@ def admin_void_payment(request, payment_id):
 def admin_send_payment_reminder(request, invoice_id):
     invoice = _get_scoped_invoice_or_404(request, invoice_id)
     if payments.send_invoice_reminder(invoice, force=True):
-        messages.success(request, f"Reminder sent to {invoice.student}.")
+        messages.success(
+            request, gettext("Reminder sent to %(student)s.") % {"student": invoice.student}
+        )
     else:
-        messages.info(request, "This invoice is settled — no reminder needed.")
+        messages.info(request, gettext("This invoice is settled — no reminder needed."))
     return redirect(f"{reverse('admin_payments')}?month={invoice.period:%Y-%m}")
 
 

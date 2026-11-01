@@ -1,7 +1,8 @@
 {% extends 'main_app/base.html' %}
+{% load i18n %}
 {% load static %}
 {% block page_title %}{{ page_title }}{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">Add Teacher</li>{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">{% translate "Add Teacher" %}</li>{% endblock %}
 
 {% block content %}
 <div class="ice-form-card">
@@ -28,7 +29,7 @@
       {% endif %}
 
       <!-- Personal information -->
-      <div class="ice-section-title">Personal Information</div>
+      <div class="ice-section-title">{% translate "Personal Information" %}</div>
       <div class="ice-form-grid cols-2">
         <div class="ice-field">
           <label>{{ form.first_name.label }}<span class="ice-field-req">*</span></label>
@@ -49,12 +50,12 @@
           <label>{{ form.date_of_birth.label }}<span class="ice-field-req">*</span></label>
           {{ form.date_of_birth }}
           {% if form.date_of_birth.errors %}<div class="ice-field-error">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
-          <small class="ice-field-help">YYYY-MM-DD — used to generate the login ID.</small>
+          <small class="ice-field-help">{% translate "YYYY-MM-DD — used to generate the login ID." %}</small>
         </div>
       </div>
 
       <!-- Account & contact -->
-      <div class="ice-section-title" style="margin-top:22px;">Account &amp; Contact</div>
+      <div class="ice-section-title" style="margin-top:22px;">{% translate "Account & Contact" %}</div>
       <div class="ice-form-grid cols-2">
         <div class="ice-field">
           <label>{{ form.password.label }}<span class="ice-field-req">*</span></label>
@@ -74,7 +75,7 @@
       </div>
 
       <!-- Teaching assignment -->
-      <div class="ice-section-title" style="margin-top:22px;">Teaching Assignment</div>
+      <div class="ice-section-title" style="margin-top:22px;">{% translate "Teaching Assignment" %}</div>
       <div class="ice-form-grid cols-2">
         <div class="ice-field">
           <label>{{ form.course.label }}</label>
@@ -89,7 +90,7 @@
         <div class="ice-field span-2">
           <label>{{ form.profile_pic.label }}</label>
           {{ form.profile_pic }}
-          <small class="ice-field-help">Optional — PNG or JPG up to 5 MB.</small>
+          <small class="ice-field-help">{% translate "Optional — PNG or JPG up to 5 MB." %}</small>
           {% if form.profile_pic.errors %}<div class="ice-field-error">{{ form.profile_pic.errors.0 }}</div>{% endif %}
         </div>
       </div>
@@ -98,10 +99,10 @@
 
     <div class="ice-submit-bar">
       <button type="submit" class="ice-btn-primary">
-        <i class="fas fa-user-plus"></i> Add Teacher
+        <i class="fas fa-user-plus"></i> {% translate "Add Teacher" %}
       </button>
       <a href="{% url 'manage_staff' %}" class="ice-btn-secondary">
-        <i class="fas fa-list"></i> View All Teachers
+        <i class="fas fa-list"></i> {% translate "View All Teachers" %}
       </a>
     </div>
   </form>

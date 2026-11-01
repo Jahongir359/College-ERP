@@ -940,3 +940,1495 @@ msgstr "Уведомление"
 
 msgid "Sent an attachment"
 msgstr "Отправил(а) файл"
+
+#: main_app/forms.py:61
+msgid "— Select branch —"
+msgstr "— Выберите филиал —"
+
+#: main_app/forms.py:62 main_app/forms.py:674 main_app/forms.py:946
+msgid "Branch / Location"
+msgstr "Филиал / Адрес"
+
+#: main_app/forms.py:82
+msgid "Date of birth cannot be in the future."
+msgstr "Дата рождения не может быть в будущем."
+
+#: main_app/forms.py:84
+msgid "Please enter a valid date of birth."
+msgstr "Введите правильную дату рождения."
+
+#: main_app/forms.py:101
+msgid "Male"
+msgstr "Мужской"
+
+#: main_app/forms.py:101
+msgid "Female"
+msgstr "Женский"
+
+#: main_app/forms.py:102 main_app/templates/hod_template/manage_student.html:65
+msgid "Gender"
+msgstr "Пол"
+
+#: main_app/forms.py:108
+msgid "Date of Birth"
+msgstr "Дата рождения"
+
+#: main_app/forms.py:118
+msgid "Format: YYYY-MM-DD. Used to generate the unique login ID."
+msgstr "Формат: ГГГГ-ММ-ДД. Используется для создания уникального логин ID."
+
+#: main_app/forms.py:121
+msgid "Address"
+msgstr "Адрес"
+
+#: main_app/forms.py:124
+msgid "e.g. Chilonzor 9, Tashkent"
+msgstr "например, Чиланзар 9, Ташкент"
+
+#: main_app/forms.py:130
+msgid "Profile pic"
+msgstr "Фото профиля"
+
+#: main_app/forms.py:146
+msgid "Profile picture too large. Maximum size is 5 MB."
+msgstr "Фото профиля слишком большое. Максимум 5 МБ."
+
+#: main_app/forms.py:173 main_app/forms.py:223 main_app/forms.py:351
+msgid "Phone Number"
+msgstr "Номер телефона"
+
+#: main_app/forms.py:182 main_app/forms.py:232
+msgid "— No level assigned —"
+msgstr "— Уровень не назначен —"
+
+#: main_app/forms.py:184 main_app/forms.py:234
+msgid "English Level"
+msgstr "Уровень английского"
+
+#: main_app/forms.py:211
+msgid "— Select a Program —"
+msgstr "— Выберите программу —"
+
+#: main_app/forms.py:212 main_app/forms.py:672 main_app/templates/hod_template/add_student_template.html:93
+msgid "Program"
+msgstr "Программа"
+
+#: main_app/forms.py:216
+msgid "— Select a Class Group (optional) —"
+msgstr "— Выберите группу (необязательно) —"
+
+#: main_app/forms.py:217
+msgid "Assign to Class Group"
+msgstr "Записать в группу"
+
+#: main_app/forms.py:264
+msgid "The selected class group does not belong to the chosen program."
+msgstr "Выбранная группа не относится к выбранной программе."
+
+#: main_app/forms.py:272
+msgid "Selected group does not belong to the selected branch."
+msgstr "Выбранная группа не относится к выбранному филиалу."
+
+#: main_app/forms.py:289
+msgid "Email"
+msgstr "Email"
+
+#: main_app/forms.py:357 main_app/templates/hod_template/manage_staff.html:63
+msgid "Specialization"
+msgstr "Специализация"
+
+#: main_app/forms.py:361
+msgid "e.g. IELTS, Mathematics, Business English"
+msgstr "например, IELTS, Математика, Business English"
+
+#: main_app/forms.py:675
+msgid "Room / Classroom"
+msgstr "Кабинет / Аудитория"
+
+#: main_app/forms.py:676 main_app/templates/hod_template/home_content.html:313
+msgid "Schedule"
+msgstr "Расписание"
+
+#: main_app/forms.py:677
+msgid "Capacity (max students)"
+msgstr "Вместимость (макс. учеников)"
+
+#: main_app/forms.py:678
+msgid "Monthly fee (UZS soʻm)"
+msgstr "Ежемесячная оплата (UZS сум)"
+
+#: main_app/forms.py:679
+msgid "Starting Date"
+msgstr "Дата начала"
+
+#: main_app/forms.py:684
+msgid "Blank = course fee"
+msgstr "Пусто = цена курса"
+
+#: main_app/forms.py:939 main_app/forms.py:1015
+msgid "Billing month"
+msgstr "Расчётный месяц"
+
+#: main_app/forms.py:941
+msgid "Invoices are created for every active enrollment in this month."
+msgstr "Счета создаются для каждой активной записи в этом месяце."
+
+#: main_app/forms.py:947
+msgid "All my branches"
+msgstr "Все мои филиалы"
+
+#: main_app/forms.py:951 main_app/forms.py:1025
+msgid "Payment due date"
+msgstr "Срок оплаты"
+
+#: main_app/forms.py:968 main_app/forms.py:1055
+msgid "Pick a month in the YYYY-MM format."
+msgstr "Выберите месяц в формате ГГГГ-ММ."
+
+#: main_app/forms.py:976 main_app/forms.py:1023
+msgid "Amount (UZS soʻm)"
+msgstr "Сумма (UZS сум)"
+
+#: main_app/forms.py:977
+msgid "Payment method"
+msgstr "Способ оплаты"
+
+#: main_app/forms.py:978
+msgid "Payment date"
+msgstr "Дата оплаты"
+
+#: main_app/forms.py:979 main_app/forms.py:1026
+msgid "Note (optional)"
+msgstr "Примечание (необязательно)"
+
+#: main_app/forms.py:983
+msgid "e.g. 200,000"
+msgstr "например, 200,000"
+
+#: main_app/forms.py:989
+msgid "e.g. receipt #, payer name"
+msgstr "например, № чека, имя плательщика"
+
+#: main_app/forms.py:1003
+msgid "Amount must be greater than zero."
+msgstr "Сумма должна быть больше нуля."
+
+#: main_app/forms.py:1024
+msgid "Discount (UZS soʻm)"
+msgstr "Скидка (UZS сум)"
+
+#: main_app/forms.py:1030
+msgid "e.g. 600,000"
+msgstr "например, 600,000"
+
+#: main_app/forms.py:1037
+msgid "e.g. course books, exam fee"
+msgstr "например, учебники, плата за экзамен"
+
+#: main_app/forms.py:1062
+msgid "Discount cannot exceed the invoice amount."
+msgstr "Скидка не может превышать сумму счёта."
+
+#: main_app/hod_views.py:392
+msgid "Upcoming Classes"
+msgstr "Скоро начнутся"
+
+#: main_app/hod_views.py:399
+msgid "Active Classes"
+msgstr "Идут занятия"
+
+#: main_app/hod_views.py:426
+#, python-format
+msgid "New student · %(course)s"
+msgstr "Новый ученик · %(course)s"
+
+#: main_app/hod_views.py:427 main_app/templates/hod_template/home_content.html:246
+msgid "Course pending"
+msgstr "Курс не выбран"
+
+#: main_app/hod_views.py:441
+#, python-format
+msgid "Assignment · %(group)s"
+msgstr "Задание · %(group)s"
+
+#: main_app/hod_views.py:442
+msgid "No group"
+msgstr "Без группы"
+
+#: main_app/hod_views.py:456
+#, python-format
+msgid "Message in %(group)s"
+msgstr "Сообщение в %(group)s"
+
+#: main_app/hod_views.py:470 main_app/hod_views.py:500 main_app/hod_views.py:521
+#, python-format
+msgid "%(count)s new this week"
+msgstr "Новых за неделю: %(count)s"
+
+#: main_app/hod_views.py:480
+#, python-format
+msgid "%(count)s added this week"
+msgstr "Добавлено за неделю: %(count)s"
+
+#: main_app/hod_views.py:485
+msgid "Active Groups"
+msgstr "Активные группы"
+
+#: main_app/hod_views.py:490
+#, python-format
+msgid "%(pct)s%% capacity filled"
+msgstr "Заполнено %(pct)s%% мест"
+
+#: main_app/hod_views.py:495
+msgid "Programs"
+msgstr "Программы"
+
+#: main_app/hod_views.py:505
+msgid "Attendance Today"
+msgstr "Посещаемость сегодня"
+
+#: main_app/hod_views.py:510 main_app/templates/hod_template/home_content.html:192
+#, python-format
+msgid "%(present)s/%(total)s present"
+msgstr "%(present)s/%(total)s присутствуют"
+
+#: main_app/hod_views.py:516 main_app/templates/hod_template/home_content.html:262
+msgid "Registration Leads"
+msgstr "Заявки на запись"
+
+#: main_app/hod_views.py:528
+msgid "Administrative Dashboard"
+msgstr "Панель администратора"
+
+#: main_app/hod_views.py:566 main_app/templates/hod_template/add_staff_template.html:5 main_app/templates/hod_template/add_staff_template.html:102
+msgid "Add Teacher"
+msgstr "Добавить учителя"
+
+#: main_app/hod_views.py:605
+#, python-format
+msgid "Teacher added successfully. Login ID: %(login_id)s"
+msgstr "Учитель добавлен. Логин ID: %(login_id)s"
+
+#: main_app/hod_views.py:611
+msgid "Could Not Add "
+msgstr "Не удалось добавить "
+
+#: main_app/hod_views.py:613
+msgid "Please fulfil all requirements"
+msgstr "Выполните все требования"
+
+#: main_app/hod_views.py:621 main_app/templates/hod_template/add_student_template.html:122 main_app/templates/hod_template/home_content.html:27
+msgid "Add Student"
+msgstr "Добавить ученика"
+
+#: main_app/hod_views.py:672
+#, python-format
+msgid "Student added and enrolled in '%(group)s'. Login ID: %(login_id)s"
+msgstr "Ученик добавлен и записан в '%(group)s'. Логин ID: %(login_id)s"
+
+#: main_app/hod_views.py:679
+#, python-format
+msgid "Student %(first_name)s %(last_name)s added. Login ID: %(login_id)s. Enroll them in a group from the Enrollments page."
+msgstr "Ученик %(first_name)s %(last_name)s добавлен. Логин ID: %(login_id)s. Запишите его в группу на странице «Записи»."
+
+#: main_app/hod_views.py:685
+msgid "Could Not Add: "
+msgstr "Не удалось добавить: "
+
+#: main_app/hod_views.py:687
+msgid "Please fix the errors below."
+msgstr "Исправьте ошибки ниже."
+
+#: main_app/hod_views.py:823 main_app/templates/hod_template/manage_staff.html:16
+msgid "Manage Teachers"
+msgstr "Учителя"
+
+#: main_app/hod_views.py:872
+msgid "You don't have access to this teacher's branch."
+msgstr "У вас нет доступа к филиалу этого учителя."
+
+#: main_app/hod_views.py:881
+msgid "Edit Teacher"
+msgstr "Редактировать учителя"
+
+#: main_app/hod_views.py:912 main_app/hod_views.py:966
+msgid "Successfully Updated"
+msgstr "Успешно обновлено"
+
+#: main_app/hod_views.py:915 main_app/hod_views.py:969
+msgid "Could Not Update "
+msgstr "Не удалось обновить "
+
+#: main_app/hod_views.py:917
+msgid "Please fill form properly"
+msgstr "Заполните форму правильно"
+
+#: main_app/hod_views.py:927
+msgid "You don't have access to this student's branch."
+msgstr "У вас нет доступа к филиалу этого ученика."
+
+#: main_app/hod_views.py:934
+msgid "Edit Student"
+msgstr "Редактировать ученика"
+
+#: main_app/hod_views.py:971
+msgid "Please Fill Form Properly!"
+msgstr "Заполните форму правильно!"
+
+#: main_app/hod_views.py:1266
+msgid "You don't have permission to delete this teacher."
+msgstr "У вас нет прав удалить этого учителя."
+
+#: main_app/hod_views.py:1270
+msgid "Staff deleted successfully!"
+msgstr "Учитель удалён!"
+
+#: main_app/hod_views.py:1273
+msgid "Could not delete staff because related attendance data exists."
+msgstr "Не удалось удалить учителя: есть связанные данные посещаемости."
+
+#: main_app/hod_views.py:1285
+msgid "You don't have permission to delete this student."
+msgstr "У вас нет прав удалить этого ученика."
+
+#: main_app/hod_views.py:1293
+msgid "Student deleted successfully!"
+msgstr "Ученик удалён!"
+
+#: main_app/hod_views.py:1296
+msgid "Could not delete student because related records still exist."
+msgstr "Не удалось удалить ученика: ещё есть связанные записи."
+
+#: main_app/hod_views.py:1864 main_app/templates/hod_template/home_content.html:31 main_app/templates/hod_template/manage_group.html:16
+msgid "Manage Groups"
+msgstr "Группы"
+
+#: main_app/hod_views.py:1927
+msgid "You can only create groups in your own branches."
+msgstr "Создавать группы можно только в своих филиалах."
+
+#: main_app/hod_views.py:1931 main_app/hod_views.py:1942 main_app/templates/hod_template/home_content.html:114
+msgid "Add Group"
+msgstr "Добавить группу"
+
+#: main_app/hod_views.py:1935
+msgid "Group created!"
+msgstr "Группа создана!"
+
+#: main_app/hod_views.py:1951 main_app/hod_views.py:1985
+msgid "You don't have access to this group's branch."
+msgstr "У вас нет доступа к филиалу этой группы."
+
+#: main_app/hod_views.py:1959
+msgid "You can only assign groups to your own branches."
+msgstr "Назначать группы можно только своим филиалам."
+
+#: main_app/hod_views.py:1963 main_app/hod_views.py:1975
+msgid "Edit Group"
+msgstr "Редактировать группу"
+
+#: main_app/hod_views.py:1968
+msgid "Group updated!"
+msgstr "Группа обновлена!"
+
+#: main_app/hod_views.py:1994
+#, python-format
+msgid "%(count)s enrollment(s)"
+msgstr "записей: %(count)s"
+
+#: main_app/hod_views.py:1996
+#, python-format
+msgid "%(count)s attendance record(s)"
+msgstr "отметок посещаемости: %(count)s"
+
+#: main_app/hod_views.py:1998
+#, python-format
+msgid "%(count)s result(s)"
+msgstr "результатов: %(count)s"
+
+#: main_app/hod_views.py:2002
+#, python-format
+msgid "Cannot delete \"%(group)s\" — it has %(parts)s. Archive it instead to hide it without losing data."
+msgstr "Нельзя удалить «%(group)s» — у неё есть %(parts)s. Отправьте её в архив, чтобы скрыть без потери данных."
+
+#: main_app/hod_views.py:2011
+#, python-format
+msgid "Group \"%(group)s\" deleted."
+msgstr "Группа «%(group)s» удалена."
+
+#: main_app/hod_views.py:2013
+#, python-format
+msgid "Could not delete group: %(error)s"
+msgstr "Не удалось удалить группу: %(error)s"
+
+#: main_app/payments_views.py:381
+msgid "This invoice already has payments. Void the payments first (super admin only)."
+msgstr "По этому счёту уже есть платежи. Сначала аннулируйте платежи (только супер-админ)."
+
+#: main_app/payments_views.py:385
+msgid "Invoice is already cancelled."
+msgstr "Счёт уже отменён."
+
+#: main_app/payments_views.py:391
+#, python-format
+msgid "Invoice for %(student)s (%(period)s) cancelled."
+msgstr "Счёт для %(student)s (%(period)s) отменён."
+
+#: main_app/payments_views.py:409
+msgid "Only the super admin can void payments."
+msgstr "Аннулировать платежи может только супер-админ."
+
+#: main_app/payments_views.py:416
+#, python-format
+msgid "Payment %(receipt)s voided. Invoice balance restored."
+msgstr "Платёж %(receipt)s аннулирован. Остаток по счёту восстановлен."
+
+#: main_app/payments_views.py:427
+#, python-format
+msgid "Reminder sent to %(student)s."
+msgstr "Напоминание отправлено: %(student)s."
+
+#: main_app/payments_views.py:430
+msgid "This invoice is settled — no reminder needed."
+msgstr "Этот счёт оплачен — напоминание не нужно."
+
+#: main_app/templates/hod_template/add_group.html:30
+msgid "Group Details"
+msgstr "Данные группы"
+
+#: main_app/templates/hod_template/add_group.html:56
+msgid "Classroom or room number, e.g. Room 3A"
+msgstr "Аудитория или номер кабинета, например, Кабинет 3A"
+
+#: main_app/templates/hod_template/add_group.html:60
+msgid "Schedule & Capacity"
+msgstr "Расписание и вместимость"
+
+#: main_app/templates/hod_template/add_group.html:66
+msgid "e.g. Mon/Wed 10:00–12:00"
+msgstr "например, Пн/Ср 10:00–12:00"
+
+#: main_app/templates/hod_template/add_group.html:84
+msgid "Save Group"
+msgstr "Сохранить группу"
+
+#: main_app/templates/hod_template/add_group.html:87
+msgid "View All Groups"
+msgstr "Все группы"
+
+#: main_app/templates/hod_template/add_staff_template.html:32 main_app/templates/hod_template/add_student_template.html:38 main_app/templates/hod_template/edit_staff_template.html:35
+msgid "Personal Information"
+msgstr "Личные данные"
+
+#: main_app/templates/hod_template/add_staff_template.html:53
+msgid "YYYY-MM-DD — used to generate the login ID."
+msgstr "ГГГГ-ММ-ДД — используется для создания логин ID."
+
+#: main_app/templates/hod_template/add_staff_template.html:58 main_app/templates/hod_template/add_student_template.html:62 main_app/templates/hod_template/edit_staff_template.html:58
+msgid "Account & Contact"
+msgstr "Аккаунт и контакты"
+
+#: main_app/templates/hod_template/add_staff_template.html:78 main_app/templates/hod_template/edit_staff_template.html:81
+msgid "Teaching Assignment"
+msgstr "Учебная нагрузка"
+
+#: main_app/templates/hod_template/add_staff_template.html:93 main_app/templates/hod_template/edit_staff_template.html:77
+msgid "Optional — PNG or JPG up to 5 MB."
+msgstr "Необязательно — PNG или JPG до 5 МБ."
+
+#: main_app/templates/hod_template/add_staff_template.html:105
+msgid "View All Teachers"
+msgstr "Все учителя"
+
+#: main_app/templates/hod_template/add_student_template.html:58
+msgid "YYYY-MM-DD — used to generate the login ID (e.g. IC052401)."
+msgstr "ГГГГ-ММ-ДД — используется для создания логин ID (например, IC052401)."
+
+#: main_app/templates/hod_template/add_student_template.html:86 main_app/templates/hod_template/edit_student_template.html:78
+msgid "Optional — PNG, JPG up to 5 MB."
+msgstr "Необязательно — PNG, JPG до 5 МБ."
+
+#: main_app/templates/hod_template/add_student_template.html:90
+msgid "Program & Class Assignment"
+msgstr "Программа и группа"
+
+#: main_app/templates/hod_template/add_student_template.html:98
+msgid "(filter groups)"
+msgstr "(фильтр групп)"
+
+#: main_app/templates/hod_template/add_student_template.html:100
+msgid "— All Teachers —"
+msgstr "— Все учителя —"
+
+#: main_app/templates/hod_template/add_student_template.html:102
+msgid "Select program first."
+msgstr "Сначала выберите программу."
+
+#: main_app/templates/hod_template/add_student_template.html:105
+msgid "Class Group"
+msgstr "Группа"
+
+#: main_app/templates/hod_template/add_student_template.html:105
+msgid "(optional)"
+msgstr "(необязательно)"
+
+#: main_app/templates/hod_template/add_student_template.html:108
+msgid "Select program to load groups."
+msgstr "Выберите программу, чтобы загрузить группы."
+
+#: main_app/templates/hod_template/add_student_template.html:114 main_app/templates/hod_template/edit_student_template.html:97
+msgid "English level 1–6. Leave blank for non-English programs."
+msgstr "Уровень английского 1–6. Для программ не по английскому оставьте пустым."
+
+#: main_app/templates/hod_template/add_student_template.html:125
+msgid "View All Students"
+msgstr "Все ученики"
+
+#: main_app/templates/hod_template/edit_staff_template.html:14 main_app/templates/hod_template/edit_student_template.html:14
+msgid "Login ID:"
+msgstr "Логин ID:"
+
+#: main_app/templates/hod_template/edit_staff_template.html:15 main_app/templates/hod_template/edit_student_template.html:15
+msgid "— read-only, cannot be changed"
+msgstr "— только для чтения, изменить нельзя"
+
+#: main_app/templates/hod_template/edit_staff_template.html:61 main_app/templates/hod_template/edit_student_template.html:61
+msgid "New Password"
+msgstr "Новый пароль"
+
+#: main_app/templates/hod_template/edit_staff_template.html:61 main_app/templates/hod_template/edit_student_template.html:61
+msgid "(leave blank to keep)"
+msgstr "(оставьте пустым, чтобы не менять)"
+
+#: main_app/templates/hod_template/edit_staff_template.html:105
+msgid "Update Teacher"
+msgstr "Обновить учителя"
+
+#: main_app/templates/hod_template/edit_staff_template.html:108
+msgid "Back to Teachers"
+msgstr "Назад к учителям"
+
+#: main_app/templates/hod_template/edit_student_template.html:86
+msgid "Program Assignment"
+msgstr "Программа"
+
+#: main_app/templates/hod_template/edit_student_template.html:111
+msgid "Update Student"
+msgstr "Обновить ученика"
+
+#: main_app/templates/hod_template/edit_student_template.html:114
+msgid "Back to Students"
+msgstr "Назад к ученикам"
+
+#: main_app/templates/hod_template/home_content.html:6 main_app/templates/hod_template/home_content.html:7
+msgid "Admin Dashboard"
+msgstr "Панель администратора"
+
+#: main_app/templates/hod_template/home_content.html:20
+msgid "ICEBERG Command Center"
+msgstr "Центр управления ICEBERG"
+
+#: main_app/templates/hod_template/home_content.html:22
+#, python-format
+msgid "Welcome back, %(name)s"
+msgstr "С возвращением, %(name)s"
+
+#: main_app/templates/hod_template/home_content.html:23
+msgid "Run admissions, groups, attendance, teacher activity, and student performance from one premium operating surface."
+msgstr "Управляйте приёмом, группами, посещаемостью, работой учителей и успеваемостью учеников в одном месте."
+
+#: main_app/templates/hod_template/home_content.html:35
+msgid "Profile Settings"
+msgstr "Настройки профиля"
+
+#: main_app/templates/hod_template/home_content.html:39
+msgid "Today snapshot"
+msgstr "Сводка за сегодня"
+
+#: main_app/templates/hod_template/home_content.html:42 main_app/templates/hod_template/home_content.html:51
+msgid "Today"
+msgstr "Сегодня"
+
+#: main_app/templates/hod_template/home_content.html:48
+#, python-format
+msgid "%(present)s present out of %(total)s attendance records today."
+msgstr "Сегодня присутствуют %(present)s из %(total)s отметок посещаемости."
+
+#: main_app/templates/hod_template/home_content.html:54
+msgid "No classes recorded yet today. Attendance appears here as teachers take it."
+msgstr "Сегодня занятия ещё не отмечены. Посещаемость появится здесь, когда учителя её отметят."
+
+#: main_app/templates/hod_template/home_content.html:58
+#, python-format
+msgid "%(count)s pending leads"
+msgstr "Ожидающих заявок: %(count)s"
+
+#: main_app/templates/hod_template/home_content.html:63
+msgid "Dashboard statistics"
+msgstr "Статистика панели"
+
+#: main_app/templates/hod_template/home_content.html:88
+msgid "Admin quick actions"
+msgstr "Быстрые действия администратора"
+
+#: main_app/templates/hod_template/home_content.html:91
+msgid "Fast Path"
+msgstr "Быстрый доступ"
+
+#: main_app/templates/hod_template/home_content.html:92 main_app/templates/main_app/profile_hub.html:105
+msgid "Quick Actions"
+msgstr "Быстрые действия"
+
+#: main_app/templates/hod_template/home_content.html:100
+msgid "Create an account and profile"
+msgstr "Создать аккаунт и профиль"
+
+#: main_app/templates/hod_template/home_content.html:105
+msgid "Set course and branch access"
+msgstr "Назначить курс и филиал"
+
+#: main_app/templates/hod_template/home_content.html:109
+msgid "Add Program"
+msgstr "Добавить программу"
+
+#: main_app/templates/hod_template/home_content.html:110
+msgid "Organize learning tracks"
+msgstr "Организовать учебные направления"
+
+#: main_app/templates/hod_template/home_content.html:115
+msgid "Schedule a class group"
+msgstr "Запланировать группу"
+
+#: main_app/templates/hod_template/home_content.html:119
+msgid "Enroll Student"
+msgstr "Записать ученика"
+
+#: main_app/templates/hod_template/home_content.html:120
+msgid "Place students into groups"
+msgstr "Распределить учеников по группам"
+
+#: main_app/templates/hod_template/home_content.html:125
+msgid "Review class records"
+msgstr "Просмотреть записи занятий"
+
+#: main_app/templates/hod_template/home_content.html:129
+msgid "Group Messages"
+msgstr "Сообщения групп"
+
+#: main_app/templates/hod_template/home_content.html:130
+msgid "Open active conversations"
+msgstr "Открыть активные переписки"
+
+#: main_app/templates/hod_template/home_content.html:135
+msgid "Reply to staff feedback"
+msgstr "Ответить на отзывы сотрудников"
+
+#: main_app/templates/hod_template/home_content.html:145
+msgid "Branch Intelligence"
+msgstr "Аналитика филиалов"
+
+#: main_app/templates/hod_template/home_content.html:146
+msgid "Branch Performance — Monthly"
+msgstr "Показатели филиалов — по месяцам"
+
+#: main_app/templates/hod_template/home_content.html:148
+msgid "Last 6 months"
+msgstr "Последние 6 месяцев"
+
+#: main_app/templates/hod_template/home_content.html:166
+msgid "Analytics"
+msgstr "Аналитика"
+
+#: main_app/templates/hod_template/home_content.html:167
+msgid "Monthly Attendance Rate"
+msgstr "Посещаемость по месяцам"
+
+#: main_app/templates/hod_template/home_content.html:169
+msgid "View report"
+msgstr "Открыть отчёт"
+
+#: main_app/templates/hod_template/home_content.html:182
+msgid "Live Ops"
+msgstr "Текущая работа"
+
+#: main_app/templates/hod_template/home_content.html:183
+msgid "Today's Attendance"
+msgstr "Посещаемость сегодня"
+
+#: main_app/templates/hod_template/home_content.html:199
+msgid "No attendance has been taken today."
+msgstr "Сегодня посещаемость не отмечалась."
+
+#: main_app/templates/hod_template/home_content.html:210
+msgid "Pulse"
+msgstr "Пульс"
+
+#: main_app/templates/hod_template/home_content.html:211
+msgid "Recent Activity"
+msgstr "Последние события"
+
+#: main_app/templates/hod_template/home_content.html:226
+msgid "Activity will appear here as the center runs."
+msgstr "События будут появляться здесь по мере работы центра."
+
+#: main_app/templates/hod_template/home_content.html:235
+msgid "Latest Arrivals"
+msgstr "Новые ученики"
+
+#: main_app/templates/hod_template/home_content.html:236
+msgid "New Enrollments"
+msgstr "Новые записи"
+
+#: main_app/templates/hod_template/home_content.html:246
+#, python-format
+msgid "Joined %(date)s"
+msgstr "Присоединился %(date)s"
+
+#: main_app/templates/hod_template/home_content.html:252
+msgid "No recent enrollments yet."
+msgstr "Новых записей пока нет."
+
+#: main_app/templates/hod_template/home_content.html:261
+msgid "Follow Up"
+msgstr "Обработать"
+
+#: main_app/templates/hod_template/home_content.html:264
+msgid "All leads"
+msgstr "Все"
+
+#: main_app/templates/hod_template/home_content.html:278
+msgid "No registration leads yet."
+msgstr "Заявок пока нет."
+
+#: main_app/templates/hod_template/home_content.html:287
+msgid "Teaching Load"
+msgstr "Учебная нагрузка"
+
+#: main_app/templates/hod_template/home_content.html:288
+msgid "Faculty Pulse"
+msgstr "Учителя"
+
+#: main_app/templates/hod_template/home_content.html:290
+#, python-format
+msgid "%(count)s active"
+msgstr "%(count)s акт."
+
+#: main_app/templates/hod_template/home_content.html:298
+#, python-format
+msgid "%(n)s group"
+msgid_plural "%(n)s groups"
+msgstr[0] "%(n)s группа"
+msgstr[1] "%(n)s группы"
+msgstr[2] "%(n)s групп"
+
+#: main_app/templates/hod_template/home_content.html:298
+msgid "No course"
+msgstr "Без курса"
+
+#: main_app/templates/hod_template/home_content.html:304
+msgid "No teachers assigned yet."
+msgstr "Учителя пока не назначены."
+
+#: main_app/templates/hod_template/home_content.html:316
+msgid "Groups"
+msgstr "Группы"
+
+#: main_app/templates/hod_template/home_content.html:325 main_app/templates/hod_template/manage_group.html:75 main_app/templates/hod_template/manage_group.html:134
+msgid "Active"
+msgstr "Активен"
+
+#: main_app/templates/hod_template/home_content.html:325
+msgid "Now"
+msgstr "Идёт"
+
+#: main_app/templates/hod_template/home_content.html:336
+msgid "No classes configured yet."
+msgstr "Группы пока не настроены."
+
+#: main_app/templates/hod_template/home_content.html:347
+msgid "Growth"
+msgstr "Рост"
+
+#: main_app/templates/hod_template/home_content.html:348
+msgid "New Students — Monthly"
+msgstr "Новые ученики — по месяцам"
+
+#: main_app/templates/hod_template/home_content.html:360
+msgid "Sessions"
+msgstr "Занятия"
+
+#: main_app/templates/hod_template/home_content.html:361
+msgid "Monthly Sessions Taken"
+msgstr "Проведённые занятия по месяцам"
+
+#: main_app/templates/hod_template/home_content.html:373
+msgid "Outcomes"
+msgstr "Результаты"
+
+#: main_app/templates/hod_template/home_content.html:374
+msgid "Monthly Attendance Rate & Sessions"
+msgstr "Посещаемость и занятия по месяцам"
+
+#: main_app/templates/hod_template/manage_group.html:17
+msgid "Manage class groups, teachers, branches, and enrollments."
+msgstr "Управляйте группами, учителями, филиалами и записями."
+
+#: main_app/templates/hod_template/manage_group.html:21 main_app/templates/hod_template/manage_staff.html:21 main_app/templates/hod_template/manage_student.html:21
+msgid "total"
+msgstr "всего"
+
+#: main_app/templates/hod_template/manage_group.html:28
+msgid "Search groups"
+msgstr "Поиск групп"
+
+#: main_app/templates/hod_template/manage_group.html:30
+msgid "Search groups, teachers, branches..."
+msgstr "Поиск групп, учителей, филиалов..."
+
+#: main_app/templates/hod_template/manage_group.html:35 main_app/templates/hod_template/manage_group.html:103 main_app/templates/hod_template/manage_group.html:180
+msgid "No groups found"
+msgstr "Группы не найдены"
+
+#: main_app/templates/hod_template/manage_group.html:36
+msgid "Try another group, teacher, course, branch, or status."
+msgstr "Попробуйте другую группу, учителя, курс, филиал или статус."
+
+#: main_app/templates/hod_template/manage_group.html:44 main_app/templates/hod_template/manage_payments.html:70 main_app/templates/hod_template/manage_payments.html:98
+msgid "Group"
+msgstr "Группа"
+
+#: main_app/templates/hod_template/manage_group.html:45 main_app/templates/hod_template/manage_staff.html:60 main_app/templates/hod_template/manage_student.html:60
+msgid "Course"
+msgstr "Курс"
+
+#: main_app/templates/hod_template/manage_group.html:49
+msgid "Start Date"
+msgstr "Дата начала"
+
+#: main_app/templates/hod_template/manage_group.html:51 main_app/templates/hod_template/manage_payments.html:104 main_app/templates/hod_template/manage_staff.html:66
+msgid "Actions"
+msgstr "Действия"
+
+#: main_app/templates/hod_template/manage_group.html:66 main_app/templates/hod_template/manage_group.html:144
+msgid "No teacher"
+msgstr "Без учителя"
+
+#: main_app/templates/hod_template/manage_group.html:69 main_app/templates/hod_template/manage_group.html:147
+#, python-format
+msgid "%(n)s student"
+msgid_plural "%(n)s students"
+msgstr[0] "%(n)s ученик"
+msgstr[1] "%(n)s ученика"
+msgstr[2] "%(n)s учеников"
+
+#: main_app/templates/hod_template/manage_group.html:73 main_app/templates/hod_template/manage_group.html:132
+msgid "Archived"
+msgstr "В архиве"
+
+#: main_app/templates/hod_template/manage_group.html:84 main_app/templates/hod_template/manage_group.html:164 main_app/templates/hod_template/manage_staff.html:113
+msgid "Edit"
+msgstr "Изменить"
+
+#: main_app/templates/hod_template/manage_group.html:89 main_app/templates/hod_template/manage_group.html:169
+msgid "Restore"
+msgstr "Восстановить"
+
+#: main_app/templates/hod_template/manage_group.html:89 main_app/templates/hod_template/manage_group.html:169
+msgid "Archive"
+msgstr "В архив"
+
+#: main_app/templates/hod_template/manage_group.html:104 main_app/templates/hod_template/manage_group.html:181
+msgid "Create a group and assign a course, teacher, and branch."
+msgstr "Создайте группу и назначьте курс, учителя и филиал."
+
+#: main_app/templates/hod_template/manage_group.html:149
+#, python-format
+msgid "Start %(date)s"
+msgstr "Начало %(date)s"
+
+#: main_app/templates/hod_template/manage_payments.html:14
+msgid "Tuition invoices, collections, and debtors for this month."
+msgstr "Счета за обучение, поступления и должники за этот месяц."
+
+#: main_app/templates/hod_template/manage_payments.html:18
+msgid "Collections"
+msgstr "Поступления"
+
+#: main_app/templates/hod_template/manage_payments.html:19
+msgid "Generate Invoices"
+msgstr "Создать счета"
+
+#: main_app/templates/hod_template/manage_payments.html:20
+msgid "One-off Invoice"
+msgstr "Разовый счёт"
+
+#: main_app/templates/hod_template/manage_payments.html:21
+msgid "CSV"
+msgstr "CSV"
+
+#: main_app/templates/hod_template/manage_payments.html:27
+msgid "Billed"
+msgstr "Выставлено"
+
+#: main_app/templates/hod_template/manage_payments.html:31
+msgid "Collected"
+msgstr "Собрано"
+
+#: main_app/templates/hod_template/manage_payments.html:35
+msgid "Outstanding"
+msgstr "Задолженность"
+
+#: main_app/templates/hod_template/manage_payments.html:39
+msgid "Overdue invoices"
+msgstr "Просроченные счета"
+
+#: main_app/templates/hod_template/manage_payments.html:47
+msgid "Month"
+msgstr "Месяц"
+
+#: main_app/templates/hod_template/manage_payments.html:53
+msgid "All statuses"
+msgstr "Все статусы"
+
+#: main_app/templates/hod_template/manage_payments.html:57 main_app/templates/hod_template/manage_payments.html:123
+msgid "Overdue"
+msgstr "Просрочено"
+
+#: main_app/templates/hod_template/manage_payments.html:63 main_app/templates/hod_template/manage_staff.html:37 main_app/templates/hod_template/manage_student.html:37
+msgid "All branches"
+msgstr "Все филиалы"
+
+#: main_app/templates/hod_template/manage_payments.html:72
+msgid "All groups"
+msgstr "Все группы"
+
+#: main_app/templates/hod_template/manage_payments.html:78
+msgid "Search invoices"
+msgstr "Поиск счетов"
+
+#: main_app/templates/hod_template/manage_payments.html:80
+msgid "Search student, group, status..."
+msgstr "Поиск ученика, группы, статуса..."
+
+#: main_app/templates/hod_template/manage_payments.html:87
+msgid "No records found"
+msgstr "Записи не найдены"
+
+#: main_app/templates/hod_template/manage_payments.html:88
+msgid "Try another student, group, or status."
+msgstr "Попробуйте другого ученика, группу или статус."
+
+#: main_app/templates/hod_template/manage_payments.html:99
+msgid "Amount"
+msgstr "Сумма"
+
+#: main_app/templates/hod_template/manage_payments.html:100 main_app/templates/hod_template/manage_payments.html:119 main_app/templates/hod_template/manage_payments.html:171
+msgid "Paid"
+msgstr "Оплачено"
+
+#: main_app/templates/hod_template/manage_payments.html:101
+msgid "Balance"
+msgstr "Остаток"
+
+#: main_app/templates/hod_template/manage_payments.html:102 main_app/templates/hod_template/manage_payments.html:127
+msgid "Due"
+msgstr "К оплате"
+
+#: main_app/templates/hod_template/manage_payments.html:121 main_app/templates/hod_template/manage_payments.html:173
+msgid "Cancelled"
+msgstr "Отменён"
+
+#: main_app/templates/hod_template/manage_payments.html:125
+msgid "Partial"
+msgstr "Частично"
+
+#: main_app/templates/hod_template/manage_payments.html:132
+msgid "Record payment"
+msgstr "Внести платёж"
+
+#: main_app/templates/hod_template/manage_payments.html:132 main_app/templates/hod_template/manage_payments.html:182
+msgid "Record"
+msgstr "Внести"
+
+#: main_app/templates/hod_template/manage_payments.html:133
+msgid "Send reminder now"
+msgstr "Отправить напоминание"
+
+#: main_app/templates/hod_template/manage_payments.html:133 main_app/templates/hod_template/manage_payments.html:183
+msgid "Remind"
+msgstr "Напомнить"
+
+#: main_app/templates/hod_template/manage_payments.html:140
+#, python-format
+msgid "Void %(receipt)s (%(amount)s)? This cannot be undone."
+msgstr "Аннулировать %(receipt)s (%(amount)s)? Это нельзя отменить."
+
+#: main_app/templates/hod_template/manage_payments.html:140
+#, python-format
+msgid "Void %(receipt)s"
+msgstr "Аннулировать %(receipt)s"
+
+#: main_app/templates/hod_template/manage_payments.html:169
+#, python-format
+msgid "Due %(date)s"
+msgstr "Срок: %(date)s"
+
+#: main_app/templates/hod_template/manage_payments.html:175
+#, python-format
+msgid "Overdue · %(amount)s"
+msgstr "Просрочено · %(amount)s"
+
+#: main_app/templates/hod_template/manage_payments.html:195
+#, python-format
+msgid "No invoices for %(period)s"
+msgstr "Нет счетов за %(period)s"
+
+#: main_app/templates/hod_template/manage_payments.html:196
+msgid "Use “Generate Invoices” to bill all active enrollments for this month."
+msgstr "Нажмите «Создать счета», чтобы выставить счета всем активным записям за этот месяц."
+
+#: main_app/templates/hod_template/manage_staff.html:17
+msgid "Manage teacher accounts and course assignments."
+msgstr "Управляйте аккаунтами учителей и назначением курсов."
+
+#: main_app/templates/hod_template/manage_staff.html:28
+msgid "Search teachers"
+msgstr "Поиск учителей"
+
+#: main_app/templates/hod_template/manage_staff.html:30
+msgid "Search teachers, ID, course..."
+msgstr "Поиск учителей, ID, курса..."
+
+#: main_app/templates/hod_template/manage_staff.html:44 main_app/templates/hod_template/manage_student.html:44
+msgid "Branch:"
+msgstr "Филиал:"
+
+#: main_app/templates/hod_template/manage_staff.html:49 main_app/templates/hod_template/manage_staff.html:128 main_app/templates/hod_template/manage_staff.html:194
+msgid "No teachers found"
+msgstr "Учителя не найдены"
+
+#: main_app/templates/hod_template/manage_staff.html:50
+msgid "Try another name, login ID, course, phone, or specialization."
+msgstr "Попробуйте другое имя, логин ID, курс, телефон или специализацию."
+
+#: main_app/templates/hod_template/manage_staff.html:62 main_app/templates/hod_template/manage_student.html:64
+msgid "Phone"
+msgstr "Телефон"
+
+#: main_app/templates/hod_template/manage_staff.html:64 main_app/templates/hod_template/manage_student.html:66
+msgid "Birthday"
+msgstr "День рождения"
+
+#: main_app/templates/hod_template/manage_staff.html:97 main_app/templates/hod_template/manage_student.html:98
+msgid "No branch"
+msgstr "Без филиала"
+
+#: main_app/templates/hod_template/manage_staff.html:107 main_app/templates/hod_template/manage_staff.html:176
+msgid "Inactive"
+msgstr "Неактивен"
+
+#: main_app/templates/hod_template/manage_staff.html:129 main_app/templates/hod_template/manage_staff.html:195
+msgid "Add a teacher account to start assigning groups and courses."
+msgstr "Добавьте аккаунт учителя, чтобы назначать группы и курсы."
+
+#: main_app/templates/hod_template/manage_staff.html:156 main_app/templates/hod_template/manage_student.html:166
+msgid "No ID"
+msgstr "Нет ID"
+
+#: main_app/templates/hod_template/manage_student.html:16
+msgid "Manage Students"
+msgstr "Ученики"
+
+#: main_app/templates/hod_template/manage_student.html:17
+msgid "Manage student accounts, profiles, and enrollment information."
+msgstr "Управляйте аккаунтами, профилями и записями учеников."
+
+#: main_app/templates/hod_template/manage_student.html:28
+msgid "Search students"
+msgstr "Поиск учеников"
+
+#: main_app/templates/hod_template/manage_student.html:30
+msgid "Search students, ID, course..."
+msgstr "Поиск учеников, ID, курса..."
+
+#: main_app/templates/hod_template/manage_student.html:49 main_app/templates/hod_template/manage_student.html:138 main_app/templates/hod_template/manage_student.html:204
+msgid "No students found"
+msgstr "Ученики не найдены"
+
+#: main_app/templates/hod_template/manage_student.html:50
+msgid "Try another name, login ID, course, status, or level."
+msgstr "Попробуйте другое имя, логин ID, курс, статус или уровень."
+
+#: main_app/templates/hod_template/manage_student.html:62
+msgid "Level"
+msgstr "Уровень"
+
+#: main_app/templates/hod_template/manage_student.html:103 main_app/templates/hod_template/manage_student.html:177
+#, python-format
+msgid "Level %(level)s"
+msgstr "Уровень %(level)s"
+
+#: main_app/templates/hod_template/manage_student.html:105
+msgid "No level"
+msgstr "Без уровня"
+
+#: main_app/templates/hod_template/manage_student.html:114
+msgid "No status"
+msgstr "Без статуса"
+
+#: main_app/templates/hod_template/manage_student.html:139 main_app/templates/hod_template/manage_student.html:205
+msgid "Add students and enroll them into groups."
+msgstr "Добавьте учеников и запишите их в группы."
+
+#: main_app/templates/main_app/profile_hub.html:5
+msgid "My Profile / Settings"
+msgstr "Мой профиль / Настройки"
+
+#: main_app/templates/main_app/profile_hub.html:16
+msgid "Choose Your Avatar"
+msgstr "Выберите аватар"
+
+#: main_app/templates/main_app/profile_hub.html:17
+msgid "Close avatar picker"
+msgstr "Закрыть выбор аватара"
+
+#: main_app/templates/main_app/profile_hub.html:25
+msgid "Save Avatar"
+msgstr "Сохранить аватар"
+
+#: main_app/templates/main_app/profile_hub.html:31
+msgid "Avatar saved"
+msgstr "Аватар сохранён"
+
+#: main_app/templates/main_app/profile_hub.html:51
+msgid "Change profile avatar"
+msgstr "Сменить аватар профиля"
+
+#: main_app/templates/main_app/profile_hub.html:72
+msgid "Profile details"
+msgstr "Данные профиля"
+
+#: main_app/templates/main_app/profile_hub.html:82
+msgid "Log Out"
+msgstr "Выйти"
+
+#: main_app/templates/main_app/profile_hub.html:83
+msgid "End this signed-in session"
+msgstr "Завершить текущий сеанс"
+
+#: main_app/templates/main_app/profile_hub.html:92
+msgid "Profile summary"
+msgstr "Сводка профиля"
+
+#: main_app/templates/main_app/profile_hub.html:106
+msgid "Fast path"
+msgstr "Быстрый доступ"
+
+#: main_app/templates/main_app/profile_hub.html:111
+msgid "Edit info"
+msgstr "Изменить данные"
+
+#: main_app/templates/main_app/profile_hub.html:111
+msgid "Name, phone, birthday"
+msgstr "Имя, телефон, день рождения"
+
+#: main_app/templates/main_app/profile_hub.html:115
+msgid "Photo"
+msgstr "Фото"
+
+#: main_app/templates/main_app/profile_hub.html:115
+msgid "Avatar and profile visual"
+msgstr "Аватар и оформление профиля"
+
+#: main_app/templates/main_app/profile_hub.html:119
+msgid "Update account security"
+msgstr "Обновить защиту аккаунта"
+
+#: main_app/templates/main_app/profile_hub.html:123
+msgid "Open conversations"
+msgstr "Открыть переписки"
+
+#: main_app/templates/main_app/profile_hub.html:132
+#, python-format
+msgid "%(n)s item"
+msgid_plural "%(n)s items"
+msgstr[0] "%(n)s пункт"
+msgstr[1] "%(n)s пункта"
+msgstr[2] "%(n)s пунктов"
+
+#: main_app/templates/main_app/profile_hub.html:165
+msgid "Theme preference"
+msgstr "Выбор темы"
+
+#: main_app/templates/main_app/profile_hub.html:166
+msgid "Use bright theme"
+msgstr "Светлая тема"
+
+#: main_app/templates/main_app/profile_hub.html:170
+msgid "Bright"
+msgstr "Светлая"
+
+#: main_app/templates/main_app/profile_hub.html:171
+msgid "Light Ice surfaces"
+msgstr "Светлый ледяной фон"
+
+#: main_app/templates/main_app/profile_hub.html:173
+msgid "Use dark theme"
+msgstr "Тёмная тема"
+
+#: main_app/templates/main_app/profile_hub.html:177
+msgid "Dark"
+msgstr "Тёмная"
+
+#: main_app/templates/main_app/profile_hub.html:178
+msgid "Deep Navy glass"
+msgstr "Тёмно-синее стекло"
+
+#: main_app/templates/main_app/profile_hub.html:180
+msgid "Use system theme"
+msgstr "Системная тема"
+
+#: main_app/templates/main_app/profile_hub.html:184
+msgid "System"
+msgstr "Системная"
+
+#: main_app/templates/main_app/profile_hub.html:185
+msgid "Match device"
+msgstr "Как на устройстве"
+
+#: main_app/templates/main_app/profile_hub.html:189
+msgid "Theme saved"
+msgstr "Тема сохранена"
+
+#: main_app/templates/main_app/profile_hub.html:218
+msgid "Edit Profile"
+msgstr "Редактировать профиль"
+
+#: main_app/templates/main_app/profile_hub.html:219
+msgid "Update details and password"
+msgstr "Обновить данные и пароль"
+
+#: main_app/templates/main_app/profile_hub.html:242
+msgid "Saving a new password may end your current session."
+msgstr "Сохранение нового пароля может завершить текущий сеанс."
+
+#: main_app/templates/main_app/profile_hub.html:249
+msgid "Save Changes"
+msgstr "Сохранить изменения"
+
+#: main_app/templates/hod_template/home_content.html
+msgctxt "dashboard date chip"
+msgid "Active"
+msgstr "Сейчас"
+
+#: main_app/templates/hod_template/home_content.html
+msgid "Program pending"
+msgstr "Программа не выбрана"
+
+#: main_app/templates/hod_template/home_content.html
+msgid "Teacher pending"
+msgstr "Учитель не назначен"
+
+#: main_app/templates/hod_template/manage_payments.html
+msgid "One-off invoice"
+msgstr "Разовый счёт"
+
+#: main_app/templates/hod_template/manage_staff.html
+msgid "No phone"
+msgstr "Нет телефона"
+
+#: main_app/templates/main_app/profile_hub.html:85
+msgid "Log out of Iceberg"
+msgstr "Выйти из Iceberg"
+
+#: main_app/views.py:583
+msgid "Branch not assigned"
+msgstr "Филиал не назначен"
+
+#: main_app/views.py:586
+msgid "Email not set"
+msgstr "Email не указан"
+
+#: main_app/views.py:589
+msgid "Super Admin"
+msgstr "Супер-админ"
+
+#: main_app/views.py:589
+msgid "Branch Admin"
+msgstr "Админ филиала"
+
+#: main_app/views.py:601
+msgid "Branch / Center Settings"
+msgstr "Настройки филиала / центра"
+
+#: main_app/views.py:608
+msgid "User Management Shortcuts"
+msgstr "Управление пользователями"
+
+#: main_app/views.py:609
+msgid "Teachers, students, and accounts"
+msgstr "Учителя, ученики и аккаунты"
+
+#: main_app/views.py:615
+msgid "Teacher Settings"
+msgstr "Настройки учителей"
+
+#: main_app/views.py:616
+#, python-format
+msgid "%(count)s teachers"
+msgstr "Учителей: %(count)s"
+
+#: main_app/views.py:622
+msgid "Student Settings"
+msgstr "Настройки учеников"
+
+#: main_app/views.py:623
+#, python-format
+msgid "%(count)s students"
+msgstr "Учеников: %(count)s"
+
+#: main_app/views.py:629
+msgid "Course / Group Settings"
+msgstr "Настройки курсов / групп"
+
+#: main_app/views.py:630
+msgid "Courses, groups, enrollments"
+msgstr "Курсы, группы, записи"
+
+#: main_app/views.py:636
+msgid "System Preferences"
+msgstr "Системные настройки"
+
+#: main_app/views.py:637
+msgid "Leaderboard rules and seasons"
+msgstr "Правила и сезоны рейтинга"
+
+#: main_app/views.py:643
+msgid "Reports / Dashboard Preferences"
+msgstr "Отчёты / настройки панели"
+
+#: main_app/views.py:644
+msgid "Attendance and stories"
+msgstr "Посещаемость и истории"
+
+#: main_app/views.py:657
+msgid "Administration"
+msgstr "Администрирование"
+
+#: main_app/views.py:693
+msgid "Your account role is not configured correctly."
+msgstr "Роль вашего аккаунта настроена неправильно."
+
+#: main_app/views.py:703
+msgid "Profile updated."
+msgstr "Профиль обновлён."
+
+#: main_app/views.py:708
+#, python-format
+msgid "Could not update your profile: %(error)s"
+msgstr "Не удалось обновить профиль: %(error)s"
+
+#: main_app/views.py:711
+msgid "Please fix the highlighted profile fields."
+msgstr "Исправьте выделенные поля профиля."
+
+#: main_app/views.py:718
+msgid "Name, contact details, birthday, and profile basics"
+msgstr "Имя, контакты, день рождения и основные данные профиля"
+
+#: main_app/views.py:725
+msgid "Change Profile Avatar"
+msgstr "Сменить аватар профиля"
+
+#: main_app/views.py:726
+msgid "Choose a profile sticker"
+msgstr "Выберите стикер профиля"
+
+#: main_app/views.py:732
+msgid "Change Password"
+msgstr "Сменить пароль"
+
+#: main_app/views.py:733
+msgid "Account credentials"
+msgstr "Данные для входа"
+
+#: main_app/views.py:744
+msgid "Theme / Appearance"
+msgstr "Тема / оформление"
+
+#: main_app/views.py:745
+msgid "Dark, bright, or system mode"
+msgstr "Тёмная, светлая или системная"
+
+#: main_app/views.py:756 main_app/views.py:775
+msgid "Announcements and alerts"
+msgstr "Объявления и оповещения"
+
+#: main_app/views.py:763 main_app/views.py:782
+msgid "Group chat and conversations"
+msgstr "Групповой чат и переписки"
+
+#: main_app/views.py:793
+msgid "Team and group conversations"
+msgstr "Переписки команды и групп"
+
+#: main_app/views.py:804
+msgid "Help & Support"
+msgstr "Помощь и поддержка"
+
+#: main_app/views.py:805
+msgid "Review student feedback"
+msgstr "Отзывы учеников"
+
+#: main_app/views.py:812
+msgid "Review teacher messages"
+msgstr "Сообщения учителей"
+
+#: main_app/views.py:819
+msgid "Follow up with interested students"
+msgstr "Связаться с заинтересованными учениками"
+
+#: main_app/views.py:828 main_app/views.py:845
+msgid "Help & Feedback"
+msgstr "Помощь и отзывы"
+
+#: main_app/views.py:829
+msgid "Contact admin"
+msgstr "Связаться с админом"
+
+#: main_app/views.py:835 main_app/views.py:852
+msgid "Apply for Leave"
+msgstr "Запросить отгул"
+
+#: main_app/views.py:836 main_app/views.py:853
+msgid "Request time off"
+msgstr "Запросить выходной"
+
+#: main_app/views.py:846
+msgid "Contact your teacher or admin"
+msgstr "Связаться с учителем или админом"
+
+#: main_app/views.py:861
+msgid "About Iceberg"
+msgstr "Об Iceberg"
+
+#: main_app/views.py:862
+msgid "Central profile and settings hub for College ERP"
+msgstr "Центр профиля и настроек College ERP"
+
+#: main_app/views.py:882
+msgid "Account"
+msgstr "Аккаунт"
+
+#: main_app/views.py:883
+msgid "Preferences"
+msgstr "Предпочтения"
+
+#: main_app/views.py:885
+msgid "Support"
+msgstr "Поддержка"
+
+#: main_app/templates/hod_template/manage_group.html
+msgctxt "group status"
+msgid "Active"
+msgstr "Активна"

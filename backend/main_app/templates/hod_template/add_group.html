@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load i18n %}
 {% load static %}
 {% block page_title %}{{ page_title }}{% endblock %}
 
@@ -26,7 +27,7 @@
       </div>
       {% endif %}
 
-      <div class="ice-section-title">Group Details</div>
+      <div class="ice-section-title">{% translate "Group Details" %}</div>
       <div class="ice-form-grid cols-2">
         <div class="ice-field span-2">
           <label>{{ form.name.label }}<span class="ice-field-req">*</span></label>
@@ -52,17 +53,17 @@
           <label>{{ form.room.label }}</label>
           {{ form.room }}
           {% if form.room.errors %}<div class="ice-field-error">{{ form.room.errors.0 }}</div>{% endif %}
-          <small class="ice-field-help">Classroom or room number, e.g. Room 3A</small>
+          <small class="ice-field-help">{% translate "Classroom or room number, e.g. Room 3A" %}</small>
         </div>
       </div>
 
-      <div class="ice-section-title" style="margin-top:22px;">Schedule &amp; Capacity</div>
+      <div class="ice-section-title" style="margin-top:22px;">{% translate "Schedule & Capacity" %}</div>
       <div class="ice-form-grid cols-2">
         <div class="ice-field">
           <label>{{ form.schedule.label }}</label>
           {{ form.schedule }}
           {% if form.schedule.errors %}<div class="ice-field-error">{{ form.schedule.errors.0 }}</div>{% endif %}
-          <small class="ice-field-help">e.g. Mon/Wed 10:00–12:00</small>
+          <small class="ice-field-help">{% translate "e.g. Mon/Wed 10:00–12:00" %}</small>
         </div>
         <div class="ice-field">
           <label>{{ form.capacity.label }}</label>
@@ -80,10 +81,10 @@
 
     <div class="ice-submit-bar">
       <button type="submit" class="ice-btn-primary">
-        <i class="fas fa-layer-group"></i> Save Group
+        <i class="fas fa-layer-group"></i> {% translate "Save Group" %}
       </button>
       <a href="{% url 'manage_group' %}" class="ice-btn-secondary">
-        <i class="fas fa-list"></i> View All Groups
+        <i class="fas fa-list"></i> {% translate "View All Groups" %}
       </a>
     </div>
   </form>
