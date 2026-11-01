@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | Done — 6/6 (2026-10-31; P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 6/7 (P3.9 claimed; P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 3/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -150,6 +150,7 @@ integrations or extras that aren't in this plan without asking the owner.
 | D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik) in Release 1 or 2; eMaktab comes later as P9 (D18). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
 | D17 | Admin web language: office staff need the **admin pages in Uzbek and Russian** (English stays). The admin web has no Django i18n today, so P3.0 adds it before the School admin pages. | **Decided 2026-10-27 (owner)** |
 | D18 | **eMaktab: the school does keep the state eMaktab journal** (required for general education schools). Connecting this app to eMaktab is a **future feature (P9), not in Release 1 or 2**. Until then teachers fill in eMaktab as they do today, and this app's register and gradebook serve parents and the office. Design the register, marks and term grades so they can later be sent to eMaktab or exported (store per-lesson and per-date data, use the same 2–5 scale and quarters as eMaktab, keep student identifiers). Don't build any eMaktab code before P9. | **Decided 2026-10-28 (owner)** |
+| D19 | **Admin web shell follows the plan mockups in both brands** (layout of screen 16: white sidebar, light topbar with chip, bell and initials avatar, serif/heavy page titles, rounded cards). Study Center uses the mockup palette (navy #103A57/#07233A, lime #CDF163, ice #38BDF0, stroke #D2DFEC) instead of the old cyan/teal gradients; Learning Center texts stay unchanged. Overrides the AGENTS.md "don't change Learning Center colors" rule for the admin shell. Asked for as "D18" by the coordinator; D18 was already taken (eMaktab), so recorded as D19. | **Decided 2026-11-01 (owner)** |
 
 Record each answer here with the date before starting the task that depends on it.
 
@@ -362,6 +363,8 @@ money is shown as `[summa]` because prices are not decided.
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
 | 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note — **approved 2026-10-30 (owner delegated to the reviewer session)** | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
+| 16c | Web — Study Center students list in the same admin shell, Study Center palette (D19) — **waiting for owner approval** | [16c-web-center-students.png](school-app-mockups/16c-web-center-students.png) | P3.9 |
+| 16d | Web — Study Center admin home (dashboard) in the same shell (D19) — **waiting for owner approval** | [16d-web-center-home.png](school-app-mockups/16d-web-center-home.png) | P3.9 |
 | 20 | Teacher grade entry — Release 2 — **approved 2026-10-30 (owner delegated to the coordinator session)**: class subject picker, date and kind (Dars / Nazorat ishi / Imtihon), 2–5 per pupil (tap again to clear), pupils absent today dimmed | [20-grade-entry.png](school-app-mockups/20-grade-entry.png) | P4.7 |
 | 20b | Teacher quarter grades — Release 2 — **approved 2026-10-30 (owner delegated to the coordinator session)**: tabs 1–4 + Yillik, marks and average per pupil, suggestion (average rounded half up, `school.suggested_grade`) confirmed or changed by the teacher, "Baholanmadi" (not graded) | [20b-quarter-grades.png](school-app-mockups/20b-quarter-grades.png) | P4.7 |
 
@@ -846,6 +849,14 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       buttons, School wordmark), page header blocks `page_eyebrow`/`page_actions` in `base.html`
       (empty for every other page), `school_period` in `context_processors.school_nav` is lazy. The
       P3.1/P3.2 tables now stay visible and scroll sideways below 1025 px (`school-admin.css`).
+- [~] **P3.9** Admin web shell rebuilt to the mockups in both brands (D19; claimed 2026-11-01,
+      `feat/school-admin-shell`): one shell (white sidebar with the brand logo, short menu per brand, topbar
+      with year · quarter or branch chip, bell and initials avatar holding language, theme and sign-out),
+      School palette maroon/gold, Study Center palette navy/lime/ice (screens 16c, 16d), all through brand
+      CSS variables. School-only admins land on `/maktab/` (helper in `branching.py`). Then the School pages
+      (16–19) and the main Study Center pages (dashboard, students, teachers, groups, payments) to the
+      mockups; other pages inherit the shell. Also fixes the unreadable navy-sidebar text in the Study
+      Center admin. Done when: side-by-side images per mockup (light, dark, 390 px), uz/ru/en, full suite.
 
 ### P4 — App
 
@@ -1014,6 +1025,10 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-01 — P3.9 claimed (`feat/school-admin-shell`); D19 recorded (owner: admin shell follows the
+  mockups in both brands, Study Center navy/lime palette). Drew screens 16c and 16d
+  (`python build_mockups.py 16c-web-center-students 16d-web-center-home`) for owner approval before the
+  shell is built.
 - 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
   Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
   CSV export; read-only, scoped by `branching.filter_classes_for_user`. Uses the P3.6 page header

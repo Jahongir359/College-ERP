@@ -81,8 +81,10 @@ when `mobile/iceberg_app/` changes; run the same locally where Flutter is instal
 
 - Prefer small, additive changes. Migrations: additive only, generated with `makemigrations`.
 - Match the surrounding code style; don't reformat files you aren't changing.
-- Don't change existing Learning Center colors or copy; brand work goes through the brand layer
-  described in the plan.
+- Don't change existing Learning Center copy (texts); brand work goes through the brand layer
+  described in the plan. Exception (plan decision D19, 2026-11-01, owner): the admin web shell follows
+  the plan mockups in both brands, so Study Center admin colors move to the mockup palette (navy
+  #103A57/#07233A, lime #CDF163, ice #38BDF0).
 - Commit messages follow `type(scope): summary`, e.g. `feat(brand): add Branch.brand field`,
   `fix(web): …`, `i18n(mobile): …`.
 - Commit or push only when the owner asks; branch off `main` first.
