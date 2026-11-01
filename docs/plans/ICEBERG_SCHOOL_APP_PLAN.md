@@ -92,8 +92,8 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 5/6 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 4/12 (P4.11 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | Done — 7/7 (2026-10-31; P3.4, P3.5 dropped) |
+| P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -826,7 +826,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
-- [ ] **P3.7** Admin: register report page (screen 19, approved 2026-10-30): for a date and
+- [x] **P3.7** Admin: register report page (screen 19, approved 2026-10-30): for a date and
       optional class, which classes took the register (time, homeroom teacher), present/late/absent
       counts and rate per class, the list of absent and late pupils with arrival time and note, CSV
       export of the same rows. Read-only (teachers take the register in the app, D15); data from
@@ -834,6 +834,22 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
       branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
       Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
+      — done 2026-10-31, PR #63; verified: full suite 562 OK, `RegisterReportAccessTests`,
+      `RegisterReportContentTests`, `RegisterReportCsvTests`; page `/maktab/register/`
+      (`school_register_report_views.py`); screenshot next to the mockup:
+      `docs/plans/school-app-screens/p3.7-register-report.png`.
+- [x] **P3.8** Admin: School board (`/maktab/`), the School admin's home page on the web: counts
+      (pupils, classes, teachers, parents), today's register (classes taken / not taken, link to the
+      register report), parents who haven't signed in yet, the current year and quarter (or a link to
+      set one up), quick links. Scoped through `branching.py`; uz/ru/en; light and dark. Done when:
+      access tests (branch admin sees own branch only, teachers/pupils get no page, anonymous → login),
+      empty states (no School branch, no classes, no current year), screenshot. Added 2026-10-31
+      (owner). — done 2026-10-31, PR #70; verified: full suite 572 OK, `test_school_board`
+      (branch admin sees own branch only, super admin all School branches, teacher/pupil/parent sent
+      home, anonymous → login, empty states, counts, uz/ru), page in `test_school_page_header`;
+      `school_board_views.py`, `hod_template/school/board.html`; screenshot
+      `docs/plans/school-app-screens/p3.8-school-board.png`. "Letter due" isn't shown: no login
+      letter field on main yet (PL.1), so the panel counts parents who never signed in.
 - [x] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
       desktop in the PR. — done 2026-10-30, PR #64; verified: full suite,
       `test_school_page_header` (eyebrow, one title, year · quarter chip, Center admin page unchanged,
@@ -1024,6 +1040,39 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 
 - 2026-10-31 — P4.3 done (PR #68, after #61): the app's "choose your password" screen for PL.1
   and the brand-from-account notice. PL.1 (#58) can merge after this. Next on this line: P4.4 (parent shell).
+
+- 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
+  today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
+  quick links), first link in the sidebar's School group. When PL.1 adds login letters, show
+  "letter due" in the Parents panel.
+
+- 2026-11-01 — Web audit M3 (PR #72): month names on the web follow the page
+  language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always
+  English; now `date_format`. Payment pages show `invoice.period|date:"F Y"`; `period_label` stays
+  English for the stored notification texts. The "Russian in English" case from the audit didn't
+  reproduce on main (Django's month names already follow the language). Minor 4: the sign-in
+  footer already follows the brand cookie; a School admin's browser gets it when they sign in.
+  Tests in `test_month_names.py`.
+
+- 2026-10-31 — P2.8 push safety fixes from QA's review of #57 (PR #69):
+  FCM `INVALID_ARGUMENT` no longer deletes device tokens (only the FCM error codes `UNREGISTERED`
+  and `SENDER_ID_MISMATCH` do, not a bare 404; it is logged), and committed pushes go to one shared worker thread
+  instead of one thread per notification (monthly invoices). P2.8 stays `[~]` until the real phone test.
+
+- 2026-10-31 — Web audit fixes B1, M1 (PR #71): new students and teachers always get a branch (one-branch
+  admins get theirs, locked; super admins and admins of several branches must choose one they can
+  see, `branching.assignable_branches`/`admin_only_branch`); edits can't clear or move it out of
+  scope; the group form only lists and accepts teachers the admin can see. Also: edit student/teacher
+  no longer demands a new password, class form help texts in uz/ru, a clear message for a pupil
+  already in a class, and the classes search message only rendered when there are classes.
+
+- 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
+  Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
+  CSV export; read-only, scoped by `branching.filter_classes_for_user`. Uses the P3.6 page header
+  (eyebrow, one title, "Download CSV" in `page_actions`), so the teal hero and the maroon-on-maroon
+  sidebar item seen before #64 are gone. CSV cells starting with = + - @ tab or CR get a leading
+  apostrophe (CSV injection), tested. Dark mode: `erpnext-style.css` forces every dark span to the
+  text colour with `!important`, so coloured spans on School pages need `!important` in dark rules.
 
 - 2026-10-30 — P3.6 done (PR #64; takeover of the unpushed `feat/school-p3.6-web-brand` work): all Maktab
   web pages on the School brand, MAKTAB eyebrow over one title, year · quarter chip, tables kept on

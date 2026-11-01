@@ -4,8 +4,8 @@ Credentials come only from env vars (see settings ``FCM_SERVICE_ACCOUNT_JSON``);
 without them every call here is a no-op, so dev and tests never reach Google.
 
 Callers use :func:`notify_users`. Sending happens after the DB transaction
-commits, on a background thread, so a slow or failing FCM call never breaks the
-request that created the notification.
+commits, on one background worker thread, so a slow or failing FCM call never
+breaks the request that created the notification.
 """
 
 import json
@@ -24,8 +24,10 @@ logger = logging.getLogger(__name__)
 FCM_SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
 FCM_SEND_URL = "https://fcm.googleapis.com/v1/projects/{project_id}/messages:send"
 SEND_TIMEOUT = 10
-# FCM error codes that mean the token will never work again.
-DEAD_TOKEN_ERRORS = {"UNREGISTERED", "INVALID_ARGUMENT", "SENDER_ID_MISMATCH"}
+# FCM error codes that mean the token will never work again. Not
+# INVALID_ARGUMENT: FCM also returns it for a bad payload, and one payload bug
+# must not delete every recipient's device token. It is logged instead.
+DEAD_TOKEN_ERRORS = {"UNREGISTERED", "SENDER_ID_MISMATCH"}
 
 CATEGORY_TITLES = {
     "attendance": _("Attendance"),
@@ -87,13 +89,13 @@ def _post(url, payload, access_token):
 
 
 def _is_dead_token(response):
-    if response.status_code == 404:
-        return True
+    # Only FCM's own error codes count: a bare 404 (wrong URL, proxy) says
+    # nothing about the token and must not delete it.
     try:
         details = response.json().get("error", {}).get("details", [])
     except ValueError:
         return False
-    return any(d.get("errorCode") in DEAD_TOKEN_ERRORS for d in details)
+    return any(isinstance(d, dict) and d.get("errorCode") in DEAD_TOKEN_ERRORS for d in details)
 
 
 def send_messages(messages):
@@ -140,18 +142,71 @@ def send_messages(messages):
     return sent
 
 
-def _send_in_thread(messages):
-    try:
+# Batches committed but not sent yet, and the one worker thread that sends
+# them. Every committed transaction adds its batches here; a worker is started
+# only when none is running, so a transaction that creates N notifications
+# (e.g. monthly invoices) starts at most one thread, not N. The worker is a
+# daemon, so batches still waiting when gunicorn restarts are lost: acceptable for push.
+_pending = []
+_pending_lock = threading.Lock()
+_worker = None
+
+
+def _take_pending():
+    """All waiting batches, or ``None`` (and the worker slot freed) when empty."""
+    global _worker
+    with _pending_lock:
+        if not _pending:
+            _worker = None
+            return None
+        batches = _pending[:]
+        _pending.clear()
+        return batches
+
+
+def _send_batches(batches):
+    messages = []
+    for users, title, body, data in batches:
+        messages.extend(_build_messages(users, title, body, data))
+    if messages:
         send_messages(messages)
+
+
+def _work():
+    try:
+        while True:
+            batches = _take_pending()
+            if batches is None:
+                return
+            try:
+                _send_batches(batches)
+            except Exception:
+                logger.exception("Push worker failed to send a batch.")
     finally:
         connection.close()
 
 
-def _dispatch(messages):
+def _enqueue(batches):
+    """Run after commit: hand ``batches`` to the worker, starting it if needed."""
+    global _worker
     if getattr(settings, "FCM_SEND_INLINE", False):
-        send_messages(messages)
-    else:
-        threading.Thread(target=_send_in_thread, args=(messages,), daemon=True).start()
+        _send_batches(batches)
+        return
+    with _pending_lock:
+        _pending.extend(batches)
+        if _worker is not None and _worker.is_alive():
+            return
+        _worker = threading.Thread(target=_work, name="fcm-push", daemon=True)
+        worker = _worker
+    try:
+        worker.start()
+    except Exception:
+        # No thread (e.g. the process is out of threads): free the slot so the
+        # next commit tries again; the batches stay queued for it.
+        with _pending_lock:
+            if _worker is worker:
+                _worker = None
+        logger.exception("Could not start the push worker.")
 
 
 def _build_messages(users, title, body, data):
@@ -173,17 +228,13 @@ def _build_messages(users, title, body, data):
 
 
 def _queue(batches):
-    """After commit, build ``[(users, title, body, data), ...]`` and send them in one go."""
+    """After commit, send ``[(users, title, body, data), ...]`` through the worker.
 
-    def _send():
-        messages = []
-        for users, title, body, data in batches:
-            messages.extend(_build_messages(users, title, body, data))
-        if messages:
-            _dispatch(messages)
-
+    Each call registers its own cheap on-commit hook, so batches from a
+    rolled-back savepoint are dropped with it; the sending itself is shared.
+    """
     # robust: an error after commit is logged by Django instead of reaching the request.
-    transaction.on_commit(_send, robust=True)
+    transaction.on_commit(lambda: _enqueue(batches), robust=True)
 
 
 def notify_users(users, title, body, data=None):
