@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../auth/auth_state.dart';
+import '../../features/parent/parent_home_screen.dart';
+import '../../features/parent/parent_shell.dart';
 import '../../features/auth/screens/change_password_screen.dart';
 import '../../features/auth/screens/choose_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -68,9 +71,13 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
   }
 
   // Admin → coming-soon wall (admin dashboard ships on the web portal).
-  // Parents too, until the parent screens are built (plan phase P5).
-  if (user.isAdmin || user.isParent) {
+  if (user.isAdmin) {
     return path == '/coming-soon' ? null : '/coming-soon';
+  }
+
+  // Parents → parent app (P4.4).
+  if (user.isParent) {
+    return path.startsWith('/parent/') ? null : '/parent/home';
   }
 
   // Staff (teachers) → teacher portal.
@@ -85,6 +92,7 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
       path == '/change-password' ||
       path == '/splash' ||
       path == '/coming-soon' ||
+      path.startsWith('/parent') ||
       path.startsWith('/staff')) {
     return '/student/home';
   }
@@ -96,7 +104,7 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
 ///   - Student (user_type 3) → full /student/* experience
 ///   - Staff   (user_type 2) → teacher portal /staff/*
 ///   - Admin   (user_type 1) → /coming-soon (admin web portal handles them)
-///   - Parent  (user_type 4) → /coming-soon until the parent screens ship
+///   - Parent  (user_type 4) → parent app /parent/* (Home, P4.4)
 ///   - Signed out → /choose on first launch, then /login
 ///   - Temporary password (any role) → /change-password until it is changed
 ///
@@ -123,7 +131,67 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const ChangePasswordScreen(),
       ),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
-      GoRoute(path: '/coming-soon', builder: (_, __) => const ComingSoonScreen()),
+      GoRoute(
+        path: '/coming-soon',
+        builder: (_, __) => const ComingSoonScreen(),
+      ),
+
+      // ── Parent shell (5 bottom-nav branches, P4.4) ───────────────────────
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            ParentShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/parent/home',
+                builder: (_, __) => const ParentHomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/parent/timetable',
+                builder: (_, __) => const ParentSoonTab(
+                  title: 'Timetable',
+                  icon: Icons.calendar_today_rounded,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/parent/homework',
+                builder: (_, __) => const ParentSoonTab(
+                  title: 'Homework',
+                  icon: Icons.menu_book_rounded,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/parent/messages',
+                builder: (_, __) => const ParentSoonTab(
+                  title: 'Messages',
+                  icon: Icons.chat_bubble_rounded,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/parent/profile',
+                builder: (_, __) => const ParentProfileTab(),
+              ),
+            ],
+          ),
+        ],
+      ),
 
       // ── Staff shell (5 bottom-nav branches) ──────────────────────────────
       StatefulShellRoute.indexedStack(
@@ -131,63 +199,103 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             StaffShell(navigationShell: navigationShell),
         branches: [
           // 0 · Dashboard
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/staff/home',
-              builder: (_, __) => const StaffHomeScreen(),
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/staff/home',
+                builder: (_, __) => const StaffHomeScreen(),
+              ),
+            ],
+          ),
           // 1 · Attendance + update
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/staff/attendance',
-              builder: (_, __) => const StaffAttendanceScreen(),
-              routes: [
-                GoRoute(
-                  path: 'update',
-                  builder: (_, __) => const StaffUpdateAttendanceScreen(),
-                ),
-              ],
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/staff/attendance',
+                builder: (_, __) => const StaffAttendanceScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'update',
+                    builder: (_, __) => const StaffUpdateAttendanceScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
           // 2 · Results
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/staff/results', builder: (_, __) => const StaffResultsScreen()),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/staff/results',
+                builder: (_, __) => const StaffResultsScreen(),
+              ),
+            ],
+          ),
           // 3 · Assignments
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/staff/assignments', builder: (_, __) => const StaffAssignmentsScreen()),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/staff/assignments',
+                builder: (_, __) => const StaffAssignmentsScreen(),
+              ),
+            ],
+          ),
           // 4 · Profile
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/staff/profile',
-              builder: (_, __) => const ProfileHubScreen(),
-              routes: [
-                GoRoute(
-                  path: 'avatar',
-                  builder: (_, __) => const StaffAvatarScreen(),
-                ),
-              ],
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/staff/profile',
+                builder: (_, __) => const ProfileHubScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'avatar',
+                    builder: (_, __) => const StaffAvatarScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
       // Staff standalone screens (pushed full-screen; each shows its own back affordance).
-      GoRoute(path: '/staff/classes',       builder: (_, __) => const StaffClassesScreen()),
-      GoRoute(path: '/staff/more',          builder: (_, __) => const StaffMoreScreen()),
-      GoRoute(path: '/staff/vocabulary',    builder: (_, __) => const StaffVocabularyScreen()),
+      GoRoute(
+        path: '/staff/classes',
+        builder: (_, __) => const StaffClassesScreen(),
+      ),
+      GoRoute(path: '/staff/more', builder: (_, __) => const StaffMoreScreen()),
+      GoRoute(
+        path: '/staff/vocabulary',
+        builder: (_, __) => const StaffVocabularyScreen(),
+      ),
       GoRoute(
         path: '/staff/vocabulary/:id',
-        builder: (_, state) => StaffVocabularyDetailScreen(
-            vocabId: state.pathParameters['id']!),
+        builder: (_, state) =>
+            StaffVocabularyDetailScreen(vocabId: state.pathParameters['id']!),
       ),
-      GoRoute(path: '/staff/leave',         builder: (_, __) => const StaffLeaveScreen()),
-      GoRoute(path: '/staff/feedback',      builder: (_, __) => const StaffFeedbackScreen()),
-      GoRoute(path: '/staff/payments',      builder: (_, __) => const StaffPaymentsScreen()),
-      GoRoute(path: '/staff/notifications', builder: (_, __) => const StaffNotificationsScreen()),
-      GoRoute(path: '/staff/settings',      builder: (_, __) => const StudentSettingsScreen()),
-      GoRoute(path: '/staff/messages',      builder: (_, __) => const MessagesScreen()),
+      GoRoute(
+        path: '/staff/leave',
+        builder: (_, __) => const StaffLeaveScreen(),
+      ),
+      GoRoute(
+        path: '/staff/feedback',
+        builder: (_, __) => const StaffFeedbackScreen(),
+      ),
+      GoRoute(
+        path: '/staff/payments',
+        builder: (_, __) => const StaffPaymentsScreen(),
+      ),
+      GoRoute(
+        path: '/staff/notifications',
+        builder: (_, __) => const StaffNotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/staff/settings',
+        builder: (_, __) => const StudentSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/staff/messages',
+        builder: (_, __) => const MessagesScreen(),
+      ),
 
       // ── Student shell (5 bottom-nav branches) ────────────────────────────
       StatefulShellRoute.indexedStack(
@@ -377,25 +485,25 @@ class _SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<_SplashScreen>
     with TickerProviderStateMixin {
   // ── Controllers ────────────────────────────────────────────────────────────
-  late final AnimationController _mainCtrl;   // 1800 ms one-shot sequence
-  late final AnimationController _floatCtrl;  // 3200 ms continuous levitation
-  late final AnimationController _glowCtrl;   // 2200 ms continuous glow breathe
-  late final AnimationController _sheenCtrl;  // 560 ms one-shot sheen sweep
+  late final AnimationController _mainCtrl; // 1800 ms one-shot sequence
+  late final AnimationController _floatCtrl; // 3200 ms continuous levitation
+  late final AnimationController _glowCtrl; // 2200 ms continuous glow breathe
+  late final AnimationController _sheenCtrl; // 560 ms one-shot sheen sweep
 
   // ── Sequence animations (driven by _mainCtrl) ───────────────────────────
-  late final Animation<double> _logoFade;    // 0–380 ms
-  late final Animation<double> _logoScale;   // 0–700 ms elasticOut
-  late final Animation<double> _glowIn;      // 380–780 ms glow enters
-  late final Animation<double> _ringScale;   // 640–1120 ms ripple expands
-  late final Animation<double> _ringFade;    // 640–1120 ms ripple fades
+  late final Animation<double> _logoFade; // 0–380 ms
+  late final Animation<double> _logoScale; // 0–700 ms elasticOut
+  late final Animation<double> _glowIn; // 380–780 ms glow enters
+  late final Animation<double> _ringScale; // 640–1120 ms ripple expands
+  late final Animation<double> _ringFade; // 640–1120 ms ripple fades
   late final List<Animation<double>> _iconScales;
   late final List<Animation<double>> _iconFades;
-  late final Animation<double> _tagFade;     // 1380–1720 ms
-  late final Animation<Offset> _tagSlide;    // 1380–1720 ms slides up
+  late final Animation<double> _tagFade; // 1380–1720 ms
+  late final Animation<Offset> _tagSlide; // 1380–1720 ms slides up
 
   // ── Continuous animations ────────────────────────────────────────────────
-  late final Animation<double> _floatY;      // –6 ↔ +6 px
-  late final Animation<double> _glowPulse;   // 0.72 ↔ 1.0
+  late final Animation<double> _floatY; // –6 ↔ +6 px
+  late final Animation<double> _glowPulse; // 0.72 ↔ 1.0
 
   // Sheen sweep: 0 = left edge, 1 = right edge
   late final Animation<double> _sheenX;
@@ -486,30 +594,31 @@ class _SplashScreenState extends State<_SplashScreen>
       parent: _mainCtrl,
       curve: Interval(_t(1380), _t(1720), curve: Curves.easeOut),
     );
-    _tagSlide = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _mainCtrl,
-        curve: Interval(_t(1380), _t(1720), curve: Curves.easeOutCubic),
-      ),
-    );
+    _tagSlide = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _mainCtrl,
+            curve: Interval(_t(1380), _t(1720), curve: Curves.easeOutCubic),
+          ),
+        );
 
     // ── Float: gentle –6 ↔ +6 px vertical ───────────────────────────────
-    _floatY = Tween<double>(begin: -6.0, end: 6.0).animate(
-      CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut),
-    );
+    _floatY = Tween<double>(
+      begin: -6.0,
+      end: 6.0,
+    ).animate(CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut));
 
     // ── Glow pulse: opacity 0.72 ↔ 1.0 ──────────────────────────────────
-    _glowPulse = Tween<double>(begin: 0.72, end: 1.0).animate(
-      CurvedAnimation(parent: _glowCtrl, curve: Curves.easeInOut),
-    );
+    _glowPulse = Tween<double>(
+      begin: 0.72,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _glowCtrl, curve: Curves.easeInOut));
 
     // ── Sheen sweep ──────────────────────────────────────────────────────
-    _sheenX = Tween<double>(begin: -1.0, end: 2.0).animate(
-      CurvedAnimation(parent: _sheenCtrl, curve: Curves.easeInOut),
-    );
+    _sheenX = Tween<double>(
+      begin: -1.0,
+      end: 2.0,
+    ).animate(CurvedAnimation(parent: _sheenCtrl, curve: Curves.easeInOut));
 
     // Start continuous effects when logo settles; trigger sheen at 860 ms.
     _mainCtrl.addListener(() {
@@ -548,7 +657,11 @@ class _SplashScreenState extends State<_SplashScreen>
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: RadialGradient(
-              colors: [Color(0x5500CFFF), Color(0x1500CFFF), Colors.transparent],
+              colors: [
+                Color(0x5500CFFF),
+                Color(0x1500CFFF),
+                Colors.transparent,
+              ],
               stops: [0.0, 0.5, 1.0],
             ),
           ),
