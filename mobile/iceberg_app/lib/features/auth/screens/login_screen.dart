@@ -204,10 +204,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
             ),
           ),
+          // Top-aligned, not centred: the maroon header has a fixed height,
+          // so on a tall screen a centred wordmark would fall below it.
           SafeArea(
-            child: Center(
+            child: Align(
+              alignment: Alignment.topCenter,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 420),
                   child: Column(
