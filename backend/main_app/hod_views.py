@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.password_validation import validate_password
@@ -249,7 +250,7 @@ def admin_home(request):
                 y -= 1
             first = date_type(y, m, 1)
             last = date_type(y + 1, 1, 1) if m == 12 else date_type(y, m + 1, 1)
-            result.append((first, last, first.strftime("%b")))
+            result.append((first, last, date_format(first, "M")))
         return result
 
     _months = _month_range(6)

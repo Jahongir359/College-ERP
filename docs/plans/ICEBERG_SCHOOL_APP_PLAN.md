@@ -1063,10 +1063,30 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   mockups in both brands, Study Center navy/lime palette). Drew screens 16c and 16d
   (`python build_mockups.py 16c-web-center-students 16d-web-center-home`) for owner approval before the
   shell is built.
+- 2026-11-01 — Web audit M3 (PR #72): month names on the web follow the page
+  language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always
+  English; now `date_format`. Payment pages show `invoice.period|date:"F Y"`; `period_label` stays
+  English for the stored notification texts. The "Russian in English" case from the audit didn't
+  reproduce on main (Django's month names already follow the language). Minor 4: the sign-in
+  footer already follows the brand cookie; a School admin's browser gets it when they sign in.
+  Tests in `test_month_names.py`.
+
 - 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
   today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
   quick links), first link in the sidebar's School group. When PL.1 adds login letters, show
   "letter due" in the Parents panel.
+
+- 2026-10-31 — P2.8 push safety fixes from QA's review of #57 (PR #69):
+  FCM `INVALID_ARGUMENT` no longer deletes device tokens (only the FCM error codes `UNREGISTERED`
+  and `SENDER_ID_MISMATCH` do, not a bare 404; it is logged), and committed pushes go to one shared worker thread
+  instead of one thread per notification (monthly invoices). P2.8 stays `[~]` until the real phone test.
+
+- 2026-10-31 — Web audit fixes B1, M1 (PR #71): new students and teachers always get a branch (one-branch
+  admins get theirs, locked; super admins and admins of several branches must choose one they can
+  see, `branching.assignable_branches`/`admin_only_branch`); edits can't clear or move it out of
+  scope; the group form only lists and accepts teachers the admin can see. Also: edit student/teacher
+  no longer demands a new password, class form help texts in uz/ru, a clear message for a pupil
+  already in a class, and the classes search message only rendered when there are classes.
 
 - 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
   Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,

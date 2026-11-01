@@ -97,8 +97,9 @@
         </div>
         {% if form.branch %}
         <div class="ice-field">
-          <label>{{ form.branch.label }}</label>
+          <label for="{{ form.branch.id_for_label }}">{{ form.branch.label }}<span class="ice-field-req">*</span></label>
           {{ form.branch }}
+          {% if form.branch.errors %}<div class="ice-field-error">{{ form.branch.errors.0 }}</div>{% endif %}
         </div>
         {% endif %}
       </div>

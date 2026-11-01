@@ -112,6 +112,11 @@
           {% if form.level.errors %}<div class="ice-field-error">{{ form.level.errors.0 }}</div>{% endif %}
           <small class="ice-field-help">English level 1–6. Leave blank for non-English programs.</small>
         </div>
+        <div class="ice-field">
+          <label for="{{ form.branch.id_for_label }}">{{ form.branch.label }}<span class="ice-field-req">*</span></label>
+          {{ form.branch }}
+          {% if form.branch.errors %}<div class="ice-field-error">{{ form.branch.errors.0 }}</div>{% endif %}
+        </div>
       </div>
 
     </div>
