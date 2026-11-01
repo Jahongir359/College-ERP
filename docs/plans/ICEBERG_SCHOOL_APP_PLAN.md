@@ -1014,6 +1014,14 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-01 — Web audit M3 (branch fix/web-month-names): month names on the web follow the page
+  language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always
+  English; now `date_format`. Payment pages show `invoice.period|date:"F Y"`; `period_label` stays
+  English for the stored notification texts. The "Russian in English" case from the audit didn't
+  reproduce on main (Django's month names already follow the language). Minor 4: the sign-in
+  footer already follows the brand cookie; a School admin's browser gets it when they sign in.
+  Tests in `test_month_names.py`.
+
 - 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
   Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
   CSV export; read-only, scoped by `branching.filter_classes_for_user`. Uses the P3.6 page header

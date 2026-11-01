@@ -11,7 +11,7 @@
     <i class="fas fa-cash-register"></i>
     <div>
       <div class="page-card-title">{{ page_title }}</div>
-      <div class="page-card-subtitle">{{ invoice.student }} · {{ invoice.period_label }}{% if invoice.group %} · {{ invoice.group.name }}{% endif %}</div>
+      <div class="page-card-subtitle">{{ invoice.student }} · {{ invoice.period|date:"F Y" }}{% if invoice.group %} · {{ invoice.group.name }}{% endif %}</div>
     </div>
   </div>
 
