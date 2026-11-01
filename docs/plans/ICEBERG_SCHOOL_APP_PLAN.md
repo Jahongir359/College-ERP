@@ -1062,7 +1062,12 @@ Newest first. One line per session: date — tasks — PR — note for the next 
 - 2026-11-01 — P3.9 claimed (`feat/school-admin-shell`); D19 recorded (owner: admin shell follows the
   mockups in both brands, Study Center navy/lime palette). Drew screens 16c and 16d
   (`python build_mockups.py 16c-web-center-students 16d-web-center-home`) for owner approval before the
-  shell is built.
+  shell is built. Then P3.9a, the shell (owner approved 16c/16d): `admin-shell.css` (tokens + Admin UI
+  kit, `html[data-shell="admin"]` only), School-only menu and `/maktab/` landing
+  (`branching.is_school_only_admin`, `admin_home_url`), avatar menu with language/theme/sign-out, legacy
+  `.ice-hero`/`.ice-manage-*`/`.ice-action` on shell tokens (fixes dark Payments header, faint Edit buttons).
+  The navy-sidebar text bug predates P3.6 (June 2026 `mobile-adaptive.css` bright-mode rules beat
+  base.html's inline white text); the white admin sidebar ends it. Proof: `school-app-screens/p3.9a-*.png`.
 - 2026-11-01 — Web audit M3 (PR #72): month names on the web follow the page
   language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always
   English; now `date_format`. Payment pages show `invoice.period|date:"F Y"`; `period_label` stays
