@@ -159,7 +159,7 @@
         </span>
         <div class="ice-mobile-card__main">
           <h3 class="ice-mobile-card__title">{{ inv.student }}</h3>
-          <div class="ice-mobile-card__subtitle">{{ inv.group.name|default:"One-off invoice" }} · {{ inv.period_label }}</div>
+          <div class="ice-mobile-card__subtitle">{{ inv.group.name|default:"One-off invoice" }} · {{ inv.period|date:"F Y" }}</div>
         </div>
       </div>
       <div class="ice-mobile-card__meta">
