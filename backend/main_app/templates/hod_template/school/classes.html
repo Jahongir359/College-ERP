@@ -45,15 +45,18 @@
     </div>
   </div>
 
+  {% if classes %}
   <label class="ice-manage-search" aria-label="{% translate 'Search classes' %}">
     <i class="fas fa-search" aria-hidden="true"></i>
     <input type="search" class="ice-manage-search__input" data-manage-search placeholder="{% translate 'Search classes or teachers…' %}" autocomplete="off">
   </label>
 
+  {# Shown by admin-manage-mobile.js only when a search matches no class. #}
   <div class="ice-manage-empty" data-manage-empty-state hidden>
     <i class="fas fa-search" aria-hidden="true"></i>
     <strong>{% translate "No classes found" %}</strong>
   </div>
+  {% endif %}
 
   <div class="ice-manage-table-wrap">
     <table class="ice-manage-table">

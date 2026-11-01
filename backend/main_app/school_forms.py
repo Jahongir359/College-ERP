@@ -195,6 +195,8 @@ class ClassForm(forms.ModelForm):
             "letter": _("For 7-B type B."),
             "course": _("The course whose subjects this class studies."),
             "monthly_fee": _("Leave blank to use the course fee."),
+            "room": _("Classroom or room number, e.g. Room 3A"),
+            "session": _("School classes only: the academic year."),
         }
 
     def __init__(self, *args, user=None, **kwargs):
@@ -260,7 +262,15 @@ class ClassForm(forms.ModelForm):
 class ClassStudentForm(_AdminForm):
     """Add a student to a class: students of the class's branch without a class this year."""
 
-    student = forms.ModelChoiceField(label=_("Student"), queryset=Student.objects.none())
+    student = forms.ModelChoiceField(
+        label=_("Student"),
+        queryset=Student.objects.none(),
+        error_messages={
+            "invalid_choice": _(
+                "This student can't be added to this class: they are not in this branch."
+            )
+        },
+    )
 
     def __init__(self, *args, user=None, group=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -269,15 +279,23 @@ class ClassStudentForm(_AdminForm):
         in_a_class = Enrollment.objects.filter(
             is_active=True, group__kind=Group.KIND_CLASS, group__session_id=group.session_id
         ).values("student_id")
-        self.fields["student"].queryset = (
-            students.filter(branch_id=group.branch_id)  # scoping-ok: narrows a scoped list
-            .exclude(pk__in=in_a_class)
+        in_branch = students.filter(branch_id=group.branch_id)  # scoping-ok: narrows a scoped list
+        # Validate against every pupil of the branch, so one already in a class
+        # gets the clear message from clean_student (web audit minor 2); the
+        # list only offers pupils without a class this year.
+        field = self.fields["student"]
+        field.queryset = in_branch
+        field.label_from_instance = lambda s: (
+            f"{s.admin.get_full_name()} ({s.admin.login_id or s.admin.email})"
+        )
+        offered = (
+            in_branch.exclude(pk__in=in_a_class)
             .select_related("admin")
             .order_by("admin__first_name", "admin__last_name")
         )
-        self.fields["student"].label_from_instance = lambda s: (
-            f"{s.admin.get_full_name()} ({s.admin.login_id or s.admin.email})"
-        )
+        field.widget.choices = [("", field.empty_label)] + [
+            (s.pk, field.label_from_instance(s)) for s in offered
+        ]
 
     def clean_student(self):
         student = self.cleaned_data["student"]
