@@ -2,7 +2,9 @@ from datetime import date
 
 from django import forms
 from django.contrib.auth.password_validation import validate_password
+from django.db.models import Q
 from django.forms.widgets import DateInput, TextInput
+from django.utils.translation import gettext_lazy
 
 from .models import *
 from . import models
@@ -45,26 +47,40 @@ class FormSettings(forms.ModelForm):
 def _scope_branch_field(form, user, required=False):
     """Scope a form's ``branch`` field to the branches ``user`` may assign.
 
-    Super admins keep the full branch list; branch admins see only their
-    assigned branches and the field defaults to their branch when they manage
-    exactly one. No-op when the form has no ``branch`` field.
+    - A branch admin with exactly one branch gets it automatically: the field
+      is shown but disabled, so a missing or forged ``branch`` in the POST is
+      ignored (web audit B1). An existing record keeps its own branch.
+    - Super admins and admins of several branches choose from the branches
+      they can see (``branching.assignable_branches``); ``required`` makes the
+      choice mandatory. A branch outside that list is refused as an invalid
+      choice.
+
+    No-op when the form has no ``branch`` field.
     """
     if "branch" not in form.fields:
         return
     qs = Branch.objects.all().order_by("name")
     if user is not None:
-        qs = branching.filter_branches_for_user(user, qs)
+        qs = branching.assignable_branches(user)
     field = form.fields["branch"]
     field.queryset = qs
     field.required = required
     field.empty_label = "— Select branch —"
     field.label = "Branch / Location"
     field.widget.attrs["class"] = "form-control"
-    if user is not None and not field.initial and not branching.is_super_admin(user):
-        first_two = list(qs[:2])
-        if len(first_two) == 1:
-            field.initial = first_two[0].pk
+    only = branching.admin_only_branch(user) if user is not None else None
+    if only is not None:
+        current = field.initial
+        if not current:
+            field.initial = only.pk
+        elif current != only.pk:
+            # Editing a record in another branch: keep it there, unchangeable.
+            field.queryset = Branch.objects.filter(pk__in=[only.pk, current])
+        field.disabled = True
+        field.required = True
 
+
+_BRANCH_REQUIRED = gettext_lazy("Choose a branch.")
 
 _MAX_PROFILE_PIC_BYTES = 5 * 1024 * 1024  # 5 MB
 
@@ -183,12 +199,14 @@ class StudentForm(CustomUserForm):
         self.fields["date_of_birth"].required = False
         instance = kwargs.get("instance")
         if instance:
+            # Edit page: a blank password keeps the current one.
+            self.fields["password"].required = False
             self.fields["phone"].initial = instance.phone
             self.fields["status"].initial = instance.status
             self.fields["level"].initial = instance.level if instance.level else ""
             if instance.branch_id:
                 self.fields["branch"].initial = instance.branch_id
-        _scope_branch_field(self, user)
+        _scope_branch_field(self, user, required=True)
 
     class Meta(CustomUserForm.Meta):
         model = Student
@@ -258,6 +276,9 @@ class AddStudentForm(CustomUserForm):
                 cleaned_data["branch"] = group.branch
             elif branch.id != group.branch_id:
                 self.add_error("branch", "Selected group does not belong to the selected branch.")
+        # A student without a branch disappears from branch admins' lists (web audit B1).
+        if not cleaned_data.get("branch") and "branch" not in self.errors:
+            self.add_error("branch", _BRANCH_REQUIRED)
         return cleaned_data
 
     class Meta(CustomUserForm.Meta):
@@ -356,7 +377,7 @@ class StaffForm(CustomUserForm):
         instance = kwargs.get("instance")
         if instance and getattr(instance, "branch_id", None):
             self.fields["branch"].initial = instance.branch_id
-        _scope_branch_field(self, user)
+        _scope_branch_field(self, user, required=True)
 
     class Meta(CustomUserForm.Meta):
         model = Staff
@@ -463,10 +484,11 @@ class StudentEditForm(CustomUserForm):
         user = kwargs.pop("user", None)
         super(StudentEditForm, self).__init__(*args, **kwargs)
         self.fields["date_of_birth"].required = False
+        self.fields["password"].required = False  # blank keeps the current one
         instance = kwargs.get("instance")
         if instance and getattr(instance, "branch_id", None):
             self.fields["branch"].initial = instance.branch_id
-        _scope_branch_field(self, user)
+        _scope_branch_field(self, user, required=True)
 
     class Meta(CustomUserForm.Meta):
         model = Student
@@ -478,10 +500,11 @@ class StaffEditForm(CustomUserForm):
         user = kwargs.pop("user", None)
         super(StaffEditForm, self).__init__(*args, **kwargs)
         self.fields["date_of_birth"].required = False
+        self.fields["password"].required = False  # blank keeps the current one
         instance = kwargs.get("instance")
         if instance and getattr(instance, "branch_id", None):
             self.fields["branch"].initial = instance.branch_id
-        _scope_branch_field(self, user)
+        _scope_branch_field(self, user, required=True)
 
     class Meta(CustomUserForm.Meta):
         model = Staff
@@ -639,8 +662,18 @@ class GroupForm(FormSettings):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         # Branch admins may only create/edit groups in their own branches.
-        # Teacher/course dropdowns keep their existing AJAX-driven behaviour.
         _scope_branch_field(self, user, required=False)
+        # ...and only pick teachers they can see (web audit M1). A teacher
+        # outside that list is refused as an invalid choice; an existing
+        # group keeps its current teacher.
+        if user is not None and "teacher" in self.fields:
+            teachers = branching.filter_staff_for_user(user, Staff.objects.all())
+            current = getattr(self.instance, "teacher_id", None)
+            if current:
+                teachers = Staff.objects.filter(Q(pk__in=teachers.values("pk")) | Q(pk=current))
+            self.fields["teacher"].queryset = teachers.select_related("admin").order_by(
+                "admin__last_name", "admin__first_name"
+            )
 
     class Meta:
         model = Group
