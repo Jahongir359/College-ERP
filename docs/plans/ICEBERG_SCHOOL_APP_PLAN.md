@@ -869,6 +869,28 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       (16–19) and the main Study Center pages (dashboard, students, teachers, groups, payments) to the
       mockups; other pages inherit the shell. Also fixes the unreadable navy-sidebar text in the Study
       Center admin. Done when: side-by-side images per mockup (light, dark, 390 px), uz/ru/en, full suite.
+      **Split (2026-11-01):** P3.9a shell (this branch: base template, sidebar, topbar, tokens, landing,
+      page header, UI kit), P3.9b School pages 16–19 and the board (another session, branched off the
+      shell), P3.9c Study Center pages (dashboard 16d, students 16c, teachers, groups, payments).
+      **Admin UI kit** (`static/dist/css/admin-shell.css`, loaded for admins only, every selector under
+      `html[data-shell="admin"]`; colours only through `--shell-*` tokens, so one markup serves both brands
+      and dark mode). Use these classes on admin pages; don't invent new ones, ask the shell owner instead:
+      - Page header: base.html blocks `page_eyebrow` (`<p class="page-eyebrow">…</p>`), `page_title`,
+        `page_subtitle`, `page_actions` (`<div class="page-actions">…buttons…</div>`). No breadcrumb.
+      - Buttons: `ui-btn ui-btn--primary` (maroon / lime), `ui-btn ui-btn--secondary` (outline);
+        add `ui-btn--sm` for row actions.
+      - Stat cards: `ui-stats` > `ui-stat` > `ui-stat-label`, `ui-stat-value`, optional `ui-stat-note`.
+      - Cards: `ui-card` > `ui-card-head` > `ui-card-title` + `ui-card-link` ("Ochish →").
+      - Filter bar: `ui-filters` > `ui-search` (`<i class="fas fa-search"></i><input>`) and `select.ui-select`.
+      - Table: `ui-table-wrap` > `table.ui-table` (tinted header, row lines, scrolls inside the card on
+        phones; don't add Bootstrap `.table`, which turns rows into phone cards); cells `ui-num`, `ui-end`;
+        row link `a.ui-open`.
+      - Badges: `ui-badge` + `ui-badge--ok` (keldi/toʻlangan), `--late` (kech/olinmagan), `--abs`
+        (yoʻq/qarzdor), `--muted`, `--accent` (counts).
+      - Others: `ui-avatar` (initials), `ui-empty` (empty state), `ui-split` (list + side panel).
+      - Tokens for anything else: `--shell-bg`, `--shell-surface`, `--shell-border`, `--shell-text`,
+        `--shell-muted`, `--shell-tint`, `--shell-title`, `--shell-eyebrow`, `--shell-link`,
+        `--shell-ok/-late/-abs` (+ `-bg`), `--shell-radius`.
 
 ### P4 — App
 

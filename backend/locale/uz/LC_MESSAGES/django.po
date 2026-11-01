@@ -1003,3 +1003,19 @@ msgstr "oʻquvchiga ota-ona bogʻlanmagan"
 
 msgid "Open parents"
 msgstr "Ota-onalarni ochish"
+
+# P3.9 admin shell
+msgid "Staff"
+msgstr "Xodimlar"
+
+msgid "Account menu"
+msgstr "Hisob menyusi"
+
+msgid "Dark mode"
+msgstr "Tungi rejim"
+
+msgid "Light mode"
+msgstr "Kunduzgi rejim"
+
+msgid "All branches"
+msgstr "Barcha filiallar"
