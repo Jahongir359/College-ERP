@@ -72,6 +72,14 @@
         <h6 class="nav-section-title">{% translate "School" %}</h6>
 
         <div class="nav-item">
+            {% url 'school_board' as school_board_url %}
+            <a href="{{ school_board_url }}" class="nav-link {% if request.path == school_board_url %}active{% endif %}">
+                <i class="nav-icon fas fa-tachometer-alt"></i>
+                <span class="nav-text">{% translate "School board" %}</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
             {% url 'school_classes' as school_classes_url %}
             <a href="{{ school_classes_url }}" class="nav-link {% if 'maktab/classes' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-door-open"></i>
