@@ -1014,7 +1014,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-11-01 — Web audit M3 (branch fix/web-month-names): month names on the web follow the page
+- 2026-11-01 — Web audit M3 (PR #72): month names on the web follow the page
   language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always
   English; now `date_format`. Payment pages show `invoice.period|date:"F Y"`; `period_label` stays
   English for the stored notification texts. The "Russian in English" case from the audit didn't
