@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | Done — 6/6 (2026-10-31; P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | Done — 7/7 (2026-10-31; P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 3/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -838,6 +838,18 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `RegisterReportContentTests`, `RegisterReportCsvTests`; page `/maktab/register/`
       (`school_register_report_views.py`); screenshot next to the mockup:
       `docs/plans/school-app-screens/p3.7-register-report.png`.
+- [x] **P3.8** Admin: School board (`/maktab/`), the School admin's home page on the web: counts
+      (pupils, classes, teachers, parents), today's register (classes taken / not taken, link to the
+      register report), parents who haven't signed in yet, the current year and quarter (or a link to
+      set one up), quick links. Scoped through `branching.py`; uz/ru/en; light and dark. Done when:
+      access tests (branch admin sees own branch only, teachers/pupils get no page, anonymous → login),
+      empty states (no School branch, no classes, no current year), screenshot. Added 2026-10-31
+      (owner). — done 2026-10-31, PR #70; verified: full suite 572 OK, `test_school_board`
+      (branch admin sees own branch only, super admin all School branches, teacher/pupil/parent sent
+      home, anonymous → login, empty states, counts, uz/ru), page in `test_school_page_header`;
+      `school_board_views.py`, `hod_template/school/board.html`; screenshot
+      `docs/plans/school-app-screens/p3.8-school-board.png`. "Letter due" isn't shown: no login
+      letter field on main yet (PL.1), so the panel counts parents who never signed in.
 - [x] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
       desktop in the PR. — done 2026-10-30, PR #64; verified: full suite,
       `test_school_page_header` (eyebrow, one title, year · quarter chip, Center admin page unchanged,
@@ -1013,6 +1025,11 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
+  today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
+  quick links), first link in the sidebar's School group. When PL.1 adds login letters, show
+  "letter due" in the Parents panel.
 
 - 2026-11-01 — Web audit M3 (PR #72): month names on the web follow the page
   language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always

@@ -951,3 +951,68 @@ msgstr "Faqat maktab sinflari uchun: oʻquv yili."
 
 msgid "This student can't be added to this class: they are not in this branch."
 msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."
+
+# School board (P3.8)
+msgid "School board"
+msgstr "Maktab paneli"
+
+msgid "No School branch yet"
+msgstr "Hali maktab filiali yoʻq"
+
+msgid "This board shows Iceberg School numbers. None of the branches you manage is a School branch."
+msgstr "Bu panel Iceberg School raqamlarini koʻrsatadi. Siz boshqaradigan filiallarning hech biri maktab filiali emas."
+
+msgid "Pupils"
+msgstr "Oʻquvchilar"
+
+msgid "Today's register"
+msgstr "Bugungi davomat"
+
+msgid "Set up the academic year first; the register follows its classes."
+msgstr "Avval oʻquv yilini sozlang: davomat uning sinflari boʻyicha yuritiladi."
+
+msgid "No classes in this academic year yet."
+msgstr "Bu oʻquv yilida hali sinflar yoʻq."
+
+#, python-format
+msgid "%(taken)s of %(total)s classes took the register"
+msgstr "%(total)s ta sinfdan %(taken)s tasida davomat olindi"
+
+msgid "classes took the register"
+msgstr "sinfda davomat olindi"
+
+msgid "Not taken yet"
+msgstr "Hali olinmagan"
+
+msgid "No homeroom teacher"
+msgstr "Sinf rahbari yoʻq"
+
+msgid "Every class has taken today's register."
+msgstr "Barcha sinflarda bugungi davomat olindi."
+
+msgid "Open the register report"
+msgstr "Davomat hisobotini ochish"
+
+msgid "Quick links"
+msgstr "Tezkor havolalar"
+
+msgid "Register"
+msgstr "Davomat"
+
+msgid "No quarter has started yet."
+msgstr "Hali birorta chorak boshlanmagan."
+
+msgid "No current academic year is set."
+msgstr "Joriy oʻquv yili belgilanmagan."
+
+msgid "Set one up"
+msgstr "Sozlash"
+
+msgid "parents haven't signed in yet"
+msgstr "ota-ona hali tizimga kirmagan"
+
+msgid "pupils have no parent linked"
+msgstr "oʻquvchiga ota-ona bogʻlanmagan"
+
+msgid "Open parents"
+msgstr "Ota-onalarni ochish"
