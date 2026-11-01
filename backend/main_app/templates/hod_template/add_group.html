@@ -1,5 +1,5 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
+{% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
 
 {% block content %}
@@ -52,7 +52,7 @@
           <label>{{ form.room.label }}</label>
           {{ form.room }}
           {% if form.room.errors %}<div class="ice-field-error">{{ form.room.errors.0 }}</div>{% endif %}
-          <small class="ice-field-help">Classroom or room number, e.g. Room 3A</small>
+          <small class="ice-field-help">{% translate "Classroom or room number, e.g. Room 3A" %}</small>
         </div>
       </div>
 
