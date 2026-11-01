@@ -1394,10 +1394,6 @@ msgstr "Bu hisob-faktura toʻlangan — eslatma kerak emas."
 msgid "Group Details"
 msgstr "Guruh maʼlumotlari"
 
-#: main_app/templates/hod_template/add_group.html:56
-msgid "Classroom or room number, e.g. Room 3A"
-msgstr "Sinf yoki xona raqami, masalan, 3A xona"
-
 #: main_app/templates/hod_template/add_group.html:60
 msgid "Schedule & Capacity"
 msgstr "Jadval va sigʻim"
@@ -2427,3 +2423,16 @@ msgstr "Yordam"
 msgctxt "group status"
 msgid "Active"
 msgstr "Faol"
+
+# Web audit fixes B1, M1 (2026-10-31)
+msgid "Choose a branch."
+msgstr "Filialni tanlang."
+
+msgid "Classroom or room number, e.g. Room 3A"
+msgstr "Sinf xonasi yoki xona raqami, masalan: 3A-xona"
+
+msgid "School classes only: the academic year."
+msgstr "Faqat maktab sinflari uchun: oʻquv yili."
+
+msgid "This student can't be added to this class: they are not in this branch."
+msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."

@@ -1396,10 +1396,6 @@ msgstr "Этот счёт оплачен — напоминание не нуж�
 msgid "Group Details"
 msgstr "Данные группы"
 
-#: main_app/templates/hod_template/add_group.html:56
-msgid "Classroom or room number, e.g. Room 3A"
-msgstr "Аудитория или номер кабинета, например, Кабинет 3A"
-
 #: main_app/templates/hod_template/add_group.html:60
 msgid "Schedule & Capacity"
 msgstr "Расписание и вместимость"
@@ -2432,3 +2428,16 @@ msgstr "Поддержка"
 msgctxt "group status"
 msgid "Active"
 msgstr "Активна"
+
+# Web audit fixes B1, M1 (2026-10-31)
+msgid "Choose a branch."
+msgstr "Выберите филиал."
+
+msgid "Classroom or room number, e.g. Room 3A"
+msgstr "Кабинет или номер комнаты, например: кабинет 3A"
+
+msgid "School classes only: the academic year."
+msgstr "Только для школьных классов: учебный год."
+
+msgid "This student can't be added to this class: they are not in this branch."
+msgstr "Этого ученика нельзя добавить в класс: он не из этого филиала."

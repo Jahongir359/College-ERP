@@ -161,6 +161,22 @@ def filter_branches_for_user(user, queryset):
     return queryset.filter(id__in=get_accessible_branches(user).values_list("id", flat=True))
 
 
+def assignable_branches(user):
+    """Branches ``user`` may put a new or edited student, teacher or group in."""
+    return filter_branches_for_user(user, Branch.objects.all()).order_by("name")
+
+
+def admin_only_branch(user):
+    """The one branch of a branch admin who has exactly one, else None.
+
+    Super admins and admins of several branches get None: they must choose.
+    """
+    if is_super_admin(user) or get_admin_profile(user) is None:
+        return None
+    branches = list(assignable_branches(user)[:2])
+    return branches[0] if len(branches) == 1 else None
+
+
 def filter_students_for_user(user, queryset):
     """Filter a Student queryset by branch access."""
     if is_super_admin(user):
