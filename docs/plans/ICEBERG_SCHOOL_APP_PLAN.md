@@ -1014,10 +1014,17 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-10-31 — P2.8 push safety fixes from QA's review of #57 (branch fix/school-push-safety):
+- 2026-10-31 — P2.8 push safety fixes from QA's review of #57 (PR #69):
   FCM `INVALID_ARGUMENT` no longer deletes device tokens (only the FCM error codes `UNREGISTERED`
   and `SENDER_ID_MISMATCH` do, not a bare 404; it is logged), and committed pushes go to one shared worker thread
   instead of one thread per notification (monthly invoices). P2.8 stays `[~]` until the real phone test.
+
+- 2026-10-31 — Web audit fixes B1, M1 (PR #71): new students and teachers always get a branch (one-branch
+  admins get theirs, locked; super admins and admins of several branches must choose one they can
+  see, `branching.assignable_branches`/`admin_only_branch`); edits can't clear or move it out of
+  scope; the group form only lists and accepts teachers the admin can see. Also: edit student/teacher
+  no longer demands a new password, class form help texts in uz/ru, a clear message for a pupil
+  already in a class, and the classes search message only rendered when there are classes.
 
 - 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
   Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
