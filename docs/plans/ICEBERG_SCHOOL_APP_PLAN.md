@@ -93,7 +93,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Done — 7/7 (2026-10-31; P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 3/11 (P4.11 dropped, P4.12 Release 2) |
+| P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -875,7 +875,19 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       already showed a brand skips `/choose`. `roleRedirect(..., brandChosen:)`: null keeps the splash.
       The School login uses the School dark tokens and the white crest wordmark; the Study Center login
       is unchanged apart from the "Iceberg Study Center · Boshqa tanlash" link.
-- [~] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — claimed 2026-10-30, branch feat/school-p4.3-account-brand.
+- [x] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — done 2026-10-31,
+      PR #68; verified: flutter analyze 0 warnings, flutter test 47 OK
+      (`test/change_password_test.dart`, `test/brand_notice_test.dart`), web build OK; School login next
+      to mockup 02 at 390 px: `docs/plans/school-app-screens/p4.3-school-login.png`. Also the **app half
+      of PL.1**: `IceUser.mustChangePassword` (`must_change_password` from login and `me/`) holds every
+      role on `/change-password` (back blocked, log out allowed) until `POST me/change-password/`
+      succeeds, then `me/` is reloaded and the user goes home; a 403 with `code ==
+      "password_change_required"` on any call (`ApiClient.onPasswordChangeRequired`) sends the user
+      there and re-checks `me/`. The 400 for `old_password` may be a string or a list (both handled).
+      Brand: after sign-in the account's brand wins; if it differs from the device's pick on `/choose`,
+      `BrandWatcher` (in `MaterialApp.builder`) shows one SnackBar and remembers the account brand, so it
+      shows once. The School login is now the light mockup-02 page (maroon header, white card, maroon
+      button with white text); the Study Center login is unchanged.
 - [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6.
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
@@ -1025,6 +1037,9 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-31 — P4.3 done (PR #68, after #61): the app's "choose your password" screen for PL.1
+  and the brand-from-account notice. PL.1 (#58) can merge after this. Next on this line: P4.4 (parent shell).
 
 - 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
   today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
