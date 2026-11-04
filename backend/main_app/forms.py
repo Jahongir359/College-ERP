@@ -67,6 +67,9 @@ def _scope_branch_field(form, user, required=False):
     field.required = required
     field.empty_label = gettext_lazy("— Select branch —")
     field.label = gettext_lazy("Branch / Location")
+    # The form may already have built the bound field (e.g. while styling the
+    # widgets), which keeps the label it had then ("Branch"); give it this one.
+    form["branch"].label = field.label
     field.widget.attrs["class"] = "form-control"
     only = branching.admin_only_branch(user) if user is not None else None
     if only is not None:
@@ -701,6 +704,7 @@ class GroupForm(FormSettings):
             "start_date",
         ]
         labels = {
+            "name": gettext_lazy("Name"),
             "course": gettext_lazy("Program"),
             "teacher": gettext_lazy("Teacher"),
             "branch": gettext_lazy("Branch / Location"),

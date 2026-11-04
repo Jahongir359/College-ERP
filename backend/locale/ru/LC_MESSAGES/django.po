@@ -2576,6 +2576,68 @@ msgstr "Центр профиля и настроек Iceberg"
 msgid "Choose a pupil"
 msgstr "Выберите ученика"
 
+msgid "Suspended"
+msgstr "Приостановлен"
+
+msgid "Partially paid"
+msgstr "Частично оплачен"
+
+#, python-format
+msgid "%(amount)s million"
+msgstr "%(amount)s млн"
+
+#, python-format
+msgid "%(amount)s ming"
+msgstr "%(amount)s тыс."
+
+#, python-format
+msgid "%(amount)s soʻm"
+msgstr "%(amount)s сум"
+
+msgid "No active enrollments matched your selection."
+msgstr "Нет активных зачислений, подходящих под выбор."
+
+msgid "Generate Monthly Invoices"
+msgstr "Создать счета за месяц"
+
+#, python-format
+msgid "Invoice created for %(student)s."
+msgstr "Счёт для %(student)s создан."
+
+msgid "Add One-off Invoice"
+msgstr "Добавить разовый счёт"
+
+msgid "This invoice is cancelled — payments cannot be recorded on it."
+msgstr "Этот счёт отменён — платежи по нему записать нельзя."
+
+#, python-format
+msgid "Recorded %(amount)s from %(student)s. Invoice is now %(status)s."
+msgstr "Записан платёж %(amount)s от %(student)s. Статус счёта: %(status)s."
+
+msgid "Record Payment"
+msgstr "Записать платёж"
+
+#, python-format
+msgid "Created %(count)s invoice for %(period)s."
+msgid_plural "Created %(count)s invoices for %(period)s."
+msgstr[0] "Создан %(count)s счёт за %(period)s."
+msgstr[1] "Создано %(count)s счёта за %(period)s."
+msgstr[2] "Создано %(count)s счетов за %(period)s."
+
+#, python-format
+msgid "%(count)s already existed and was skipped."
+msgid_plural "%(count)s already existed and were skipped."
+msgstr[0] "%(count)s уже существовал и пропущен."
+msgstr[1] "%(count)s уже существовали и пропущены."
+msgstr[2] "%(count)s уже существовали и пропущены."
+
+#, python-format
+msgid "%(count)s enrollment has no monthly fee set (set a fee on the group or its course, then generate again)."
+msgid_plural "%(count)s enrollments have no monthly fee set (set a fee on the group or its course, then generate again)."
+msgstr[0] "У %(count)s зачисления не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
+msgstr[1] "У %(count)s зачислений не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
+msgstr[2] "У %(count)s зачислений не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
+
 #: main_app/school_forms.py
 msgid "Choose a teacher"
 msgstr "Выберите учителя"

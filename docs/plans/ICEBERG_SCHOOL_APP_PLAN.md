@@ -1071,6 +1071,14 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-04 — Web audit M2 part 2 (branch i18n/admin-pages-2, Python only): Student and Invoice
+  status labels and the "Level N" choices use gettext_lazy; the group form's Name label and the
+  branch field label ("Branch / Location", which a stale bound field showed as "Branch") follow the
+  language; the `uzs` filter's "ming"/"million"/"soʻm" are translated on pages (ru: "тыс."/"млн"/"сум")
+  while stored notification texts keep them; payments_views messages and page titles (generate,
+  one-off invoice, record payment, collections) use gettext/ngettext. No migration (0051 stays for
+  PL.1). Templates untouched (P3.9 restyles them); their remaining English text is for later.
+
 - 2026-11-04 — P3.9b (`feat/school-pages-redesign`): School classes (16), timetable (17), parents (18),
   parent page (18b), register report (19) and the board `/maktab/` rebuilt on the Admin UI kit, colours
   only from `--shell-*` tokens; the old P3.8 board CSS with fixed colours is gone. Classes gains a 4th stat
