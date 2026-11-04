@@ -14,7 +14,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext
+from django.utils.formats import date_format
+from django.utils.translation import gettext, ngettext
 from django.views.decorators.http import require_POST
 
 from . import branching, payments
@@ -246,7 +247,7 @@ def admin_collections(request):
     }
 
     context = {
-        "page_title": "Collections",
+        "page_title": gettext("Collections"),
         "period": period,
         "month_value": period.strftime("%Y-%m"),
         "is_super_admin": is_super,
@@ -254,7 +255,7 @@ def admin_collections(request):
         "collected": collected,
         "outstanding": outstanding,
         "collection_rate": round(collected / expected * 100, 1) if expected else 0,
-        "group_by_label": "Branch" if is_super else "Group",
+        "group_by_label": gettext("Branch") if is_super else gettext("Group"),
         "rows": rows,
         "worst": worst,
         "attention": attention,
@@ -286,23 +287,42 @@ def admin_generate_invoices(request):
         if created:
             messages.success(
                 request,
-                f"Created {created} invoice{'s' if created != 1 else ''} for {period:%B %Y}.",
+                ngettext(
+                    "Created %(count)s invoice for %(period)s.",
+                    "Created %(count)s invoices for %(period)s.",
+                    created,
+                )
+                % {"count": created, "period": date_format(period, "F Y")},
             )
         if skipped:
-            messages.info(request, f"{skipped} already existed and were skipped.")
+            messages.info(
+                request,
+                ngettext(
+                    "%(count)s already existed and was skipped.",
+                    "%(count)s already existed and were skipped.",
+                    skipped,
+                )
+                % {"count": skipped},
+            )
         if no_fee:
             messages.warning(
                 request,
-                f"{no_fee} enrollment{'s have' if no_fee != 1 else ' has'} no monthly fee set "
-                "(set a fee on the group or its course, then generate again).",
+                ngettext(
+                    "%(count)s enrollment has no monthly fee set "
+                    "(set a fee on the group or its course, then generate again).",
+                    "%(count)s enrollments have no monthly fee set "
+                    "(set a fee on the group or its course, then generate again).",
+                    no_fee,
+                )
+                % {"count": no_fee},
             )
         if not (created or skipped or no_fee):
-            messages.info(request, "No active enrollments matched your selection.")
+            messages.info(request, gettext("No active enrollments matched your selection."))
         return redirect(f"{reverse('admin_payments')}?month={period:%Y-%m}")
     return render(
         request,
         "hod_template/generate_invoices.html",
-        {"form": form, "page_title": "Generate Monthly Invoices"},
+        {"form": form, "page_title": gettext("Generate Monthly Invoices")},
     )
 
 
@@ -324,12 +344,14 @@ def admin_add_invoice(request):
             ),
             link=reverse("student_payments"),
         )
-        messages.success(request, f"Invoice created for {invoice.student}.")
+        messages.success(
+            request, gettext("Invoice created for %(student)s.") % {"student": invoice.student}
+        )
         return redirect(f"{reverse('admin_payments')}?month={invoice.period:%Y-%m}")
     return render(
         request,
         "hod_template/add_invoice.html",
-        {"form": form, "page_title": "Add One-off Invoice"},
+        {"form": form, "page_title": gettext("Add One-off Invoice")},
     )
 
 
@@ -337,7 +359,9 @@ def admin_add_invoice(request):
 def admin_record_payment(request, invoice_id):
     invoice = _get_scoped_invoice_or_404(request, invoice_id)
     if invoice.status == Invoice.STATUS_CANCELLED:
-        messages.error(request, "This invoice is cancelled — payments cannot be recorded on it.")
+        messages.error(
+            request, gettext("This invoice is cancelled — payments cannot be recorded on it.")
+        )
         return redirect(f"{reverse('admin_payments')}?month={invoice.period:%Y-%m}")
     form = RecordPaymentForm(request.POST or None, invoice=invoice)
     if request.method != "POST":
@@ -359,14 +383,18 @@ def admin_record_payment(request, invoice_id):
         )
         messages.success(
             request,
-            f"Recorded {payments._uzs(payment.amount)} from {invoice.student}. "
-            f"Invoice is now {invoice.get_status_display().lower()}.",
+            gettext("Recorded %(amount)s from %(student)s. Invoice is now %(status)s.")
+            % {
+                "amount": payments.format_uzs(payment.amount),
+                "student": invoice.student,
+                "status": invoice.get_status_display().lower(),
+            },
         )
         return redirect(f"{reverse('admin_payments')}?month={invoice.period:%Y-%m}")
     return render(
         request,
         "hod_template/record_payment.html",
-        {"form": form, "invoice": invoice, "page_title": "Record Payment"},
+        {"form": form, "invoice": invoice, "page_title": gettext("Record Payment")},
     )
 
 
