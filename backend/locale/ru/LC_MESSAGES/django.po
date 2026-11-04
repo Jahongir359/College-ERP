@@ -2519,68 +2519,58 @@ msgstr "Только для школьных классов: учебный го
 
 msgid "This student can't be added to this class: they are not in this branch."
 msgstr "Этого ученика нельзя добавить в класс: он не из этого филиала."
-
-# School board (P3.8)
-msgid "School board"
-msgstr "Панель школы"
-
-msgid "No School branch yet"
-msgstr "Пока нет филиала школы"
-
-msgid "This board shows Iceberg School numbers. None of the branches you manage is a School branch."
-msgstr "Эта панель показывает цифры Iceberg School. Ни один из ваших филиалов не является филиалом школы."
-
-msgid "Pupils"
-msgstr "Ученики"
-
-msgid "Today's register"
-msgstr "Журнал за сегодня"
-
-msgid "Set up the academic year first; the register follows its classes."
-msgstr "Сначала настройте учебный год: журнал ведётся по его классам."
-
-msgid "No classes in this academic year yet."
-msgstr "В этом учебном году ещё нет классов."
+# P3.9c admin home (mockup 16d)
+#, python-format
+msgid "Good morning, %(name)s"
+msgstr "Доброе утро, %(name)s"
 
 #, python-format
-msgid "%(taken)s of %(total)s classes took the register"
-msgstr "Журнал отмечен в %(taken)s из %(total)s классов"
+msgid "Good afternoon, %(name)s"
+msgstr "Добрый день, %(name)s"
 
-msgid "classes took the register"
-msgstr "классов отметили журнал"
+#, python-format
+msgid "Good evening, %(name)s"
+msgstr "Добрый вечер, %(name)s"
 
-msgid "Not taken yet"
-msgstr "Ещё не отмечен"
+msgid "Paid this month"
+msgstr "Оплачено в этом месяце"
 
-msgid "No homeroom teacher"
-msgstr "Нет классного руководителя"
+#, python-format
+msgid "%(rate)s%% of this month's invoices"
+msgstr "%(rate)s%% от счетов этого месяца"
 
-msgid "Every class has taken today's register."
-msgstr "Все классы отметили журнал за сегодня."
+msgid "Payments · 6 months"
+msgstr "Платежи · 6 месяцев"
 
-msgid "Open the register report"
-msgstr "Открыть отчёт по журналу"
+#, python-format
+msgid "%(count)s student has an overdue payment"
+msgid_plural "%(count)s students have overdue payments"
+msgstr[0] "У %(count)s ученика просрочена оплата"
+msgstr[1] "У %(count)s учеников просрочена оплата"
+msgstr[2] "У %(count)s учеников просрочена оплата"
 
-msgid "Quick links"
-msgstr "Быстрые ссылки"
+msgid "Send a reminder or open the list."
+msgstr "Отправьте напоминание или откройте список."
 
-msgid "Register"
-msgstr "Журнал"
+msgid "No overdue payments."
+msgstr "Просроченных платежей нет."
 
-msgid "No quarter has started yet."
-msgstr "Ещё не началась ни одна четверть."
+msgid "New leads"
+msgstr "Новые заявки"
 
-msgid "No current academic year is set."
-msgstr "Текущий учебный год не задан."
+msgid "No new leads."
+msgstr "Новых заявок нет."
 
-msgid "Set one up"
-msgstr "Настроить"
+# P3.9c students list (mockup 16c)
+#, python-format
+msgid "+%(count)s this month"
+msgstr "+%(count)s в этом месяце"
 
-msgid "parents haven't signed in yet"
-msgstr "родителей ещё не входили в приложение"
+msgid "In active groups"
+msgstr "В активных группах"
 
-msgid "pupils have no parent linked"
-msgstr "учеников без привязанного родителя"
+msgid "With overdue payments"
+msgstr "С просрочкой оплаты"
 
-msgid "Open parents"
-msgstr "Открыть родителей"
+msgid "Present today"
+msgstr "Сегодня на занятиях"

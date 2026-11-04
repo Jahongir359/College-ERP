@@ -2514,68 +2514,57 @@ msgstr "Faqat maktab sinflari uchun: oʻquv yili."
 
 msgid "This student can't be added to this class: they are not in this branch."
 msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."
-
-# School board (P3.8)
-msgid "School board"
-msgstr "Maktab paneli"
-
-msgid "No School branch yet"
-msgstr "Hali maktab filiali yoʻq"
-
-msgid "This board shows Iceberg School numbers. None of the branches you manage is a School branch."
-msgstr "Bu panel Iceberg School raqamlarini koʻrsatadi. Siz boshqaradigan filiallarning hech biri maktab filiali emas."
-
-msgid "Pupils"
-msgstr "Oʻquvchilar"
-
-msgid "Today's register"
-msgstr "Bugungi davomat"
-
-msgid "Set up the academic year first; the register follows its classes."
-msgstr "Avval oʻquv yilini sozlang: davomat uning sinflari boʻyicha yuritiladi."
-
-msgid "No classes in this academic year yet."
-msgstr "Bu oʻquv yilida hali sinflar yoʻq."
+# P3.9c admin home (mockup 16d)
+#, python-format
+msgid "Good morning, %(name)s"
+msgstr "Xayrli tong, %(name)s"
 
 #, python-format
-msgid "%(taken)s of %(total)s classes took the register"
-msgstr "%(total)s ta sinfdan %(taken)s tasida davomat olindi"
+msgid "Good afternoon, %(name)s"
+msgstr "Xayrli kun, %(name)s"
 
-msgid "classes took the register"
-msgstr "sinfda davomat olindi"
+#, python-format
+msgid "Good evening, %(name)s"
+msgstr "Xayrli kech, %(name)s"
 
-msgid "Not taken yet"
-msgstr "Hali olinmagan"
+msgid "Paid this month"
+msgstr "Bu oy toʻlangan"
 
-msgid "No homeroom teacher"
-msgstr "Sinf rahbari yoʻq"
+#, python-format
+msgid "%(rate)s%% of this month's invoices"
+msgstr "Bu oygi hisoblarning %(rate)s%%"
 
-msgid "Every class has taken today's register."
-msgstr "Barcha sinflarda bugungi davomat olindi."
+msgid "Payments · 6 months"
+msgstr "Toʻlovlar · 6 oy"
 
-msgid "Open the register report"
-msgstr "Davomat hisobotini ochish"
+#, python-format
+msgid "%(count)s student has an overdue payment"
+msgid_plural "%(count)s students have overdue payments"
+msgstr[0] "%(count)s ta oʻquvchining toʻlovi kechikkan"
+msgstr[1] "%(count)s ta oʻquvchining toʻlovi kechikkan"
 
-msgid "Quick links"
-msgstr "Tezkor havolalar"
+msgid "Send a reminder or open the list."
+msgstr "Eslatma yuboring yoki roʻyxatni oching."
 
-msgid "Register"
-msgstr "Davomat"
+msgid "No overdue payments."
+msgstr "Kechikkan toʻlovlar yoʻq."
 
-msgid "No quarter has started yet."
-msgstr "Hali birorta chorak boshlanmagan."
+msgid "New leads"
+msgstr "Yangi arizalar"
 
-msgid "No current academic year is set."
-msgstr "Joriy oʻquv yili belgilanmagan."
+msgid "No new leads."
+msgstr "Yangi arizalar yoʻq."
 
-msgid "Set one up"
-msgstr "Sozlash"
+# P3.9c students list (mockup 16c)
+#, python-format
+msgid "+%(count)s this month"
+msgstr "+%(count)s bu oy"
 
-msgid "parents haven't signed in yet"
-msgstr "ota-ona hali tizimga kirmagan"
+msgid "In active groups"
+msgstr "Faol guruhlarda"
 
-msgid "pupils have no parent linked"
-msgstr "oʻquvchiga ota-ona bogʻlanmagan"
+msgid "With overdue payments"
+msgstr "Qarzdorlar"
 
-msgid "Open parents"
-msgstr "Ota-onalarni ochish"
+msgid "Present today"
+msgstr "Bugun darsda"

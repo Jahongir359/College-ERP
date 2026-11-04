@@ -233,3 +233,87 @@ def _send_sms(phone, text):
     except Exception:  # noqa: BLE001 — SMS is an optional channel
         logger.warning("Eskiz SMS send failed for %s", phone, exc_info=True)
     return False
+
+
+def dashboard_payment_summary(students, months, today=None):
+    """Money numbers for the admin home (P3.9c, mockup 16d).
+
+    ``students`` is the queryset the admin may see (already scoped by
+    ``branching.filter_students_for_user``); ``months`` is a list of
+    ``(first_day, next_first_day, label)``, oldest first, the last one being the
+    current month. Returns the soʻm paid this month (by payment date), the share
+    of this month's invoices already collected, money paid per month for the
+    chart, and how many pupils have an overdue invoice.
+    """
+    from django.db.models import F, Sum
+
+    from .models import Payment
+
+    today = today or timezone.localdate()
+    payments = Payment.objects.filter(invoice__student__in=students)
+    first, last = months[-1][0], months[-1][1]
+
+    paid_this_month = (
+        payments.filter(paid_on__gte=first, paid_on__lt=last).aggregate(t=Sum("amount"))["t"] or 0
+    )
+
+    current = Invoice.objects.filter(student__in=students, period=first).exclude(
+        status=Invoice.STATUS_CANCELLED
+    )
+    billed = current.aggregate(t=Sum(F("amount") - F("discount")))["t"] or 0
+    collected = payments.filter(invoice__in=current).aggregate(t=Sum("amount"))["t"] or 0
+    rate = round(collected / billed * 100) if billed else None
+
+    monthly = []
+    for start, end, label in months:
+        total = (
+            payments.filter(paid_on__gte=start, paid_on__lt=end).aggregate(t=Sum("amount"))["t"]
+            or 0
+        )
+        monthly.append({"label": label, "total": total})
+    top = max((m["total"] for m in monthly), default=0)
+    for m in monthly:
+        m["pct"] = round(m["total"] / top * 100) if top else 0
+
+    overdue_students = (
+        Invoice.objects.filter(
+            student__in=students,
+            status__in=[Invoice.STATUS_DUE, Invoice.STATUS_PARTIAL],
+            due_date__lt=today,
+        )
+        .values("student")
+        .distinct()
+        .count()
+    )
+    return {
+        "paid_this_month": paid_this_month,
+        "collection_rate": rate,
+        "monthly": monthly,
+        "overdue_students": overdue_students,
+    }
+
+
+def student_payment_states(students, today=None):
+    """Payment state per pupil for list pages (P3.9c, mockup 16c).
+
+    ``students``: Student queryset already scoped by branching. Returns
+    ``{student_id: "debt" | "due" | "paid"}``: "debt" when an open invoice is
+    past its due date, "due" when one is open but not late, "paid" when the
+    pupil has invoices and none is open. Pupils without invoices are absent.
+    """
+    today = today or timezone.localdate()
+    states = {}
+    rows = (
+        Invoice.objects.filter(student__in=students)
+        .exclude(status=Invoice.STATUS_CANCELLED)
+        .values_list("student_id", "status", "due_date")
+    )
+    rank = {"paid": 0, "due": 1, "debt": 2}
+    for student_id, status, due_date in rows:
+        if status in (Invoice.STATUS_DUE, Invoice.STATUS_PARTIAL):
+            state = "debt" if due_date < today else "due"
+        else:
+            state = "paid"
+        if rank[state] > rank.get(states.get(student_id), -1):
+            states[student_id] = state
+    return states
