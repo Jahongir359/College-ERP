@@ -84,12 +84,12 @@
                 <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
               </a>
               <a href="{% url 'archive_group' group.id %}" class="ice-manage-action ice-manage-action--warning"
-                 data-confirm-post="{% if group.is_archived %}Restore{% else %}Archive{% endif %} this group?">
+                 data-confirm-post="{% if group.is_archived %}{% translate "Restore this group?" %}{% else %}{% translate "Archive this group?" %}{% endif %}">
                 <i class="fas fa-{% if group.is_archived %}undo{% else %}archive{% endif %}" aria-hidden="true"></i>
                 {% if group.is_archived %}{% translate "Restore" %}{% else %}{% translate "Archive" %}{% endif %}
               </a>
               <a href="{% url 'delete_group' group.id %}" class="ice-manage-action ice-manage-action--danger"
-                 data-confirm-post="Delete this group? This is only allowed when no records are linked.">
+                 data-confirm-post="{% translate "Delete this group? This is only allowed when no records are linked." %}">
                 <i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}
               </a>
             </div>
@@ -164,12 +164,12 @@
           <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
         </a>
         <a href="{% url 'archive_group' group.id %}" class="ice-manage-action ice-manage-action--warning"
-           data-confirm-post="{% if group.is_archived %}Restore{% else %}Archive{% endif %} this group?">
+           data-confirm-post="{% if group.is_archived %}{% translate "Restore this group?" %}{% else %}{% translate "Archive this group?" %}{% endif %}">
           <i class="fas fa-{% if group.is_archived %}undo{% else %}archive{% endif %}" aria-hidden="true"></i>
           {% if group.is_archived %}{% translate "Restore" %}{% else %}{% translate "Archive" %}{% endif %}
         </a>
         <a href="{% url 'delete_group' group.id %}" class="ice-manage-action ice-manage-action--danger"
-           data-confirm-post="Delete this group? This is only allowed when no records are linked.">
+           data-confirm-post="{% translate "Delete this group? This is only allowed when no records are linked." %}">
           <i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}
         </a>
       </div>

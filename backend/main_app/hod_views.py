@@ -837,9 +837,9 @@ def manage_staff(request):
         allStaff = allStaff.filter(staff__branch_id=branch_id)
     # P3.9c: numbers above the list and each teacher's active groups.
     groups_by_staff = {}
-    for staff_id, name in Group.objects.filter(
-        teacher__in=allowed, is_archived=False
-    ).values_list("teacher_id", "name"):
+    for staff_id, name in Group.objects.filter(teacher__in=allowed, is_archived=False).values_list(
+        "teacher_id", "name"
+    ):
         groups_by_staff.setdefault(staff_id, []).append(name)
     allStaff = list(allStaff)
     for user_row in allStaff:
@@ -915,7 +915,7 @@ def manage_student(request):
     context = {
         "students": students,
         "student_stats": student_stats,
-        "page_title": "Manage Students",
+        "page_title": gettext("Manage Students"),
         "branches": branching.get_accessible_branches(request.user),
         "selected_branch": branch_id,
         "is_super_admin": branching.is_super_admin(request.user),
@@ -1947,7 +1947,7 @@ def manage_group(request):
 def admin_group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     if not branching.user_can_access_group(request.user, group):
-        messages.error(request, "You don't have access to this group's branch.")
+        messages.error(request, gettext("You don't have access to this group's branch."))
         return redirect(reverse("manage_group"))
     enrollments = (
         Enrollment.objects.filter(group=group, is_active=True)
@@ -1962,7 +1962,7 @@ def admin_group_detail(request, group_id):
             "group": group,
             "enrollments": enrollments,
             "total_inactive": total_all - enrollments.count(),
-            "page_title": f"{group.name} — Students",
+            "page_title": gettext("%(group)s — Students") % {"group": group.name},
         },
     )
 
@@ -2093,12 +2093,15 @@ def delete_group(request, group_id):
 def archive_group(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     if not branching.user_can_access_group(request.user, group):
-        messages.error(request, "You don't have access to this group's branch.")
+        messages.error(request, gettext("You don't have access to this group's branch."))
         return redirect(reverse("manage_group"))
     group.is_archived = not group.is_archived
     group.save()
-    action = "archived" if group.is_archived else "restored"
-    messages.success(request, f'Group "{group.name}" {action}.')
+    if group.is_archived:
+        message = gettext('Group "%(group)s" archived.')
+    else:
+        message = gettext('Group "%(group)s" restored.')
+    messages.success(request, message % {"group": group.name})
     return redirect(reverse("manage_group"))
 
 

@@ -1071,6 +1071,13 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-04 — Web audit M2 part 1 (PR #73, i18n): admin Dashboard, Students, Teachers, Groups (list,
+  add, edit), Payments and the admin Profile now render in uz/ru, including the delete/archive/cancel/remind
+  confirm dialogs, page titles and group messages; form labels and messages use gettext (English wording
+  unchanged). Left for part 2: Student/Invoice status choices from the models, the payments action pages
+  (generate, add one-off, record, collections), the `uzs` "million" word, chart empty-state texts in the
+  dashboard scripts, and the other admin pages listed in the PR.
+
 - 2026-11-01 — P3.9 claimed (`feat/school-admin-shell`); D19 recorded (owner: admin shell follows the
   mockups in both brands, Study Center navy/lime palette). Drew screens 16c and 16d
   (`python build_mockups.py 16c-web-center-students 16d-web-center-home`) for owner approval before the
@@ -1080,8 +1087,15 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   `.ice-hero`/`.ice-manage-*`/`.ice-action` on shell tokens (fixes dark Payments header, faint Edit buttons).
   The navy-sidebar text bug predates P3.6 (June 2026 `mobile-adaptive.css` bright-mode rules beat
   base.html's inline white text); the white admin sidebar ends it. Proof: `school-app-screens/p3.9a-*.png`.
+
 - 2026-10-31 — P4.3 done (PR #68, after #61): the app's "choose your password" screen for PL.1
   and the brand-from-account notice. PL.1 (#58) can merge after this. Next on this line: P4.4 (parent shell).
+
+- 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
+  today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
+  quick links), first link in the sidebar's School group. When PL.1 adds login letters, show
+  "letter due" in the Parents panel.
+
 - 2026-11-01 — Web audit M3 (PR #72): month names on the web follow the page
   language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always
   English; now `date_format`. Payment pages show `invoice.period|date:"F Y"`; `period_label` stays
@@ -1100,10 +1114,6 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   and `SENDER_ID_MISMATCH` do, not a bare 404; it is logged), and committed pushes go to one shared worker thread
   instead of one thread per notification (monthly invoices). P2.8 stays `[~]` until the real phone test.
 
-- 2026-11-01 — Web audit M2 part 1 (i18n): admin Dashboard, Students, Teachers, Groups (list, add, edit),
-  Payments and the admin Profile now render in uz/ru; their form labels and success/error messages use
-  gettext (English wording unchanged). Still English: Student/Invoice status choices from the models, chart
-  empty-state texts in the dashboard scripts, and the pages listed in the PR for part 2.
 - 2026-10-31 — Web audit fixes B1, M1 (PR #71): new students and teachers always get a branch (one-branch
   admins get theirs, locked; super admins and admins of several branches must choose one they can
   see, `branching.assignable_branches`/`admin_only_branch`); edits can't clear or move it out of

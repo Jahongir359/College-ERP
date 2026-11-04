@@ -88,23 +88,33 @@
               </span>
             </div>
           </td>
-          <td class="admin-list-muted">{{ staff.login_id|default:_("No ID") }}</td>
-          <td>{% if staff.group_names %}{{ staff.group_names|join:", " }}{% else %}<span class="admin-list-muted">{% translate "No group" %}</span>{% endif %}</td>
-          <td class="admin-list-nowrap">{{ staff.staff.phone|default:"—" }}</td>
+          <td><span class="ice-manage-code">{{ staff.login_id|default:_("No ID") }}</span></td>
+          <td>{{ staff.staff.course.name|default:_("No course") }}</td>
           <td>
-            {% if staff.staff.is_active %}
-            <span class="ui-badge ui-badge--ok">{% translate "Active" %}</span>
+            {% if staff.staff.branch %}
+            <span class="ice-manage-chip"><i class="fas fa-code-branch" aria-hidden="true"></i> {{ staff.staff.branch.name }}</span>
             {% else %}
-            <span class="ui-badge ui-badge--muted">{% translate "Inactive" %}</span>
+            <span class="ice-manage-chip ice-manage-chip--muted">{% translate "No branch" %}</span>
             {% endif %}
           </td>
-          <td class="ui-end">
-            <div class="admin-list-actions">
-              <a href="{% url 'edit_staff' staff.staff.id %}" class="ui-open">{% translate "Edit" %} →</a>
+          <td>{{ staff.staff.phone|default:_("No phone") }}</td>
+          <td>{{ staff.staff.specialization|default:_("Not set") }}</td>
+          <td>{{ staff.date_of_birth|date:"Y-m-d"|default:_("Not set") }}</td>
+          <td>
+            {% if staff.staff.is_active %}
+            <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i> {% translate "Active" %}</span>
+            {% else %}
+            <span class="ice-manage-chip ice-manage-chip--muted"><i class="fas fa-pause-circle" aria-hidden="true"></i> {% translate "Inactive" %}</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="ice-manage-actions">
+              <a href="{% url 'edit_staff' staff.staff.id %}" class="ice-manage-action">
+                <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
+              </a>
               <a href="{% url 'delete_staff' staff.staff.id %}"
-                 class="admin-list-delete"
-                 title="{% translate 'Delete' %}" aria-label="{% translate 'Delete' %}"
-                 data-confirm-post="Delete {{ staff.get_full_name|default:'this teacher' }}? Their account and all related data will be removed. This cannot be undone.">
+                 class="ice-manage-action ice-manage-action--danger-fill"
+                 data-confirm-post="{% blocktranslate trimmed with name=staff.get_full_name|default:_("this teacher") %}Delete {{ name }}? Their account and all related data will be removed. This cannot be undone.{% endblocktranslate %}">
                 <i class="fas fa-trash" aria-hidden="true"></i>
               </a>
             </div>
@@ -172,7 +182,7 @@
         </a>
         <a href="{% url 'delete_staff' staff.staff.id %}"
            class="ice-manage-action ice-manage-action--danger-fill"
-           data-confirm-post="Delete {{ staff.get_full_name|default:'this teacher' }}? Their account and all related data will be removed. This cannot be undone.">
+           data-confirm-post="{% blocktranslate trimmed with name=staff.get_full_name|default:_("this teacher") %}Delete {{ name }}? Their account and all related data will be removed. This cannot be undone.{% endblocktranslate %}">
           <i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}
         </a>
       </div>

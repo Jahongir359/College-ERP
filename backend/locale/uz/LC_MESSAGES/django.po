@@ -1017,6 +1017,21 @@ msgstr "Tungi rejim"
 msgid "Light mode"
 msgstr "Kunduzgi rejim"
 
+msgid "All branches"
+msgstr "Barcha filiallar"
+# Web audit fixes B1, M1 (2026-10-31)
+msgid "Choose a branch."
+msgstr "Filialni tanlang."
+
+msgid "Classroom or room number, e.g. Room 3A"
+msgstr "Sinf xonasi yoki xona raqami, masalan: 3A-xona"
+
+msgid "School classes only: the academic year."
+msgstr "Faqat maktab sinflari uchun: oʻquv yili."
+
+msgid "This student can't be added to this class: they are not in this branch."
+msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."
+
 #: main_app/forms.py:61
 msgid "— Select branch —"
 msgstr "— Filialni tanlang —"
@@ -1964,10 +1979,6 @@ msgstr "Barcha holatlar"
 msgid "Overdue"
 msgstr "Muddati oʻtgan"
 
-#: main_app/templates/hod_template/manage_payments.html:63 main_app/templates/hod_template/manage_staff.html:37 main_app/templates/hod_template/manage_student.html:37
-msgid "All branches"
-msgstr "Barcha filiallar"
-
 #: main_app/templates/hod_template/manage_payments.html:72
 msgid "All groups"
 msgstr "Barcha guruhlar"
@@ -2481,10 +2492,6 @@ msgstr "Oʻqituvchi yoki admin bilan bogʻlanish"
 msgid "About Iceberg"
 msgstr "Iceberg haqida"
 
-#: main_app/views.py:862
-msgid "Central profile and settings hub for College ERP"
-msgstr "College ERP uchun profil va sozlamalar markazi"
-
 #: main_app/views.py:882
 msgid "Account"
 msgstr "Hisob"
@@ -2502,18 +2509,52 @@ msgctxt "group status"
 msgid "Active"
 msgstr "Faol"
 
-# Web audit fixes B1, M1 (2026-10-31)
-msgid "Choose a branch."
-msgstr "Filialni tanlang."
+msgid "this student"
+msgstr "bu oʻquvchi"
 
-msgid "Classroom or room number, e.g. Room 3A"
-msgstr "Sinf xonasi yoki xona raqami, masalan: 3A-xona"
+msgid "this teacher"
+msgstr "bu oʻqituvchi"
 
-msgid "School classes only: the academic year."
-msgstr "Faqat maktab sinflari uchun: oʻquv yili."
+#, python-format
+msgid "Delete %(name)s? All attendance records will be removed. This cannot be undone."
+msgstr "Rostdan ham oʻchirasizmi: %(name)s? Barcha davomat yozuvlari oʻchiriladi. Buni ortga qaytarib boʻlmaydi."
 
-msgid "This student can't be added to this class: they are not in this branch."
-msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."
+#, python-format
+msgid "Delete %(name)s? Their account and all related data will be removed. This cannot be undone."
+msgstr "Rostdan ham oʻchirasizmi: %(name)s? Hisobi va unga bogʻliq barcha maʼlumotlar oʻchiriladi. Buni ortga qaytarib boʻlmaydi."
+
+msgid "Delete this group? This is only allowed when no records are linked."
+msgstr "Guruh oʻchirilsinmi? Bunga faqat guruhga hech qanday yozuv bogʻlanmagan boʻlsa ruxsat beriladi."
+
+msgid "Archive this group?"
+msgstr "Guruh arxivga olinsinmi?"
+
+msgid "Restore this group?"
+msgstr "Guruh arxivdan qaytarilsinmi?"
+
+#, python-format
+msgid "Send a payment reminder to %(student)s?"
+msgstr "Toʻlov eslatmasi yuborilsinmi: %(student)s?"
+
+#, python-format
+msgid "Cancel this invoice for %(student)s?"
+msgstr "%(student)s uchun hisob-faktura bekor qilinsinmi?"
+
+#, python-format
+msgid "%(group)s — Students"
+msgstr "%(group)s — Oʻquvchilar"
+
+#, python-format
+msgid "Group \"%(group)s\" archived."
+msgstr "\"%(group)s\" guruhi arxivga olindi."
+
+#, python-format
+msgid "Group \"%(group)s\" restored."
+msgstr "\"%(group)s\" guruhi arxivdan qaytarildi."
+
+msgid "Central profile and settings hub for Iceberg"
+msgstr "Iceberg profil va sozlamalar markazi"
+
 # P3.9c admin home (mockup 16d)
 #, python-format
 msgid "Good morning, %(name)s"

@@ -130,10 +130,10 @@
           <td style="white-space:nowrap;">
             {% if inv.status != 'paid' and inv.status != 'cancelled' %}
             <a href="{% url 'admin_record_payment' inv.id %}" class="ab-primary" title="{% translate 'Record payment' %}"><i class="fas fa-cash-register me-1"></i>{% translate "Record" %}</a>
-            <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ab-secondary" title="{% translate 'Send reminder now' %}" data-confirm-post="Send a payment reminder to {{ inv.student }}?"><i class="fas fa-bell me-1"></i>{% translate "Remind" %}</a>
+            <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ab-secondary" title="{% translate 'Send reminder now' %}" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Send a payment reminder to {{ student }}?{% endblocktranslate %}"><i class="fas fa-bell me-1"></i>{% translate "Remind" %}</a>
             {% endif %}
             {% if inv.paid_amount == 0 and inv.status != 'cancelled' %}
-            <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ab-danger" data-confirm-post="Cancel this invoice for {{ inv.student }}?"><i class="fas fa-ban me-1"></i>{% translate "Cancel" %}</a>
+            <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ab-danger" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Cancel this invoice for {{ student }}?{% endblocktranslate %}"><i class="fas fa-ban me-1"></i>{% translate "Cancel" %}</a>
             {% endif %}
             {% if is_super_admin %}
               {% for p in inv.payments.all %}
@@ -180,10 +180,10 @@
       <div class="ice-actions">
         {% if inv.status != 'paid' and inv.status != 'cancelled' %}
         <a href="{% url 'admin_record_payment' inv.id %}" class="ice-action ice-action--primary"><i class="fas fa-cash-register" aria-hidden="true"></i> {% translate "Record" %}</a>
-        <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ice-action" data-confirm-post="Send a payment reminder to {{ inv.student }}?"><i class="fas fa-bell" aria-hidden="true"></i> {% translate "Remind" %}</a>
+        <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ice-action" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Send a payment reminder to {{ student }}?{% endblocktranslate %}"><i class="fas fa-bell" aria-hidden="true"></i> {% translate "Remind" %}</a>
         {% endif %}
         {% if inv.paid_amount == 0 and inv.status != 'cancelled' %}
-        <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ice-action ice-action--danger" data-confirm-post="Cancel this invoice for {{ inv.student }}?"><i class="fas fa-ban" aria-hidden="true"></i> {% translate "Cancel" %}</a>
+        <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ice-action ice-action--danger" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Cancel this invoice for {{ student }}?{% endblocktranslate %}"><i class="fas fa-ban" aria-hidden="true"></i> {% translate "Cancel" %}</a>
         {% endif %}
       </div>
     </article>

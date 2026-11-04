@@ -98,22 +98,20 @@
             {% elif student.student.status %}
             <span class="ui-badge ui-badge--late">{{ student.student.get_status_display }}</span>
             {% else %}
-            <span class="ui-badge ui-badge--muted">{% translate "No status" %}</span>
+            <span class="ice-manage-chip ice-manage-chip--muted">{% translate "No status" %}</span>
             {% endif %}
           </td>
+          <td>{{ student.student.phone|default:_("No phone") }}</td>
+          <td>{{ student.gender|default:_("Not set") }}</td>
+          <td>{{ student.date_of_birth|date:"Y-m-d"|default:_("Not set") }}</td>
           <td>
-            {% if student.pay_state == "debt" %}<span class="ui-badge ui-badge--abs">{% translate "Overdue" %}</span>
-            {% elif student.pay_state == "due" %}<span class="ui-badge ui-badge--late">{% translate "Due" %}</span>
-            {% elif student.pay_state == "paid" %}<span class="ui-badge ui-badge--ok">{% translate "Paid" %}</span>
-            {% else %}<span class="admin-list-muted">—</span>{% endif %}
-          </td>
-          <td class="ui-end">
-            <div class="admin-list-actions">
-              <a href="{% url 'edit_student' student.student.id %}" class="ui-open">{% translate "Edit" %} →</a>
+            <div class="ice-manage-actions">
+              <a href="{% url 'edit_student' student.student.id %}" class="ice-manage-action">
+                <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
+              </a>
               <a href="{% url 'delete_student' student.student.id %}"
-                 class="admin-list-delete"
-                 title="{% translate 'Delete' %}" aria-label="{% translate 'Delete' %}"
-                 data-confirm-post="Delete {{ student.get_full_name|default:'this student' }}? All attendance records will be removed. This cannot be undone.">
+                 class="ice-manage-action ice-manage-action--danger-fill"
+                 data-confirm-post="{% blocktranslate trimmed with name=student.get_full_name|default:_("this student") %}Delete {{ name }}? All attendance records will be removed. This cannot be undone.{% endblocktranslate %}">
                 <i class="fas fa-trash" aria-hidden="true"></i>
               </a>
             </div>
@@ -181,7 +179,7 @@
         </a>
         <a href="{% url 'delete_student' student.student.id %}"
            class="ice-manage-action ice-manage-action--danger-fill"
-           data-confirm-post="Delete {{ student.get_full_name|default:'this student' }}? All attendance records will be removed. This cannot be undone.">
+           data-confirm-post="{% blocktranslate trimmed with name=student.get_full_name|default:_("this student") %}Delete {{ name }}? All attendance records will be removed. This cannot be undone.{% endblocktranslate %}">
           <i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}
         </a>
       </div>
