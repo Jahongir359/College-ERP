@@ -1071,6 +1071,14 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-04 — P3.9b (`feat/school-pages-redesign`): School classes (16), timetable (17), parents (18),
+  parent page (18b), register report (19) and the board `/maktab/` rebuilt on the Admin UI kit, colours
+  only from `--shell-*` tokens; the old P3.8 board CSS with fixed colours is gone. Classes gains a 4th stat
+  "Register taken today" and a today's present/late/absent column (`school.register_summaries`); the parent
+  page works without JS (relation and main-contact toggle submit on change, noscript Save). Deliberate
+  differences from the mockups: no CSV on classes, the class search box stays, the topbar search belongs
+  to the shell. P3.9 stays `[~]` until P3.9c (Study Center pages). Proof: `school-app-screens/p3.9b-*.png`.
+
 - 2026-11-04 — Web audit M2 part 1 (PR #73, i18n): admin Dashboard, Students, Teachers, Groups (list,
   add, edit), Payments and the admin Profile now render in uz/ru, including the delete/archive/cancel/remind
   confirm dialogs, page titles and group messages; form labels and messages use gettext (English wording
