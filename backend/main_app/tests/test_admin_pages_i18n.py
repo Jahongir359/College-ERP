@@ -116,3 +116,38 @@ class AdminPagesTranslatedTests(TestCase):
         self._use("ru")
         response = self.client.post(reverse("delete_group", args=[empty.id]))
         self.assertIn("Группа «Beta» удалена.", self._messages(response))
+
+    def test_confirm_dialogs_are_translated(self):
+        self._use("ru")
+        html = self.client.get(reverse("manage_student")).content.decode()
+        self.assertIn(
+            'data-confirm-post="Удалить T U? Все записи посещаемости будут удалены.', html
+        )
+        html = self.client.get(reverse("manage_staff")).content.decode()
+        self.assertIn("Аккаунт и все связанные данные будут удалены.", html)
+        html = self.client.get(reverse("manage_group")).content.decode()
+        self.assertIn('data-confirm-post="Перенести группу в архив?"', html)
+        self.assertIn("Удалить группу? Это возможно, только если", html)
+        self._use("uz")
+        html = self.client.get(reverse("manage_group")).content.decode()
+        self.assertIn('data-confirm-post="Guruh arxivga olinsinmi?"', html)
+        html = self.client.get(reverse("manage_student")).content.decode()
+        self.assertIn("Rostdan ham oʻchirasizmi: T U?", html)
+
+    def test_page_titles_and_group_messages_are_translated(self):
+        self._use("uz")
+        response = self.client.get(reverse("manage_student"))
+        self.assertEqual(response.context["page_title"], "Oʻquvchilar")
+        response = self.client.get(reverse("admin_group_detail", args=[self.group.id]))
+        self.assertEqual(response.context["page_title"], "Alpha — Oʻquvchilar")
+        response = self.client.post(reverse("archive_group", args=[self.group.id]))
+        self.assertIn('"Alpha" guruhi arxivga olindi.', self._messages(response))
+        self._use("ru")
+        response = self.client.post(reverse("archive_group", args=[self.group.id]))
+        self.assertIn("Группа «Alpha» возвращена из архива.", self._messages(response))
+
+    def test_profile_subtitle_names_iceberg(self):
+        self._use("uz")
+        html = self.client.get(reverse("profile_hub")).content.decode()
+        self.assertIn("Iceberg profil va sozlamalar markazi", html)
+        self.assertNotIn("College ERP", html)

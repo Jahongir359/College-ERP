@@ -1135,7 +1135,7 @@ msgstr "Скоро начнутся"
 
 #: main_app/hod_views.py:399
 msgid "Active Classes"
-msgstr "Идут занятия"
+msgstr "Активные группы"
 
 #: main_app/hod_views.py:426
 #, python-format
@@ -2408,9 +2408,6 @@ msgstr "Связаться с учителем или админом"
 msgid "About Iceberg"
 msgstr "Об Iceberg"
 
-#: main_app/views.py:862
-msgid "Central profile and settings hub for College ERP"
-msgstr "Центр профиля и настроек College ERP"
 
 #: main_app/views.py:882
 msgid "Account"
@@ -2506,3 +2503,49 @@ msgstr "учеников без привязанного родителя"
 
 msgid "Open parents"
 msgstr "Открыть родителей"
+
+msgid "this student"
+msgstr "этого ученика"
+
+msgid "this teacher"
+msgstr "этого учителя"
+
+#, python-format
+msgid "Delete %(name)s? All attendance records will be removed. This cannot be undone."
+msgstr "Удалить %(name)s? Все записи посещаемости будут удалены. Это действие нельзя отменить."
+
+#, python-format
+msgid "Delete %(name)s? Their account and all related data will be removed. This cannot be undone."
+msgstr "Удалить %(name)s? Аккаунт и все связанные данные будут удалены. Это действие нельзя отменить."
+
+msgid "Delete this group? This is only allowed when no records are linked."
+msgstr "Удалить группу? Это возможно, только если к ней не привязаны никакие записи."
+
+msgid "Archive this group?"
+msgstr "Перенести группу в архив?"
+
+msgid "Restore this group?"
+msgstr "Вернуть группу из архива?"
+
+#, python-format
+msgid "Send a payment reminder to %(student)s?"
+msgstr "Отправить напоминание об оплате: %(student)s?"
+
+#, python-format
+msgid "Cancel this invoice for %(student)s?"
+msgstr "Отменить счёт для %(student)s?"
+
+#, python-format
+msgid "%(group)s — Students"
+msgstr "%(group)s — Ученики"
+
+#, python-format
+msgid "Group \"%(group)s\" archived."
+msgstr "Группа «%(group)s» перенесена в архив."
+
+#, python-format
+msgid "Group \"%(group)s\" restored."
+msgstr "Группа «%(group)s» возвращена из архива."
+
+msgid "Central profile and settings hub for Iceberg"
+msgstr "Центр профиля и настроек Iceberg"

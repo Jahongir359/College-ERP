@@ -2403,9 +2403,6 @@ msgstr "Oʻqituvchi yoki admin bilan bogʻlanish"
 msgid "About Iceberg"
 msgstr "Iceberg haqida"
 
-#: main_app/views.py:862
-msgid "Central profile and settings hub for College ERP"
-msgstr "College ERP uchun profil va sozlamalar markazi"
 
 #: main_app/views.py:882
 msgid "Account"
@@ -2501,3 +2498,49 @@ msgstr "oʻquvchiga ota-ona bogʻlanmagan"
 
 msgid "Open parents"
 msgstr "Ota-onalarni ochish"
+
+msgid "this student"
+msgstr "bu oʻquvchi"
+
+msgid "this teacher"
+msgstr "bu oʻqituvchi"
+
+#, python-format
+msgid "Delete %(name)s? All attendance records will be removed. This cannot be undone."
+msgstr "Rostdan ham oʻchirasizmi: %(name)s? Barcha davomat yozuvlari oʻchiriladi. Buni ortga qaytarib boʻlmaydi."
+
+#, python-format
+msgid "Delete %(name)s? Their account and all related data will be removed. This cannot be undone."
+msgstr "Rostdan ham oʻchirasizmi: %(name)s? Hisobi va unga bogʻliq barcha maʼlumotlar oʻchiriladi. Buni ortga qaytarib boʻlmaydi."
+
+msgid "Delete this group? This is only allowed when no records are linked."
+msgstr "Guruh oʻchirilsinmi? Bunga faqat guruhga hech qanday yozuv bogʻlanmagan boʻlsa ruxsat beriladi."
+
+msgid "Archive this group?"
+msgstr "Guruh arxivga olinsinmi?"
+
+msgid "Restore this group?"
+msgstr "Guruh arxivdan qaytarilsinmi?"
+
+#, python-format
+msgid "Send a payment reminder to %(student)s?"
+msgstr "Toʻlov eslatmasi yuborilsinmi: %(student)s?"
+
+#, python-format
+msgid "Cancel this invoice for %(student)s?"
+msgstr "%(student)s uchun hisob-faktura bekor qilinsinmi?"
+
+#, python-format
+msgid "%(group)s — Students"
+msgstr "%(group)s — Oʻquvchilar"
+
+#, python-format
+msgid "Group \"%(group)s\" archived."
+msgstr "\"%(group)s\" guruhi arxivga olindi."
+
+#, python-format
+msgid "Group \"%(group)s\" restored."
+msgstr "\"%(group)s\" guruhi arxivdan qaytarildi."
+
+msgid "Central profile and settings hub for Iceberg"
+msgstr "Iceberg profil va sozlamalar markazi"

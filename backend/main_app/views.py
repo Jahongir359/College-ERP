@@ -859,7 +859,7 @@ def profile_settings_hub(request):
     support_rows.append(
         _settings_row(
             _("About Iceberg"),
-            _("Central profile and settings hub for College ERP"),
+            _("Central profile and settings hub for Iceberg"),
             "fa-info-circle",
             anim="icon-hover-rotate",
             kind="static",

@@ -124,7 +124,7 @@
               </a>
               <a href="{% url 'delete_student' student.student.id %}"
                  class="ice-manage-action ice-manage-action--danger-fill"
-                 data-confirm-post="Delete {{ student.get_full_name|default:'this student' }}? All attendance records will be removed. This cannot be undone.">
+                 data-confirm-post="{% blocktranslate trimmed with name=student.get_full_name|default:_("this student") %}Delete {{ name }}? All attendance records will be removed. This cannot be undone.{% endblocktranslate %}">
                 <i class="fas fa-trash" aria-hidden="true"></i>
               </a>
             </div>
@@ -193,7 +193,7 @@
         </a>
         <a href="{% url 'delete_student' student.student.id %}"
            class="ice-manage-action ice-manage-action--danger-fill"
-           data-confirm-post="Delete {{ student.get_full_name|default:'this student' }}? All attendance records will be removed. This cannot be undone.">
+           data-confirm-post="{% blocktranslate trimmed with name=student.get_full_name|default:_("this student") %}Delete {{ name }}? All attendance records will be removed. This cannot be undone.{% endblocktranslate %}">
           <i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}
         </a>
       </div>
