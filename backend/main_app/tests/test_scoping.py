@@ -49,9 +49,12 @@ SCHOOL_MODULES = (
     "parents.py",
     "school.py",
     "school_admin_views.py",
+    "school_board_views.py",
     "school_timetable_views.py",
+    "school_register_report_views.py",
     "school_demo.py",
     "school_forms.py",
+    "push.py",
 )
 
 _CALL = re.compile(r"\.(?:filter|exclude|get)\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)", re.S)

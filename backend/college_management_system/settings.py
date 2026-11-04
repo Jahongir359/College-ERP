@@ -45,7 +45,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "False").strip().lower() not in ("0", "fa
 # Always require an explicit secret key in production.
 # Fallback is only kept so `manage.py` commands work in a fresh clone
 # before the developer has created their .env file.
-_secret_key_fallback = "f2zx8*lb*em*-*b+!&1lpp&$_9q9kmkar+l3x90do@s(+sr&x7"
+_secret_key_fallback = "django-insecure-dev-only-not-a-real-key"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", _secret_key_fallback)
 if not DEBUG and SECRET_KEY == _secret_key_fallback and not _ALLOW_INSECURE_CONFIG_DEFAULTS:
     raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is False.")

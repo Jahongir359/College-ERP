@@ -27,7 +27,9 @@ from . import (
     payments_views,
     public_views,
     school_admin_views,
+    school_board_views,
     school_parent_views,
+    school_register_report_views,
     school_timetable_views,
     staff_views,
     student_views,
@@ -40,6 +42,7 @@ urlpatterns = [
     path("login/", views.login_page, name="login_page"),
     path("language/", language.set_language, name="set_language"),
     # ── Maktab: School admin pages (P3.1) ────────────────────────────────────
+    path("maktab/", school_board_views.school_board, name="school_board"),
     path("maktab/classes/", school_admin_views.classes, name="school_classes"),
     path("maktab/classes/add/", school_admin_views.class_add, name="school_class_add"),
     path("maktab/classes/<int:pk>/", school_admin_views.class_detail, name="school_class_detail"),
@@ -102,6 +105,11 @@ urlpatterns = [
         "maktab/bells/<int:pk>/delete/",
         school_timetable_views.bell_delete,
         name="school_bell_delete",
+    ),
+    path(
+        "maktab/register/",
+        school_register_report_views.register_report,
+        name="school_register_report",
     ),
     path("maktab/parents/", school_parent_views.parent_list, name="school_parents"),
     path(

@@ -1,0 +1,142 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ today|date:"l, j E Y" }}</p>{% endblock %}
+{% block page_actions %}
+{% if has_school %}
+{% url 'school_register_report' as register_url %}
+<div class="page-actions">
+  {% if register_url %}
+  <a href="{{ register_url }}" class="ice-manage-add-btn">
+    <i class="fas fa-clipboard-check" aria-hidden="true"></i> {% translate "Register report" %}
+  </a>
+  {% endif %}
+  <a href="{% url 'school_classes' %}" class="ice-manage-action">
+    <i class="fas fa-door-open" aria-hidden="true"></i> {% translate "Classes" %}
+  </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+{% url 'school_register_report' as register_url %}
+<div class="ice-manage-page school-board">
+
+{% if not has_school %}
+  <section class="school-panel board-empty" data-board-empty="no-school">
+    <i class="fas fa-school" aria-hidden="true"></i>
+    <h3 class="school-panel__title">{% translate "No School branch yet" %}</h3>
+    <p class="school-note">{% translate "This board shows Iceberg School numbers. None of the branches you manage is a School branch." %}</p>
+  </section>
+{% else %}
+
+  {% if show_branch %}
+  <p class="board-branches">{% for branch in branches %}<b class="school-chip">{{ branch.name }}</b>{% endfor %}</p>
+  {% endif %}
+
+  <div class="school-stats board-stats">
+    <a class="school-stat board-stat" href="{% url 'school_classes' %}">
+      <b class="school-stat__label">{% translate "Pupils" %}</b>
+      <b class="school-stat__value" data-count="pupils">{{ counts.pupils }}</b>
+    </a>
+    <a class="school-stat board-stat" href="{% url 'school_classes' %}">
+      <b class="school-stat__label">{% translate "Classes" %}</b>
+      <b class="school-stat__value" data-count="classes">{{ counts.classes }}</b>
+    </a>
+    <a class="school-stat board-stat" href="{% url 'school_timetable' %}">
+      <b class="school-stat__label">{% translate "Teachers" %}</b>
+      <b class="school-stat__value" data-count="teachers">{{ counts.teachers }}</b>
+    </a>
+    <a class="school-stat board-stat" href="{% url 'school_parents' %}">
+      <b class="school-stat__label">{% translate "Parents" %}</b>
+      <b class="school-stat__value" data-count="parents">{{ counts.parents }}</b>
+    </a>
+  </div>
+
+  <div class="school-split board-split">
+    <div>
+      <section class="school-panel">
+        <h3 class="school-panel__title"><i class="fas fa-clipboard-check" aria-hidden="true"></i> {% translate "Today's register" %}</h3>
+        {% if not year %}
+          <p class="school-note" data-board-empty="no-year">{% translate "Set up the academic year first; the register follows its classes." %}</p>
+        {% elif not class_rows %}
+          <div class="board-empty board-empty--inline" data-board-empty="no-classes">
+            <p class="school-note">{% translate "No classes in this academic year yet." %}</p>
+            <a href="{% url 'school_class_add' %}" class="ice-manage-action ice-manage-action--primary">{% translate "New class" %} →</a>
+          </div>
+        {% else %}
+          <div class="board-progress" role="img" aria-label="{% blocktranslate with taken=taken_count total=class_rows|length %}{{ taken }} of {{ total }} classes took the register{% endblocktranslate %}">
+            <div class="board-progress__bar"><i style="width: {% widthratio taken_count class_rows|length 100 %}%"></i></div>
+            <p class="board-progress__text">
+              <b class="board-big">{{ taken_count }} / {{ class_rows|length }}</b>
+              {% translate "classes took the register" %}
+            </p>
+          </div>
+          {% if not_taken %}
+          <h4 class="board-subhead">{% translate "Not taken yet" %}</h4>
+          <ul class="board-list">
+            {% for row in not_taken %}
+            <li>
+              <b class="board-list__name">{{ row.group.name }}</b>
+              <em class="board-list__meta">{% if row.group.teacher %}{{ row.group.teacher.admin.get_full_name }}{% else %}{% translate "No homeroom teacher" %}{% endif %}</em>
+              <a href="{% url 'school_class_detail' row.group.pk %}" class="ice-manage-action">{% translate "Open" %} →</a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="board-ok"><i class="fas fa-check-circle" aria-hidden="true"></i> {% translate "Every class has taken today's register." %}</p>
+          {% endif %}
+          {% if register_url %}
+          <a href="{{ register_url }}" class="ice-manage-action ice-manage-action--primary board-more">{% translate "Open the register report" %} →</a>
+          {% endif %}
+        {% endif %}
+      </section>
+
+      <section class="school-panel">
+        <h3 class="school-panel__title"><i class="fas fa-th-large" aria-hidden="true"></i> {% translate "Quick links" %}</h3>
+        <nav class="board-links" aria-label="{% translate 'Quick links' %}">
+          <a href="{% url 'school_classes' %}"><i class="fas fa-door-open" aria-hidden="true"></i> {% translate "Classes" %}</a>
+          <a href="{% url 'school_timetable' %}"><i class="fas fa-table" aria-hidden="true"></i> {% translate "Timetable" %}</a>
+          <a href="{% url 'school_bells' %}"><i class="fas fa-bell" aria-hidden="true"></i> {% translate "Bell times" %}</a>
+          {% if register_url %}<a href="{{ register_url }}"><i class="fas fa-clipboard-check" aria-hidden="true"></i> {% translate "Register" %}</a>{% endif %}
+          <a href="{% url 'school_parents' %}"><i class="fas fa-user-friends" aria-hidden="true"></i> {% translate "Parents" %}</a>
+          <a href="{% url 'school_years' %}"><i class="fas fa-calendar-alt" aria-hidden="true"></i> {% translate "Academic year" %}</a>
+        </nav>
+      </section>
+    </div>
+
+    <div>
+      <section class="school-panel {% if not year %}school-panel--gold{% endif %}">
+        <h3 class="school-panel__title"><i class="fas fa-calendar-alt" aria-hidden="true"></i> {% translate "Academic year" %}</h3>
+        {% if year %}
+          <p class="board-big">{{ year }}</p>
+          {% if term %}
+          <p class="school-note">{% if term.name %}{{ term.name }}{% else %}{% blocktranslate with number=term.number %}Quarter {{ number }}{% endblocktranslate %}{% endif %} · {{ term.start_date|date:"j E" }} – {{ term.end_date|date:"j E Y" }}</p>
+          {% else %}
+          <p class="school-note">{% translate "No quarter has started yet." %}</p>
+          {% endif %}
+        {% else %}
+          <p class="school-note" data-board-empty="no-year">{% translate "No current academic year is set." %}</p>
+          <a href="{% url 'school_years' %}" class="ice-manage-action ice-manage-action--primary board-more">{% translate "Set one up" %} →</a>
+        {% endif %}
+      </section>
+
+      <section class="school-panel">
+        <h3 class="school-panel__title"><i class="fas fa-user-friends" aria-hidden="true"></i> {% translate "Parents" %}</h3>
+        <ul class="board-facts">
+          <li><b class="board-big" data-count="never-signed-in">{{ parents_never_signed_in }}</b> {% translate "parents haven't signed in yet" %}</li>
+          <li><b class="board-big" data-count="no-parent">{{ pupils_without_parent }}</b> {% translate "pupils have no parent linked" %}</li>
+        </ul>
+        <a href="{% url 'school_parents' %}" class="ice-manage-action ice-manage-action--primary board-more">{% translate "Open parents" %} →</a>
+      </section>
+    </div>
+  </div>
+{% endif %}
+</div>
+{% endblock content %}
