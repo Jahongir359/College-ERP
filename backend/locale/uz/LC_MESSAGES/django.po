@@ -2629,3 +2629,15 @@ msgid "%(count)s enrollment has no monthly fee set (set a fee on the group or it
 msgid_plural "%(count)s enrollments have no monthly fee set (set a fee on the group or its course, then generate again)."
 msgstr[0] "%(count)s ta roʻyxatga olishda oylik toʻlov belgilanmagan (guruh yoki uning kursiga toʻlov belgilab, qayta yarating)."
 msgstr[1] "%(count)s ta roʻyxatga olishda oylik toʻlov belgilanmagan (guruh yoki uning kursiga toʻlov belgilab, qayta yarating)."
+
+#: main_app/school_forms.py
+msgid "Choose a teacher"
+msgstr "Oʻqituvchini tanlang"
+
+#: main_app/school_forms.py
+msgid "Choose a course"
+msgstr "Kursni tanlang"
+
+#: main_app/school_forms.py
+msgid "Choose a subject"
+msgstr "Fanni tanlang"

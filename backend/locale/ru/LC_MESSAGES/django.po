@@ -2637,3 +2637,15 @@ msgid_plural "%(count)s enrollments have no monthly fee set (set a fee on the gr
 msgstr[0] "У %(count)s зачисления не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
 msgstr[1] "У %(count)s зачислений не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
 msgstr[2] "У %(count)s зачислений не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
+
+#: main_app/school_forms.py
+msgid "Choose a teacher"
+msgstr "Выберите учителя"
+
+#: main_app/school_forms.py
+msgid "Choose a course"
+msgstr "Выберите курс"
+
+#: main_app/school_forms.py
+msgid "Choose a subject"
+msgstr "Выберите предмет"

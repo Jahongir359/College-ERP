@@ -345,3 +345,21 @@ class SchoolPageTranslationTests(_SchoolFixture):
         html = self.html(reverse("school_classes"))
         self.assertIn("Sinflar", html)
         self.assertIn("Sinf rahbari", html)
+
+    def test_class_pickers_show_translated_placeholders(self):
+        """Empty pickers on the class pages read "Choose a …", never Django's "---------"."""
+        self.client.force_login(self.school_admin)
+        add = reverse("school_class_add")
+        detail = reverse("school_class_detail", args=[self.class_7b.pk])
+        for language, teacher, course, subject in (
+            ("en", "Choose a teacher", "Choose a course", "Choose a subject"),
+            ("ru", "Выберите учителя", "Выберите курс", "Выберите предмет"),
+            ("uz", "Oʻqituvchini tanlang", "Kursni tanlang", "Fanni tanlang"),
+        ):
+            self.client.post(reverse("set_language"), {"language": language, "next": "/"})
+            for url, placeholders in ((add, [teacher, course]), (detail, [teacher, subject])):
+                with self.subTest(language=language, url=url):
+                    html = self.html(url)
+                    for placeholder in placeholders:
+                        self.assertIn(placeholder, html)
+                    self.assertNotIn("---------", html)
