@@ -924,7 +924,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [x] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6. — done 2026-11-04, PR #77; verified: flutter analyze 0 warnings,
       flutter test 65 OK (`test/parent_home_test.dart`, `test/role_redirect_test.dart`), web build
-      (-O1) OK, backend 608 tests OK (`tests/test_parent_homework.py`); mockup next to the app at 390
+      (-O1) OK, backend 639 tests OK (`tests/test_parent_homework.py`); mockup next to the app at 390
       and 1366 px: `docs/plans/school-app-screens/p4.4-parent-home.png` and `p4.4-parent-home-dark.png`.
       Parents get `/parent/*` (Home, Timetable, Homework, Messages, Profile) instead of `/coming-soon`;
       Timetable (P4.5), Homework and Messages (P4.8) are "next update" tabs for now; Profile has the
