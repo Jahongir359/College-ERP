@@ -1,5 +1,20 @@
 {% load static i18n %}
 
+{% if user.user_type == '1' %}
+<!-- Admin shell (P3.9, mockups 16 and 16c): the brand logo heads the sidebar;
+     the admin's name, language, theme and sign-out live in the avatar menu. -->
+<div class="sidebar-header sidebar-brand-header">
+    <a class="sidebar-brand" href="{{ admin_home_url|default:'/admin/home/' }}" aria-label="{{ brand.display_name|default:'Iceberg Study Center' }}">
+        {% if brand.key == "school" %}
+        <img class="sidebar-brand-logo sidebar-brand-logo--light" src="{% static brand.logo_on_light %}" alt="{{ brand.display_name }}">
+        <img class="sidebar-brand-logo sidebar-brand-logo--dark" src="{% static brand.logo_on_dark %}" alt="" aria-hidden="true">
+        {% else %}
+        <img class="sidebar-brand-tile" src="{% static brand.logo_tile|default:'dist/img/logo.png' %}" alt="">
+        <span class="sidebar-brand-name">ICEBERG<small>Study Center</small></span>
+        {% endif %}
+    </a>
+</div>
+{% else %}
 <!-- Sidebar Header -->
 <div class="sidebar-header">
     <div class="sidebar-user">
@@ -20,10 +35,13 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <!-- Navigation Menu -->
 <div class="nav-section nav-section--simple">
-    {% if user.user_type == '1' %}
+    {% if user.user_type == '1' and school_only_admin %}
+        {% include "main_app/includes/school_admin_nav.html" %}
+    {% elif user.user_type == '1' %}
         <h6 class="nav-section-title">{% translate "Overview" %}</h6>
 
         <div class="nav-item">
@@ -522,11 +540,14 @@
     {% endif %}
 </div>
 
-<!-- Sidebar Footer with Logout (animated, POST + CSRF, JS-optional) -->
+<!-- Sidebar Footer with Logout (animated, POST + CSRF, JS-optional).
+     Admins sign out from the avatar menu instead (P3.9). -->
+{% if user.user_type != '1' %}
 <div class="sidebar-footer">
     {% translate "Sign Out" as sign_out_label %}{% translate "Sign out of Iceberg" as sign_out_aria %}
     {% include "main_app/includes/animated_logout_button.html" with btn_class="sidebar-logout-btn" label=sign_out_label aria=sign_out_aria %}
 </div>
+{% endif %}
 
 <script>
 // Render avatar sticker emojis in the sidebar

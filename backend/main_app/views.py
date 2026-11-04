@@ -19,6 +19,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from . import branching
 from .forms import AdminForm, StaffProfileForm, StudentProfileForm
 from .language import remember_cookie_language
 from .middleware import PARENT_HOME_URL
@@ -65,7 +66,7 @@ def _redirect_authenticated_user(user):
     """Return the correct home redirect for an already-logged-in user."""
     user_type = str(user.user_type)
     if user_type == "1":
-        return redirect(reverse("admin_home"))
+        return redirect(branching.admin_home_url(user))
     if user_type == "2":
         return redirect(reverse("staff_home"))
     if user_type == "3":
@@ -227,7 +228,7 @@ def doLogin(request, **kwargs):
 
     # Deterministic redirect — no catch-all else that silently misroutes users.
     if user_type == "1":
-        return redirect(reverse("admin_home"))
+        return redirect(branching.admin_home_url(user))
     if user_type == "2":
         return redirect(reverse("staff_home"))
     if user_type == "3":

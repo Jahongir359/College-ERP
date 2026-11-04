@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | Done — 7/7 (2026-10-31; P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 7/8 (P3.9 claimed; P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -150,6 +150,7 @@ integrations or extras that aren't in this plan without asking the owner.
 | D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik) in Release 1 or 2; eMaktab comes later as P9 (D18). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
 | D17 | Admin web language: office staff need the **admin pages in Uzbek and Russian** (English stays). The admin web has no Django i18n today, so P3.0 adds it before the School admin pages. | **Decided 2026-10-27 (owner)** |
 | D18 | **eMaktab: the school does keep the state eMaktab journal** (required for general education schools). Connecting this app to eMaktab is a **future feature (P9), not in Release 1 or 2**. Until then teachers fill in eMaktab as they do today, and this app's register and gradebook serve parents and the office. Design the register, marks and term grades so they can later be sent to eMaktab or exported (store per-lesson and per-date data, use the same 2–5 scale and quarters as eMaktab, keep student identifiers). Don't build any eMaktab code before P9. | **Decided 2026-10-28 (owner)** |
+| D19 | **Admin web shell follows the plan mockups in both brands** (layout of screen 16: white sidebar, light topbar with chip, bell and initials avatar, serif/heavy page titles, rounded cards). Study Center uses the mockup palette (navy #103A57/#07233A, lime #CDF163, ice #38BDF0, stroke #D2DFEC) instead of the old cyan/teal gradients; Learning Center texts stay unchanged. Overrides the AGENTS.md "don't change Learning Center colors" rule for the admin shell. Asked for as "D18" by the coordinator; D18 was already taken (eMaktab), so recorded as D19. | **Decided 2026-11-01 (owner)** |
 
 Record each answer here with the date before starting the task that depends on it.
 
@@ -362,6 +363,8 @@ money is shown as `[summa]` because prices are not decided.
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
 | 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note — **approved 2026-10-30 (owner delegated to the reviewer session)** | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
+| 16c | Web — Study Center students list in the same admin shell, Study Center palette (D19) — **waiting for owner approval** | [16c-web-center-students.png](school-app-mockups/16c-web-center-students.png) | P3.9 |
+| 16d | Web — Study Center admin home (dashboard) in the same shell (D19) — **waiting for owner approval** | [16d-web-center-home.png](school-app-mockups/16d-web-center-home.png) | P3.9 |
 | 20 | Teacher grade entry — Release 2 — **approved 2026-10-30 (owner delegated to the coordinator session)**: class subject picker, date and kind (Dars / Nazorat ishi / Imtihon), 2–5 per pupil (tap again to clear), pupils absent today dimmed | [20-grade-entry.png](school-app-mockups/20-grade-entry.png) | P4.7 |
 | 20b | Teacher quarter grades — Release 2 — **approved 2026-10-30 (owner delegated to the coordinator session)**: tabs 1–4 + Yillik, marks and average per pupil, suggestion (average rounded half up, `school.suggested_grade`) confirmed or changed by the teacher, "Baholanmadi" (not graded) | [20b-quarter-grades.png](school-app-mockups/20b-quarter-grades.png) | P4.7 |
 
@@ -858,6 +861,36 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       buttons, School wordmark), page header blocks `page_eyebrow`/`page_actions` in `base.html`
       (empty for every other page), `school_period` in `context_processors.school_nav` is lazy. The
       P3.1/P3.2 tables now stay visible and scroll sideways below 1025 px (`school-admin.css`).
+- [~] **P3.9** Admin web shell rebuilt to the mockups in both brands (D19; claimed 2026-11-01,
+      `feat/school-admin-shell`): one shell (white sidebar with the brand logo, short menu per brand, topbar
+      with year · quarter or branch chip, bell and initials avatar holding language, theme and sign-out),
+      School palette maroon/gold, Study Center palette navy/lime/ice (screens 16c, 16d), all through brand
+      CSS variables. School-only admins land on `/maktab/` (helper in `branching.py`). Then the School pages
+      (16–19) and the main Study Center pages (dashboard, students, teachers, groups, payments) to the
+      mockups; other pages inherit the shell. Also fixes the unreadable navy-sidebar text in the Study
+      Center admin. Done when: side-by-side images per mockup (light, dark, 390 px), uz/ru/en, full suite.
+      **Split (2026-11-01):** P3.9a shell (this branch: base template, sidebar, topbar, tokens, landing,
+      page header, UI kit), P3.9b School pages 16–19 and the board (another session, branched off the
+      shell), P3.9c Study Center pages (dashboard 16d, students 16c, teachers, groups, payments).
+      **Admin UI kit** (`static/dist/css/admin-shell.css`, loaded for admins only, every selector under
+      `html[data-shell="admin"]`; colours only through `--shell-*` tokens, so one markup serves both brands
+      and dark mode). Use these classes on admin pages; don't invent new ones, ask the shell owner instead:
+      - Page header: base.html blocks `page_eyebrow` (`<p class="page-eyebrow">…</p>`), `page_title`,
+        `page_subtitle`, `page_actions` (`<div class="page-actions">…buttons…</div>`). No breadcrumb.
+      - Buttons: `ui-btn ui-btn--primary` (maroon / lime), `ui-btn ui-btn--secondary` (outline);
+        add `ui-btn--sm` for row actions.
+      - Stat cards: `ui-stats` > `ui-stat` > `ui-stat-label`, `ui-stat-value`, optional `ui-stat-note`.
+      - Cards: `ui-card` > `ui-card-head` > `ui-card-title` + `ui-card-link` ("Ochish →").
+      - Filter bar: `ui-filters` > `ui-search` (`<i class="fas fa-search"></i><input>`) and `select.ui-select`.
+      - Table: `ui-table-wrap` > `table.ui-table` (tinted header, row lines, scrolls inside the card on
+        phones; don't add Bootstrap `.table`, which turns rows into phone cards); cells `ui-num`, `ui-end`;
+        row link `a.ui-open`.
+      - Badges: `ui-badge` + `ui-badge--ok` (keldi/toʻlangan), `--late` (kech/olinmagan), `--abs`
+        (yoʻq/qarzdor), `--muted`, `--accent` (counts).
+      - Others: `ui-avatar` (initials), `ui-empty` (empty state), `ui-split` (list + side panel).
+      - Tokens for anything else: `--shell-bg`, `--shell-surface`, `--shell-border`, `--shell-text`,
+        `--shell-muted`, `--shell-tint`, `--shell-title`, `--shell-eyebrow`, `--shell-link`,
+        `--shell-ok/-late/-abs` (+ `-bg`), `--shell-radius`.
 
 ### P4 — App
 
@@ -1038,6 +1071,16 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-01 — P3.9 claimed (`feat/school-admin-shell`); D19 recorded (owner: admin shell follows the
+  mockups in both brands, Study Center navy/lime palette). Drew screens 16c and 16d
+  (`python build_mockups.py 16c-web-center-students 16d-web-center-home`) for owner approval before the
+  shell is built. Then P3.9a, the shell (owner approved 16c/16d): `admin-shell.css` (tokens + Admin UI
+  kit, `html[data-shell="admin"]` only), School-only menu and `/maktab/` landing
+  (`branching.is_school_only_admin`, `admin_home_url`), avatar menu with language/theme/sign-out, legacy
+  `.ice-hero`/`.ice-manage-*`/`.ice-action` on shell tokens (fixes dark Payments header, faint Edit buttons).
+  The navy-sidebar text bug predates P3.6 (June 2026 `mobile-adaptive.css` bright-mode rules beat
+  base.html's inline white text); the white admin sidebar ends it. Proof: `school-app-screens/p3.9a-*.png`.
+
 - 2026-10-31 — P4.3 done (PR #68, after #61): the app's "choose your password" screen for PL.1
   and the brand-from-account notice. PL.1 (#58) can merge after this. Next on this line: P4.4 (parent shell).
 
@@ -1053,6 +1096,11 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   reproduce on main (Django's month names already follow the language). Minor 4: the sign-in
   footer already follows the brand cookie; a School admin's browser gets it when they sign in.
   Tests in `test_month_names.py`.
+
+- 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
+  today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
+  quick links), first link in the sidebar's School group. When PL.1 adds login letters, show
+  "letter due" in the Parents panel.
 
 - 2026-10-31 — P2.8 push safety fixes from QA's review of #57 (PR #69):
   FCM `INVALID_ARGUMENT` no longer deletes device tokens (only the FCM error codes `UNREGISTERED`

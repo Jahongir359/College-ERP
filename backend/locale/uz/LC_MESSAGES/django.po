@@ -939,19 +939,6 @@ msgstr "Bildirishnoma"
 msgid "Sent an attachment"
 msgstr "Fayl yubordi"
 
-# Web audit fixes B1, M1 (2026-10-31)
-msgid "Choose a branch."
-msgstr "Filialni tanlang."
-
-msgid "Classroom or room number, e.g. Room 3A"
-msgstr "Sinf xonasi yoki xona raqami, masalan: 3A-xona"
-
-msgid "School classes only: the academic year."
-msgstr "Faqat maktab sinflari uchun: oʻquv yili."
-
-msgid "This student can't be added to this class: they are not in this branch."
-msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."
-
 # School board (P3.8)
 msgid "School board"
 msgstr "Maktab paneli"
@@ -1016,3 +1003,32 @@ msgstr "oʻquvchiga ota-ona bogʻlanmagan"
 
 msgid "Open parents"
 msgstr "Ota-onalarni ochish"
+
+# P3.9 admin shell
+msgid "Staff"
+msgstr "Xodimlar"
+
+msgid "Account menu"
+msgstr "Hisob menyusi"
+
+msgid "Dark mode"
+msgstr "Tungi rejim"
+
+msgid "Light mode"
+msgstr "Kunduzgi rejim"
+
+msgid "All branches"
+msgstr "Barcha filiallar"
+# Web audit fixes B1, M1 (2026-10-31)
+msgid "Choose a branch."
+msgstr "Filialni tanlang."
+
+msgid "Classroom or room number, e.g. Room 3A"
+msgstr "Sinf xonasi yoki xona raqami, masalan: 3A-xona"
+
+msgid "School classes only: the academic year."
+msgstr "Faqat maktab sinflari uchun: oʻquv yili."
+
+msgid "This student can't be added to this class: they are not in this branch."
+msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."
+

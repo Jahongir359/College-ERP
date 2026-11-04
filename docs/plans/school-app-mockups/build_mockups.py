@@ -1339,5 +1339,213 @@ SCREENS += [
     ("20b-quarter-grades", "Chorak baholari (2-bosqich)", s_quarter_grades),
 ]
 
+
+# ---------------------------------------------------------------- P3.9: Study Center admin shell (D18)
+# The same web shell as 16–19 in the Study Center palette: navy #103A57 / #07233A, lime #CDF163 for
+# the primary action, ice #38BDF0 for highlights, stroke #D2DFEC, the Iceberg mountain logo.
+# The page re-points the shared tokens (--m, --tint, --border …) at the Study Center ones, the same
+# way the live brand CSS does it, so cards, pills and tables are the School components unchanged.
+
+CENTER_VARS = (
+    "--m:var(--c-hi);--m-hover:#1B5A82;--m-deep:var(--c-deep);--tint:var(--c-bg);--bg:#F6F9FC;"
+    "--border:var(--c-stroke);--text:var(--c-text);--muted:var(--c-muted);--gold-soft:var(--c-lime);"
+    "--gold-ink:#1B5A82"
+)
+
+CENTER_SIDEBAR = [
+    ("grid", "Bosh sahifa"),
+    ("users", "Oʻquvchilar"),
+    ("user", "Xodimlar"),
+    (None, "Oʻquv jarayoni"),
+    ("door", "Guruhlar"),
+    ("book", "Kurslar"),
+    ("check", "Davomat"),
+    ("globe", "Lugʻat"),
+    ("star", "Reyting"),
+    (None, "Moliya"),
+    ("wallet", "Toʻlovlar"),
+    (None, "Aloqa"),
+    ("chat", "Xabarlar"),
+    ("send", "Arizalar"),
+    (None, "Tizim"),
+    ("key", "Filiallar va adminlar"),
+]
+
+
+def web_shell_center(content: str, active: str) -> str:
+    nav = ""
+    for icon, label in CENTER_SIDEBAR:
+        if icon is None:
+            nav += f'<div class="tiny b" style="letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px 12px">{label}</div>'
+            continue
+        on = label == active
+        nav_icon = i(icon, 'style="width:19px;height:19px"')
+        badge = (
+            '<span style="margin-left:auto;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--c-lime);color:var(--c-deep)">3</span>'
+            if label == "Arizalar"
+            else ""
+        )
+        nav += (
+            f'<div class="row" style="gap:10px;padding:8px 12px;border-radius:10px;font-size:14px;font-weight:600;'
+            f'{"background:var(--tint);color:var(--m);box-shadow:inset 3px 0 0 var(--c-ice)" if on else "color:var(--text)"}">{nav_icon}{label}{badge}</div>'
+        )
+    return page(
+        f"""
+<div style="display:grid;grid-template-columns:256px 1fr;height:800px;{CENTER_VARS};background:var(--bg)">
+  <aside style="background:var(--surface);border-right:1px solid var(--border);padding:16px 14px">
+    <div class="row" style="gap:10px;margin:2px 0 12px 4px"><img src="{CENTER_TILE}" style="height:38px;width:38px;border-radius:11px" alt="">
+      <div style="font-size:15px;font-weight:800;letter-spacing:.02em;color:var(--c-deep);line-height:1.1">ICEBERG<div style="font-size:12.5px;font-weight:600;letter-spacing:0;color:var(--muted)">Study Center</div></div></div>{nav}
+  </aside>
+  <div>
+    <header class="row between" style="height:60px;padding:0 28px;background:var(--surface);border-bottom:1px solid var(--border)">
+      <div class="row" style="gap:10px;color:var(--muted)">{i("search")}<span class="small">Qidirish…</span></div>
+      <div class="row" style="gap:16px"><span class="pill" style="background:var(--tint);color:var(--m)">Chilonzor filiali</span>{i("bell")}<span class="av" style="background:var(--c-lime);color:var(--c-deep)">SA</span></div>
+    </header>
+    <main style="padding:24px 28px">{content}</main>
+  </div>
+</div>""",
+        "web",
+    )
+
+
+def _c_title(kicker: str, title: str, actions: str) -> str:
+    return (
+        f'<div class="row between"><div><p class="kicker">{kicker}</p>'
+        f'<h1 style="font-size:30px;font-weight:800;letter-spacing:-.02em;color:var(--c-deep);margin-top:4px">{title}</h1></div>'
+        f'<div class="row" style="gap:10px">{actions}</div></div>'
+    )
+
+
+C_BTN_LIME = (
+    "background:var(--c-lime);color:var(--c-deep);box-shadow:0 10px 22px rgb(7 35 58 / .16)"
+)
+
+
+def _c_stats(items: list[tuple[str, str, str]]) -> str:
+    cards = "".join(
+        f'<div class="card" style="flex:1;padding:14px 18px"><div class="small muted">{label}</div>'
+        f'<div class="row" style="gap:8px;align-items:baseline"><div class="b" style="font-size:26px;color:var(--c-deep)">{value}</div>'
+        f'<span class="tiny b" style="color:#1B7FB0">{note}</span></div></div>'
+        for label, value, note in items
+    )
+    return f'<div class="row" style="gap:12px;margin-top:18px">{cards}</div>'
+
+
+def w_center_students() -> str:
+    data = [
+        ("Abdullayeva Madina", "S-24-0112", "IELTS 6.5 · Tong", "+998 90 ··· 12 45", "paid"),
+        ("Bakirov Sardor", "S-24-0187", "CEFR B2 · Kechki", "+998 93 ··· 08 71", "debt"),
+        ("Ergasheva Zarina", "S-24-0203", "SAT Math · Shanba", "+998 97 ··· 55 10", "paid"),
+        ("Hasanov Temur", "S-24-0219", "IELTS 5.5 · Kechki", "+998 99 ··· 40 02", "due"),
+        ("Ismoilova Nodira", "S-24-0230", "General English A2", "+998 90 ··· 77 19", "paid"),
+        ("Karimov Aziz", "S-24-0244", "CEFR B1 · Tong", "+998 94 ··· 63 88", "paid"),
+        ("Mahmudov Ulugʻbek", "S-24-0251", "IELTS 7.0 · Intensiv", "+998 91 ··· 20 36", "debt"),
+        ("Yoʻldosheva Kamola", "S-24-0266", "Kimyo · Abituriyent", "+998 88 ··· 14 50", "paid"),
+    ]
+    pills = {
+        "paid": '<span class="pill ok">Toʻlangan</span>',
+        "debt": '<span class="pill abs">Qarzdor</span>',
+        "due": '<span class="pill late">Muddat yaqin</span>',
+    }
+    rows = "".join(
+        f'<tr style="border-top:1px solid var(--border)"><td style="padding:11px 14px"><div class="row" style="gap:10px">'
+        f'<span class="av" style="background:var(--tint);color:var(--m)">{_initials(n)}</span><span class="b">{n}</span></div></td>'
+        f'<td class="small muted">{lid}</td><td>{g}</td><td class="small">{ph}</td><td>{pills[st]}</td>'
+        f'<td style="text-align:right;padding-right:14px;color:var(--m)" class="small b">Ochish →</td></tr>'
+        for n, lid, g, ph, st in data
+    )
+    up = i("upload", 'style="width:18px;height:18px"')
+    actions = (
+        f'<div class="btn btn-ghost" style="height:44px;padding:0 16px">{up}Excel yuklash</div>'
+        f'<div class="btn" style="height:44px;padding:0 18px;{C_BTN_LIME}">{i("plus")}Yangi oʻquvchi</div>'
+    )
+    content = f"""
+{_c_title("Odamlar", "Oʻquvchilar", actions)}
+{_c_stats([("Jami oʻquvchilar", "412", "+18 bu oy"), ("Faol guruhlarda", "389", "94%"), ("Qarzdorlar", "23", ""), ("Bugun darsda", "176", "")])}
+<div class="row" style="gap:10px;margin-top:16px">
+  <div class="row" style="flex:1;gap:10px;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--muted)">{i("search")}<span class="small">Ism, telefon yoki login ID</span></div>
+  <div class="row small b" style="height:44px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface)">Guruh: hammasi {i("chev", 'style="width:16px;height:16px;transform:rotate(90deg)"')}</div>
+  <div class="row small b" style="height:44px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface)">Toʻlov: hammasi {i("chev", 'style="width:16px;height:16px;transform:rotate(90deg)"')}</div>
+</div>
+<div class="card" style="margin-top:14px;padding:0;overflow:hidden">
+  <table style="width:100%;border-collapse:collapse;font-size:14px">
+    <thead><tr style="background:var(--tint);text-align:left" class="small muted"><th style="padding:11px 14px">Oʻquvchi</th><th>Login ID</th><th>Guruh</th><th>Telefon</th><th>Toʻlov</th><th></th></tr></thead>
+    <tbody>{rows}</tbody>
+  </table>
+</div>"""
+    return web_shell_center(content, "Oʻquvchilar")
+
+
+def w_center_home() -> str:
+    months = [("May", 58), ("Iyn", 64), ("Iyl", 52), ("Avg", 70), ("Sen", 86), ("Okt", 94)]
+    bars = "".join(
+        f'<div style="display:grid;justify-items:center;gap:6px;flex:1"><div style="width:34px;height:{h * 2.3:.0f}px;border-radius:10px 10px 4px 4px;'
+        f'background:{"var(--c-hi)" if n == len(months) - 1 else "#BFDDF0"}"></div><span class="tiny muted">{m}</span></div>'
+        for n, (m, h) in enumerate(months)
+    )
+    lessons = [
+        ("09:00", "IELTS 6.5 · Tong", "Kamola Yusupova", "14 / 16", True),
+        ("11:00", "CEFR B1 · Tong", "Sherzod Aliyev", "12 / 12", True),
+        ("14:00", "SAT Math · Shanba", "Bekzod Qodirov", "—", False),
+        ("16:30", "IELTS 5.5 · Kechki", "Nargiza Olimova", "—", False),
+        ("18:30", "CEFR B2 · Kechki", "Dilnoza Rahimova", "—", False),
+    ]
+
+    def _state(a: str, done: bool) -> str:
+        if done:
+            return f'<span class="pill ok">{i("check")}{a}</span>'
+        return '<span class="small muted">Kutilmoqda</span>'
+
+    rows = "".join(
+        f'<div class="row" style="padding:10px 0;border-top:1px solid var(--border)"><span class="pill" style="background:var(--tint);color:var(--m);width:62px;justify-content:center">{t}</span>'
+        f'<div style="flex:1;min-width:0"><div class="b" style="font-size:14px">{g}</div><div class="tiny muted">{tch}</div></div>'
+        f"{state}</div>"
+        for t, g, tch, a, done in lessons
+        for state in [_state(a, done)]
+    )
+    leads = [
+        ("Olimov Jamshid", "IELTS", "Bugun 10:12"),
+        ("Saidova Laylo", "SAT", "Bugun 09:40"),
+        ("Qodirov Aziz", "CEFR", "Kecha 18:05"),
+    ]
+    lead_rows = "".join(
+        f'<div class="row" style="padding:9px 0;border-top:1px solid var(--border)"><span class="av" style="background:var(--tint);color:var(--m)">{_initials(n)}</span>'
+        f'<div style="flex:1"><div class="b" style="font-size:14px">{n}</div><div class="tiny muted">{c} · {w}</div></div>'
+        f'<span class="small b" style="color:var(--m)">Qoʻngʻiroq →</span></div>'
+        for n, c, w in leads
+    )
+    content = f"""
+{_c_title("Bosh sahifa", "Xayrli tong, Sardor", f'<div class="btn btn-ghost" style="height:44px;padding:0 16px">Hisobot</div><div class="btn" style="height:44px;padding:0 18px;{C_BTN_LIME}">{i("plus")}Yangi oʻquvchi</div>')}
+{_c_stats([("Oʻquvchilar", "412", "+18"), ("Guruhlar", "36", ""), ("Bugungi darslar", "14", "2 tugadi"), ("Oktabr toʻlovlari", "[summa]", "82%")])}
+<div style="display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:16px">
+  <div class="card" style="padding:18px 20px">
+    <div class="row between"><div class="b" style="color:var(--c-deep)">Toʻlovlar · 6 oy</div><span class="tiny muted">soʻm</span></div>
+    <div class="row" style="align-items:flex-end;height:250px;margin-top:20px;gap:8px">{bars}</div>
+  </div>
+  <div class="card" style="padding:18px 20px">
+    <div class="row between"><div class="b" style="color:var(--c-deep)">Bugungi darslar</div><span class="small b" style="color:var(--m)">Davomat →</span></div>
+    <div style="margin-top:8px">{rows}</div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:14px;align-items:start">
+  <div class="card row" style="padding:16px 20px;gap:14px;background:var(--c-deep);border-color:var(--c-deep);color:#fff">
+    <span class="tile" style="background:rgb(255 255 255 / .1);color:var(--c-lime)">{i("alert")}</span>
+    <div style="flex:1"><div class="b">23 ta oʻquvchining toʻlovi kechikkan</div><div class="small" style="color:#AFD9F2">Eslatma yuborish yoki roʻyxatni koʻrish</div></div>
+    <div class="btn" style="height:40px;padding:0 14px;font-size:14px;{C_BTN_LIME}">Koʻrish</div>
+  </div>
+  <div class="card" style="padding:14px 20px">
+    <div class="row between"><div class="b" style="color:var(--c-deep)">Yangi arizalar</div><span class="pill" style="background:var(--c-lime);color:var(--c-deep)">3</span></div>
+    {lead_rows}
+  </div>
+</div>"""
+    return web_shell_center(content, "Bosh sahifa")
+
+
+WEB_SCREENS += [
+    ("16c-web-center-students", "Web · Study Center · Oʻquvchilar", w_center_students),
+    ("16d-web-center-home", "Web · Study Center · Bosh sahifa", w_center_home),
+]
+
+
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
