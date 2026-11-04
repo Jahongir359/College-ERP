@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../auth/auth_state.dart';
+import '../../features/auth/screens/change_password_screen.dart';
 import '../../features/auth/screens/choose_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/coming_soon_screen.dart';
@@ -61,6 +62,11 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
 
   final user = auth.user!;
 
+  // A temporary password (PL.1): nothing else until the user picks their own.
+  if (user.mustChangePassword) {
+    return path == '/change-password' ? null : '/change-password';
+  }
+
   // Admin → coming-soon wall (admin dashboard ships on the web portal).
   // Parents too, until the parent screens are built (plan phase P5).
   if (user.isAdmin || user.isParent) {
@@ -76,6 +82,7 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
   // Students → student app; bounce off auth/transitional routes.
   if (path == '/login' ||
       path == '/choose' ||
+      path == '/change-password' ||
       path == '/splash' ||
       path == '/coming-soon' ||
       path.startsWith('/staff')) {
@@ -91,6 +98,7 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
 ///   - Admin   (user_type 1) → /coming-soon (admin web portal handles them)
 ///   - Parent  (user_type 4) → /coming-soon until the parent screens ship
 ///   - Signed out → /choose on first launch, then /login
+///   - Temporary password (any role) → /change-password until it is changed
 ///
 /// Each role's sub-screens are nested inside the role's StatefulShellRoute
 /// branches so the bottom navigation bar persists and back-navigation works.
@@ -110,6 +118,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const _SplashScreen()),
       GoRoute(path: '/choose', builder: (_, __) => const ChooseScreen()),
+      GoRoute(
+        path: '/change-password',
+        builder: (_, __) => const ChangePasswordScreen(),
+      ),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/coming-soon', builder: (_, __) => const ComingSoonScreen()),
 

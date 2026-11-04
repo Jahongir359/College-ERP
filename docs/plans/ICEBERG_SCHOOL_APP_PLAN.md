@@ -92,8 +92,8 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | Done — 6/6 (2026-10-31; P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 3/11 (P4.11 dropped, P4.12 Release 2) |
+| P3 | Web screens for admins (D15: teachers use the app) | Done — 7/7 (2026-10-31; P3.4, P3.5 dropped) |
+| P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -838,6 +838,18 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `RegisterReportContentTests`, `RegisterReportCsvTests`; page `/maktab/register/`
       (`school_register_report_views.py`); screenshot next to the mockup:
       `docs/plans/school-app-screens/p3.7-register-report.png`.
+- [x] **P3.8** Admin: School board (`/maktab/`), the School admin's home page on the web: counts
+      (pupils, classes, teachers, parents), today's register (classes taken / not taken, link to the
+      register report), parents who haven't signed in yet, the current year and quarter (or a link to
+      set one up), quick links. Scoped through `branching.py`; uz/ru/en; light and dark. Done when:
+      access tests (branch admin sees own branch only, teachers/pupils get no page, anonymous → login),
+      empty states (no School branch, no classes, no current year), screenshot. Added 2026-10-31
+      (owner). — done 2026-10-31, PR #70; verified: full suite 572 OK, `test_school_board`
+      (branch admin sees own branch only, super admin all School branches, teacher/pupil/parent sent
+      home, anonymous → login, empty states, counts, uz/ru), page in `test_school_page_header`;
+      `school_board_views.py`, `hod_template/school/board.html`; screenshot
+      `docs/plans/school-app-screens/p3.8-school-board.png`. "Letter due" isn't shown: no login
+      letter field on main yet (PL.1), so the panel counts parents who never signed in.
 - [x] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
       desktop in the PR. — done 2026-10-30, PR #64; verified: full suite,
       `test_school_page_header` (eyebrow, one title, year · quarter chip, Center admin page unchanged,
@@ -863,7 +875,19 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       already showed a brand skips `/choose`. `roleRedirect(..., brandChosen:)`: null keeps the splash.
       The School login uses the School dark tokens and the white crest wordmark; the Study Center login
       is unchanged apart from the "Iceberg Study Center · Boshqa tanlash" link.
-- [~] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — claimed 2026-10-30, branch feat/school-p4.3-account-brand.
+- [x] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — done 2026-10-31,
+      PR #68; verified: flutter analyze 0 warnings, flutter test 47 OK
+      (`test/change_password_test.dart`, `test/brand_notice_test.dart`), web build OK; School login next
+      to mockup 02 at 390 px: `docs/plans/school-app-screens/p4.3-school-login.png`. Also the **app half
+      of PL.1**: `IceUser.mustChangePassword` (`must_change_password` from login and `me/`) holds every
+      role on `/change-password` (back blocked, log out allowed) until `POST me/change-password/`
+      succeeds, then `me/` is reloaded and the user goes home; a 403 with `code ==
+      "password_change_required"` on any call (`ApiClient.onPasswordChangeRequired`) sends the user
+      there and re-checks `me/`. The 400 for `old_password` may be a string or a list (both handled).
+      Brand: after sign-in the account's brand wins; if it differs from the device's pick on `/choose`,
+      `BrandWatcher` (in `MaterialApp.builder`) shows one SnackBar and remembers the account brand, so it
+      shows once. The School login is now the light mockup-02 page (maroon header, white card, maroon
+      button with white text); the Study Center login is unchanged.
 - [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6.
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
@@ -1014,10 +1038,34 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-11-01 — Web audit M2 part 1 (i18n): admin Dashboard, Students, Teachers, Groups (list, add, edit),
-  Payments and the admin Profile now render in uz/ru; their form labels and success/error messages use
-  gettext (English wording unchanged). Still English: Student/Invoice status choices from the models, chart
-  empty-state texts in the dashboard scripts, and the pages listed in the PR for part 2.
+- 2026-11-04 — Web audit M2 part 1 (PR #73, i18n): admin Dashboard, Students, Teachers, Groups (list,
+  add, edit), Payments and the admin Profile now render in uz/ru, including the delete/archive/cancel/remind
+  confirm dialogs, page titles and group messages; form labels and messages use gettext (English wording
+  unchanged). Left for part 2: Student/Invoice status choices from the models, the payments action pages
+  (generate, add one-off, record, collections), the `uzs` "million" word, chart empty-state texts in the
+  dashboard scripts, and the other admin pages listed in the PR.
+
+- 2026-10-31 — P4.3 done (PR #68, after #61): the app's "choose your password" screen for PL.1
+  and the brand-from-account notice. PL.1 (#58) can merge after this. Next on this line: P4.4 (parent shell).
+
+- 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
+  today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
+  quick links), first link in the sidebar's School group. When PL.1 adds login letters, show
+  "letter due" in the Parents panel.
+
+- 2026-11-01 — Web audit M3 (PR #72): month names on the web follow the page
+  language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always
+  English; now `date_format`. Payment pages show `invoice.period|date:"F Y"`; `period_label` stays
+  English for the stored notification texts. The "Russian in English" case from the audit didn't
+  reproduce on main (Django's month names already follow the language). Minor 4: the sign-in
+  footer already follows the brand cookie; a School admin's browser gets it when they sign in.
+  Tests in `test_month_names.py`.
+
+- 2026-10-31 — P2.8 push safety fixes from QA's review of #57 (PR #69):
+  FCM `INVALID_ARGUMENT` no longer deletes device tokens (only the FCM error codes `UNREGISTERED`
+  and `SENDER_ID_MISMATCH` do, not a bare 404; it is logged), and committed pushes go to one shared worker thread
+  instead of one thread per notification (monthly invoices). P2.8 stays `[~]` until the real phone test.
+
 - 2026-10-31 — Web audit fixes B1, M1 (PR #71): new students and teachers always get a branch (one-branch
   admins get theirs, locked; super admins and admins of several branches must choose one they can
   see, `branching.assignable_branches`/`admin_only_branch`); edits can't clear or move it out of
