@@ -1032,6 +1032,18 @@ msgstr "Faqat maktab sinflari uchun: oʻquv yili."
 msgid "This student can't be added to this class: they are not in this branch."
 msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."
 
+#: main_app/templates/hod_template/school/
+msgid "Register taken today"
+msgstr "Bugun davomat olingan"
+
+#: main_app/templates/hod_template/school/
+msgid "Today's register (present / late / absent)"
+msgstr "Bugungi davomat (keldi / kech / yoʻq)"
+
+#: main_app/templates/hod_template/school/
+#, python-format
+msgid "Class: %(name)s"
+msgstr "Sinf: %(name)s"
 #: main_app/forms.py:61
 msgid "— Select branch —"
 msgstr "— Filialni tanlang —"
@@ -2554,6 +2566,10 @@ msgstr "\"%(group)s\" guruhi arxivdan qaytarildi."
 
 msgid "Central profile and settings hub for Iceberg"
 msgstr "Iceberg profil va sozlamalar markazi"
+
+#: main_app/school_forms.py
+msgid "Choose a pupil"
+msgstr "Oʻquvchini tanlang"
 
 msgid "Suspended"
 msgstr "Toʻxtatilgan"

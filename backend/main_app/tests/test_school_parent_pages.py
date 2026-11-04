@@ -299,3 +299,23 @@ class ParentPageTranslationTests(_ParentFixture):
             for word in words:
                 with self.subTest(language=language, word=word):
                     self.assertIn(word, html)
+
+    def test_child_pickers_show_a_translated_placeholder(self):
+        """The empty child choice reads "Choose a pupil", never Django's "---------" (P3.9b)."""
+        self.client.force_login(self.school_admin)
+        for language, placeholder in (
+            ("en", "Choose a pupil"),
+            ("ru", "Выберите ученика"),
+            ("uz", "Oʻquvchini tanlang"),
+        ):
+            self.client.post(reverse("set_language"), {"language": language, "next": "/"})
+            pages = [
+                reverse("school_parents"),
+                reverse("school_parents") + "?panel=link",
+                self.detail(self.mum),
+            ]
+            for url in pages:
+                with self.subTest(language=language, url=url):
+                    html = self.html(url)
+                    self.assertIn(placeholder, html)
+                    self.assertNotIn("---------", html)

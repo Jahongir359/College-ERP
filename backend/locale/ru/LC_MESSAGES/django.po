@@ -1034,6 +1034,18 @@ msgstr "Только для школьных классов: учебный го
 msgid "This student can't be added to this class: they are not in this branch."
 msgstr "Этого ученика нельзя добавить в класс: он не из этого филиала."
 
+#: main_app/templates/hod_template/school/
+msgid "Register taken today"
+msgstr "Журнал сегодня заполнен"
+
+#: main_app/templates/hod_template/school/
+msgid "Today's register (present / late / absent)"
+msgstr "Журнал за сегодня (пришли / опоздали / нет)"
+
+#: main_app/templates/hod_template/school/
+#, python-format
+msgid "Class: %(name)s"
+msgstr "Класс: %(name)s"
 #: main_app/forms.py:61
 msgid "— Select branch —"
 msgstr "— Выберите филиал —"
@@ -2559,6 +2571,10 @@ msgstr "Группа «%(group)s» возвращена из архива."
 
 msgid "Central profile and settings hub for Iceberg"
 msgstr "Центр профиля и настроек Iceberg"
+
+#: main_app/school_forms.py
+msgid "Choose a pupil"
+msgstr "Выберите ученика"
 
 msgid "Suspended"
 msgstr "Приостановлен"
