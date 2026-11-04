@@ -1086,6 +1086,10 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   and `SENDER_ID_MISMATCH` do, not a bare 404; it is logged), and committed pushes go to one shared worker thread
   instead of one thread per notification (monthly invoices). P2.8 stays `[~]` until the real phone test.
 
+- 2026-11-01 — Web audit M2 part 1 (i18n): admin Dashboard, Students, Teachers, Groups (list, add, edit),
+  Payments and the admin Profile now render in uz/ru; their form labels and success/error messages use
+  gettext (English wording unchanged). Still English: Student/Invoice status choices from the models, chart
+  empty-state texts in the dashboard scripts, and the pages listed in the PR for part 2.
 - 2026-10-31 — Web audit fixes B1, M1 (PR #71): new students and teachers always get a branch (one-branch
   admins get theirs, locked; super admins and admins of several branches must choose one they can
   see, `branching.assignable_branches`/`admin_only_branch`); edits can't clear or move it out of

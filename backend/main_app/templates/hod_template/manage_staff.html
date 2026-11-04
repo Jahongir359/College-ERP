@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load i18n %}
 {% load static %}
 {% block page_title %}{{ page_title }}{% endblock %}
 
@@ -12,41 +13,41 @@
     <div class="ice-manage-hero__main">
       <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-chalkboard-teacher"></i></span>
       <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">Manage Teachers</h2>
-        <p class="ice-manage-hero__subtitle">Manage teacher accounts and course assignments.</p>
+        <h2 class="ice-manage-hero__title">{% translate "Manage Teachers" %}</h2>
+        <p class="ice-manage-hero__subtitle">{% translate "Manage teacher accounts and course assignments." %}</p>
       </div>
     </div>
     <div class="ice-manage-hero__actions">
-      <span class="ice-manage-count"><span data-manage-visible-count>{{ allStaff|length }}</span>&nbsp;total</span>
+      <span class="ice-manage-count"><span data-manage-visible-count>{{ allStaff|length }}</span>&nbsp;{% translate "total" %}</span>
       <a href="{% url 'add_staff' %}" class="ice-manage-add-btn">
-        <i class="fas fa-plus" aria-hidden="true"></i> Add Teacher
+        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "Add Teacher" %}
       </a>
     </div>
   </section>
 
-  <label class="ice-manage-search" aria-label="Search teachers">
+  <label class="ice-manage-search" aria-label="{% translate 'Search teachers' %}">
     <i class="fas fa-search" aria-hidden="true"></i>
-    <input type="search" class="ice-manage-search__input" data-manage-search placeholder="Search teachers, ID, course..." autocomplete="off">
+    <input type="search" class="ice-manage-search__input" data-manage-search placeholder="{% translate 'Search teachers, ID, course...' %}" autocomplete="off">
   </label>
 
   {% if is_super_admin %}
   <form method="get" class="ice-manage-filter">
-    <label for="branch-filter" class="ice-manage-filter__label"><i class="fas fa-code-branch" aria-hidden="true"></i> Branch</label>
+    <label for="branch-filter" class="ice-manage-filter__label"><i class="fas fa-code-branch" aria-hidden="true"></i> {% translate "Branch" %}</label>
     <select id="branch-filter" name="branch" class="ice-manage-filter__select" onchange="this.form.submit()">
-      <option value="">All branches</option>
+      <option value="">{% translate "All branches" %}</option>
       {% for b in branches %}
       <option value="{{ b.id }}" {% if selected_branch == b.id|stringformat:'s' %}selected{% endif %}>{{ b.name }}</option>
       {% endfor %}
     </select>
   </form>
   {% elif branches %}
-  <p class="ice-manage-branch-note"><i class="fas fa-code-branch" aria-hidden="true"></i> Branch: {% for b in branches %}{{ b.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+  <p class="ice-manage-branch-note"><i class="fas fa-code-branch" aria-hidden="true"></i> {% translate "Branch:" %} {% for b in branches %}{{ b.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
   {% endif %}
 
   <div class="ice-manage-empty" data-manage-empty-state hidden>
     <i class="fas fa-search" aria-hidden="true"></i>
-    <strong>No teachers found</strong>
-    <span>Try another name, login ID, course, phone, or specialization.</span>
+    <strong>{% translate "No teachers found" %}</strong>
+    <span>{% translate "Try another name, login ID, course, phone, or specialization." %}</span>
   </div>
 
   <div class="ice-manage-table-wrap">
@@ -54,15 +55,15 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Teacher</th>
-          <th>Login ID</th>
-          <th>Course</th>
-          <th>Branch</th>
-          <th>Phone</th>
-          <th>Specialization</th>
-          <th>Birthday</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>{% translate "Teacher" %}</th>
+          <th>{% translate "Login ID" %}</th>
+          <th>{% translate "Course" %}</th>
+          <th>{% translate "Branch" %}</th>
+          <th>{% translate "Phone" %}</th>
+          <th>{% translate "Specialization" %}</th>
+          <th>{% translate "Birthday" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th>{% translate "Actions" %}</th>
         </tr>
       </thead>
       <tbody>
@@ -87,29 +88,29 @@
               </span>
             </div>
           </td>
-          <td><span class="ice-manage-code">{{ staff.login_id|default:"No ID" }}</span></td>
-          <td>{{ staff.staff.course.name|default:"No course" }}</td>
+          <td><span class="ice-manage-code">{{ staff.login_id|default:_("No ID") }}</span></td>
+          <td>{{ staff.staff.course.name|default:_("No course") }}</td>
           <td>
             {% if staff.staff.branch %}
             <span class="ice-manage-chip"><i class="fas fa-code-branch" aria-hidden="true"></i> {{ staff.staff.branch.name }}</span>
             {% else %}
-            <span class="ice-manage-chip ice-manage-chip--muted">No branch</span>
+            <span class="ice-manage-chip ice-manage-chip--muted">{% translate "No branch" %}</span>
             {% endif %}
           </td>
-          <td>{{ staff.staff.phone|default:"No phone" }}</td>
-          <td>{{ staff.staff.specialization|default:"Not set" }}</td>
-          <td>{{ staff.date_of_birth|date:"Y-m-d"|default:"Not set" }}</td>
+          <td>{{ staff.staff.phone|default:_("No phone") }}</td>
+          <td>{{ staff.staff.specialization|default:_("Not set") }}</td>
+          <td>{{ staff.date_of_birth|date:"Y-m-d"|default:_("Not set") }}</td>
           <td>
             {% if staff.staff.is_active %}
-            <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i> Active</span>
+            <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i> {% translate "Active" %}</span>
             {% else %}
-            <span class="ice-manage-chip ice-manage-chip--muted"><i class="fas fa-pause-circle" aria-hidden="true"></i> Inactive</span>
+            <span class="ice-manage-chip ice-manage-chip--muted"><i class="fas fa-pause-circle" aria-hidden="true"></i> {% translate "Inactive" %}</span>
             {% endif %}
           </td>
           <td>
             <div class="ice-manage-actions">
               <a href="{% url 'edit_staff' staff.staff.id %}" class="ice-manage-action">
-                <i class="fas fa-edit" aria-hidden="true"></i> Edit
+                <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
               </a>
               <a href="{% url 'delete_staff' staff.staff.id %}"
                  class="ice-manage-action ice-manage-action--danger-fill"
@@ -124,8 +125,8 @@
           <td colspan="9">
             <div class="ice-manage-empty">
               <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
-              <strong>No teachers found</strong>
-              <span>Add a teacher account to start assigning groups and courses.</span>
+              <strong>{% translate "No teachers found" %}</strong>
+              <span>{% translate "Add a teacher account to start assigning groups and courses." %}</span>
             </div>
           </td>
         </tr>
@@ -152,14 +153,14 @@
         </span>
         <div class="ice-manage-card__main">
           <h3 class="ice-manage-card__title">{{ staff.get_full_name|default:staff.email }}</h3>
-          <div class="ice-manage-card__subtitle">Teacher &middot; {{ staff.login_id|default:"No ID" }}</div>
+          <div class="ice-manage-card__subtitle">{% translate "Teacher" %} &middot; {% if staff.login_id %}{{ staff.login_id }}{% else %}{% translate "No ID" %}{% endif %}</div>
         </div>
       </div>
 
       <div class="ice-manage-card__meta">
-        <span class="ice-manage-chip"><i class="fas fa-id-badge" aria-hidden="true"></i><span>{{ staff.login_id|default:"No ID" }}</span></span>
+        <span class="ice-manage-chip"><i class="fas fa-id-badge" aria-hidden="true"></i><span>{{ staff.login_id|default:_("No ID") }}</span></span>
         <span class="ice-manage-chip"><i class="fas fa-envelope" aria-hidden="true"></i><span>{{ staff.email }}</span></span>
-        <span class="ice-manage-chip"><i class="fas fa-graduation-cap" aria-hidden="true"></i><span>{{ staff.staff.course.name|default:"No course" }}</span></span>
+        <span class="ice-manage-chip"><i class="fas fa-graduation-cap" aria-hidden="true"></i><span>{{ staff.staff.course.name|default:_("No course") }}</span></span>
         {% if staff.staff.branch %}
         <span class="ice-manage-chip"><i class="fas fa-code-branch" aria-hidden="true"></i><span>{{ staff.staff.branch.name }}</span></span>
         {% endif %}
@@ -170,28 +171,28 @@
         <span class="ice-manage-chip"><i class="fas fa-star" aria-hidden="true"></i><span>{{ staff.staff.specialization }}</span></span>
         {% endif %}
         {% if staff.staff.is_active %}
-        <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i><span>Active</span></span>
+        <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i><span>{% translate "Active" %}</span></span>
         {% else %}
-        <span class="ice-manage-chip ice-manage-chip--muted"><i class="fas fa-pause-circle" aria-hidden="true"></i><span>Inactive</span></span>
+        <span class="ice-manage-chip ice-manage-chip--muted"><i class="fas fa-pause-circle" aria-hidden="true"></i><span>{% translate "Inactive" %}</span></span>
         {% endif %}
       </div>
 
       <div class="ice-manage-actions">
         <a href="{% url 'edit_staff' staff.staff.id %}" class="ice-manage-action">
-          <i class="fas fa-edit" aria-hidden="true"></i> Edit
+          <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
         </a>
         <a href="{% url 'delete_staff' staff.staff.id %}"
            class="ice-manage-action ice-manage-action--danger-fill"
            data-confirm-post="Delete {{ staff.get_full_name|default:'this teacher' }}? Their account and all related data will be removed. This cannot be undone.">
-          <i class="fas fa-trash" aria-hidden="true"></i> Delete
+          <i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}
         </a>
       </div>
     </article>
     {% empty %}
     <div class="ice-manage-empty">
       <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
-      <strong>No teachers found</strong>
-      <span>Add a teacher account to start assigning groups and courses.</span>
+      <strong>{% translate "No teachers found" %}</strong>
+      <span>{% translate "Add a teacher account to start assigning groups and courses." %}</span>
     </div>
     {% endfor %}
   </div>
