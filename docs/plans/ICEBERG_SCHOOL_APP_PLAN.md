@@ -889,7 +889,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       shows once. The School login is now the light mockup-02 page (maroon header, white card, maroon
       button with white text); the Study Center login is unchanged.
 - [x] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
-      unpaid invoice. Needs: P1.6. — done 2026-11-04, PR #PRNUM; verified: flutter analyze 0 warnings,
+      unpaid invoice. Needs: P1.6. — done 2026-11-04, PR #77; verified: flutter analyze 0 warnings,
       flutter test 65 OK (`test/parent_home_test.dart`, `test/role_redirect_test.dart`), web build
       (-O1) OK, backend 608 tests OK (`tests/test_parent_homework.py`); mockup next to the app at 390
       and 1366 px: `docs/plans/school-app-screens/p4.4-parent-home.png` and `p4.4-parent-home-dark.png`.
@@ -1051,7 +1051,7 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
-- 2026-11-04 — P4.4 done (PR #PRNUM): parents now land on the parent app (Home with child switcher,
+- 2026-11-04 — P4.4 done (PR #77): parents now land on the parent app (Home with child switcher,
   mockups 04/05) instead of "Tez kunda"; plus parent read access to assignments/ (for P4.4 Home).
   Local screenshots need `SCHOOL_BRAND_ENABLED=True`, else demo parents get the Study Center brand.
   Next on this line: P4.5 timetable tab, then P4.8 (homework, payments, messages).
