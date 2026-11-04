@@ -1,61 +1,38 @@
-/* Register report (plan P3.7, mockup 19). Colours match the register screens. */
-.school-report-filters { margin: 0 0 16px; }
-.school-report-filters .form-control { width: auto; }
-.school-stat__value small { font-size: 14px; font-weight: 600; opacity: .7; }
-.report-present { color: #17633A; }
-.report-late { color: #8A5A12; font-weight: 700; }
-.report-absent { color: #B03A2E; font-weight: 700; }
-.report-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.report-badge--ok { background: #E3F4EA; color: #17633A; }
-.report-badge--wait { background: #FBF0D9; color: #8A5A12; }
-.report-badge--late { background: #FBF0D9; color: #8A5A12; }
-.report-badge--absent { background: #FBE9E7; color: #B03A2E; }
-.report-bar {
+/* Register report (plan P3.7, mockup 19), on the Admin UI kit (P3.9b).
+   Colours only through the --shell-* tokens. */
+html[data-shell="admin"] .school-report .report-present { color: var(--shell-ok); }
+html[data-shell="admin"] .school-report .report-late { color: var(--shell-late); font-weight: 700; }
+html[data-shell="admin"] .school-report .report-absent { color: var(--shell-abs); font-weight: 700; }
+html[data-shell="admin"] .school-report .report-bar {
   display: inline-block;
-  width: 90px;
+  width: 84px;
   height: 8px;
   margin-right: 6px;
   border-radius: 999px;
-  background: rgba(127, 127, 127, .15);
+  background: var(--shell-tint);
   vertical-align: middle;
   overflow: hidden;
 }
-.report-bar span { display: block; height: 100%; background: var(--ice-primary, #5B1A1A); }
-.report-pupils { display: grid; gap: 0; margin: 12px 0 0; padding: 0; list-style: none; }
-.report-pupils li {
+html[data-shell="admin"] .school-report .report-bar span {
+  display: block;
+  height: 100%;
+  background: var(--shell-primary);
+}
+html[data-shell="admin"] .school-report .report-pupils { margin: 0; padding: 0; list-style: none; }
+html[data-shell="admin"] .school-report .report-pupils li {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 10px 0;
-  border-top: 1px solid rgba(127, 127, 127, .18);
+  border-top: 1px solid var(--shell-border);
 }
-.report-pupils li div { display: grid; min-width: 0; }
-.report-pupils .school-muted { font-size: 13px; }
-/* The stats row already has a bottom margin. */
-.school-report-split.school-section { margin-top: 0; }
-/* Nine columns: let long headers (ru) wrap instead of pushing the rate column out of view. */
-.school-report-split .ice-manage-table th { white-space: normal; vertical-align: bottom; }
-.school-report-split .ice-manage-table td:first-child { white-space: nowrap; }
-/* The 9-column table needs the full width below a wide desktop: the pupils panel goes under it. */
-@media (max-width: 1500px) {
-  .school-split.school-report-split { grid-template-columns: 1fr; }
+html[data-shell="admin"] .school-report .report-pupils li div { display: grid; min-width: 0; }
+html[data-shell="admin"] .school-report .report-pupils small { font-size: 13px; color: var(--shell-muted); }
+/* Mockup 19: the table takes about two thirds, the pupils panel sits on the right at 1440 px. */
+@media (min-width: 1101px) {
+  html[data-shell="admin"] .school-report .ui-split { grid-template-columns: minmax(0, 2.2fr) minmax(280px, 1fr); }
 }
-/* erpnext-style.css forces every dark-mode span to the text colour with !important. */
-html.dark-mode .report-present, html[data-theme="dark"] .report-present { color: #7FD6A1 !important; }
-html.dark-mode .report-late, html[data-theme="dark"] .report-late { color: #F2C46D !important; }
-html.dark-mode .report-absent, html[data-theme="dark"] .report-absent { color: #F49A8F !important; }
-.dark-mode .report-badge--ok, [data-theme="dark"] .report-badge--ok { background: rgba(127, 214, 161, .16); color: #7FD6A1 !important; }
-.dark-mode .report-badge--wait, [data-theme="dark"] .report-badge--wait,
-.dark-mode .report-badge--late, [data-theme="dark"] .report-badge--late { background: rgba(242, 196, 109, .16); color: #F2C46D !important; }
-.dark-mode .report-badge--absent, [data-theme="dark"] .report-badge--absent { background: rgba(244, 154, 143, .16); color: #F49A8F !important; }
-.dark-mode .report-bar span, [data-theme="dark"] .report-bar span { background: #E9C77E; }
+html[data-shell="admin"] .school-report .ui-table th,
+html[data-shell="admin"] .school-report .ui-table td { padding-left: 10px; padding-right: 10px; }
+html[data-shell="admin"] .school-report .ui-table td:nth-child(2) { white-space: nowrap; }
