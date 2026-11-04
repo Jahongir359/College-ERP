@@ -93,7 +93,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | In progress — 7/8 (P3.9 claimed; P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
+| P4 | App: choice screen, parent role, School screens | In progress — 5/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -921,8 +921,21 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `BrandWatcher` (in `MaterialApp.builder`) shows one SnackBar and remembers the account brand, so it
       shows once. The School login is now the light mockup-02 page (maroon header, white card, maroon
       button with white text); the Study Center login is unchanged.
-- [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
-      unpaid invoice. Needs: P1.6.
+- [x] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
+      unpaid invoice. Needs: P1.6. — done 2026-11-04, PR #77; verified: flutter analyze 0 warnings,
+      flutter test 65 OK (`test/parent_home_test.dart`, `test/role_redirect_test.dart`), web build
+      (-O1) OK, backend 639 tests OK (`tests/test_parent_homework.py`); mockup next to the app at 390
+      and 1366 px: `docs/plans/school-app-screens/p4.4-parent-home.png` and `p4.4-parent-home-dark.png`.
+      Parents get `/parent/*` (Home, Timetable, Homework, Messages, Profile) instead of `/coming-soon`;
+      Timetable (P4.5), Homework and Messages (P4.8) are "next update" tabs for now; Profile has the
+      children, language, theme and log out. Home reads `me/` `children`, `attendance/`,
+      `school/timetable/`, `assignments/`, `invoices/` and `messages/parent/` with `?student=`, plus
+      `notifications/`; each part fails on its own. The chosen child is kept in `cache_parent_child`
+      (cleared on sign-out). On a laptop the page stays a 560 px column. Backend: **parent read access
+      to assignments/ (for P4.4 Home)** — read-only list, no submission data, no `?student` or another
+      family's child is 404, access via `family.student_for_request`. Kept differences from mockup 04:
+      sans greeting (Fraunces comes with PD.1), and the payment tile shows the due date, not
+      "Toʻlash" (no payment screen yet, P4.8).
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
 - [ ] **P4.6** Teacher register screen (fast: everyone present by default, tap to change). Needs: P2.2.
 - [ ] **P4.7** Grades screens (marks list, term grades) for student/parent; gradebook entry for
@@ -1070,6 +1083,11 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-11-04 — P4.4 done (PR #77): parents now land on the parent app (Home with child switcher,
+  mockups 04/05) instead of "Tez kunda"; plus parent read access to assignments/ (for P4.4 Home).
+  Local screenshots need `SCHOOL_BRAND_ENABLED=True`, else demo parents get the Study Center brand.
+  Next on this line: P4.5 timetable tab, then P4.8 (homework, payments, messages).
 
 - 2026-11-04 — Web audit M2 part 2 (branch i18n/admin-pages-2, Python only): Student and Invoice
   status labels and the "Level N" choices use gettext_lazy; the group form's Name label and the

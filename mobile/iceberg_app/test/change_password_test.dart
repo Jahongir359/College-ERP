@@ -69,7 +69,7 @@ Widget _app(ProviderContainer c) {
         roleRedirect(c.read(authProvider), state.matchedLocation),
     routes: [
       GoRoute(path: '/student/home', builder: (_, __) => const Text('home')),
-      GoRoute(path: '/coming-soon', builder: (_, __) => const Text('home')),
+      GoRoute(path: '/parent/home', builder: (_, __) => const Text('home')),
       GoRoute(path: '/login', builder: (_, __) => const Text('login')),
       GoRoute(
         path: '/change-password',
@@ -148,7 +148,7 @@ void main() {
           AuthState.auth(_user(mustChange: false)),
           '/change-password',
         ),
-        '/coming-soon',
+        '/parent/home',
       );
     });
 
