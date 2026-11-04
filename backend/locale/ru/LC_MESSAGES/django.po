@@ -941,6 +941,99 @@ msgstr "Уведомление"
 msgid "Sent an attachment"
 msgstr "Отправил(а) файл"
 
+# School board (P3.8)
+msgid "School board"
+msgstr "Панель школы"
+
+msgid "No School branch yet"
+msgstr "Пока нет филиала школы"
+
+msgid "This board shows Iceberg School numbers. None of the branches you manage is a School branch."
+msgstr "Эта панель показывает цифры Iceberg School. Ни один из ваших филиалов не является филиалом школы."
+
+msgid "Pupils"
+msgstr "Ученики"
+
+msgid "Today's register"
+msgstr "Журнал за сегодня"
+
+msgid "Set up the academic year first; the register follows its classes."
+msgstr "Сначала настройте учебный год: журнал ведётся по его классам."
+
+msgid "No classes in this academic year yet."
+msgstr "В этом учебном году ещё нет классов."
+
+#, python-format
+msgid "%(taken)s of %(total)s classes took the register"
+msgstr "Журнал отмечен в %(taken)s из %(total)s классов"
+
+msgid "classes took the register"
+msgstr "классов отметили журнал"
+
+msgid "Not taken yet"
+msgstr "Ещё не отмечен"
+
+msgid "No homeroom teacher"
+msgstr "Нет классного руководителя"
+
+msgid "Every class has taken today's register."
+msgstr "Все классы отметили журнал за сегодня."
+
+msgid "Open the register report"
+msgstr "Открыть отчёт по журналу"
+
+msgid "Quick links"
+msgstr "Быстрые ссылки"
+
+msgid "Register"
+msgstr "Журнал"
+
+msgid "No quarter has started yet."
+msgstr "Ещё не началась ни одна четверть."
+
+msgid "No current academic year is set."
+msgstr "Текущий учебный год не задан."
+
+msgid "Set one up"
+msgstr "Настроить"
+
+msgid "parents haven't signed in yet"
+msgstr "родителей ещё не входили в приложение"
+
+msgid "pupils have no parent linked"
+msgstr "учеников без привязанного родителя"
+
+msgid "Open parents"
+msgstr "Открыть родителей"
+
+# P3.9 admin shell
+msgid "Staff"
+msgstr "Сотрудники"
+
+msgid "Account menu"
+msgstr "Меню аккаунта"
+
+msgid "Dark mode"
+msgstr "Тёмная тема"
+
+msgid "Light mode"
+msgstr "Светлая тема"
+
+msgid "All branches"
+msgstr "Все филиалы"
+# Web audit fixes B1, M1 (2026-10-31)
+msgid "Choose a branch."
+msgstr "Выберите филиал."
+
+msgid "Classroom or room number, e.g. Room 3A"
+msgstr "Кабинет или номер комнаты, например: кабинет 3A"
+
+msgid "School classes only: the academic year."
+msgstr "Только для школьных классов: учебный год."
+
+msgid "This student can't be added to this class: they are not in this branch."
+msgstr "Этого ученика нельзя добавить в класс: он не из этого филиала."
+
 #: main_app/forms.py:61
 msgid "— Select branch —"
 msgstr "— Выберите филиал —"
@@ -1890,10 +1983,6 @@ msgstr "Все статусы"
 msgid "Overdue"
 msgstr "Просрочено"
 
-#: main_app/templates/hod_template/manage_payments.html:63 main_app/templates/hod_template/manage_staff.html:37 main_app/templates/hod_template/manage_student.html:37
-msgid "All branches"
-msgstr "Все филиалы"
-
 #: main_app/templates/hod_template/manage_payments.html:72
 msgid "All groups"
 msgstr "Все группы"
@@ -2408,7 +2497,6 @@ msgstr "Связаться с учителем или админом"
 msgid "About Iceberg"
 msgstr "Об Iceberg"
 
-
 #: main_app/views.py:882
 msgid "Account"
 msgstr "Аккаунт"
@@ -2425,84 +2513,6 @@ msgstr "Поддержка"
 msgctxt "group status"
 msgid "Active"
 msgstr "Активна"
-
-# Web audit fixes B1, M1 (2026-10-31)
-msgid "Choose a branch."
-msgstr "Выберите филиал."
-
-msgid "Classroom or room number, e.g. Room 3A"
-msgstr "Кабинет или номер комнаты, например: кабинет 3A"
-
-msgid "School classes only: the academic year."
-msgstr "Только для школьных классов: учебный год."
-
-msgid "This student can't be added to this class: they are not in this branch."
-msgstr "Этого ученика нельзя добавить в класс: он не из этого филиала."
-
-# School board (P3.8)
-msgid "School board"
-msgstr "Панель школы"
-
-msgid "No School branch yet"
-msgstr "Пока нет филиала школы"
-
-msgid "This board shows Iceberg School numbers. None of the branches you manage is a School branch."
-msgstr "Эта панель показывает цифры Iceberg School. Ни один из ваших филиалов не является филиалом школы."
-
-msgid "Pupils"
-msgstr "Ученики"
-
-msgid "Today's register"
-msgstr "Журнал за сегодня"
-
-msgid "Set up the academic year first; the register follows its classes."
-msgstr "Сначала настройте учебный год: журнал ведётся по его классам."
-
-msgid "No classes in this academic year yet."
-msgstr "В этом учебном году ещё нет классов."
-
-#, python-format
-msgid "%(taken)s of %(total)s classes took the register"
-msgstr "Журнал отмечен в %(taken)s из %(total)s классов"
-
-msgid "classes took the register"
-msgstr "классов отметили журнал"
-
-msgid "Not taken yet"
-msgstr "Ещё не отмечен"
-
-msgid "No homeroom teacher"
-msgstr "Нет классного руководителя"
-
-msgid "Every class has taken today's register."
-msgstr "Все классы отметили журнал за сегодня."
-
-msgid "Open the register report"
-msgstr "Открыть отчёт по журналу"
-
-msgid "Quick links"
-msgstr "Быстрые ссылки"
-
-msgid "Register"
-msgstr "Журнал"
-
-msgid "No quarter has started yet."
-msgstr "Ещё не началась ни одна четверть."
-
-msgid "No current academic year is set."
-msgstr "Текущий учебный год не задан."
-
-msgid "Set one up"
-msgstr "Настроить"
-
-msgid "parents haven't signed in yet"
-msgstr "родителей ещё не входили в приложение"
-
-msgid "pupils have no parent linked"
-msgstr "учеников без привязанного родителя"
-
-msgid "Open parents"
-msgstr "Открыть родителей"
 
 msgid "this student"
 msgstr "этого ученика"
