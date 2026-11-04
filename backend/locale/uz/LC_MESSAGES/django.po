@@ -2570,3 +2570,15 @@ msgstr "Iceberg profil va sozlamalar markazi"
 #: main_app/school_forms.py
 msgid "Choose a pupil"
 msgstr "Oʻquvchini tanlang"
+
+#: main_app/school_forms.py
+msgid "Choose a teacher"
+msgstr "Oʻqituvchini tanlang"
+
+#: main_app/school_forms.py
+msgid "Choose a course"
+msgstr "Kursni tanlang"
+
+#: main_app/school_forms.py
+msgid "Choose a subject"
+msgstr "Fanni tanlang"

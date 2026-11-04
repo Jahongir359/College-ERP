@@ -2575,3 +2575,15 @@ msgstr "Центр профиля и настроек Iceberg"
 #: main_app/school_forms.py
 msgid "Choose a pupil"
 msgstr "Выберите ученика"
+
+#: main_app/school_forms.py
+msgid "Choose a teacher"
+msgstr "Выберите учителя"
+
+#: main_app/school_forms.py
+msgid "Choose a course"
+msgstr "Выберите курс"
+
+#: main_app/school_forms.py
+msgid "Choose a subject"
+msgstr "Выберите предмет"
