@@ -2554,3 +2554,62 @@ msgstr "\"%(group)s\" guruhi arxivdan qaytarildi."
 
 msgid "Central profile and settings hub for Iceberg"
 msgstr "Iceberg profil va sozlamalar markazi"
+
+msgid "Suspended"
+msgstr "Toʻxtatilgan"
+
+msgid "Partially paid"
+msgstr "Qisman toʻlangan"
+
+#, python-format
+msgid "%(amount)s million"
+msgstr "%(amount)s million"
+
+#, python-format
+msgid "%(amount)s ming"
+msgstr "%(amount)s ming"
+
+#, python-format
+msgid "%(amount)s soʻm"
+msgstr "%(amount)s soʻm"
+
+msgid "No active enrollments matched your selection."
+msgstr "Tanlovingizga mos faol roʻyxatga olish topilmadi."
+
+msgid "Generate Monthly Invoices"
+msgstr "Oylik hisob-fakturalarni yaratish"
+
+#, python-format
+msgid "Invoice created for %(student)s."
+msgstr "%(student)s uchun hisob-faktura yaratildi."
+
+msgid "Add One-off Invoice"
+msgstr "Bir martalik hisob-faktura qoʻshish"
+
+msgid "This invoice is cancelled — payments cannot be recorded on it."
+msgstr "Bu hisob-faktura bekor qilingan — unga toʻlov yozib boʻlmaydi."
+
+#, python-format
+msgid "Recorded %(amount)s from %(student)s. Invoice is now %(status)s."
+msgstr "%(student)s dan %(amount)s qabul qilindi. Hisob-faktura holati: %(status)s."
+
+msgid "Record Payment"
+msgstr "Toʻlovni yozish"
+
+#, python-format
+msgid "Created %(count)s invoice for %(period)s."
+msgid_plural "Created %(count)s invoices for %(period)s."
+msgstr[0] "%(period)s uchun %(count)s ta hisob-faktura yaratildi."
+msgstr[1] "%(period)s uchun %(count)s ta hisob-faktura yaratildi."
+
+#, python-format
+msgid "%(count)s already existed and was skipped."
+msgid_plural "%(count)s already existed and were skipped."
+msgstr[0] "%(count)s tasi avval yaratilgan, oʻtkazib yuborildi."
+msgstr[1] "%(count)s tasi avval yaratilgan, oʻtkazib yuborildi."
+
+#, python-format
+msgid "%(count)s enrollment has no monthly fee set (set a fee on the group or its course, then generate again)."
+msgid_plural "%(count)s enrollments have no monthly fee set (set a fee on the group or its course, then generate again)."
+msgstr[0] "%(count)s ta roʻyxatga olishda oylik toʻlov belgilanmagan (guruh yoki uning kursiga toʻlov belgilab, qayta yarating)."
+msgstr[1] "%(count)s ta roʻyxatga olishda oylik toʻlov belgilanmagan (guruh yoki uning kursiga toʻlov belgilab, qayta yarating)."

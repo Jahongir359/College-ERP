@@ -1071,6 +1071,14 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-04 — Web audit M2 part 2 (branch i18n/admin-pages-2, Python only): Student and Invoice
+  status labels and the "Level N" choices use gettext_lazy; the group form's Name label and the
+  branch field label ("Branch / Location", which a stale bound field showed as "Branch") follow the
+  language; the `uzs` filter's "ming"/"million"/"soʻm" are translated on pages (ru: "тыс."/"млн"/"сум")
+  while stored notification texts keep them; payments_views messages and page titles (generate,
+  one-off invoice, record payment, collections) use gettext/ngettext. No migration (0051 stays for
+  PL.1). Templates untouched (P3.9 restyles them); their remaining English text is for later.
+
 - 2026-11-04 — Web audit M2 part 1 (PR #73, i18n): admin Dashboard, Students, Teachers, Groups (list,
   add, edit), Payments and the admin Profile now render in uz/ru, including the delete/archive/cancel/remind
   confirm dialogs, page titles and group messages; form labels and messages use gettext (English wording

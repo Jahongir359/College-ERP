@@ -15,13 +15,14 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext
 
 from .models import Enrollment, Invoice, Notification
 
 logger = logging.getLogger(__name__)
 
 
-def format_uzs_number(amount):
+def format_uzs_number(amount, localized=False):
     """Format a whole-soʻm amount the Uzbek way.
 
     Round thousands/millions use the local "ming"/"million" words (cleaner than
@@ -33,6 +34,10 @@ def format_uzs_number(amount):
         1500000  -> "1.5 million"
         200500   -> "200,500"
         500      -> "500"
+
+    With ``localized=True`` the "ming"/"million" words follow the page
+    language (e.g. "200 тыс." in Russian); leave it off for text that is
+    stored, such as notifications.
     """
     try:
         n = int(round(float(amount)))
@@ -40,15 +45,17 @@ def format_uzs_number(amount):
         return str(amount)
     sign = "-" if n < 0 else ""
     n = abs(n)
+    million = gettext("%(amount)s million") if localized else "%(amount)s million"
+    thousand = gettext("%(amount)s ming") if localized else "%(amount)s ming"
     if n >= 1_000_000:
         if n % 1_000_000 == 0:
-            body = f"{n // 1_000_000:,} million"
+            body = million % {"amount": f"{n // 1_000_000:,}"}
         elif n % 100_000 == 0:
-            body = f"{n / 1_000_000:.1f} million"
+            body = million % {"amount": f"{n / 1_000_000:.1f}"}
         else:
             body = f"{n:,}"
     elif n >= 1_000 and n % 1_000 == 0:
-        body = f"{n // 1_000:,} ming"
+        body = thousand % {"amount": f"{n // 1_000:,}"}
     else:
         body = f"{n:,}"
     return sign + body
@@ -56,6 +63,11 @@ def format_uzs_number(amount):
 
 def _uzs(amount):
     return f"{format_uzs_number(amount)} soʻm"
+
+
+def format_uzs(amount):
+    """``_uzs`` in the page language, for pages and messages (not stored text)."""
+    return gettext("%(amount)s soʻm") % {"amount": format_uzs_number(amount, localized=True)}
 
 
 def generate_invoices_for_month(period, due_date, user=None, branch=None):
