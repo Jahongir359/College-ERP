@@ -122,6 +122,7 @@ class ParentChildForm(_AdminForm):
         self.fields["student"].queryset = branching.filter_students_for_user(
             user, Student.objects.select_related("admin").order_by("admin__first_name")
         )
+        self.fields["student"].empty_label = _("Choose a pupil")
 
 
 class ParentLinkEditForm(ParentChildForm):
@@ -285,6 +286,7 @@ class ClassStudentForm(_AdminForm):
         # list only offers pupils without a class this year.
         field = self.fields["student"]
         field.queryset = in_branch
+        field.empty_label = _("Choose a pupil")
         field.label_from_instance = lambda s: (
             f"{s.admin.get_full_name()} ({s.admin.login_id or s.admin.email})"
         )

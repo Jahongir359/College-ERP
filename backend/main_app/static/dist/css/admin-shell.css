@@ -1,0 +1,902 @@
+/* ============================================================================
+   Admin web shell (P3.9, plan decision D19)
+   ----------------------------------------------------------------------------
+   One shell for every admin page, laid out like mockup 16 (and 16c/16d for the
+   Study Center): white sidebar with the brand logo at the top, light topbar with
+   a chip, a bell and an initials avatar, warm or cool page background, page
+   titles in the brand's display type.
+
+   Loaded ONLY for admins (base.html, user_type "1"), after every other sheet
+   and after brand-school.css. Teachers' and students' Django pages are frozen
+   (D15) and never load it.
+
+   SAFETY RULE: every selector starts with  html[data-shell="admin"]
+   (base.html sets it for admins only). Colours come from the --shell-* tokens
+   below; components never use a hex of their own, so the School and Study
+   Center palettes (and dark mode) only differ in the token blocks.
+
+   Order: 1. tokens (School light/dark, Study Center light/dark) · 2. Study
+   Center re-points of the legacy palettes · 3. layout · 4. sidebar · 5. topbar
+   and avatar menu · 6. page header · 7. Admin UI kit (ui-*) · 8. narrow
+   screens. The UI kit classes are listed in the plan's P3.9 entry; pages use
+   them instead of inventing their own.
+
+   Contrast (WCAG AA, checked 2026-11-01): Study Center text #06223A on #F6F9FC
+   15.6:1, muted #4C6480 on white 6.0:1, eyebrow #1B5A82 on #F6F9FC 7.1:1,
+   navy #07233A on lime #CDF163 13.6:1, active #103A57 on #EDF3F9 10.9:1; dark
+   text #E6F0F8 on #0B2233 14.5:1, muted #9DB4C8 on #0B2233 7.6:1, ink #7FD0F5
+   on #10304A 7.4:1. School values are the brand-school.css ones.
+   ========================================================================== */
+
+
+/* ── 1. Tokens ───────────────────────────────────────────────────────────── */
+
+html[data-shell="admin"] {
+  --shell-sidebar-width: 256px;
+  --shell-topbar-height: 60px;
+  --shell-radius: 24px;
+  --shell-radius-sm: 12px;
+  --shell-title-size: 30px;
+  /* Status colours shared by both brands (mockups 16, 19, 16c). */
+  --shell-ok: #17633A;
+  --shell-ok-bg: #E3F4EA;
+  --shell-late: #8A5A12;
+  --shell-late-bg: #FBF0D9;
+  --shell-abs: #A8322A;
+  --shell-abs-bg: #FBE6E3;
+}
+html[data-shell="admin"][data-theme="dark"],
+html[data-shell="admin"].dark-mode {
+  --shell-ok: #7FD3A0;
+  --shell-ok-bg: #12301F;
+  --shell-late: #E9C77E;
+  --shell-late-bg: #33260F;
+  --shell-abs: #F2A39A;
+  --shell-abs-bg: #3A1513;
+}
+
+/* School: maroon and gold (mockups 16–19). */
+html[data-shell="admin"][data-brand="school"] {
+  --shell-bg: #FBF7F6;
+  --shell-surface: #FFFFFF;
+  --shell-border: #E8DCDA;
+  --shell-text: #1F1515;
+  --shell-muted: #5A4747;
+  --shell-primary: #4C0909;
+  --shell-primary-hover: #7A1F1F;
+  --shell-on-primary: #FFFFFF;
+  --shell-tint: #F8F1F0;
+  --shell-active-text: #4C0909;
+  --shell-active-bar: transparent;
+  --shell-avatar-bg: #E9C77E;
+  --shell-avatar-text: #2E0505;
+  --shell-eyebrow: #8A5A12;
+  --shell-title: #4C0909;
+  --shell-title-font: "Fraunces", Georgia, "Times New Roman", serif;
+  --shell-title-weight: 600;
+  --shell-title-spacing: -.01em;
+  --shell-shadow: 0 1px 2px rgb(46 5 5 / .04), 0 10px 28px rgb(76 9 9 / .07);
+  --shell-btn-bg: #4C0909;
+  --shell-btn-bg-hover: #7A1F1F;
+  --shell-btn-text: #FFFFFF;
+  --shell-btn-shadow: 0 10px 22px rgb(76 9 9 / .28);
+  --shell-link: #4C0909;
+}
+html[data-shell="admin"][data-brand="school"][data-theme="dark"],
+html[data-shell="admin"][data-brand="school"].dark-mode {
+  --shell-bg: #140808;
+  --shell-surface: #1D0E0E;
+  --shell-border: #3A1E1E;
+  --shell-text: #F4E9E7;
+  --shell-muted: #BFA5A2;
+  --shell-primary: #8E2A2A;
+  --shell-primary-hover: #A33A3A;
+  --shell-tint: #2A1414;
+  --shell-active-text: #F2B8B0;
+  --shell-eyebrow: #E9C77E;
+  --shell-title: #F4E9E7;
+  --shell-shadow: 0 1px 2px rgb(0 0 0 / .3), 0 10px 28px rgb(0 0 0 / .25);
+  --shell-btn-bg: #8E2A2A;
+  --shell-btn-bg-hover: #A33A3A;
+  --shell-btn-shadow: 0 10px 22px rgb(0 0 0 / .3);
+  --shell-link: #F2B8B0;
+}
+
+/* Study Center: navy, lime and ice (mockups 16c, 16d; plan palette --c-*). */
+html[data-shell="admin"][data-brand="center"] {
+  --shell-bg: #F6F9FC;
+  --shell-surface: #FFFFFF;
+  --shell-border: #D2DFEC;
+  --shell-text: #06223A;
+  --shell-muted: #4C6480;
+  --shell-primary: #103A57;
+  --shell-primary-hover: #1B5A82;
+  --shell-on-primary: #FFFFFF;
+  --shell-deep: #07233A;
+  --shell-lime: #CDF163;
+  --shell-ice: #38BDF0;
+  --shell-tint: #EDF3F9;
+  --shell-active-text: #103A57;
+  --shell-active-bar: #38BDF0;
+  --shell-avatar-bg: #CDF163;
+  --shell-avatar-text: #07233A;
+  --shell-eyebrow: #1B5A82;
+  --shell-title: #07233A;
+  --shell-title-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shell-title-weight: 800;
+  --shell-title-spacing: -.02em;
+  --shell-shadow: 0 1px 2px rgb(7 35 58 / .04), 0 10px 28px rgb(16 58 87 / .07);
+  --shell-btn-bg: #CDF163;
+  --shell-btn-bg-hover: #BFE64A;
+  --shell-btn-text: #07233A;
+  --shell-btn-shadow: 0 10px 22px rgb(7 35 58 / .16);
+  --shell-link: #103A57;
+}
+html[data-shell="admin"][data-brand="center"][data-theme="dark"],
+html[data-shell="admin"][data-brand="center"].dark-mode {
+  --shell-bg: #061826;
+  --shell-surface: #0B2233;
+  --shell-border: #1C3A52;
+  --shell-text: #E6F0F8;
+  --shell-muted: #9DB4C8;
+  --shell-primary: #1B5A82;
+  --shell-primary-hover: #236C9A;
+  --shell-tint: #10304A;
+  --shell-active-text: #7FD0F5;
+  --shell-eyebrow: #7FD0F5;
+  --shell-title: #E6F0F8;
+  --shell-shadow: 0 1px 2px rgb(0 0 0 / .3), 0 10px 28px rgb(0 0 0 / .25);
+  --shell-link: #7FD0F5;
+}
+
+
+/* ── 2. Study Center re-points (D19) ─────────────────────────────────────── */
+/* The legacy sheets read these aliases (iceberg.css, erpnext-style.css,
+   mobile-adaptive.css, storefront-ui.css). Pointing them at the plan palette
+   turns the old cyan/teal (#06B6D4, #0C1F45 …) into navy, lime and ice on
+   every admin page that uses variables. Pages that hard-code hexes are listed
+   in the P3.9 PR for a follow-up. */
+html[data-shell="admin"][data-brand="center"] {
+  --brand-primary: #103A57;
+  --brand-primary-hover: #1B5A82;
+  --brand-primary-deep: #07233A;
+  --brand-primary-ink: #7FD0F5;
+  --navy: #103A57;
+  --navy-mid: #1B5A82;
+  --navy-light: #1B5A82;
+  --navy-deep: #07233A;
+  --cyan: #1B7FB0;
+  --cyan-dk: #1B5A82;
+  --cyan-light: #EDF3F9;
+  --border: #D2DFEC;
+  --text: #06223A;
+  --text-muted: #4C6480;
+  --text-sub: #4C6480;
+  --primary-color: #103A57;
+  --border-color: #D2DFEC;
+  --app-primary: #103A57;
+  --app-primary-dark: #07233A;
+  --ice-navy: #103A57;
+  --ice-navy-mid: #1B5A82;
+  --ice-navy-dk: #07233A;
+  --ice-deep-navy: #07233A;
+  --ice-cyan: #1B7FB0;
+  --ice-cyan-dk: #1B5A82;
+  --ice-cyan-soft: #EDF3F9;
+  --ice-surface2: #EDF3F9;
+  --ice-border: #D2DFEC;
+  --ice-text: #06223A;
+  --ice-muted: #4C6480;
+  --ice-bg: #F6F9FC;
+  --ice-page-bg: #F6F9FC;
+  --ice-page-bg-2: #F6F9FC;
+  --ice-focus: rgba(56, 189, 240, .35);
+  --ice-accent: #1B7FB0;
+  --ice-icon-primary: #103A57;
+  --ice-icon-active: #1B5A82;
+}
+html[data-shell="admin"][data-brand="center"][data-theme="bright"],
+html[data-shell="admin"][data-brand="center"].bright-mode {
+  --ice-body-text: #06223A;
+  --ice-body-muted: #4C6480;
+  --ice-icon-fg: #06223A;
+}
+html[data-shell="admin"][data-brand="center"][data-theme="dark"],
+html[data-shell="admin"][data-brand="center"].dark-mode,
+html[data-shell="admin"][data-brand="center"] .dark-mode {
+  --border: #1C3A52;
+  --border-color: #1C3A52;
+  --text: #E6F0F8;
+  --text-muted: #9DB4C8;
+  --ice-surface: #0B2233;
+  --ice-surface2: #10304A;
+  --ice-border: #1C3A52;
+  --ice-text: #E6F0F8;
+  --ice-muted: #9DB4C8;
+  --ice-bg: #061826;
+  --ice-page-bg: #061826;
+  --ice-page-bg-2: #061826;
+  --ice-cyan-soft: rgba(127, 208, 245, .12);
+  --ice-body-text: #E6F0F8;
+  --ice-body-muted: #9DB4C8;
+  --ice-icon-active: #7FD0F5;
+}
+
+
+/* ── 3. Layout: full-height sidebar, topbar beside it (mockup 16) ────────── */
+
+html[data-shell="admin"][data-brand] body,
+html[data-shell="admin"][data-brand] .ice-page,
+html[data-shell="admin"][data-brand] .erpnext-main {
+  background: var(--shell-bg) !important;
+}
+html[data-shell="admin"][data-brand] body::before,
+html[data-shell="admin"][data-brand] body::after {
+  display: none !important;   /* iceberg-bold.css animated glow */
+}
+
+@media (min-width: 769px) {
+  html[data-shell="admin"][data-brand] .erpnext-sidebar {
+    top: 0 !important;
+    height: 100vh !important;
+    z-index: 1035 !important;
+  }
+  html[data-shell="admin"][data-brand] .erpnext-navbar {
+    left: var(--shell-sidebar-width) !important;
+    transition: left .3s ease;
+  }
+  html[data-shell="admin"][data-brand] body.sidebar-collapsed .erpnext-navbar {
+    left: var(--sidebar-rail-width, 76px) !important;
+  }
+  /* The logo sits in the sidebar on desktop. */
+  html[data-shell="admin"][data-brand] .erpnext-navbar .navbar-brand { display: none !important; }
+}
+html[data-shell="admin"][data-brand] .erpnext-main {
+  padding: 24px 28px 32px !important;
+}
+
+
+/* ── 4. Sidebar ──────────────────────────────────────────────────────────── */
+
+html[data-shell="admin"][data-brand] .erpnext-sidebar,
+html[data-shell="admin"][data-brand].platform-apple .erpnext-sidebar,
+html[data-shell="admin"][data-brand] .platform-apple .erpnext-sidebar {
+  background: var(--shell-surface) !important;
+  border-right: 1px solid var(--shell-border) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-sidebar .sidebar-brand-header {
+  padding: 16px 18px 10px !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+html[data-shell="admin"][data-brand] .sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  text-decoration: none;
+}
+html[data-shell="admin"][data-brand] .sidebar-brand-logo { display: block; height: 38px; width: auto; }
+html[data-shell="admin"][data-brand] .sidebar-brand-logo--dark { display: none; }
+html[data-shell="admin"][data-brand][data-theme="dark"] .sidebar-brand-logo--light { display: none; }
+html[data-shell="admin"][data-brand][data-theme="dark"] .sidebar-brand-logo--dark { display: block; }
+html[data-shell="admin"][data-brand] .sidebar-brand-tile {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  flex: none;
+}
+html[data-shell="admin"][data-brand] .sidebar-brand-name {
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  line-height: 1.1;
+  color: var(--shell-title);
+}
+html[data-shell="admin"][data-brand] .sidebar-brand-name small {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--shell-muted);
+}
+
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-section {
+  padding: 4px 14px 16px !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-section-title {
+  margin: 16px 0 6px 12px !important;
+  padding: 0 !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase;
+  color: var(--shell-muted) !important;
+  border: 0 !important;
+  opacity: 1 !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-section-title::after { display: none !important; }
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-section-title:first-child { margin-top: 4px !important; }
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-item { margin: 0 0 2px !important; }
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-link {
+  gap: 10px;
+  margin: 0 !important;
+  padding: 9px 12px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--shell-text) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-link::before { display: none !important; }
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-icon {
+  width: 20px !important;
+  margin: 0 !important;
+  font-size: 15px !important;
+  text-align: center;
+  color: var(--shell-muted) !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-link:hover {
+  color: var(--shell-active-text) !important;
+  background: var(--shell-tint) !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-link.active {
+  color: var(--shell-active-text) !important;
+  background: var(--shell-tint) !important;
+  box-shadow: inset 3px 0 0 var(--shell-active-bar) !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-link.active .nav-icon,
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-link:hover .nav-icon {
+  color: var(--shell-active-text) !important;
+}
+/* Quieter items (Bell times, Academic year): set up once a year. */
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-item--quiet .nav-link {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--shell-muted) !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-item--quiet .nav-icon { font-size: 13px !important; }
+html[data-shell="admin"][data-brand] .erpnext-sidebar .nav-link .badge {
+  margin-left: auto;
+  background: var(--shell-avatar-bg) !important;
+  color: var(--shell-avatar-text) !important;
+}
+
+/* Collapsed rail (desktop): logo only. */
+@media (min-width: 769px) {
+  html[data-shell="admin"][data-brand] body.sidebar-collapsed .sidebar-brand-name,
+  html[data-shell="admin"][data-brand] body.sidebar-collapsed .sidebar-brand-logo { display: none !important; }
+  html[data-shell="admin"][data-brand] body.sidebar-collapsed .sidebar-brand-header { padding: 16px 10px 10px !important; }
+  html[data-shell="admin"][data-brand] body.sidebar-collapsed .erpnext-sidebar .nav-section { padding: 4px 8px 16px !important; }
+  html[data-shell="admin"][data-brand] body.sidebar-collapsed .erpnext-sidebar .nav-link { justify-content: center; }
+}
+
+
+/* ── 5. Topbar and avatar menu ───────────────────────────────────────────── */
+
+html[data-shell="admin"][data-brand] .erpnext-navbar {
+  height: var(--shell-topbar-height) !important;
+  padding: 0 28px !important;
+  background: var(--shell-surface) !important;
+  border-bottom: 1px solid var(--shell-border) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html[data-shell="admin"][data-brand] .erpnext-navbar .navbar-toggle {
+  color: var(--shell-muted) !important;
+  background: transparent !important;
+}
+html[data-shell="admin"][data-brand] .admin-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+html[data-shell="admin"][data-brand] .admin-chip,
+html[data-shell="admin"][data-brand] .navbar-period-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--shell-tint) !important;
+  color: var(--shell-active-text) !important;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+html[data-shell="admin"][data-brand] .admin-topbar-icon {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: var(--shell-text) !important;
+  font-size: 19px;
+  text-decoration: none;
+}
+html[data-shell="admin"][data-brand] .admin-topbar-icon:hover { background: var(--shell-tint); }
+html[data-shell="admin"][data-brand] .admin-topbar-icon .notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+html[data-shell="admin"][data-brand] .admin-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--shell-avatar-bg) !important;
+  color: var(--shell-avatar-text) !important;
+  font: 800 13px/1 "Inter", system-ui, sans-serif;
+  cursor: pointer;
+}
+html[data-shell="admin"][data-brand] button.admin-avatar:focus-visible {
+  outline: 2px solid var(--shell-primary);
+  outline-offset: 2px;
+}
+html[data-shell="admin"][data-brand] .admin-avatar--lg { width: 40px; height: 40px; font-size: 14px; flex: none; }
+html[data-shell="admin"][data-brand] .admin-account-menu {
+  min-width: 270px;
+  margin-top: 10px !important;
+  padding: 8px;
+  border: 1px solid var(--shell-border);
+  border-radius: 16px;
+  background: var(--shell-surface);
+  color: var(--shell-text);
+  box-shadow: var(--shell-shadow);
+}
+html[data-shell="admin"][data-brand] .admin-account-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 12px;
+  border-bottom: 1px solid var(--shell-border);
+  margin-bottom: 6px;
+}
+html[data-shell="admin"][data-brand] .admin-account-head b,
+html[data-shell="admin"][data-brand] .admin-account-head small { display: block; }
+html[data-shell="admin"][data-brand] .admin-account-head b { font-size: 14px; color: var(--shell-text); }
+html[data-shell="admin"][data-brand] .admin-account-head small {
+  font-size: 12px;
+  color: var(--shell-muted);
+  overflow-wrap: anywhere;
+}
+html[data-shell="admin"][data-brand] .admin-account-menu .dropdown-item,
+html[data-shell="admin"][data-brand] .admin-account-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--shell-text) !important;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+html[data-shell="admin"][data-brand] .admin-account-row { justify-content: space-between; }
+html[data-shell="admin"][data-brand] .admin-account-row > span { display: inline-flex; align-items: center; gap: 10px; }
+html[data-shell="admin"][data-brand] .admin-account-menu i {
+  width: 18px;
+  text-align: center;
+  color: var(--shell-muted);
+}
+html[data-shell="admin"][data-brand] .admin-account-menu .dropdown-item:hover,
+html[data-shell="admin"][data-brand] .admin-account-menu .dropdown-item:focus {
+  background: var(--shell-tint);
+  color: var(--shell-active-text) !important;
+}
+html[data-shell="admin"][data-brand] .admin-account-menu .dropdown-divider {
+  margin: 6px 0;
+  border-color: var(--shell-border);
+}
+html[data-shell="admin"][data-brand] .admin-account-menu .ice-lang-switch { background: var(--shell-tint); }
+html[data-shell="admin"][data-brand] .admin-account-menu .ice-lang-switch button { color: var(--shell-text); }
+html[data-shell="admin"][data-brand] .admin-account-menu .ice-lang-switch button.is-active {
+  background: var(--shell-primary);
+  color: var(--shell-on-primary);
+}
+html[data-shell="admin"][data-brand] .admin-theme-label--light { display: none; }
+html[data-shell="admin"][data-brand][data-theme="dark"] .admin-theme-label--dark { display: none; }
+html[data-shell="admin"][data-brand][data-theme="dark"] .admin-theme-label--light { display: inline; }
+/* Sign out: the animated logout form inside the menu, as a plain menu row. */
+html[data-shell="admin"][data-brand] .admin-account-menu .animated-logout-form { display: block; }
+html[data-shell="admin"][data-brand] .admin-account-menu .admin-signout {
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  color: var(--shell-text) !important;
+}
+html[data-shell="admin"][data-brand] .admin-account-menu .admin-signout:hover { color: #A8322A !important; }
+html[data-shell="admin"][data-brand][data-theme="dark"] .admin-account-menu .admin-signout:hover { color: #F2A39A !important; }
+
+
+/* ── 6. Page header ──────────────────────────────────────────────────────── */
+
+html[data-shell="admin"][data-brand] .page-header {
+  margin-bottom: 18px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html[data-shell="admin"][data-brand] .page-header nav[aria-label="breadcrumb"] { display: none !important; }
+html[data-shell="admin"][data-brand] .page-eyebrow {
+  margin: 0 0 4px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--shell-eyebrow) !important;
+}
+html[data-shell="admin"][data-brand] .page-header .page-title,
+html[data-shell="admin"][data-brand][data-theme="dark"] .page-header .page-title {
+  font-family: var(--shell-title-font) !important;
+  font-size: var(--shell-title-size) !important;
+  font-weight: var(--shell-title-weight) !important;
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: var(--shell-title-spacing) !important;
+  line-height: 1.15 !important;
+  color: var(--shell-title) !important;
+  background: none !important;
+  -webkit-text-fill-color: var(--shell-title) !important;
+}
+html[data-shell="admin"][data-brand] .page-header .page-title::after { display: none !important; }
+html[data-shell="admin"][data-brand] .page-header .page-subtitle { color: var(--shell-muted) !important; }
+
+
+/* ── 7. Admin UI kit (stable class names; see plan P3.9 "Admin UI kit") ───── */
+
+/* Page actions next to the title: {% block page_actions %}<div class="page-actions">… */
+html[data-shell="admin"][data-brand] .page-header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 16px; }
+html[data-shell="admin"][data-brand] .page-header .page-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Buttons: ui-btn + ui-btn--primary | ui-btn--secondary [+ ui-btn--sm] */
+html[data-shell="admin"][data-brand] .ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  font: 700 15px/1 "Inter", system-ui, sans-serif;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .15s ease, box-shadow .15s ease, color .15s ease;
+}
+html[data-shell="admin"][data-brand] .ui-btn--primary {
+  background: var(--shell-btn-bg);
+  color: var(--shell-btn-text) !important;
+  box-shadow: var(--shell-btn-shadow);
+}
+html[data-shell="admin"][data-brand] .ui-btn--primary:hover { background: var(--shell-btn-bg-hover); }
+html[data-shell="admin"][data-brand] .ui-btn--secondary {
+  background: var(--shell-surface);
+  border-color: var(--shell-border);
+  color: var(--shell-link) !important;
+}
+html[data-shell="admin"][data-brand] .ui-btn--secondary:hover { background: var(--shell-tint); }
+html[data-shell="admin"][data-brand] .ui-btn--sm { min-height: 36px; padding: 0 12px; font-size: 13.5px; border-radius: 11px; }
+html[data-shell="admin"][data-brand] .ui-btn:focus-visible { outline: 2px solid var(--shell-primary); outline-offset: 2px; }
+
+/* Cards: ui-card [> ui-card-head (ui-card-title, ui-card-link)] */
+html[data-shell="admin"][data-brand] .ui-card {
+  background: var(--shell-surface);
+  border: 1px solid var(--shell-border);
+  border-radius: var(--shell-radius);
+  padding: 18px 20px;
+  box-shadow: var(--shell-shadow);
+  color: var(--shell-text);
+}
+html[data-shell="admin"][data-brand] .ui-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+html[data-shell="admin"][data-brand] .ui-card-title { margin: 0; font-size: 16px; font-weight: 700; color: var(--shell-title); }
+html[data-shell="admin"][data-brand] .ui-card-link,
+html[data-shell="admin"][data-brand] .ui-open {
+  color: var(--shell-link) !important;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+html[data-shell="admin"][data-brand] .ui-card-link:hover,
+html[data-shell="admin"][data-brand] .ui-open:hover { text-decoration: underline; }
+
+/* Stat cards: ui-stats > ui-stat (ui-stat-label, ui-stat-value, ui-stat-note) */
+html[data-shell="admin"][data-brand] .ui-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+}
+html[data-shell="admin"][data-brand] .ui-stat {
+  background: var(--shell-surface);
+  border: 1px solid var(--shell-border);
+  border-radius: var(--shell-radius);
+  padding: 14px 18px;
+  box-shadow: var(--shell-shadow);
+  min-width: 0;
+}
+html[data-shell="admin"][data-brand] .ui-stat-label { font-size: 13px; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .ui-stat-value {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--shell-title);
+}
+html[data-shell="admin"][data-brand] .ui-stat-note { margin-left: 6px; font-size: 11.5px; font-weight: 700; color: var(--shell-eyebrow); }
+
+/* Filter bar: ui-filters > ui-search (icon + input) and ui-select */
+html[data-shell="admin"][data-brand] .ui-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+html[data-shell="admin"][data-brand] .ui-search {
+  position: relative;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+html[data-shell="admin"][data-brand] .ui-search > i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--shell-muted);
+  pointer-events: none;
+}
+html[data-shell="admin"][data-brand] .ui-search input,
+html[data-shell="admin"][data-brand] .ui-select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--shell-border) !important;
+  border-radius: var(--shell-radius-sm) !important;
+  background: var(--shell-surface) !important;
+  color: var(--shell-text) !important;
+  font-size: 14px;
+  box-shadow: none !important;
+}
+html[data-shell="admin"][data-brand] .ui-search input { padding-left: 40px; }
+html[data-shell="admin"][data-brand] .ui-select { width: auto; flex: 0 1 auto; font-weight: 700; }
+html[data-shell="admin"][data-brand] .ui-search input:focus,
+html[data-shell="admin"][data-brand] .ui-select:focus {
+  outline: 2px solid var(--shell-primary);
+  outline-offset: 1px;
+}
+
+/* Tables: ui-table-wrap > table.ui-table (rounded card, tinted header row).
+   The wrap scrolls sideways on narrow screens; the page never does. */
+html[data-shell="admin"][data-brand] .ui-table-wrap {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  background: var(--shell-surface);
+  border: 1px solid var(--shell-border);
+  border-radius: var(--shell-radius);
+  box-shadow: var(--shell-shadow);
+}
+html[data-shell="admin"][data-brand] .ui-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: var(--shell-text);
+  background: transparent;
+}
+html[data-shell="admin"][data-brand] .ui-table thead th {
+  padding: 11px 14px;
+  background: var(--shell-tint) !important;
+  color: var(--shell-muted) !important;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  border: 0 !important;
+  white-space: nowrap;
+}
+html[data-shell="admin"][data-brand] .ui-table tbody td {
+  padding: 12px 14px;
+  border: 0 !important;
+  border-top: 1px solid var(--shell-border) !important;
+  background: transparent !important;
+  color: var(--shell-text);
+  vertical-align: middle;
+}
+html[data-shell="admin"][data-brand] .ui-table tbody tr:hover td { background: var(--shell-tint) !important; }
+html[data-shell="admin"][data-brand] .ui-table .ui-num { text-align: right; font-variant-numeric: tabular-nums; }
+html[data-shell="admin"][data-brand] .ui-table .ui-end { text-align: right; }
+
+/* Badges: ui-badge + ui-badge--ok | --late | --abs | --muted | --accent */
+html[data-shell="admin"][data-brand] .ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  background: var(--shell-tint);
+  color: var(--shell-active-text);
+}
+html[data-shell="admin"][data-brand] .ui-badge--ok { background: var(--shell-ok-bg); color: var(--shell-ok); }
+html[data-shell="admin"][data-brand] .ui-badge--late { background: var(--shell-late-bg); color: var(--shell-late); }
+html[data-shell="admin"][data-brand] .ui-badge--abs { background: var(--shell-abs-bg); color: var(--shell-abs); }
+html[data-shell="admin"][data-brand] .ui-badge--muted { background: var(--shell-tint); color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .ui-badge--accent { background: var(--shell-avatar-bg); color: var(--shell-avatar-text); }
+
+/* Initials avatar in lists: ui-avatar */
+html[data-shell="admin"][data-brand] .ui-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--shell-tint);
+  color: var(--shell-active-text);
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+/* Empty state inside a card or table: ui-empty */
+html[data-shell="admin"][data-brand] .ui-empty {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--shell-muted);
+  font-size: 14px;
+}
+
+/* Two-column page body (list + side panel, mockups 18, 19, 16d): ui-split */
+html[data-shell="admin"][data-brand] .ui-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  html[data-shell="admin"][data-brand] .ui-split { grid-template-columns: minmax(0, 1fr); }
+}
+
+
+/* ── 7b. Legacy admin components on the shell tokens ──────────────────────
+   Admin pages not yet rebuilt with the kit use admin-manage-mobile.css
+   (.ice-manage-*) and iceberg-mobile-polish.css (.ice-hero, .ice-action).
+   Those hard-code light cyan glass that stayed light in dark mode (Payments
+   header card) or faded out (Edit buttons on Groups and Teachers). Point them
+   at the shell tokens so they read in both brands and both themes. */
+html[data-shell="admin"][data-brand] {
+  --ice-manage-navy: var(--shell-primary);
+  --ice-manage-navy-2: var(--shell-title);
+  --ice-manage-cyan: var(--shell-primary-hover);
+  --ice-manage-cyan-2: var(--shell-primary-hover);
+  --ice-manage-bg: var(--shell-bg);
+  --ice-manage-surface: var(--shell-surface);
+  --ice-manage-surface-2: var(--shell-tint);
+  --ice-manage-border: var(--shell-border);
+  --ice-manage-text: var(--shell-text);
+  --ice-manage-muted: var(--shell-muted);
+  --ice-manage-shadow: var(--shell-shadow);
+  --ice-manage-shadow-soft: var(--shell-shadow);
+}
+html[data-shell="admin"][data-brand] .ice-manage-hero,
+html[data-shell="admin"][data-brand] .ice-hero,
+html[data-shell="admin"][data-brand] .ice-form-section,
+html[data-shell="admin"][data-brand] .ice-table-card,
+html[data-shell="admin"][data-brand] .ice-manage-table-wrap,
+html[data-shell="admin"][data-brand] .ice-manage-card {
+  background: var(--shell-surface) !important;
+  border: 1px solid var(--shell-border) !important;
+  border-radius: var(--shell-radius) !important;
+  box-shadow: var(--shell-shadow) !important;
+  color: var(--shell-text) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-hero::before,
+html[data-shell="admin"][data-brand] .ice-hero::after { display: none !important; }
+html[data-shell="admin"][data-brand] .ice-manage-hero__title,
+html[data-shell="admin"][data-brand] .ice-hero__title {
+  color: var(--shell-title) !important;
+  -webkit-text-fill-color: var(--shell-title) !important;
+  background: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-hero__subtitle,
+html[data-shell="admin"][data-brand] .ice-hero__subtitle,
+html[data-shell="admin"][data-brand] .ice-hero__copy p { color: var(--shell-muted) !important; }
+html[data-shell="admin"][data-brand] .ice-manage-hero__icon,
+html[data-shell="admin"][data-brand] .ice-hero__icon {
+  background: var(--shell-tint) !important;
+  color: var(--shell-active-text) !important;
+  box-shadow: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-count {
+  background: var(--shell-tint) !important;
+  border-color: transparent !important;
+  color: var(--shell-active-text) !important;
+}
+/* Primary actions = ui-btn--primary; the other actions = ui-btn--secondary. */
+html[data-shell="admin"][data-brand] .ice-manage-add-btn,
+html[data-shell="admin"][data-brand] .ice-action--primary {
+  background: var(--shell-btn-bg) !important;
+  border: 1.5px solid transparent !important;
+  color: var(--shell-btn-text) !important;
+  box-shadow: var(--shell-btn-shadow) !important;
+  filter: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-add-btn:hover,
+html[data-shell="admin"][data-brand] .ice-action--primary:hover { background: var(--shell-btn-bg-hover) !important; }
+html[data-shell="admin"][data-brand] .ice-action:not(.ice-action--primary),
+html[data-shell="admin"][data-brand] .ice-manage-action {
+  background: var(--shell-surface) !important;
+  border: 1.5px solid var(--shell-border) !important;
+  color: var(--shell-link) !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-action:not(.ice-action--primary):hover,
+html[data-shell="admin"][data-brand] .ice-manage-action:hover { background: var(--shell-tint) !important; }
+html[data-shell="admin"][data-brand] .ice-manage-action--primary {
+  border-color: transparent !important;
+  background: var(--shell-tint) !important;
+  color: var(--shell-active-text) !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-action--danger,
+html[data-shell="admin"][data-brand] .ice-manage-action--warning { color: var(--shell-abs) !important; }
+html[data-shell="admin"][data-brand] .ice-manage-action--danger-fill {
+  background: var(--shell-abs-bg) !important;
+  border-color: transparent !important;
+  color: var(--shell-abs) !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-table th {
+  background: var(--shell-tint) !important;
+  color: var(--shell-muted) !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-table td { color: var(--shell-text); border-color: var(--shell-border) !important; }
+
+
+/* ── 8. Narrow screens ───────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  html[data-shell="admin"][data-brand] .erpnext-navbar { padding: 0 12px !important; }
+  html[data-shell="admin"][data-brand] .erpnext-main { padding: 16px 16px 96px !important; }
+  html[data-shell="admin"][data-brand] .admin-topbar { gap: 8px; }
+  html[data-shell="admin"][data-brand] .admin-chip,
+  html[data-shell="admin"][data-brand] .navbar-period-chip { display: none !important; }
+  html[data-shell="admin"][data-brand] .navbar-brand-logo { height: 26px; }
+  html[data-shell="admin"][data-brand] { --shell-title-size: 24px; }
+  html[data-shell="admin"][data-brand] .ui-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html[data-shell="admin"][data-brand] .ui-select { flex: 1 1 140px; }
+}
