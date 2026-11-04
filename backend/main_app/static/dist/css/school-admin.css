@@ -203,53 +203,6 @@ html[data-shell="admin"][data-brand] .school-hours-list { display: flex; flex-wr
   .school-pair { grid-template-columns: 1fr; }
 }
 
-/* School board (P3.8). Text uses <b>/<em>, not <span>: erpnext-style.css
-   forces a colour on every .dark-mode span. */
-.school-board .board-stat { color: inherit; text-decoration: none; transition: border-color .15s; }
-.school-board .board-stat:hover { border-color: var(--brand-primary, #0C1F45); }
-.school-board .school-stat__label { font-weight: 500; }
-.board-branches { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
-.board-split > div { gap: 16px; }
-.board-big { display: inline-block; font-size: 22px; font-weight: 800; line-height: 1.2; margin: 0; }
-.board-progress__bar {
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(127, 127, 127, .18);
-  overflow: hidden;
-}
-.board-progress__bar i { display: block; height: 100%; border-radius: inherit; background: var(--brand-primary, #0C1F45); }
-.board-progress__text { margin: 10px 0 0; font-size: 14px; }
-.board-subhead { margin: 16px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
-.board-list, .board-facts { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-.board-list li {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--ice-manage-border, rgba(127, 127, 127, .2));
-  border-radius: 12px;
-}
-.board-list__name { min-width: 48px; font-weight: 800; }
-.board-list__meta { flex: 1 1 140px; font-style: normal; font-size: 13px; opacity: .8; }
-.board-facts li { display: flex; align-items: baseline; gap: 10px; font-size: 14px; }
-.board-ok { margin: 14px 0 0; font-weight: 600; color: #17633A; }
-.board-more { display: inline-flex; margin-top: 14px; }
-.board-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-.board-links a {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--ice-manage-border, rgba(127, 127, 127, .2));
-  border-radius: 12px;
-  color: inherit;
-  font-weight: 600;
-  text-decoration: none;
-}
-.board-links a:hover { border-color: var(--brand-primary, #0C1F45); }
-.board-links i { width: 18px; text-align: center; color: var(--brand-primary, #0C1F45); }
-.board-empty { display: grid; justify-items: start; gap: 8px; }
-.board-empty > i { font-size: 28px; color: var(--brand-primary, #0C1F45); }
-.board-empty--inline { gap: 4px; }
-html.dark-mode .board-ok, [data-theme="dark"] .board-ok { color: #7FD3A0; }
-html.dark-mode .board-links i, [data-theme="dark"] .board-links i,
-html.dark-mode .board-empty > i, [data-theme="dark"] .board-empty > i { color: var(--brand-primary-ink, #F2B8B0); }
 
 /* ── P3.9b: Maktab pages on the Admin UI kit (mockups 16–19). Layout only;
    colours come from the --shell-* tokens in admin-shell.css. ─────────────── */

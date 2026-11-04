@@ -1,10 +1,11 @@
 {% extends 'main_app/base.html' %}
+{% load i18n %}
 {% load json_tags %}
 {% load static %}
 
-{% block title %}Admin Dashboard — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
-{% block page_title %}Admin Dashboard{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">Dashboard</li>{% endblock %}
+{% block title %}{% translate "Admin Dashboard" %} — {{ brand.name|default:"Iceberg Study Center" }}{% endblock %}
+{% block page_title %}{% translate "Admin Dashboard" %}{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">{% translate "Dashboard" %}</li>{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-dashboard-2026.css' %}">
@@ -16,50 +17,50 @@
     <div class="admin-command__glow" aria-hidden="true"></div>
     <div class="admin-command__content">
       <div class="admin-eyebrow">
-        ICEBERG Command Center
+        {% translate "ICEBERG Command Center" %}
       </div>
-      <h1>Welcome back, {{ request.user.get_full_name|default:request.user.username }}</h1>
-      <p>Run admissions, groups, attendance, teacher activity, and student performance from one premium operating surface.</p>
+      <h1>{% blocktranslate trimmed with name=request.user.get_full_name|default:request.user.username %}Welcome back, {{ name }}{% endblocktranslate %}</h1>
+      <p>{% translate "Run admissions, groups, attendance, teacher activity, and student performance from one premium operating surface." %}</p>
       <div class="admin-command__actions">
         <a href="{% url 'add_student' %}" class="admin-primary-action">
           <i class="fas fa-user-plus" aria-hidden="true"></i>
-          Add Student
+          {% translate "Add Student" %}
         </a>
         <a href="{% url 'manage_group' %}" class="admin-secondary-action">
           <i class="fas fa-layer-group" aria-hidden="true"></i>
-          Manage Groups
+          {% translate "Manage Groups" %}
         </a>
         <a href="{% url 'profile_hub' %}" class="admin-secondary-action">
           <i class="fas fa-sliders-h" aria-hidden="true"></i>
-          Profile Settings
+          {% translate "Profile Settings" %}
         </a>
       </div>
     </div>
-    <div class="admin-command__panel" aria-label="Today snapshot">
+    <div class="admin-command__panel" aria-label="{% translate 'Today snapshot' %}">
       {% if today_attendance_total %}
       <div class="admin-command__panel-header">
-        <span>Today</span>
+        <span>{% translate "Today" %}</span>
         <strong>{{ attendance_today_rate }}%</strong>
       </div>
       <div class="admin-radial" style="--value: {{ attendance_today_rate }};">
         <span>{{ today_attendance_present }}</span>
       </div>
-      <p>{{ today_attendance_present }} present out of {{ today_attendance_total }} attendance records today.</p>
+      <p>{% blocktranslate trimmed with present=today_attendance_present total=today_attendance_total %}{{ present }} present out of {{ total }} attendance records today.{% endblocktranslate %}</p>
       {% else %}
       <div class="admin-command__panel-header">
-        <span>Today</span>
+        <span>{% translate "Today" %}</span>
         <strong><i class="far fa-calendar" aria-hidden="true"></i></strong>
       </div>
-      <p style="margin-top:6px;">No classes recorded yet today. Attendance appears here as teachers take it.</p>
+      <p style="margin-top:6px;">{% translate "No classes recorded yet today. Attendance appears here as teachers take it." %}</p>
       {% endif %}
       <div class="admin-mini-stack">
-        <span><i class="fas fa-user-plus" aria-hidden="true"></i>{{ new_students_7 }} new this week</span>
-        <span><i class="fas fa-user-clock" aria-hidden="true"></i>{{ recent_leads|length }} pending leads</span>
+        <span><i class="fas fa-user-plus" aria-hidden="true"></i>{% blocktranslate trimmed with count=new_students_7 %}{{ count }} new this week{% endblocktranslate %}</span>
+        <span><i class="fas fa-user-clock" aria-hidden="true"></i>{% blocktranslate trimmed with count=recent_leads|length %}{{ count }} pending leads{% endblocktranslate %}</span>
       </div>
     </div>
   </section>
 
-  <section class="admin-metrics" aria-label="Dashboard statistics">
+  <section class="admin-metrics" aria-label="{% translate 'Dashboard statistics' %}">
     {% for card in metric_cards %}
     <a href="{{ card.href }}" class="admin-metric-card admin-metric-card--{{ card.tone }}">
       <div class="admin-metric-card__top">
@@ -84,54 +85,54 @@
     {% endfor %}
   </section>
 
-  <section class="admin-quick-actions" aria-label="Admin quick actions">
+  <section class="admin-quick-actions" aria-label="{% translate 'Admin quick actions' %}">
     <div class="admin-card__header">
       <div>
-        <span class="admin-section-kicker">Fast Path</span>
-        <h2>Quick Actions</h2>
+        <span class="admin-section-kicker">{% translate "Fast Path" %}</span>
+        <h2>{% translate "Quick Actions" %}</h2>
       </div>
-      <a href="{% url 'manage_registration_leads' %}" class="admin-link">Leads</a>
+      <a href="{% url 'manage_registration_leads' %}" class="admin-link">{% translate "Leads" %}</a>
     </div>
     <div class="admin-quick-actions__grid">
       <a href="{% url 'add_student' %}" class="admin-quick-action">
         <span><i class="fas fa-user-plus" aria-hidden="true"></i></span>
-        <strong>Add Student</strong>
-        <small>Create an account and profile</small>
+        <strong>{% translate "Add Student" %}</strong>
+        <small>{% translate "Create an account and profile" %}</small>
       </a>
       <a href="{% url 'add_staff' %}" class="admin-quick-action">
         <span><i class="fas fa-chalkboard-teacher" aria-hidden="true"></i></span>
-        <strong>Add Teacher</strong>
-        <small>Set course and branch access</small>
+        <strong>{% translate "Add Teacher" %}</strong>
+        <small>{% translate "Set course and branch access" %}</small>
       </a>
       <a href="{% url 'add_course' %}" class="admin-quick-action">
         <span><i class="fas fa-graduation-cap" aria-hidden="true"></i></span>
-        <strong>Add Program</strong>
-        <small>Organize learning tracks</small>
+        <strong>{% translate "Add Program" %}</strong>
+        <small>{% translate "Organize learning tracks" %}</small>
       </a>
       <a href="{% url 'add_group' %}" class="admin-quick-action">
         <span><i class="fas fa-layer-group" aria-hidden="true"></i></span>
-        <strong>Add Group</strong>
-        <small>Schedule a class group</small>
+        <strong>{% translate "Add Group" %}</strong>
+        <small>{% translate "Schedule a class group" %}</small>
       </a>
       <a href="{% url 'add_enrollment' %}" class="admin-quick-action">
         <span><i class="fas fa-id-card" aria-hidden="true"></i></span>
-        <strong>Enroll Student</strong>
-        <small>Place students into groups</small>
+        <strong>{% translate "Enroll Student" %}</strong>
+        <small>{% translate "Place students into groups" %}</small>
       </a>
       <a href="{% url 'admin_view_attendance' %}" class="admin-quick-action">
         <span><i class="fas fa-clipboard-check" aria-hidden="true"></i></span>
-        <strong>Attendance</strong>
-        <small>Review class records</small>
+        <strong>{% translate "Attendance" %}</strong>
+        <small>{% translate "Review class records" %}</small>
       </a>
       <a href="{% url 'messages' %}" class="admin-quick-action">
         <span><i class="fas fa-comments" aria-hidden="true"></i></span>
-        <strong>Group Messages</strong>
-        <small>Open active conversations</small>
+        <strong>{% translate "Group Messages" %}</strong>
+        <small>{% translate "Open active conversations" %}</small>
       </a>
       <a href="{% url 'staff_feedback_message' %}" class="admin-quick-action">
         <span><i class="fas fa-comment-dots" aria-hidden="true"></i></span>
-        <strong>Teacher Feedback</strong>
-        <small>Reply to staff feedback</small>
+        <strong>{% translate "Teacher Feedback" %}</strong>
+        <small>{% translate "Reply to staff feedback" %}</small>
       </a>
     </div>
   </section>
@@ -141,10 +142,10 @@
     <article class="admin-card admin-card--wide">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Branch Intelligence</span>
-          <h2>Branch Performance — Monthly</h2>
+          <span class="admin-section-kicker">{% translate "Branch Intelligence" %}</span>
+          <h2>{% translate "Branch Performance — Monthly" %}</h2>
         </div>
-        <span class="admin-soft-badge">Last 6 months</span>
+        <span class="admin-soft-badge">{% translate "Last 6 months" %}</span>
       </div>
       <div style="padding:8px 0 4px 16px;font-size:11px;color:var(--ice-muted);">
         Health score = 50 % attendance · 35 % results · 15 % enrollment
@@ -162,10 +163,10 @@
     <article class="admin-card admin-card--wide">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Analytics</span>
-          <h2>Monthly Attendance Rate</h2>
+          <span class="admin-section-kicker">{% translate "Analytics" %}</span>
+          <h2>{% translate "Monthly Attendance Rate" %}</h2>
         </div>
-        <a href="{% url 'admin_view_attendance' %}" class="admin-link">View report</a>
+        <a href="{% url 'admin_view_attendance' %}" class="admin-link">{% translate "View report" %}</a>
       </div>
       <div class="admin-chart-stage admin-chart-stage--bar">
         <div class="admin-chart-skeleton" aria-hidden="true">
@@ -178,8 +179,8 @@
     <article class="admin-card">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Live Ops</span>
-          <h2>Today's Attendance</h2>
+          <span class="admin-section-kicker">{% translate "Live Ops" %}</span>
+          <h2>{% translate "Today's Attendance" %}</h2>
         </div>
         <span class="admin-soft-badge">{{ attendance_today_rate }}%</span>
       </div>
@@ -188,14 +189,14 @@
         <a href="{% url 'admin_view_attendance' %}" class="admin-attendance-row">
           <span>
             <strong>{{ item.group.name }}</strong>
-            <small>{{ item.present }}/{{ item.total }} present</small>
+            <small>{% blocktranslate trimmed with present=item.present total=item.total %}{{ present }}/{{ total }} present{% endblocktranslate %}</small>
           </span>
           <span class="admin-ring" style="--value: {{ item.rate }};">{{ item.rate }}%</span>
         </a>
         {% empty %}
         <div class="admin-empty-state">
           <i class="fas fa-clipboard-check" aria-hidden="true"></i>
-          <span>No attendance has been taken today.</span>
+          <span>{% translate "No attendance has been taken today." %}</span>
         </div>
         {% endfor %}
       </div>
@@ -206,8 +207,8 @@
     <article class="admin-card">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Pulse</span>
-          <h2>Recent Activity</h2>
+          <span class="admin-section-kicker">{% translate "Pulse" %}</span>
+          <h2>{% translate "Recent Activity" %}</h2>
         </div>
       </div>
       <div class="admin-activity-feed">
@@ -222,7 +223,7 @@
         {% empty %}
         <div class="admin-empty-state">
           <i class="fas fa-wave-square" aria-hidden="true"></i>
-          <span>Activity will appear here as the center runs.</span>
+          <span>{% translate "Activity will appear here as the center runs." %}</span>
         </div>
         {% endfor %}
       </div>
@@ -231,8 +232,8 @@
     <article class="admin-card">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Latest Arrivals</span>
-          <h2>New Enrollments</h2>
+          <span class="admin-section-kicker">{% translate "Latest Arrivals" %}</span>
+          <h2>{% translate "New Enrollments" %}</h2>
         </div>
         <span class="admin-soft-badge">{{ recent_students|length }}</span>
       </div>
@@ -242,13 +243,13 @@
           <span class="admin-avatar-sm">{{ student.admin.first_name|first|upper }}{{ student.admin.last_name|first|upper }}</span>
           <span>
             <strong>{{ student.admin.get_full_name|default:student.admin.email }}</strong>
-            <small>{{ student.course|default:"Course pending" }} · Joined {{ student.admin.created_at|date:"M j" }}</small>
+            <small>{% if student.course %}{{ student.course }}{% else %}{% translate "Course pending" %}{% endif %} · {% blocktranslate trimmed with date=student.admin.created_at|date:"M j" %}Joined {{ date }}{% endblocktranslate %}</small>
           </span>
         </a>
         {% empty %}
         <div class="admin-empty-state">
           <i class="fas fa-user-plus" aria-hidden="true"></i>
-          <span>No recent enrollments yet.</span>
+          <span>{% translate "No recent enrollments yet." %}</span>
         </div>
         {% endfor %}
       </div>
@@ -257,10 +258,10 @@
     <article class="admin-card">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Follow Up</span>
-          <h2>Registration Leads</h2>
+          <span class="admin-section-kicker">{% translate "Follow Up" %}</span>
+          <h2>{% translate "Registration Leads" %}</h2>
         </div>
-        <a href="{% url 'manage_registration_leads' %}" class="admin-link">All leads</a>
+        <a href="{% url 'manage_registration_leads' %}" class="admin-link">{% translate "All leads" %}</a>
       </div>
       <div class="admin-person-list">
         {% for lead in recent_leads %}
@@ -268,13 +269,13 @@
           <span class="admin-avatar-sm admin-avatar-sm--lead">{{ lead.full_name|first|upper }}</span>
           <span>
             <strong>{{ lead.full_name }}</strong>
-            <small>{{ lead.program|default:"Program pending" }} · {{ lead.status|title }} · {{ lead.created_at|date:"M j" }}</small>
+            <small>{{ lead.program|default:_("Program pending") }} · {{ lead.status|title }} · {{ lead.created_at|date:"M j" }}</small>
           </span>
         </a>
         {% empty %}
         <div class="admin-empty-state">
           <i class="fas fa-user-clock" aria-hidden="true"></i>
-          <span>No registration leads yet.</span>
+          <span>{% translate "No registration leads yet." %}</span>
         </div>
         {% endfor %}
       </div>
@@ -283,10 +284,10 @@
     <article class="admin-card">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Teaching Load</span>
-          <h2>Faculty Pulse</h2>
+          <span class="admin-section-kicker">{% translate "Teaching Load" %}</span>
+          <h2>{% translate "Faculty Pulse" %}</h2>
         </div>
-        <span class="admin-soft-badge">{{ teacher_activity|length }} active</span>
+        <span class="admin-soft-badge">{% blocktranslate trimmed with count=teacher_activity|length %}{{ count }} active{% endblocktranslate %}</span>
       </div>
       <div class="admin-person-list">
         {% for teacher in teacher_activity %}
@@ -294,13 +295,13 @@
           <span class="admin-avatar-sm admin-avatar-sm--teacher">{{ teacher.admin.first_name|first|upper }}{{ teacher.admin.last_name|first|upper }}</span>
           <span>
             <strong>{{ teacher.admin.get_full_name|default:teacher.admin.email }}</strong>
-            <small>{{ teacher.active_groups_count }} group{% if teacher.active_groups_count != 1 %}s{% endif %} · {{ teacher.course|default:"No course" }}</small>
+            <small>{% blocktranslate trimmed count n=teacher.active_groups_count %}{{ n }} group{% plural %}{{ n }} groups{% endblocktranslate %} · {% if teacher.course %}{{ teacher.course }}{% else %}{% translate "No course" %}{% endif %}</small>
           </span>
         </a>
         {% empty %}
         <div class="admin-empty-state">
           <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
-          <span>No teachers assigned yet.</span>
+          <span>{% translate "No teachers assigned yet." %}</span>
         </div>
         {% endfor %}
       </div>
@@ -309,10 +310,10 @@
     <article class="admin-card">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Schedule</span>
+          <span class="admin-section-kicker">{% translate "Schedule" %}</span>
           <h2>{{ upcoming_title }}</h2>
         </div>
-        <a href="{% url 'manage_group' %}" class="admin-link">Groups</a>
+        <a href="{% url 'manage_group' %}" class="admin-link">{% translate "Groups" %}</a>
       </div>
       <div class="admin-class-list">
         {% for group in upcoming_classes %}
@@ -321,18 +322,18 @@
             {% if group.start_date %}
             {{ group.start_date|date:"M" }}<strong>{{ group.start_date|date:"j" }}</strong>
             {% else %}
-            Active<strong>Now</strong>
+            {% translate "Active" context "dashboard date chip" %}<strong>{% translate "Now" %}</strong>
             {% endif %}
           </span>
           <span>
             <strong>{{ group.name }}</strong>
-            <small>{{ group.course }} · {{ group.teacher.admin.get_full_name|default:"Teacher pending" }}</small>
+            <small>{{ group.course }} · {{ group.teacher.admin.get_full_name|default:_("Teacher pending") }}</small>
           </span>
         </a>
         {% empty %}
         <div class="admin-empty-state">
           <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-          <span>No classes configured yet.</span>
+          <span>{% translate "No classes configured yet." %}</span>
         </div>
         {% endfor %}
       </div>
@@ -343,8 +344,8 @@
     <article class="admin-card">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Growth</span>
-          <h2>New Students — Monthly</h2>
+          <span class="admin-section-kicker">{% translate "Growth" %}</span>
+          <h2>{% translate "New Students — Monthly" %}</h2>
         </div>
       </div>
       <div class="admin-chart-stage admin-chart-stage--bar">
@@ -356,8 +357,8 @@
     <article class="admin-card">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Sessions</span>
-          <h2>Monthly Sessions Taken</h2>
+          <span class="admin-section-kicker">{% translate "Sessions" %}</span>
+          <h2>{% translate "Monthly Sessions Taken" %}</h2>
         </div>
       </div>
       <div class="admin-chart-stage admin-chart-stage--bar">
@@ -369,8 +370,8 @@
     <article class="admin-card admin-card--wide">
       <div class="admin-card__header">
         <div>
-          <span class="admin-section-kicker">Outcomes</span>
-          <h2>Monthly Attendance Rate &amp; Sessions</h2>
+          <span class="admin-section-kicker">{% translate "Outcomes" %}</span>
+          <h2>{% translate "Monthly Attendance Rate & Sessions" %}</h2>
         </div>
       </div>
       <div class="admin-chart-stage admin-chart-stage--bar">

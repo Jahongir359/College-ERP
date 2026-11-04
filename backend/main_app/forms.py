@@ -65,8 +65,8 @@ def _scope_branch_field(form, user, required=False):
     field = form.fields["branch"]
     field.queryset = qs
     field.required = required
-    field.empty_label = "— Select branch —"
-    field.label = "Branch / Location"
+    field.empty_label = gettext_lazy("— Select branch —")
+    field.label = gettext_lazy("Branch / Location")
     field.widget.attrs["class"] = "form-control"
     only = branching.admin_only_branch(user) if user is not None else None
     if only is not None:
@@ -94,9 +94,9 @@ def _validate_birthday(value):
         return None
     today = date.today()
     if value > today:
-        raise forms.ValidationError("Date of birth cannot be in the future.")
+        raise forms.ValidationError(gettext_lazy("Date of birth cannot be in the future."))
     if value < _DOB_MIN:
-        raise forms.ValidationError("Please enter a valid date of birth.")
+        raise forms.ValidationError(gettext_lazy("Please enter a valid date of birth."))
     return value
 
 
@@ -112,12 +112,15 @@ def _clean_new_password(password):
 
 
 class CustomUserForm(FormSettings):
-    gender = forms.ChoiceField(choices=[("M", "Male"), ("F", "Female")])
-    first_name = forms.CharField(required=True)
-    last_name = forms.CharField(required=True)
+    gender = forms.ChoiceField(
+        choices=[("M", gettext_lazy("Male")), ("F", gettext_lazy("Female"))],
+        label=gettext_lazy("Gender"),
+    )
+    first_name = forms.CharField(required=True, label=gettext_lazy("First name"))
+    last_name = forms.CharField(required=True, label=gettext_lazy("Last name"))
     date_of_birth = forms.DateField(
         required=True,
-        label="Date of Birth",
+        label=gettext_lazy("Date of Birth"),
         widget=forms.DateInput(
             attrs={
                 "type": "date",
@@ -127,15 +130,19 @@ class CustomUserForm(FormSettings):
             format="%Y-%m-%d",
         ),
         input_formats=["%Y-%m-%d"],
-        help_text="Format: YYYY-MM-DD. Used to generate the unique login ID.",
+        help_text=gettext_lazy("Format: YYYY-MM-DD. Used to generate the unique login ID."),
     )
     address = forms.CharField(
+        label=gettext_lazy("Address"),
         widget=forms.TextInput(
-            attrs={"placeholder": "e.g. Chilonzor 9, Tashkent", "class": "form-control"}
-        )
+            attrs={
+                "placeholder": gettext_lazy("e.g. Chilonzor 9, Tashkent"),
+                "class": "form-control",
+            }
+        ),
     )
-    password = forms.CharField(widget=forms.PasswordInput)
-    profile_pic = forms.ImageField()
+    password = forms.CharField(label=gettext_lazy("Password"), widget=forms.PasswordInput)
+    profile_pic = forms.ImageField(label=gettext_lazy("Profile pic"))
 
     def __init__(self, *args, **kwargs):
         super(CustomUserForm, self).__init__(*args, **kwargs)
@@ -150,7 +157,9 @@ class CustomUserForm(FormSettings):
     def clean_profile_pic(self):
         pic = self.cleaned_data.get("profile_pic")
         if pic and getattr(pic, "size", 0) > _MAX_PROFILE_PIC_BYTES:
-            raise forms.ValidationError("Profile picture too large. Maximum size is 5 MB.")
+            raise forms.ValidationError(
+                gettext_lazy("Profile picture too large. Maximum size is 5 MB.")
+            )
         return pic
 
     def clean_date_of_birth(self):
@@ -176,18 +185,18 @@ class StudentForm(CustomUserForm):
     phone = forms.CharField(
         max_length=20,
         required=False,
-        label="Phone Number",
+        label=gettext_lazy("Phone Number"),
         widget=forms.TextInput(attrs={"placeholder": "+998 90 123 45 67", "class": "form-control"}),
     )
     status = forms.ChoiceField(
         choices=Student.STATUS_CHOICES,
         initial=Student.STATUS_ACTIVE,
-        label="Status",
+        label=gettext_lazy("Status"),
     )
     level = forms.ChoiceField(
-        choices=[("", "— No level assigned —")] + Student.LEVEL_CHOICES,
+        choices=[("", gettext_lazy("— No level assigned —"))] + Student.LEVEL_CHOICES,
         required=False,
-        label="English Level",
+        label=gettext_lazy("English Level"),
     )
 
     def __init__(self, *args, **kwargs):
@@ -216,30 +225,30 @@ class StudentForm(CustomUserForm):
 class AddStudentForm(CustomUserForm):
     course = forms.ModelChoiceField(
         queryset=Course.objects.all(),
-        empty_label="— Select a Program —",
-        label="Program",
+        empty_label=gettext_lazy("— Select a Program —"),
+        label=gettext_lazy("Program"),
     )
     group = forms.ModelChoiceField(
         queryset=Group.objects.none(),
-        empty_label="— Select a Class Group (optional) —",
-        label="Assign to Class Group",
+        empty_label=gettext_lazy("— Select a Class Group (optional) —"),
+        label=gettext_lazy("Assign to Class Group"),
         required=False,
     )
     phone = forms.CharField(
         max_length=20,
         required=False,
-        label="Phone Number",
+        label=gettext_lazy("Phone Number"),
         widget=forms.TextInput(attrs={"placeholder": "+998 90 123 45 67"}),
     )
     status = forms.ChoiceField(
         choices=Student.STATUS_CHOICES,
         initial=Student.STATUS_ACTIVE,
-        label="Status",
+        label=gettext_lazy("Status"),
     )
     level = forms.ChoiceField(
-        choices=[("", "— No level assigned —")] + Student.LEVEL_CHOICES,
+        choices=[("", gettext_lazy("— No level assigned —"))] + Student.LEVEL_CHOICES,
         required=False,
-        label="English Level",
+        label=gettext_lazy("English Level"),
     )
 
     def __init__(self, *args, **kwargs):
@@ -268,14 +277,17 @@ class AddStudentForm(CustomUserForm):
         branch = cleaned_data.get("branch")
         if group and course and group.course_id != course.id:
             self.add_error(
-                "group", "The selected class group does not belong to the chosen program."
+                "group",
+                gettext_lazy("The selected class group does not belong to the chosen program."),
             )
         # Keep student branch coherent with the chosen group's branch.
         if group and group.branch_id:
             if not branch:
                 cleaned_data["branch"] = group.branch
             elif branch.id != group.branch_id:
-                self.add_error("branch", "Selected group does not belong to the selected branch.")
+                self.add_error(
+                    "branch", gettext_lazy("Selected group does not belong to the selected branch.")
+                )
         # A student without a branch disappears from branch admins' lists (web audit B1).
         if not cleaned_data.get("branch") and "branch" not in self.errors:
             self.add_error("branch", _BRANCH_REQUIRED)
@@ -294,7 +306,7 @@ class AddStudentForm(CustomUserForm):
 
 
 class AdminForm(CustomUserForm):
-    email = forms.EmailField(required=False, label="Email")
+    email = forms.EmailField(required=False, label=gettext_lazy("Email"))
 
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)
@@ -356,17 +368,17 @@ class StaffForm(CustomUserForm):
     phone = forms.CharField(
         max_length=20,
         required=False,
-        label="Phone Number",
+        label=gettext_lazy("Phone Number"),
         widget=forms.TextInput(attrs={"placeholder": "+998 90 123 45 67", "class": "form-control"}),
     )
     specialization = forms.CharField(
         max_length=200,
         required=False,
-        label="Specialization",
+        label=gettext_lazy("Specialization"),
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "e.g. IELTS, Mathematics, Business English",
+                "placeholder": gettext_lazy("e.g. IELTS, Mathematics, Business English"),
             }
         ),
     )
@@ -689,19 +701,19 @@ class GroupForm(FormSettings):
             "start_date",
         ]
         labels = {
-            "course": "Program",
-            "teacher": "Teacher",
-            "branch": "Branch / Location",
-            "room": "Room / Classroom",
-            "schedule": "Schedule",
-            "capacity": "Capacity (max students)",
-            "monthly_fee": "Monthly fee (UZS soʻm)",
-            "start_date": "Starting Date",
+            "course": gettext_lazy("Program"),
+            "teacher": gettext_lazy("Teacher"),
+            "branch": gettext_lazy("Branch / Location"),
+            "room": gettext_lazy("Room / Classroom"),
+            "schedule": gettext_lazy("Schedule"),
+            "capacity": gettext_lazy("Capacity (max students)"),
+            "monthly_fee": gettext_lazy("Monthly fee (UZS soʻm)"),
+            "start_date": gettext_lazy("Starting Date"),
         }
         widgets = {
             "start_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
             "monthly_fee": GroupedNumberInput(
-                attrs={"class": "form-control", "placeholder": "Blank = course fee"}
+                attrs={"class": "form-control", "placeholder": gettext_lazy("Blank = course fee")}
             ),
         }
 
@@ -956,19 +968,19 @@ class GenerateInvoicesForm(forms.Form):
     """Monthly tuition invoice generation for all active enrollments."""
 
     month = forms.CharField(
-        label="Billing month",
+        label=gettext_lazy("Billing month"),
         widget=forms.TextInput(attrs={"type": "month", "class": "form-control"}),
-        help_text="Invoices are created for every active enrollment in this month.",
+        help_text=gettext_lazy("Invoices are created for every active enrollment in this month."),
     )
     branch = forms.ModelChoiceField(
         queryset=Branch.objects.none(),
         required=False,
-        label="Branch / Location",
-        empty_label="All my branches",
+        label=gettext_lazy("Branch / Location"),
+        empty_label=gettext_lazy("All my branches"),
         widget=forms.Select(attrs={"class": "form-control"}),
     )
     due_date = forms.DateField(
-        label="Payment due date",
+        label=gettext_lazy("Payment due date"),
         widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
     )
 
@@ -985,7 +997,7 @@ class GenerateInvoicesForm(forms.Form):
             year, month = raw.split("-")
             return date(int(year), int(month), 1)
         except (ValueError, AttributeError):
-            raise forms.ValidationError("Pick a month in the YYYY-MM format.")
+            raise forms.ValidationError(gettext_lazy("Pick a month in the YYYY-MM format."))
 
 
 class RecordPaymentForm(FormSettings):
@@ -993,18 +1005,21 @@ class RecordPaymentForm(FormSettings):
         model = Payment
         fields = ["amount", "method", "paid_on", "note"]
         labels = {
-            "amount": "Amount (UZS soʻm)",
-            "method": "Payment method",
-            "paid_on": "Payment date",
-            "note": "Note (optional)",
+            "amount": gettext_lazy("Amount (UZS soʻm)"),
+            "method": gettext_lazy("Payment method"),
+            "paid_on": gettext_lazy("Payment date"),
+            "note": gettext_lazy("Note (optional)"),
         }
         widgets = {
             "amount": GroupedNumberInput(
-                attrs={"class": "form-control", "placeholder": "e.g. 200,000"}
+                attrs={"class": "form-control", "placeholder": gettext_lazy("e.g. 200,000")}
             ),
             "paid_on": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
             "note": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "e.g. receipt #, payer name"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": gettext_lazy("e.g. receipt #, payer name"),
+                }
             ),
         }
 
@@ -1017,7 +1032,7 @@ class RecordPaymentForm(FormSettings):
     def clean_amount(self):
         amount = self.cleaned_data["amount"]
         if amount <= 0:
-            raise forms.ValidationError("Amount must be greater than zero.")
+            raise forms.ValidationError(gettext_lazy("Amount must be greater than zero."))
         if self.invoice is not None and amount > self.invoice.balance:
             raise forms.ValidationError(
                 f"Amount exceeds the remaining balance ({self.invoice.balance:,.0f} soʻm)."
@@ -1029,7 +1044,7 @@ class ManualInvoiceForm(FormSettings):
     """One-off invoice for a single student (extra charge, materials, etc.)."""
 
     month = forms.CharField(
-        label="Billing month",
+        label=gettext_lazy("Billing month"),
         widget=forms.TextInput(attrs={"type": "month", "class": "form-control"}),
     )
 
@@ -1037,19 +1052,22 @@ class ManualInvoiceForm(FormSettings):
         model = Invoice
         fields = ["student", "amount", "discount", "due_date", "note"]
         labels = {
-            "amount": "Amount (UZS soʻm)",
-            "discount": "Discount (UZS soʻm)",
-            "due_date": "Payment due date",
-            "note": "Note (optional)",
+            "amount": gettext_lazy("Amount (UZS soʻm)"),
+            "discount": gettext_lazy("Discount (UZS soʻm)"),
+            "due_date": gettext_lazy("Payment due date"),
+            "note": gettext_lazy("Note (optional)"),
         }
         widgets = {
             "amount": GroupedNumberInput(
-                attrs={"class": "form-control", "placeholder": "e.g. 600,000"}
+                attrs={"class": "form-control", "placeholder": gettext_lazy("e.g. 600,000")}
             ),
             "discount": GroupedNumberInput(attrs={"class": "form-control", "placeholder": "0"}),
             "due_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
             "note": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "e.g. course books, exam fee"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": gettext_lazy("e.g. course books, exam fee"),
+                }
             ),
         }
 
@@ -1066,12 +1084,12 @@ class ManualInvoiceForm(FormSettings):
             year, month = raw.split("-")
             return date(int(year), int(month), 1)
         except (ValueError, AttributeError):
-            raise forms.ValidationError("Pick a month in the YYYY-MM format.")
+            raise forms.ValidationError(gettext_lazy("Pick a month in the YYYY-MM format."))
 
     def clean(self):
         cleaned = super().clean()
         amount = cleaned.get("amount")
         discount = cleaned.get("discount") or 0
         if amount is not None and discount > amount:
-            self.add_error("discount", "Discount cannot exceed the invoice amount.")
+            self.add_error("discount", gettext_lazy("Discount cannot exceed the invoice amount."))
         return cleaned
