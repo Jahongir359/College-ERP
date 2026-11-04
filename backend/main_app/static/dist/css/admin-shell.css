@@ -791,6 +791,102 @@ html[data-shell="admin"][data-brand] .ui-split {
 }
 
 
+/* ── 7b. Legacy admin components on the shell tokens ──────────────────────
+   Admin pages not yet rebuilt with the kit use admin-manage-mobile.css
+   (.ice-manage-*) and iceberg-mobile-polish.css (.ice-hero, .ice-action).
+   Those hard-code light cyan glass that stayed light in dark mode (Payments
+   header card) or faded out (Edit buttons on Groups and Teachers). Point them
+   at the shell tokens so they read in both brands and both themes. */
+html[data-shell="admin"][data-brand] {
+  --ice-manage-navy: var(--shell-primary);
+  --ice-manage-navy-2: var(--shell-title);
+  --ice-manage-cyan: var(--shell-primary-hover);
+  --ice-manage-cyan-2: var(--shell-primary-hover);
+  --ice-manage-bg: var(--shell-bg);
+  --ice-manage-surface: var(--shell-surface);
+  --ice-manage-surface-2: var(--shell-tint);
+  --ice-manage-border: var(--shell-border);
+  --ice-manage-text: var(--shell-text);
+  --ice-manage-muted: var(--shell-muted);
+  --ice-manage-shadow: var(--shell-shadow);
+  --ice-manage-shadow-soft: var(--shell-shadow);
+}
+html[data-shell="admin"][data-brand] .ice-manage-hero,
+html[data-shell="admin"][data-brand] .ice-hero,
+html[data-shell="admin"][data-brand] .ice-form-section,
+html[data-shell="admin"][data-brand] .ice-table-card,
+html[data-shell="admin"][data-brand] .ice-manage-table-wrap,
+html[data-shell="admin"][data-brand] .ice-manage-card {
+  background: var(--shell-surface) !important;
+  border: 1px solid var(--shell-border) !important;
+  border-radius: var(--shell-radius) !important;
+  box-shadow: var(--shell-shadow) !important;
+  color: var(--shell-text) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-hero::before,
+html[data-shell="admin"][data-brand] .ice-hero::after { display: none !important; }
+html[data-shell="admin"][data-brand] .ice-manage-hero__title,
+html[data-shell="admin"][data-brand] .ice-hero__title {
+  color: var(--shell-title) !important;
+  -webkit-text-fill-color: var(--shell-title) !important;
+  background: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-hero__subtitle,
+html[data-shell="admin"][data-brand] .ice-hero__subtitle,
+html[data-shell="admin"][data-brand] .ice-hero__copy p { color: var(--shell-muted) !important; }
+html[data-shell="admin"][data-brand] .ice-manage-hero__icon,
+html[data-shell="admin"][data-brand] .ice-hero__icon {
+  background: var(--shell-tint) !important;
+  color: var(--shell-active-text) !important;
+  box-shadow: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-count {
+  background: var(--shell-tint) !important;
+  border-color: transparent !important;
+  color: var(--shell-active-text) !important;
+}
+/* Primary actions = ui-btn--primary; the other actions = ui-btn--secondary. */
+html[data-shell="admin"][data-brand] .ice-manage-add-btn,
+html[data-shell="admin"][data-brand] .ice-action--primary {
+  background: var(--shell-btn-bg) !important;
+  border: 1.5px solid transparent !important;
+  color: var(--shell-btn-text) !important;
+  box-shadow: var(--shell-btn-shadow) !important;
+  filter: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-add-btn:hover,
+html[data-shell="admin"][data-brand] .ice-action--primary:hover { background: var(--shell-btn-bg-hover) !important; }
+html[data-shell="admin"][data-brand] .ice-action:not(.ice-action--primary),
+html[data-shell="admin"][data-brand] .ice-manage-action {
+  background: var(--shell-surface) !important;
+  border: 1.5px solid var(--shell-border) !important;
+  color: var(--shell-link) !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+html[data-shell="admin"][data-brand] .ice-action:not(.ice-action--primary):hover,
+html[data-shell="admin"][data-brand] .ice-manage-action:hover { background: var(--shell-tint) !important; }
+html[data-shell="admin"][data-brand] .ice-manage-action--primary {
+  border-color: transparent !important;
+  background: var(--shell-tint) !important;
+  color: var(--shell-active-text) !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-action--danger,
+html[data-shell="admin"][data-brand] .ice-manage-action--warning { color: var(--shell-abs) !important; }
+html[data-shell="admin"][data-brand] .ice-manage-action--danger-fill {
+  background: var(--shell-abs-bg) !important;
+  border-color: transparent !important;
+  color: var(--shell-abs) !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-table th {
+  background: var(--shell-tint) !important;
+  color: var(--shell-muted) !important;
+}
+html[data-shell="admin"][data-brand] .ice-manage-table td { color: var(--shell-text); border-color: var(--shell-border) !important; }
+
+
 /* ── 8. Narrow screens ───────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {

@@ -38,10 +38,12 @@
   </div>
 
   <form method="get" class="ui-filters" role="search">
+    {% if classes %}
     <label class="ui-search" aria-label="{% translate 'Search classes' %}">
       <i class="fas fa-search" aria-hidden="true"></i>
       <input type="search" data-manage-search placeholder="{% translate 'Search classes or teachers…' %}" autocomplete="off">
     </label>
+    {% endif %}
     {% if years|length > 1 %}
     <select name="year" class="ui-select" aria-label="{% translate 'Academic year' %}" onchange="this.form.submit()">
       {% for y in years %}
@@ -52,7 +54,10 @@
     {% endif %}
   </form>
 
+  {% if classes %}
+  {# Shown by admin-manage-mobile.js only when a search matches no class. #}
   <div class="ui-empty" data-manage-empty-state hidden>{% translate "No classes found" %}</div>
+  {% endif %}
 
   <div class="ui-table-wrap" data-no-table-enhance>
     <table class="ui-table">
