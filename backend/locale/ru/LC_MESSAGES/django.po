@@ -1033,3 +1033,4 @@ msgstr "Только для школьных классов: учебный го
 
 msgid "This student can't be added to this class: they are not in this branch."
 msgstr "Этого ученика нельзя добавить в класс: он не из этого филиала."
+
