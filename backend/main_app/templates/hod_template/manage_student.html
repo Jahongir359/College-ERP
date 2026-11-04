@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load i18n %}
 {% load static %}
 {% block page_title %}{{ page_title }}{% endblock %}
 
@@ -12,41 +13,41 @@
     <div class="ice-manage-hero__main">
       <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-user-graduate"></i></span>
       <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">Manage Students</h2>
-        <p class="ice-manage-hero__subtitle">Manage student accounts, profiles, and enrollment information.</p>
+        <h2 class="ice-manage-hero__title">{% translate "Manage Students" %}</h2>
+        <p class="ice-manage-hero__subtitle">{% translate "Manage student accounts, profiles, and enrollment information." %}</p>
       </div>
     </div>
     <div class="ice-manage-hero__actions">
-      <span class="ice-manage-count"><span data-manage-visible-count>{{ students|length }}</span>&nbsp;total</span>
+      <span class="ice-manage-count"><span data-manage-visible-count>{{ students|length }}</span>&nbsp;{% translate "total" %}</span>
       <a href="{% url 'add_student' %}" class="ice-manage-add-btn">
-        <i class="fas fa-plus" aria-hidden="true"></i> Add Student
+        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "Add Student" %}
       </a>
     </div>
   </section>
 
-  <label class="ice-manage-search" aria-label="Search students">
+  <label class="ice-manage-search" aria-label="{% translate 'Search students' %}">
     <i class="fas fa-search" aria-hidden="true"></i>
-    <input type="search" class="ice-manage-search__input" data-manage-search placeholder="Search students, ID, course..." autocomplete="off">
+    <input type="search" class="ice-manage-search__input" data-manage-search placeholder="{% translate 'Search students, ID, course...' %}" autocomplete="off">
   </label>
 
   {% if is_super_admin %}
   <form method="get" class="ice-manage-filter">
-    <label for="branch-filter" class="ice-manage-filter__label"><i class="fas fa-code-branch" aria-hidden="true"></i> Branch</label>
+    <label for="branch-filter" class="ice-manage-filter__label"><i class="fas fa-code-branch" aria-hidden="true"></i> {% translate "Branch" %}</label>
     <select id="branch-filter" name="branch" class="ice-manage-filter__select" onchange="this.form.submit()">
-      <option value="">All branches</option>
+      <option value="">{% translate "All branches" %}</option>
       {% for b in branches %}
       <option value="{{ b.id }}" {% if selected_branch == b.id|stringformat:'s' %}selected{% endif %}>{{ b.name }}</option>
       {% endfor %}
     </select>
   </form>
   {% elif branches %}
-  <p class="ice-manage-branch-note"><i class="fas fa-code-branch" aria-hidden="true"></i> Branch: {% for b in branches %}{{ b.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+  <p class="ice-manage-branch-note"><i class="fas fa-code-branch" aria-hidden="true"></i> {% translate "Branch:" %} {% for b in branches %}{{ b.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
   {% endif %}
 
   <div class="ice-manage-empty" data-manage-empty-state hidden>
     <i class="fas fa-search" aria-hidden="true"></i>
-    <strong>No students found</strong>
-    <span>Try another name, login ID, course, status, or level.</span>
+    <strong>{% translate "No students found" %}</strong>
+    <span>{% translate "Try another name, login ID, course, status, or level." %}</span>
   </div>
 
   <div class="ice-manage-table-wrap">
@@ -54,16 +55,16 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Student</th>
-          <th>Login ID</th>
-          <th>Course</th>
-          <th>Branch</th>
-          <th>Level</th>
-          <th>Status</th>
-          <th>Phone</th>
-          <th>Gender</th>
-          <th>Birthday</th>
-          <th>Actions</th>
+          <th>{% translate "Student" %}</th>
+          <th>{% translate "Login ID" %}</th>
+          <th>{% translate "Course" %}</th>
+          <th>{% translate "Branch" %}</th>
+          <th>{% translate "Level" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th>{% translate "Phone" %}</th>
+          <th>{% translate "Gender" %}</th>
+          <th>{% translate "Birthday" %}</th>
+          <th>{% translate "Actions" %}</th>
         </tr>
       </thead>
       <tbody>
@@ -88,42 +89,42 @@
               </span>
             </div>
           </td>
-          <td><span class="ice-manage-code">{{ student.login_id|default:"No ID" }}</span></td>
-          <td>{{ student.student.course.name|default:"No course" }}</td>
+          <td><span class="ice-manage-code">{{ student.login_id|default:_("No ID") }}</span></td>
+          <td>{{ student.student.course.name|default:_("No course") }}</td>
           <td>
             {% if student.student.branch %}
             <span class="ice-manage-chip"><i class="fas fa-code-branch" aria-hidden="true"></i> {{ student.student.branch.name }}</span>
             {% else %}
-            <span class="ice-manage-chip ice-manage-chip--muted">No branch</span>
+            <span class="ice-manage-chip ice-manage-chip--muted">{% translate "No branch" %}</span>
             {% endif %}
           </td>
           <td>
             {% if student.student.level %}
-            <span class="ice-manage-chip"><i class="fas fa-signal" aria-hidden="true"></i> Level {{ student.student.level }}</span>
+            <span class="ice-manage-chip"><i class="fas fa-signal" aria-hidden="true"></i> {% blocktranslate trimmed with level=student.student.level %}Level {{ level }}{% endblocktranslate %}</span>
             {% else %}
-            <span class="ice-manage-chip ice-manage-chip--muted">No level</span>
+            <span class="ice-manage-chip ice-manage-chip--muted">{% translate "No level" %}</span>
             {% endif %}
           </td>
           <td>
             {% if student.student.status == "active" %}
-            <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i> {{ student.student.get_status_display|default:"Active" }}</span>
+            <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i> {{ student.student.get_status_display|default:_("Active") }}</span>
             {% elif student.student.status %}
             <span class="ice-manage-chip ice-manage-chip--warning"><i class="fas fa-circle" aria-hidden="true"></i> {{ student.student.get_status_display }}</span>
             {% else %}
-            <span class="ice-manage-chip ice-manage-chip--muted">No status</span>
+            <span class="ice-manage-chip ice-manage-chip--muted">{% translate "No status" %}</span>
             {% endif %}
           </td>
-          <td>{{ student.student.phone|default:"No phone" }}</td>
-          <td>{{ student.gender|default:"Not set" }}</td>
-          <td>{{ student.date_of_birth|date:"Y-m-d"|default:"Not set" }}</td>
+          <td>{{ student.student.phone|default:_("No phone") }}</td>
+          <td>{{ student.gender|default:_("Not set") }}</td>
+          <td>{{ student.date_of_birth|date:"Y-m-d"|default:_("Not set") }}</td>
           <td>
             <div class="ice-manage-actions">
               <a href="{% url 'edit_student' student.student.id %}" class="ice-manage-action">
-                <i class="fas fa-edit" aria-hidden="true"></i> Edit
+                <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
               </a>
               <a href="{% url 'delete_student' student.student.id %}"
                  class="ice-manage-action ice-manage-action--danger-fill"
-                 data-confirm-post="Delete {{ student.get_full_name|default:'this student' }}? All attendance records will be removed. This cannot be undone.">
+                 data-confirm-post="{% blocktranslate trimmed with name=student.get_full_name|default:_("this student") %}Delete {{ name }}? All attendance records will be removed. This cannot be undone.{% endblocktranslate %}">
                 <i class="fas fa-trash" aria-hidden="true"></i>
               </a>
             </div>
@@ -134,8 +135,8 @@
           <td colspan="10">
             <div class="ice-manage-empty">
               <i class="fas fa-user-graduate" aria-hidden="true"></i>
-              <strong>No students found</strong>
-              <span>Add students and enroll them into groups.</span>
+              <strong>{% translate "No students found" %}</strong>
+              <span>{% translate "Add students and enroll them into groups." %}</span>
             </div>
           </td>
         </tr>
@@ -162,21 +163,21 @@
         </span>
         <div class="ice-manage-card__main">
           <h3 class="ice-manage-card__title">{{ student.get_full_name|default:student.email }}</h3>
-          <div class="ice-manage-card__subtitle">Student &middot; {{ student.login_id|default:"No ID" }}</div>
+          <div class="ice-manage-card__subtitle">{% translate "Student" %} &middot; {% if student.login_id %}{{ student.login_id }}{% else %}{% translate "No ID" %}{% endif %}</div>
         </div>
       </div>
 
       <div class="ice-manage-card__meta">
-        <span class="ice-manage-chip"><i class="fas fa-id-badge" aria-hidden="true"></i><span>{{ student.login_id|default:"No ID" }}</span></span>
-        <span class="ice-manage-chip"><i class="fas fa-graduation-cap" aria-hidden="true"></i><span>{{ student.student.course.name|default:"No course" }}</span></span>
+        <span class="ice-manage-chip"><i class="fas fa-id-badge" aria-hidden="true"></i><span>{{ student.login_id|default:_("No ID") }}</span></span>
+        <span class="ice-manage-chip"><i class="fas fa-graduation-cap" aria-hidden="true"></i><span>{{ student.student.course.name|default:_("No course") }}</span></span>
         {% if student.student.branch %}
         <span class="ice-manage-chip"><i class="fas fa-code-branch" aria-hidden="true"></i><span>{{ student.student.branch.name }}</span></span>
         {% endif %}
         {% if student.student.level %}
-        <span class="ice-manage-chip"><i class="fas fa-signal" aria-hidden="true"></i><span>Level {{ student.student.level }}</span></span>
+        <span class="ice-manage-chip"><i class="fas fa-signal" aria-hidden="true"></i><span>{% blocktranslate trimmed with level=student.student.level %}Level {{ level }}{% endblocktranslate %}</span></span>
         {% endif %}
         {% if student.student.status == "active" %}
-        <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i><span>{{ student.student.get_status_display|default:"Active" }}</span></span>
+        <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i><span>{{ student.student.get_status_display|default:_("Active") }}</span></span>
         {% elif student.student.status %}
         <span class="ice-manage-chip ice-manage-chip--warning"><i class="fas fa-circle" aria-hidden="true"></i><span>{{ student.student.get_status_display }}</span></span>
         {% endif %}
@@ -188,20 +189,20 @@
 
       <div class="ice-manage-actions">
         <a href="{% url 'edit_student' student.student.id %}" class="ice-manage-action">
-          <i class="fas fa-edit" aria-hidden="true"></i> Edit
+          <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
         </a>
         <a href="{% url 'delete_student' student.student.id %}"
            class="ice-manage-action ice-manage-action--danger-fill"
-           data-confirm-post="Delete {{ student.get_full_name|default:'this student' }}? All attendance records will be removed. This cannot be undone.">
-          <i class="fas fa-trash" aria-hidden="true"></i> Delete
+           data-confirm-post="{% blocktranslate trimmed with name=student.get_full_name|default:_("this student") %}Delete {{ name }}? All attendance records will be removed. This cannot be undone.{% endblocktranslate %}">
+          <i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}
         </a>
       </div>
     </article>
     {% empty %}
     <div class="ice-manage-empty">
       <i class="fas fa-user-graduate" aria-hidden="true"></i>
-      <strong>No students found</strong>
-      <span>Add students and enroll them into groups.</span>
+      <strong>{% translate "No students found" %}</strong>
+      <span>{% translate "Add students and enroll them into groups." %}</span>
     </div>
     {% endfor %}
   </div>

@@ -1071,6 +1071,13 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-04 — Web audit M2 part 1 (PR #73, i18n): admin Dashboard, Students, Teachers, Groups (list,
+  add, edit), Payments and the admin Profile now render in uz/ru, including the delete/archive/cancel/remind
+  confirm dialogs, page titles and group messages; form labels and messages use gettext (English wording
+  unchanged). Left for part 2: Student/Invoice status choices from the models, the payments action pages
+  (generate, add one-off, record, collections), the `uzs` "million" word, chart empty-state texts in the
+  dashboard scripts, and the other admin pages listed in the PR.
+
 - 2026-11-01 — P3.9 claimed (`feat/school-admin-shell`); D19 recorded (owner: admin shell follows the
   mockups in both brands, Study Center navy/lime palette). Drew screens 16c and 16d
   (`python build_mockups.py 16c-web-center-students 16d-web-center-home`) for owner approval before the
