@@ -46,11 +46,19 @@ class ParentNavBar extends ConsumerWidget {
   final ValueChanged<int> onTap;
 
   static const items = [
-    (Icons.home_outlined, Icons.home_rounded, 'Home'),
-    (Icons.calendar_today_outlined, Icons.calendar_today_rounded, 'Timetable'),
-    (Icons.menu_book_outlined, Icons.menu_book_rounded, 'Homework'),
-    (Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded, 'Messages'),
-    (Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
+    (Icons.home_outlined, Icons.home_outlined, 'Home'),
+    (Icons.calendar_month_outlined, Icons.calendar_month_outlined, 'Timetable'),
+    (
+      Icons.import_contacts_outlined,
+      Icons.import_contacts_outlined,
+      'Homework',
+    ),
+    (
+      Icons.chat_bubble_outline_rounded,
+      Icons.chat_bubble_outline_rounded,
+      'Messages',
+    ),
+    (Icons.person_outline_rounded, Icons.person_outline_rounded, 'Profile'),
   ];
 
   @override

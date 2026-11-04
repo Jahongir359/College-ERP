@@ -113,9 +113,9 @@ class ParentHomeScreen extends ConsumerWidget {
       return [
         _LoadError(
           s: s,
-          onRetry: () =>
-              ProviderScope.containerOf(context)
-                  .invalidate(parentTodayProvider(child.id)),
+          onRetry: () => ProviderScope.containerOf(
+            context,
+          ).invalidate(parentTodayProvider(child.id)),
         ),
       ];
     }
@@ -664,7 +664,7 @@ class _HomeworkTile extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _IconBox(Icons.menu_book_outlined),
+          const _IconBox(Icons.import_contacts_outlined),
           const SizedBox(height: 18),
           Text(
             h == null ? '–' : '${h.count}',
@@ -731,8 +731,9 @@ class _PaymentTile extends ConsumerWidget {
             const SizedBox(height: 6),
             Text(
               inv!.overdue
-                  ? s('Overdue since {date}')
-                        .replaceAll('{date}', shortDate(lang, due))
+                  ? s(
+                      'Overdue since {date}',
+                    ).replaceAll('{date}', shortDate(lang, due))
                   : s('Due {date}').replaceAll('{date}', shortDate(lang, due)),
               style: TextStyle(
                 color: inv.overdue

@@ -157,7 +157,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               path: '/parent/homework',
               builder: (_, __) => const ParentSoonTab(
                 title: 'Homework',
-                icon: Icons.menu_book_rounded,
+                icon: Icons.import_contacts_outlined,
               ),
             ),
           ]),
