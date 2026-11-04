@@ -1,9 +1,9 @@
 /* Register report (plan P3.7, mockup 19), on the Admin UI kit (P3.9b).
    Colours only through the --shell-* tokens. */
-html[data-shell="admin"] .school-report .report-present { color: var(--shell-ok); }
-html[data-shell="admin"] .school-report .report-late { color: var(--shell-late); font-weight: 700; }
-html[data-shell="admin"] .school-report .report-absent { color: var(--shell-abs); font-weight: 700; }
-html[data-shell="admin"] .school-report .report-bar {
+html[data-shell="admin"][data-brand] .school-report .report-present { color: var(--shell-ok); }
+html[data-shell="admin"][data-brand] .school-report .report-late { color: var(--shell-late); font-weight: 700; }
+html[data-shell="admin"][data-brand] .school-report .report-absent { color: var(--shell-abs); font-weight: 700; }
+html[data-shell="admin"][data-brand] .school-report .report-bar {
   display: inline-block;
   width: 84px;
   height: 8px;
@@ -13,13 +13,13 @@ html[data-shell="admin"] .school-report .report-bar {
   vertical-align: middle;
   overflow: hidden;
 }
-html[data-shell="admin"] .school-report .report-bar span {
+html[data-shell="admin"][data-brand] .school-report .report-bar span {
   display: block;
   height: 100%;
   background: var(--shell-primary);
 }
-html[data-shell="admin"] .school-report .report-pupils { margin: 0; padding: 0; list-style: none; }
-html[data-shell="admin"] .school-report .report-pupils li {
+html[data-shell="admin"][data-brand] .school-report .report-pupils { margin: 0; padding: 0; list-style: none; }
+html[data-shell="admin"][data-brand] .school-report .report-pupils li {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -27,12 +27,14 @@ html[data-shell="admin"] .school-report .report-pupils li {
   padding: 10px 0;
   border-top: 1px solid var(--shell-border);
 }
-html[data-shell="admin"] .school-report .report-pupils li div { display: grid; min-width: 0; }
-html[data-shell="admin"] .school-report .report-pupils small { font-size: 13px; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .school-report .report-pupils li div { display: grid; min-width: 0; }
+html[data-shell="admin"][data-brand] .school-report .report-pupils small { font-size: 13px; color: var(--shell-muted); }
 /* Mockup 19: the table takes about two thirds, the pupils panel sits on the right at 1440 px. */
 @media (min-width: 1101px) {
-  html[data-shell="admin"] .school-report .ui-split { grid-template-columns: minmax(0, 2.2fr) minmax(280px, 1fr); }
+  html[data-shell="admin"][data-brand] .school-report .ui-split { grid-template-columns: minmax(0, 2.4fr) minmax(280px, 1fr); }
 }
-html[data-shell="admin"] .school-report .ui-table th,
-html[data-shell="admin"] .school-report .ui-table td { padding-left: 10px; padding-right: 10px; }
-html[data-shell="admin"] .school-report .ui-table td:nth-child(2) { white-space: nowrap; }
+html[data-shell="admin"][data-brand] .school-report .ui-table th,
+html[data-shell="admin"][data-brand] .school-report .ui-table td { padding-left: 10px; padding-right: 10px; }
+html[data-shell="admin"][data-brand] .school-report .ui-table td:nth-child(2) { white-space: nowrap; }
+html[data-shell="admin"][data-brand] .school-report .ui-table thead th { white-space: normal; vertical-align: bottom; }
+html[data-shell="admin"][data-brand] .school-report .report-bar { width: 56px; }

@@ -1033,3 +1033,16 @@ msgstr "Только для школьных классов: учебный го
 
 msgid "This student can't be added to this class: they are not in this branch."
 msgstr "Этого ученика нельзя добавить в класс: он не из этого филиала."
+
+#: main_app/templates/hod_template/school/
+msgid "Register taken today"
+msgstr "Журнал сегодня заполнен"
+
+#: main_app/templates/hod_template/school/
+msgid "Today's register (present / late / absent)"
+msgstr "Журнал за сегодня (пришли / опоздали / нет)"
+
+#: main_app/templates/hod_template/school/
+#, python-format
+msgid "Class: %(name)s"
+msgstr "Класс: %(name)s"

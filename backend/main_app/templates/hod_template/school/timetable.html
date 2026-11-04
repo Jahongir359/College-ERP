@@ -13,8 +13,9 @@
       {% endfor %}
       {% if group not in picker %}<option value="{{ group.pk }}" selected>{% blocktranslate with name=group.name %}Class: {{ name }}{% endblocktranslate %}</option>{% endif %}
     </select>
-    <label class="school-date-field">
-      <span>{% translate "Changes apply from" %}</span>
+    <label class="school-date-field" title="{% translate 'Changes apply from' %}">
+      <span class="sr-only">{% translate "Changes apply from" %}</span>
+      <i class="fas fa-calendar-alt" aria-hidden="true"></i>
       <input type="date" name="start" value="{{ start|date:'Y-m-d' }}" class="ui-select" onchange="this.form.submit()">
     </label>
     <noscript><button type="submit" class="ui-btn ui-btn--secondary">{% translate "Show" %}</button></noscript>
