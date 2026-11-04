@@ -2566,3 +2566,7 @@ msgstr "\"%(group)s\" guruhi arxivdan qaytarildi."
 
 msgid "Central profile and settings hub for Iceberg"
 msgstr "Iceberg profil va sozlamalar markazi"
+
+#: main_app/school_forms.py
+msgid "Choose a pupil"
+msgstr "Oʻquvchini tanlang"

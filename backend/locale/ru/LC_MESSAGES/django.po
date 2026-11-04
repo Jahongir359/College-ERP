@@ -2571,3 +2571,7 @@ msgstr "Группа «%(group)s» возвращена из архива."
 
 msgid "Central profile and settings hub for Iceberg"
 msgstr "Центр профиля и настроек Iceberg"
+
+#: main_app/school_forms.py
+msgid "Choose a pupil"
+msgstr "Выберите ученика"
