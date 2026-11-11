@@ -92,7 +92,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 7/8 (P3.9 claimed; P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | Done 2026-11-11 — 8/8 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
@@ -861,7 +861,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       buttons, School wordmark), page header blocks `page_eyebrow`/`page_actions` in `base.html`
       (empty for every other page), `school_period` in `context_processors.school_nav` is lazy. The
       P3.1/P3.2 tables now stay visible and scroll sideways below 1025 px (`school-admin.css`).
-- [~] **P3.9** Admin web shell rebuilt to the mockups in both brands (D19; claimed 2026-11-01,
+- [x] **P3.9** Admin web shell rebuilt to the mockups in both brands (D19; claimed 2026-11-01,
       `feat/school-admin-shell`): one shell (white sidebar with the brand logo, short menu per brand, topbar
       with year · quarter or branch chip, bell and initials avatar holding language, theme and sign-out),
       School palette maroon/gold, Study Center palette navy/lime/ice (screens 16c, 16d), all through brand
@@ -869,6 +869,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       (16–19) and the main Study Center pages (dashboard, students, teachers, groups, payments) to the
       mockups; other pages inherit the shell. Also fixes the unreadable navy-sidebar text in the Study
       Center admin. Done when: side-by-side images per mockup (light, dark, 390 px), uz/ru/en, full suite.
+      — done 2026-11-11 (P3.9a PR #74, P3.9b PR #75, P3.9c branch `feat/center-admin-pages`); verified: full
+      suite 643 OK, `test_admin_center_pages`, side-by-side images `school-app-screens/p3.9a-*.png`,
+      `p3.9b-*.png`, `p3.9c-*.png`. Pages still on old colours are listed in the 2026-11-04 P3.9c log line.
       **Split (2026-11-01):** P3.9a shell (this branch: base template, sidebar, topbar, tokens, landing,
       page header, UI kit), P3.9b School pages 16–19 and the board (another session, branched off the
       shell), P3.9c Study Center pages (dashboard 16d, students 16c, teachers, groups, payments).
@@ -1085,6 +1088,22 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   collections, record_payment, generate_invoices, add_enrollment, manage_vocabulary_days, story_form,
   manage_stories, admin_manage_seasons, admin_leaderboard_settings, the home's lower analytics charts
   (JS colours) and the phone card chips on the list pages (`admin-manage-mobile.css`).
+
+- 2026-11-04 — Web audit M2 part 2 (branch i18n/admin-pages-2, Python only): Student and Invoice
+  status labels and the "Level N" choices use gettext_lazy; the group form's Name label and the
+  branch field label ("Branch / Location", which a stale bound field showed as "Branch") follow the
+  language; the `uzs` filter's "ming"/"million"/"soʻm" are translated on pages (ru: "тыс."/"млн"/"сум")
+  while stored notification texts keep them; payments_views messages and page titles (generate,
+  one-off invoice, record payment, collections) use gettext/ngettext. No migration (0051 stays for
+  PL.1). Templates untouched (P3.9 restyles them); their remaining English text is for later.
+
+- 2026-11-04 — P3.9b (`feat/school-pages-redesign`): School classes (16), timetable (17), parents (18),
+  parent page (18b), register report (19) and the board `/maktab/` rebuilt on the Admin UI kit, colours
+  only from `--shell-*` tokens; the old P3.8 board CSS with fixed colours is gone. Classes gains a 4th stat
+  "Register taken today" and a today's present/late/absent column (`school.register_summaries`); the parent
+  page works without JS (relation and main-contact toggle submit on change, noscript Save). Deliberate
+  differences from the mockups: no CSV on classes, the class search box stays, the topbar search belongs
+  to the shell. P3.9 stays `[~]` until P3.9c (Study Center pages). Proof: `school-app-screens/p3.9b-*.png`.
 
 - 2026-11-04 — Web audit M2 part 1 (PR #73, i18n): admin Dashboard, Students, Teachers, Groups (list,
   add, edit), Payments and the admin Profile now render in uz/ru, including the delete/archive/cancel/remind

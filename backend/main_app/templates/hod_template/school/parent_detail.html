@@ -2,21 +2,20 @@
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'school_parents' %}">{% translate "School" %} · {% translate "Parents" %}</a></p>{% endblock %}
-{% block page_subtitle %}<p class="page-subtitle">{% translate "Login ID" %}: {{ parent.admin.login_id }}</p>{% endblock %}
 {% block page_actions %}
 <div class="page-actions">
-  <a href="{% url 'school_parents' %}" class="ice-manage-action">← {% translate "All parents" %}</a>
-  <form method="post" action="{% url 'school_parent_reset_password' parent.pk %}" class="school-inline-form">
+  <a href="{% url 'school_parents' %}" class="ui-btn ui-btn--secondary">← {% translate "All parents" %}</a>
+  <form method="post" action="{% url 'school_parent_reset_password' parent.pk %}" class="school-header-form">
     {% csrf_token %}
-    <button type="submit" class="ice-manage-action"
+    <button type="submit" class="ui-btn ui-btn--secondary"
             data-confirm="{% translate 'Give this parent a new password? The old one stops working.' %}"
             onclick="return confirm(this.dataset.confirm)">
       <i class="fas fa-key" aria-hidden="true"></i> {% translate "Reset password" %}
     </button>
   </form>
-  <form method="post" action="{% url 'school_parent_delete' parent.pk %}" class="school-inline-form">
+  <form method="post" action="{% url 'school_parent_delete' parent.pk %}" class="school-header-form">
     {% csrf_token %}
-    <button type="submit" class="ice-manage-action ice-manage-action--danger"
+    <button type="submit" class="ui-btn ui-btn--secondary school-danger"
             data-confirm="{% translate 'Delete this parent login? Their children stay.' %}"
             onclick="return confirm(this.dataset.confirm)">
       {% translate "Delete" %}
@@ -26,66 +25,77 @@
 {% endblock %}
 
 {% block custom_css %}
-<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
 <link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
 {% endblock custom_css %}
 
 {% block content %}
-<div class="ice-manage-page">
+<div class="school-page">
   {% if new_password %}
-  <div class="school-password" role="status">
+  <div class="ui-card school-password" role="status">
     <strong>{% translate "New password" %}: <code>{{ new_password }}</code></strong>
-    <span>{% translate "Give it to the parent now; it is shown only once." %}</span>
+    <small>{% translate "Give it to the parent now; it is shown only once." %}</small>
   </div>
   {% endif %}
 
-  <div class="school-split school-split--detail">
-    <aside class="school-panel">
-      <h3 class="school-panel__title">{% translate "Details" %}</h3>
+  <div class="school-detail">
+    <aside class="ui-card school-form-card">
+      <div class="school-person">
+        <span class="ui-avatar">{{ parent.admin.first_name|slice:":1"|upper }}{{ parent.admin.last_name|slice:":1"|upper }}</span>
+        <div>
+          <strong>{{ parent.admin.get_full_name }}</strong>
+          <small class="school-sub">{% translate "Login ID" %}: {{ parent.admin.login_id }}</small>
+        </div>
+      </div>
       <form method="post" class="school-stack">
         {% csrf_token %}
         {{ form.non_field_errors }}
         {% include "hod_template/school/_field.html" with field=form.first_name %}
         {% include "hod_template/school/_field.html" with field=form.last_name %}
         {% include "hod_template/school/_field.html" with field=form.phone %}
-        <button type="submit" class="ice-manage-add-btn school-submit">{% translate "Save" %}</button>
+        <button type="submit" class="ui-btn ui-btn--primary school-submit">{% translate "Save" %}</button>
       </form>
       <p class="school-help">{% translate "“Reset password” gives a new temporary password; hand it to the parent." %}</p>
     </aside>
 
-    <div>
-      <section class="school-panel" aria-labelledby="children-title">
-        <h3 id="children-title" class="school-panel__title">{% translate "Children" %}
-          {% if hidden_count %}<span class="school-chip school-chip--other">{% blocktranslate count n=hidden_count %}+{{ n }} in another branch{% plural %}+{{ n }} in other branches{% endblocktranslate %}</span>{% endif %}
-        </h3>
-        <div class="ice-manage-table-wrap school-table-wrap">
-          <table class="ice-manage-table">
+    <div class="school-stack">
+      <section class="ui-card school-flush" aria-labelledby="children-title">
+        <div class="ui-card-head">
+          <h2 id="children-title" class="ui-card-title">{% translate "Children" %}</h2>
+          {% if hidden_count %}<span class="ui-badge ui-badge--muted school-chip--other">{% blocktranslate count n=hidden_count %}+{{ n }} in another branch{% plural %}+{{ n }} in other branches{% endblocktranslate %}</span>{% endif %}
+        </div>
+        <div class="ui-table-wrap" data-no-table-enhance>
+          <table class="ui-table">
             <thead>
               <tr>
                 <th>{% translate "Child" %}</th>
                 <th>{% translate "Class" %}</th>
-                <th>{% translate "Relation" %} · {% translate "Main contact" %}</th>
-                <th></th>
+                <th>{% translate "Relation" %}</th>
+                <th>{% translate "Main contact" %}</th>
+                <th><span class="sr-only">{% translate "Unlink" %}</span></th>
               </tr>
             </thead>
             <tbody>
               {% for link, edit in links %}
               <tr>
                 <td><strong>{{ link.student.admin.get_full_name }}</strong></td>
-                <td>{{ link.class_name|default:link.student.branch.name|default:"—" }}</td>
+                <td class="school-nowrap">{{ link.class_name|default:link.student.branch.name|default:"—" }}</td>
                 <td>
-                  <form method="post" action="{% url 'school_parent_child_edit' parent.pk link.student_id %}" class="school-inline-form school-link-edit">
-                    {% csrf_token %}
-                    <label class="visually-hidden" for="{{ edit.relation.id_for_label }}">{{ edit.relation.label }}</label>
-                    {{ edit.relation }}
-                    <label class="school-check">{{ edit.is_primary }} {% translate "Main contact" %}</label>
-                    <button type="submit" class="ice-manage-action">{% translate "Save" %}</button>
-                  </form>
+                  <form method="post" id="link-{{ link.student_id }}" action="{% url 'school_parent_child_edit' parent.pk link.student_id %}">{% csrf_token %}</form>
+                  <select name="{{ edit.relation.html_name }}" form="link-{{ link.student_id }}" class="ui-select school-pill-select" aria-label="{% translate 'Relation' %}" onchange="this.form.submit()">
+                    {% for option in edit.relation %}<option value="{{ option.data.value }}"{% if option.data.selected %} selected{% endif %}>{{ option.data.label }}</option>{% endfor %}
+                  </select>
                 </td>
                 <td>
-                  <form method="post" action="{% url 'school_parent_child_remove' parent.pk link.student_id %}" class="school-inline-form">
+                  <label class="school-switch">
+                    <input type="checkbox" name="{{ edit.is_primary.html_name }}" form="link-{{ link.student_id }}"{% if edit.is_primary.value %} checked{% endif %} onchange="this.form.submit()">
+                    <span class="sr-only">{% translate "Main contact for this child" %}</span>
+                  </label>
+                  <noscript><button type="submit" form="link-{{ link.student_id }}" class="ui-btn ui-btn--secondary ui-btn--sm">{% translate "Save" %}</button></noscript>
+                </td>
+                <td class="ui-end">
+                  <form method="post" action="{% url 'school_parent_child_remove' parent.pk link.student_id %}" class="school-header-form">
                     {% csrf_token %}
-                    <button type="submit" class="ice-manage-action ice-manage-action--danger"
+                    <button type="submit" class="school-link-danger"
                             data-confirm="{% translate 'Unlink this child from the parent?' %}"
                             onclick="return confirm(this.dataset.confirm)">
                       {% translate "Unlink" %}
@@ -94,22 +104,22 @@
                 </td>
               </tr>
               {% empty %}
-              <tr><td colspan="4"><div class="ice-manage-empty"><strong>{% translate "No children linked." %}</strong></div></td></tr>
+              <tr><td colspan="5"><div class="ui-empty">{% translate "No children linked." %}</div></td></tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
-        <form method="post" action="{% url 'school_parent_child_add' parent.pk %}" class="school-inline-form school-add-row">
+        <form method="post" action="{% url 'school_parent_child_add' parent.pk %}" class="school-add-child">
           {% csrf_token %}
           {% include "hod_template/school/_field.html" with field=child_form.student %}
           {% include "hod_template/school/_field.html" with field=child_form.relation %}
           <label class="school-check">{{ child_form.is_primary }} {% translate "Main contact" %}</label>
-          <button type="submit" class="ice-manage-action ice-manage-action--primary"><i class="fas fa-plus" aria-hidden="true"></i> {% translate "Link child" %}</button>
+          <button type="submit" class="ui-btn ui-btn--primary"><i class="fas fa-plus" aria-hidden="true"></i> {% translate "Link child" %}</button>
         </form>
       </section>
 
-      <section class="school-panel school-panel--gold">
-        {% include "hod_template/school/parent_link_form.html" %}
+      <section class="ui-card school-card-gold">
+        {% include "hod_template/school/parent_link_form.html" with inline=True %}
       </section>
     </div>
   </div>

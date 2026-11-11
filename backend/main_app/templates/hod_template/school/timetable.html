@@ -1,66 +1,60 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
-{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
-{% block page_subtitle %}{% if group %}<p class="page-subtitle">{{ group.name }} · {{ group.branch.name }} · {{ group.session }}</p>{% endif %}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}{% if group %} · {{ group.name }}{% endif %}</p>{% endblock %}
+{% block page_subtitle %}{% if group %}<p class="page-subtitle">{{ group.branch.name }} · {{ group.session }}</p>{% endif %}{% endblock %}
 {% block page_actions %}
+{% if group %}
 <div class="page-actions">
-  {% if group %}<a href="{% url 'school_class_detail' group.pk %}" class="ice-manage-action">{% translate "Class page" %}</a>{% endif %}
+  <form method="get" class="school-header-form">
+    <select name="class" class="ui-select" aria-label="{% translate 'Class' %}" onchange="this.form.submit()">
+      {% for c in picker %}
+      <option value="{{ c.pk }}" {% if c.pk == group.pk %}selected{% endif %}>{% blocktranslate with name=c.name %}Class: {{ name }}{% endblocktranslate %}{% if c.branch_id != group.branch_id %} · {{ c.branch.name }}{% endif %}</option>
+      {% endfor %}
+      {% if group not in picker %}<option value="{{ group.pk }}" selected>{% blocktranslate with name=group.name %}Class: {{ name }}{% endblocktranslate %}</option>{% endif %}
+    </select>
+    <label class="school-date-field" title="{% translate 'Changes apply from' %}">
+      <span class="sr-only">{% translate "Changes apply from" %}</span>
+      <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+      <input type="date" name="start" value="{{ start|date:'Y-m-d' }}" class="ui-select" onchange="this.form.submit()">
+    </label>
+    <noscript><button type="submit" class="ui-btn ui-btn--secondary">{% translate "Show" %}</button></noscript>
+  </form>
+  <a href="{% url 'school_class_detail' group.pk %}" class="ui-btn ui-btn--secondary">{% translate "Class page" %}</a>
+  {% if rows and subjects %}
+  <button type="submit" form="timetable-form" class="ui-btn ui-btn--primary"><i class="fas fa-save" aria-hidden="true"></i> {% translate "Save" %}</button>
+  {% endif %}
 </div>
+{% endif %}
 {% endblock %}
 
 {% block custom_css %}
-<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
 <link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
 {% endblock custom_css %}
 
 {% block content %}
-<div class="ice-manage-page">
+<div class="school-page">
 
   {% if not group %}
-  <div class="ice-manage-empty">
-    <i class="fas fa-door-open" aria-hidden="true"></i>
-    <strong>{% translate "No classes yet" %}</strong>
-    <span><a href="{% url 'school_class_add' %}">{% translate "Create the first class, for example 1-A." %}</a></span>
+  <div class="ui-card ui-empty">
+    <strong>{% translate "No classes yet" %}</strong><br>
+    <a class="ui-open" href="{% url 'school_class_add' %}">{% translate "Create the first class, for example 1-A." %}</a>
   </div>
-  {% else %}
-
-  <form method="get" class="school-week-bar">
-    <div class="school-inline-form">
-      <div>
-        <label for="tt-class">{% translate "Class" %}</label>
-        <select id="tt-class" name="class" class="form-control" onchange="this.form.submit()">
-          {% for c in picker %}
-          <option value="{{ c.pk }}" {% if c.pk == group.pk %}selected{% endif %}>{{ c.name }}{% if c.branch_id != group.branch_id %} · {{ c.branch.name }}{% endif %}</option>
-          {% endfor %}
-          {% if group not in picker %}<option value="{{ group.pk }}" selected>{{ group.name }}</option>{% endif %}
-        </select>
-      </div>
-      <div>
-        <label for="tt-start">{% translate "Changes apply from" %}</label>
-        <input id="tt-start" type="date" name="start" value="{{ start|date:'Y-m-d' }}" class="form-control">
-      </div>
-      <button type="submit" class="ice-manage-action">{% translate "Show" %}</button>
-    </div>
-  </form>
-
-  {% if not rows %}
-  <div class="ice-manage-empty">
-    <i class="fas fa-bell" aria-hidden="true"></i>
-    <strong>{% translate "This branch has no bell times yet." %}</strong>
-    <span><a href="{% url 'school_bells' %}">{% translate "Add the bell times first." %}</a></span>
+  {% elif not rows %}
+  <div class="ui-card ui-empty">
+    <strong>{% translate "This branch has no bell times yet." %}</strong><br>
+    <a class="ui-open" href="{% url 'school_bells' %}">{% translate "Add the bell times first." %}</a>
   </div>
   {% elif not subjects %}
-  <div class="ice-manage-empty">
-    <i class="fas fa-book" aria-hidden="true"></i>
-    <strong>{% translate "This class has no subjects yet." %}</strong>
-    <span><a href="{% url 'school_class_detail' group.pk %}">{% translate "Add subjects on the class page first." %}</a></span>
+  <div class="ui-card ui-empty">
+    <strong>{% translate "This class has no subjects yet." %}</strong><br>
+    <a class="ui-open" href="{% url 'school_class_detail' group.pk %}">{% translate "Add subjects on the class page first." %}</a>
   </div>
   {% else %}
-  <form method="post" action="{% url 'school_timetable' %}?class={{ group.pk }}">
+  <form method="post" id="timetable-form" action="{% url 'school_timetable' %}?class={{ group.pk }}">
     {% csrf_token %}
     <input type="hidden" name="start" value="{{ start|date:'Y-m-d' }}">
-    <div class="ice-manage-table-wrap school-week-wrap">
+    <div class="ui-card school-week-card">
       <table class="school-week">
         <thead>
           <tr>
@@ -73,18 +67,20 @@
           <tr>
             <th scope="row" class="school-week__period">{{ row.period.number }}<span>{{ row.period.start_time|time:"H:i" }}</span></th>
             {% for cell in row.cells %}
-            <td class="school-cell{% if not cell.selected %} school-cell--empty{% endif %}{% if cell.errors %} school-cell--clash{% endif %}">
-              <label class="visually-hidden" for="{{ cell.name }}">{{ row.period.number }} · {{ cell.day }}</label>
-              <select id="{{ cell.name }}" name="{{ cell.name }}" class="form-control">
-                <option value="">+ {% translate "lesson" %}</option>
-                {% for cs in subjects %}
-                <option value="{{ cs.pk }}" {% if cs.pk == cell.selected %}selected{% endif %}>{{ cs.subject.name }}</option>
-                {% endfor %}
-              </select>
-              {% if cell.lesson and cell.lesson.class_subject_id == cell.selected and cell.lesson.class_subject.teacher %}
-              <span class="school-cell__teacher">{{ cell.lesson.class_subject.teacher.admin.get_full_name }}</span>
-              {% endif %}
-              {% for error in cell.errors %}<span class="school-cell__error">{{ error }}</span>{% endfor %}
+            <td>
+              <div class="school-cell{% if not cell.selected %} school-cell--empty{% endif %}{% if cell.errors %} school-cell--clash{% endif %}">
+                <label class="visually-hidden" for="{{ cell.name }}">{{ row.period.number }} · {{ cell.day }}</label>
+                <select id="{{ cell.name }}" name="{{ cell.name }}" class="school-cell__subject">
+                  <option value="">+ {% translate "lesson" %}</option>
+                  {% for cs in subjects %}
+                  <option value="{{ cs.pk }}" {% if cs.pk == cell.selected %}selected{% endif %}>{{ cs.subject.name }}</option>
+                  {% endfor %}
+                </select>
+                {% if cell.lesson and cell.lesson.class_subject_id == cell.selected and cell.lesson.class_subject.teacher %}
+                <small class="school-cell__teacher">{{ cell.lesson.class_subject.teacher.admin.get_full_name }}</small>
+                {% endif %}
+                {% for error in cell.errors %}<strong class="school-cell__error">{{ error }}</strong>{% endfor %}
+              </div>
             </td>
             {% endfor %}
           </tr>
@@ -95,19 +91,18 @@
 
     <ul class="school-hours-list" aria-label="{% translate 'Lessons a week per subject' %}">
       {% for cs, count in hours %}
-      <li class="{% if count != cs.weekly_hours %}is-off{% endif %}">{{ cs.subject.name }} {{ count }}/{{ cs.weekly_hours }}</li>
+      <li class="ui-badge {% if count != cs.weekly_hours %}ui-badge--late{% else %}ui-badge--muted{% endif %}">{{ cs.subject.name }} {{ count }}/{{ cs.weekly_hours }}</li>
       {% endfor %}
     </ul>
 
-    <div class="school-week-bar">
-      <p class="school-muted" style="margin:0;">
-        {% if whole_year %}{% translate "Changes apply to the whole academic year." %}{% else %}{% blocktranslate with day=start|date:"d.m.Y" %}Changes apply from {{ day }}; earlier weeks keep the old timetable.{% endblocktranslate %}{% endif %}
-        {% translate "A red cell is a clash: the teacher or room is busy at that time. Fix it before saving." %}
-      </p>
-      <button type="submit" class="ice-manage-add-btn"><i class="fas fa-save" aria-hidden="true"></i> {% translate "Save" %}</button>
+    <p class="school-help">
+      {% if whole_year %}{% translate "Changes apply to the whole academic year." %}{% else %}{% blocktranslate with day=start|date:"d.m.Y" %}Changes apply from {{ day }}; earlier weeks keep the old timetable.{% endblocktranslate %}{% endif %}
+      {% translate "A red cell is a clash: the teacher or room is busy at that time. Fix it before saving." %}
+    </p>
+    <div class="school-form-end">
+      <button type="submit" class="ui-btn ui-btn--primary"><i class="fas fa-save" aria-hidden="true"></i> {% translate "Save" %}</button>
     </div>
   </form>
-  {% endif %}
   {% endif %}
 </div>
 {% endblock content %}
