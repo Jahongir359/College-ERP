@@ -1,21 +1,21 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
-{% block title %}{{ page_title }} — Iceberg Study Center{% endblock %}
+{% load static i18n %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'admin_payments' %}">{% translate "Payments" %}</a></p>{% endblock page_eyebrow %}
 {% block page_title %}{{ page_title }}{% endblock page_title %}
-{% block breadcrumb %}<li class="breadcrumb-item"><a href="{% url 'admin_payments' %}">Payments</a></li><li class="breadcrumb-item active">Generate</li>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "Creates one tuition invoice per active enrollment for the chosen month. Already-invoiced students are skipped, so it is safe to run again." %}</p>{% endblock page_subtitle %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'admin_payments' %}" class="ui-btn ui-btn--secondary">← {% translate "Back to payments" %}</a>
+</div>{% endblock page_actions %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
+{% endblock custom_css %}
 
 {% block content %}
-<div class="page-card" style="max-width:640px;">
-  <div class="page-card-header">
-    <i class="fas fa-file-invoice"></i>
-    <div>
-      <div class="page-card-title">{{ page_title }}</div>
-      <div class="page-card-subtitle">Creates one tuition invoice per active enrollment for the chosen month. Already-invoiced students are skipped, so it is safe to run again.</div>
-    </div>
+<div class="admin-form-page">
+  <div class="page-card">
+    {% translate "Generate invoices" as button_text %}
+    {% include "main_app/form_template.html" with messages=messages form=form button_text=button_text %}
   </div>
-  {% include "main_app/form_template.html" with messages=messages form=form button_text="Generate Invoices" %}
-  <a href="{% url 'admin_payments' %}" class="enroll-secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;margin:0 22px 22px;border:1px solid var(--ice-border,#E4E7EC);border-radius:12px;color:var(--ice-muted,#64748B);font-size:13px;font-weight:700;text-decoration:none;">
-    <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Payments
-  </a>
 </div>
 {% endblock content %}

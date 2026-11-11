@@ -2224,7 +2224,7 @@ def add_enrollment(request):
                 "students": students,
                 "errors": errors,
                 "posted": request.POST,
-                "page_title": "Enroll Student",
+                "page_title": gettext("Enroll student"),
             },
         )
 
@@ -2234,7 +2234,7 @@ def add_enrollment(request):
         {
             "groups": groups,
             "students": students,
-            "page_title": "Enroll Student",
+            "page_title": gettext("Enroll student"),
         },
     )
 

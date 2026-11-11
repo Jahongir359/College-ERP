@@ -1078,6 +1078,15 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-11 — P3.9 follow-up, part 1 (`feat/center-admin-pages-2`, on top of #79): the group page, collections,
+  generate invoices, one-off invoice, record payment and enroll student are on the Admin UI kit and in
+  uz/ru. The old form card (`.page-card`, `.pf-*`: every add/edit form in both brands) now takes shell
+  tokens in `admin-shell.css` section 7c, so its submit button is the kit's primary button. Collections
+  chart colours come from the tokens. Proof `school-app-screens/p3.9d-*.png`. Still on old colours or in
+  English: manage_vocabulary_days, story_form, manage_stories, admin_manage_seasons,
+  admin_leaderboard_settings (super admin only), manage_enrollment, the home's lower charts, phone card
+  chips (`admin-manage-mobile.css`), model field labels on forms (e.g. "Student" on the one-off invoice).
+
 - 2026-11-04 — P3.9c Study Center pages (`feat/center-admin-pages`): admin home to 16d (greeting, four
   numbers with this month's paid total, 6-month payments bars, today's attendance, overdue alert, new
   leads; `payments.dashboard_payment_summary`), students to 16c (numbers, payment badge per pupil from

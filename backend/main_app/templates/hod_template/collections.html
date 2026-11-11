@@ -1,155 +1,130 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
+{% load static i18n %}
 {% load uzs %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'admin_payments' %}?month={{ month_value }}">{% translate "Payments" %}</a> · {{ period|date:"F Y" }}</p>{% endblock page_eyebrow %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% if is_super_admin %}{% translate "Expected vs collected tuition across every branch." %}{% else %}{% translate "Expected vs collected tuition across your groups." %}{% endif %}</p>{% endblock page_subtitle %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'admin_payments' %}?month={{ month_value }}" class="ui-btn ui-btn--secondary"><i class="fas fa-list" aria-hidden="true"></i> {% translate "Invoices" %}</a>
+</div>{% endblock page_actions %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
+{% endblock custom_css %}
 
 {% block content %}
-<div class="ice-mobile-page">
-  <section class="ice-hero">
-    <div class="ice-hero__main">
-      <span class="ice-hero__icon" aria-hidden="true"><i class="fas fa-chart-column"></i></span>
-      <div class="ice-hero__copy">
-        <h2 class="ice-hero__title">Collections · {{ period|date:"F Y" }}</h2>
-        <p class="ice-hero__subtitle">
-          {% if is_super_admin %}Expected vs collected tuition across every branch.{% else %}Expected vs collected tuition across your groups.{% endif %}
-        </p>
-      </div>
+<div class="admin-list-page">
+  <section class="ui-stats" aria-label="{{ page_title }}">
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Expected" %}</div>
+      <span class="ui-stat-value ui-stat-value--money">{{ expected|uzs }}</span>
     </div>
-    <div class="ice-hero__actions">
-      <a href="{% url 'admin_payments' %}?month={{ month_value }}" class="ice-action"><i class="fas fa-list" aria-hidden="true"></i> Invoices</a>
+    <div class="ui-stat ui-stat--ok">
+      <div class="ui-stat-label">{% translate "Collected" %}</div>
+      <span class="ui-stat-value ui-stat-value--money">{{ collected|uzs }}</span>
+    </div>
+    <div class="ui-stat ui-stat--abs">
+      <div class="ui-stat-label">{% translate "Outstanding" %}</div>
+      <span class="ui-stat-value ui-stat-value--money">{{ outstanding|uzs }}</span>
+    </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Collection rate" %}</div>
+      <span class="ui-stat-value">{{ collection_rate }}%</span>
     </div>
   </section>
 
-  {# ── Month picker ──────────────────────────────────────────────────── #}
-  <div class="ice-form-section">
-    <form method="get" class="ice-form-grid" style="align-items:end;">
-      <div>
-        <label class="form-label" for="month-filter">Month</label>
-        <input type="month" id="month-filter" name="month" value="{{ month_value }}"
-               class="form-control" onchange="this.form.submit()">
-      </div>
-    </form>
-  </div>
-
-  {# ── Summary cards ─────────────────────────────────────────────────── #}
-  <div class="ice-form-section" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px;">
-    <div style="padding:14px 16px; border:1px solid var(--ice-border,#E4E7EC); border-radius:14px;">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">Expected</div>
-      <div style="font-size:18px; font-weight:800;">{{ expected|uzs }}</div>
-    </div>
-    <div style="padding:14px 16px; border:1px solid rgba(22,163,74,.35); border-radius:14px; background:rgba(22,163,74,.06);">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#16A34A;">Collected</div>
-      <div style="font-size:18px; font-weight:800; color:#16A34A;">{{ collected|uzs }}</div>
-    </div>
-    <div style="padding:14px 16px; border:1px solid rgba(220,38,38,.35); border-radius:14px; background:rgba(220,38,38,.05);">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#DC2626;">Outstanding</div>
-      <div style="font-size:18px; font-weight:800; color:#DC2626;">{{ outstanding|uzs }}</div>
-    </div>
-    <div style="padding:14px 16px; border:1px solid var(--ice-border,#E4E7EC); border-radius:14px;">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">Collection rate</div>
-      <div style="font-size:18px; font-weight:800;">{{ collection_rate }}%</div>
-    </div>
-  </div>
+  <form method="get" class="ui-filters">
+    <label for="month-filter" class="visually-hidden">{% translate "Month" %}</label>
+    <input type="month" id="month-filter" name="month" value="{{ month_value }}" class="ui-select" onchange="this.form.submit()">
+  </form>
 
   {% if worst %}
-  <div class="ice-form-section">
-    <div style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1px solid rgba(220,38,38,.35); border-radius:14px; background:rgba(220,38,38,.05);">
-      <i class="fas fa-triangle-exclamation" style="color:#DC2626; font-size:18px;" aria-hidden="true"></i>
-      <div>
-        <div style="font-weight:800;">{{ group_by_label }} lagging the most: {{ worst.label }}</div>
-        <div style="font-size:13px; color:var(--ice-muted,#64748B);">
-          {{ worst.outstanding|uzs }} outstanding · {{ worst.rate }}% collected
-        </div>
-      </div>
-    </div>
+  <div class="admin-home-alert" role="status">
+    <span class="admin-home-alert__icon" aria-hidden="true"><i class="fas fa-exclamation-triangle"></i></span>
+    <span class="admin-home-alert__text">
+      <b>{% blocktranslate with kind=group_by_label name=worst.label %}{{ kind }} lagging the most: {{ name }}{% endblocktranslate %}</b>
+      <small>{% blocktranslate with amount=worst.outstanding|uzs rate=worst.rate %}{{ amount }} outstanding · {{ rate }}% collected{% endblocktranslate %}</small>
+    </span>
   </div>
   {% endif %}
 
-  {# ── Chart: expected vs collected ──────────────────────────────────── #}
   {% if rows %}
-  <div class="ice-form-section">
-    <div style="padding:16px; border:1px solid var(--ice-border,#E4E7EC); border-radius:16px;">
-      <div style="font-weight:800; margin-bottom:10px;">Expected vs collected by {{ group_by_label|lower }}</div>
-      <div style="position:relative; height:340px;">
-        <canvas id="collections-chart"></canvas>
-      </div>
+  <section class="ui-card">
+    <div class="ui-card-head">
+      <h2 class="ui-card-title">{% blocktranslate with kind=group_by_label|lower %}Expected vs collected by {{ kind }}{% endblocktranslate %}</h2>
     </div>
-  </div>
+    <div class="admin-chart-box">
+      <canvas id="collections-chart" data-label-expected="{% translate 'Expected' %}" data-label-collected="{% translate 'Collected' %}"></canvas>
+    </div>
+  </section>
   {% endif %}
 
-  {# ── Ranked breakdown table ────────────────────────────────────────── #}
-  <div class="ice-form-section">
-    <div class="ice-table-scroll" style="overflow-x:auto;">
-      <table class="ice-table" style="width:100%; border-collapse:collapse; min-width:680px;">
-        <thead>
-          <tr style="text-align:left; border-bottom:2px solid var(--ice-border,#E4E7EC); font-size:12px; text-transform:uppercase; letter-spacing:.03em; color:var(--ice-muted,#64748B);">
-            <th style="padding:10px 12px;">{{ group_by_label }}</th>
-            <th style="padding:10px 12px;">Students</th>
-            <th style="padding:10px 12px;">Expected</th>
-            <th style="padding:10px 12px;">Collected</th>
-            <th style="padding:10px 12px;">Outstanding</th>
-            <th style="padding:10px 12px;">Rate</th>
-            <th style="padding:10px 12px;">Overdue</th>
-            <th style="padding:10px 12px;">Partial</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in rows %}
-          <tr style="border-bottom:1px solid var(--ice-border,#E4E7EC);">
-            <td style="padding:10px 12px; font-weight:700;">{{ row.label }}</td>
-            <td style="padding:10px 12px;">{{ row.students }}</td>
-            <td style="padding:10px 12px;">{{ row.expected|uzs_plain }}</td>
-            <td style="padding:10px 12px; color:#16A34A; font-weight:700;">{{ row.collected|uzs_plain }}</td>
-            <td style="padding:10px 12px; {% if row.outstanding > 0 %}color:#DC2626; font-weight:700;{% endif %}">{{ row.outstanding|uzs_plain }}</td>
-            <td style="padding:10px 12px;">{{ row.rate }}%</td>
-            <td style="padding:10px 12px;">{% if row.overdue %}<span style="color:#DC2626; font-weight:700;">{{ row.overdue }}</span>{% else %}0{% endif %}</td>
-            <td style="padding:10px 12px;">{{ row.partial }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="8" style="padding:18px 12px; text-align:center; color:var(--ice-muted,#64748B);">No invoices for this month yet.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <div class="ui-table-wrap" data-no-table-enhance>
+    <table class="ui-table">
+      <thead>
+        <tr>
+          <th>{{ group_by_label }}</th>
+          <th class="ui-num">{% translate "Students" %}</th>
+          <th class="ui-num">{% translate "Expected" %}</th>
+          <th class="ui-num">{% translate "Collected" %}</th>
+          <th class="ui-num">{% translate "Outstanding" %}</th>
+          <th class="ui-num">{% translate "Rate" %}</th>
+          <th class="ui-num">{% translate "Overdue" %}</th>
+          <th class="ui-num">{% translate "Partial" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td><strong>{{ row.label }}</strong></td>
+          <td class="ui-num">{{ row.students }}</td>
+          <td class="ui-num">{{ row.expected|uzs_plain }}</td>
+          <td class="ui-num">{{ row.collected|uzs_plain }}</td>
+          <td class="ui-num">{% if row.outstanding > 0 %}<span class="admin-list-owed">{{ row.outstanding|uzs_plain }}</span>{% else %}{{ row.outstanding|uzs_plain }}{% endif %}</td>
+          <td class="ui-num">{{ row.rate }}%</td>
+          <td class="ui-num">{% if row.overdue %}<span class="ui-badge ui-badge--abs">{{ row.overdue }}</span>{% else %}0{% endif %}</td>
+          <td class="ui-num">{{ row.partial }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8"><div class="ui-empty">{% translate "No invoices for this month yet." %}</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
-  {# ── Branch-admin: who needs chasing ───────────────────────────────── #}
+  {# Branch admin: who needs chasing #}
   {% if not is_super_admin and attention %}
-  <div class="ice-form-section">
-    <div style="font-weight:800; margin-bottom:10px;"><i class="fas fa-user-clock" aria-hidden="true"></i> Needs attention — overdue &amp; partial payers</div>
-    <div class="ice-table-scroll" style="overflow-x:auto;">
-      <table class="ice-table" style="width:100%; border-collapse:collapse; min-width:640px;">
+  <section class="ui-card admin-card-flush">
+    <div class="ui-card-head">
+      <h2 class="ui-card-title">{% translate "Needs attention: overdue and partial payers" %}</h2>
+    </div>
+    <div class="ui-table-wrap" data-no-table-enhance>
+      <table class="ui-table">
         <thead>
-          <tr style="text-align:left; border-bottom:2px solid var(--ice-border,#E4E7EC); font-size:12px; text-transform:uppercase; letter-spacing:.03em; color:var(--ice-muted,#64748B);">
-            <th style="padding:10px 12px;">Student</th>
-            <th style="padding:10px 12px;">Group</th>
-            <th style="padding:10px 12px;">Status</th>
-            <th style="padding:10px 12px;">Balance</th>
-            <th style="padding:10px 12px;">Due</th>
-            <th style="padding:10px 12px;"></th>
+          <tr>
+            <th>{% translate "Student" %}</th>
+            <th>{% translate "Group" %}</th>
+            <th>{% translate "Status" %}</th>
+            <th class="ui-num">{% translate "Balance" %}</th>
+            <th>{% translate "Due" %}</th>
+            <th><span class="sr-only">{% translate "Record payment" %}</span></th>
           </tr>
         </thead>
         <tbody>
           {% for inv in attention %}
-          <tr style="border-bottom:1px solid var(--ice-border,#E4E7EC);">
-            <td style="padding:10px 12px; font-weight:700;">{{ inv.student }}</td>
-            <td style="padding:10px 12px;">{{ inv.group.name|default:"—" }}</td>
-            <td style="padding:10px 12px;">
-              {% if inv.is_overdue %}
-              <span class="ice-chip" style="border-color:rgba(220,38,38,.4); color:#DC2626;"><i class="fas fa-exclamation-circle" aria-hidden="true"></i> Overdue</span>
-              {% else %}
-              <span class="ice-chip ice-chip--info"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Partial</span>
-              {% endif %}
-            </td>
-            <td style="padding:10px 12px; color:#DC2626; font-weight:700;">{{ inv.balance|uzs_plain }}</td>
-            <td style="padding:10px 12px;">{{ inv.due_date|date:"d M" }}</td>
-            <td style="padding:10px 12px;"><a href="{% url 'admin_record_payment' inv.id %}" class="ice-action ice-action--sm"><i class="fas fa-coins" aria-hidden="true"></i> Record</a></td>
+          <tr>
+            <td><strong>{{ inv.student }}</strong></td>
+            <td>{{ inv.group.name|default:"—" }}</td>
+            <td>{% if inv.is_overdue %}<span class="ui-badge ui-badge--abs">{% translate "Overdue" %}</span>{% else %}<span class="ui-badge ui-badge--late">{% translate "Partial" %}</span>{% endif %}</td>
+            <td class="ui-num"><span class="admin-list-owed">{{ inv.balance|uzs_plain }}</span></td>
+            <td>{{ inv.due_date|date:"d.m.Y" }}</td>
+            <td class="ui-end"><a href="{% url 'admin_record_payment' inv.id %}" class="ui-btn ui-btn--secondary ui-btn--sm">{% translate "Record payment" %}</a></td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-  </div>
+  </section>
   {% endif %}
 </div>
 
@@ -164,10 +139,11 @@ document.addEventListener("DOMContentLoaded", function () {
   var data = JSON.parse(document.getElementById("collections-data").textContent);
   if (!data.labels.length) return;
 
-  var dark = document.documentElement.getAttribute("data-theme") === "dark"
-          || document.body.classList.contains("dark-mode");
-  var tick = dark ? "#cbd5e1" : "#334155";
-  var grid = dark ? "rgba(148,163,184,.18)" : "rgba(100,116,139,.16)";
+  // Colours come from the shell tokens, so both brands and dark mode match the page.
+  var css = getComputedStyle(document.documentElement);
+  function token(name, fallback) { return (css.getPropertyValue(name) || "").trim() || fallback; }
+  var tick = token("--shell-muted", "#334155");
+  var grid = token("--shell-border", "rgba(100,116,139,.16)");
 
   function fmt(v) { return Number(v).toLocaleString("en-US") + " soʻm"; }
 
@@ -176,8 +152,8 @@ document.addEventListener("DOMContentLoaded", function () {
     data: {
       labels: data.labels,
       datasets: [
-        { label: "Expected", data: data.expected, backgroundColor: "#0B4F8A", borderRadius: 6, maxBarThickness: 46 },
-        { label: "Collected", data: data.collected, backgroundColor: "#16A34A", borderRadius: 6, maxBarThickness: 46 }
+        { label: el.dataset.labelExpected, data: data.expected, backgroundColor: token("--shell-primary", "#0B4F8A"), borderRadius: 6, maxBarThickness: 46 },
+        { label: el.dataset.labelCollected, data: data.collected, backgroundColor: token("--shell-ok", "#16A34A"), borderRadius: 6, maxBarThickness: 46 }
       ]
     },
     options: {

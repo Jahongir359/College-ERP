@@ -2708,3 +2708,104 @@ msgstr "Выберите курс"
 #: main_app/school_forms.py
 msgid "Choose a subject"
 msgstr "Выберите предмет"
+
+# P3.9d group page, collections and payment forms
+msgid "All enrollments"
+msgstr "Все зачисления"
+
+msgid "Already paid"
+msgstr "Уже оплачено"
+
+msgid "Back to payments"
+msgstr "Назад к платежам"
+
+msgid "Bill a single student for something outside regular tuition: books, exam fees, a custom plan."
+msgstr "Выставьте одному ученику счёт сверх обычной оплаты: книги, экзаменационный сбор, особый план."
+
+msgid "Choose a group"
+msgstr "Выберите группу"
+
+msgid "Choose a student"
+msgstr "Выберите ученика"
+
+msgid "Collection rate"
+msgstr "Доля сбора"
+
+msgid "Create invoice"
+msgstr "Создать счёт"
+
+msgid "Creates one tuition invoice per active enrollment for the chosen month. Already-invoiced students are skipped, so it is safe to run again."
+msgstr "Создаёт один счёт за обучение на каждое активное зачисление за выбранный месяц. Ученики, у которых счёт уже есть, пропускаются, поэтому запускать повторно безопасно."
+
+msgid "Due date"
+msgstr "Срок оплаты"
+
+msgid "Enroll student"
+msgstr "Зачислить ученика"
+
+msgid "Enrolled on"
+msgstr "Дата зачисления"
+
+msgid "Enrollment status"
+msgstr "Статус зачисления"
+
+msgid "Expected"
+msgstr "Ожидается"
+
+msgid "Expected vs collected tuition across every branch."
+msgstr "Ожидаемая и собранная оплата по всем филиалам."
+
+msgid "Expected vs collected tuition across your groups."
+msgstr "Ожидаемая и собранная оплата по вашим группам."
+
+msgid "Generate invoices"
+msgstr "Создать счета"
+
+msgid "Invoice total"
+msgstr "Сумма счёта"
+
+msgid "Invoices"
+msgstr "Счета"
+
+msgid "Needs attention: overdue and partial payers"
+msgstr "Требуют внимания: просроченные и частичные оплаты"
+
+msgid "No invoices for this month yet."
+msgstr "За этот месяц счетов пока нет."
+
+msgid "No students enrolled in this group yet."
+msgstr "В эту группу пока никто не зачислен."
+
+msgid "No teacher assigned"
+msgstr "Учитель не назначен"
+
+msgid "Pick a group, then choose the student to place in it."
+msgstr "Выберите группу, затем ученика, которого нужно в неё зачислить."
+
+msgid "Rate"
+msgstr "Доля"
+
+msgid "Remaining balance"
+msgstr "Остаток"
+
+msgid "Start date"
+msgstr "Дата начала"
+
+#, python-format
+msgid "%(kind)s lagging the most: %(name)s"
+msgstr "Больше всего долгов — %(kind)s: %(name)s"
+
+#, python-format
+msgid "%(amount)s outstanding · %(rate)s%% collected"
+msgstr "%(amount)s долга · собрано %(rate)s%%"
+
+#, python-format
+msgid "Expected vs collected by %(kind)s"
+msgstr "Ожидается и собрано: %(kind)s"
+
+#, python-format
+msgid "%(n)s inactive"
+msgid_plural "%(n)s inactive"
+msgstr[0] "%(n)s неактивный"
+msgstr[1] "%(n)s неактивных"
+msgstr[2] "%(n)s неактивных"
