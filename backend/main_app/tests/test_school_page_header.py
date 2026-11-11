@@ -4,6 +4,7 @@ from datetime import date
 from unittest import mock
 
 from django.test import override_settings
+from django.utils import translation
 from django.urls import reverse
 
 from main_app.context_processors import school_period_label
@@ -35,7 +36,11 @@ class SchoolPeriodLabelTests(_SchoolFixture):
             end_date=date(2026, 12, 26),
         )
         with _today():
-            self.assertEqual(school_period_label(), "2026–2027 · 1-chorak")
+            self.assertEqual(school_period_label(), "2026–2027 · Quarter 1")
+            # The chip follows the language, not the term's free-text name.
+            for language, label in (("uz", "1-chorak"), ("ru", "1-я четверть")):
+                with translation.override(language):
+                    self.assertEqual(school_period_label(), f"2026–2027 · {label}")
 
     def test_holiday_keeps_the_last_started_quarter_and_unnamed_falls_back(self):
         Term.objects.create(
@@ -88,7 +93,7 @@ class SchoolPageHeaderTests(_SchoolFixture):
                 html = self.html(url)
                 self.assertIn('class="page-eyebrow"', html)
                 self.assertNotIn("ice-manage-hero__title", html)
-                self.assertIn('class="navbar-period-chip">2026–2027 · 1-chorak<', html)
+                self.assertIn('class="navbar-period-chip">2026–2027 · Quarter 1<', html)
 
     def test_actions_move_into_the_page_header(self):
         self.client.force_login(self.school_admin)
@@ -101,8 +106,7 @@ class SchoolPageHeaderTests(_SchoolFixture):
         with _today():
             html = self.html(reverse("admin_home"))
         self.assertNotIn("navbar-period-chip", html)
-        self.assertNotIn("page-eyebrow", html)
-        self.assertNotIn("page-actions", html)
+        # The Study Center home has its own eyebrow and actions since P3.9c (16d).
         self.assertNotIn("navbar-brand-logo", html)  # the School wordmark
         self.assertIn('class="navbar-logo-text">ICEBERG<', html)  # unchanged Center wordmark
 

@@ -188,3 +188,28 @@ html[data-shell="admin"][data-brand] .admin-list-delete:hover {
   background: var(--shell-abs-bg);
   color: var(--shell-abs) !important;
 }
+/* Neutral icon buttons (edit, archive) share the delete button's size; only
+   delete turns red on hover. */
+html[data-shell="admin"][data-brand] .admin-list-icon:hover {
+  background: var(--shell-tint);
+  color: var(--shell-link) !important;
+}
+
+/* ── Payments ───────────────────────────────────────────────────────────── */
+
+html[data-shell="admin"][data-brand] .ui-stat--ok .ui-stat-value { color: var(--shell-ok) !important; }
+html[data-shell="admin"][data-brand] .ui-stat--abs .ui-stat-value { color: var(--shell-abs) !important; }
+html[data-shell="admin"][data-brand] .admin-list-owed { color: var(--shell-abs) !important; }
+html[data-shell="admin"][data-brand] .admin-list-void { font-size: 12px; }
+html[data-shell="admin"][data-brand] input[type="month"].ui-select { min-width: 150px; }
+
+/* Phones and tablets get the card list (admin-manage-mobile.css); the kit
+   table wrap would otherwise stay visible next to it. */
+@media (max-width: 1024px) {
+  html[data-shell="admin"][data-brand] .admin-list-page .ice-manage-table-wrap { display: none !important; }
+}
+@media (max-width: 768px) {
+  html[data-shell="admin"][data-brand] .admin-list-page .ui-stat-value { font-size: 22px; }
+}
+/* Money values are long ("4.8 million soʻm"): a size that keeps them on one line. */
+html[data-shell="admin"][data-brand] .admin-list-page .ui-stat-value--money { font-size: 22px; }

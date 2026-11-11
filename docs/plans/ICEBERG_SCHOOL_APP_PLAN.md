@@ -888,6 +888,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       - Badges: `ui-badge` + `ui-badge--ok` (keldi/toʻlangan), `--late` (kech/olinmagan), `--abs`
         (yoʻq/qarzdor), `--muted`, `--accent` (counts).
       - Others: `ui-avatar` (initials), `ui-empty` (empty state), `ui-split` (list + side panel).
+      - Forms (P3.9c, from P3.9b's `.school-field`/`.school-switch`): `ui-field` > `label` + input/select/
+        textarea (optional `ui-field-help`, `ui-field-error`); toggle `label.ui-switch` > checkbox.
+      - Tables that already have their own search: put `data-no-table-enhance` on the wrap, or
+        `iceberg-interactive.js` adds a second search bar and sort arrows.
       - Tokens for anything else: `--shell-bg`, `--shell-surface`, `--shell-border`, `--shell-text`,
         `--shell-muted`, `--shell-tint`, `--shell-title`, `--shell-eyebrow`, `--shell-link`,
         `--shell-ok/-late/-abs` (+ `-bg`), `--shell-radius`.
@@ -1070,6 +1074,17 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-11-04 — P3.9c Study Center pages (`feat/center-admin-pages`): admin home to 16d (greeting, four
+  numbers with this month's paid total, 6-month payments bars, today's attendance, overdue alert, new
+  leads; `payments.dashboard_payment_summary`), students to 16c (numbers, payment badge per pupil from
+  `payments.student_payment_states`), teachers, groups and payments in the same kit style; phones keep
+  the card lists. Shell follow-ups from the #75 review: quarter chip follows the language, logo can't be
+  squeezed, `ui-field`/`ui-switch` in the kit, accent badge readable in dark. Proof:
+  `school-app-screens/p3.9c-*.png`. Still on old hard-coded colours (follow-up): group_detail,
+  collections, record_payment, generate_invoices, add_enrollment, manage_vocabulary_days, story_form,
+  manage_stories, admin_manage_seasons, admin_leaderboard_settings, the home's lower analytics charts
+  (JS colours) and the phone card chips on the list pages (`admin-manage-mobile.css`).
 
 - 2026-11-04 — Web audit M2 part 1 (PR #73, i18n): admin Dashboard, Students, Teachers, Groups (list,
   add, edit), Payments and the admin Profile now render in uz/ru, including the delete/archive/cancel/remind

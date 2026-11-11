@@ -2609,3 +2609,6 @@ msgstr "Qarzdorlar"
 
 msgid "Present today"
 msgstr "Bugun darsda"
+
+msgid "Without a group"
+msgstr "Guruhsiz"

@@ -1930,11 +1930,21 @@ def manage_group(request):
     branch_id = request.GET.get("branch")
     if branch_id:
         groups = groups.filter(branch_id=branch_id)
+    # P3.9c: numbers above the list.
+    groups = list(groups)
+    active = [g for g in groups if not g.is_archived]
+    group_stats = {
+        "active": len(active),
+        "students": sum(g.enrolled_count for g in active),
+        "no_teacher": sum(1 for g in active if not g.teacher_id),
+        "archived": len(groups) - len(active),
+    }
     return render(
         request,
         "hod_template/manage_group.html",
         {
             "groups": groups,
+            "group_stats": group_stats,
             "page_title": gettext("Manage Groups"),
             "branches": branching.get_accessible_branches(request.user),
             "selected_branch": branch_id,

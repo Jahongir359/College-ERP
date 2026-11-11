@@ -2615,3 +2615,6 @@ msgstr "С просрочкой оплаты"
 
 msgid "Present today"
 msgstr "Сегодня на занятиях"
+
+msgid "Without a group"
+msgstr "Без группы"
