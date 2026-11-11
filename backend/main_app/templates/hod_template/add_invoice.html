@@ -1,18 +1,21 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
-{% block title %}{{ page_title }} — Iceberg Study Center{% endblock %}
+{% load static i18n %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'admin_payments' %}">{% translate "Payments" %}</a></p>{% endblock page_eyebrow %}
 {% block page_title %}{{ page_title }}{% endblock page_title %}
-{% block breadcrumb %}<li class="breadcrumb-item"><a href="{% url 'admin_payments' %}">Payments</a></li><li class="breadcrumb-item active">One-off Invoice</li>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "Bill a single student for something outside regular tuition: books, exam fees, a custom plan." %}</p>{% endblock page_subtitle %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'admin_payments' %}" class="ui-btn ui-btn--secondary">← {% translate "Back to payments" %}</a>
+</div>{% endblock page_actions %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
+{% endblock custom_css %}
 
 {% block content %}
-<div class="page-card" style="max-width:640px;">
-  <div class="page-card-header">
-    <i class="fas fa-file-invoice-dollar"></i>
-    <div>
-      <div class="page-card-title">{{ page_title }}</div>
-      <div class="page-card-subtitle">Bill a single student for something outside regular tuition — books, exam fees, a custom plan.</div>
-    </div>
+<div class="admin-form-page">
+  <div class="page-card">
+    {% translate "Create invoice" as button_text %}
+    {% include "main_app/form_template.html" with messages=messages form=form button_text=button_text %}
   </div>
-  {% include "main_app/form_template.html" with messages=messages form=form button_text="Create Invoice" %}
 </div>
 {% endblock content %}
