@@ -869,7 +869,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       (16–19) and the main Study Center pages (dashboard, students, teachers, groups, payments) to the
       mockups; other pages inherit the shell. Also fixes the unreadable navy-sidebar text in the Study
       Center admin. Done when: side-by-side images per mockup (light, dark, 390 px), uz/ru/en, full suite.
-      — done 2026-11-11 (P3.9a PR #74, P3.9b PR #75, P3.9c branch `feat/center-admin-pages`); verified: full
+      — done 2026-11-11 (P3.9a PR #74, P3.9b PR #75, P3.9c PR #79); verified: full
       suite 643 OK, `test_admin_center_pages`, side-by-side images `school-app-screens/p3.9a-*.png`,
       `p3.9b-*.png`, `p3.9c-*.png`. Pages still on old colours are listed in the 2026-11-04 P3.9c log line.
       **Split (2026-11-01):** P3.9a shell (this branch: base template, sidebar, topbar, tokens, landing,
