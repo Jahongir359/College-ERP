@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load i18n %}
 {% load static %}
 {% load uzs %}
 {% block page_title %}{{ page_title }}{% endblock %}
@@ -10,32 +11,32 @@
       <span class="ice-hero__icon" aria-hidden="true"><i class="fas fa-money-bill-wave"></i></span>
       <div class="ice-hero__copy">
         <h2 class="ice-hero__title">{{ page_title }} · {{ period|date:"F Y" }}</h2>
-        <p class="ice-hero__subtitle">Tuition invoices, collections, and debtors for this month.</p>
+        <p class="ice-hero__subtitle">{% translate "Tuition invoices, collections, and debtors for this month." %}</p>
       </div>
     </div>
     <div class="ice-hero__actions">
-      <a href="{% url 'admin_collections' %}?month={{ month_value }}" class="ice-action ice-action--primary"><i class="fas fa-chart-column" aria-hidden="true"></i> Collections</a>
-      <a href="{% url 'admin_generate_invoices' %}" class="ice-action"><i class="fas fa-file-invoice" aria-hidden="true"></i> Generate Invoices</a>
-      <a href="{% url 'admin_add_invoice' %}" class="ice-action"><i class="fas fa-plus" aria-hidden="true"></i> One-off Invoice</a>
-      <a href="?month={{ month_value }}&status={{ status }}&branch={{ selected_branch }}&group={{ selected_group }}&export=csv" class="ice-action"><i class="fas fa-download" aria-hidden="true"></i> CSV</a>
+      <a href="{% url 'admin_collections' %}?month={{ month_value }}" class="ice-action ice-action--primary"><i class="fas fa-chart-column" aria-hidden="true"></i> {% translate "Collections" %}</a>
+      <a href="{% url 'admin_generate_invoices' %}" class="ice-action"><i class="fas fa-file-invoice" aria-hidden="true"></i> {% translate "Generate Invoices" %}</a>
+      <a href="{% url 'admin_add_invoice' %}" class="ice-action"><i class="fas fa-plus" aria-hidden="true"></i> {% translate "One-off Invoice" %}</a>
+      <a href="?month={{ month_value }}&status={{ status }}&branch={{ selected_branch }}&group={{ selected_group }}&export=csv" class="ice-action"><i class="fas fa-download" aria-hidden="true"></i> {% translate "CSV" %}</a>
     </div>
   </section>
 
   <div class="ice-form-section" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px;">
     <div style="padding:14px 16px; border:1px solid var(--ice-border,#E4E7EC); border-radius:14px;">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">Billed</div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">{% translate "Billed" %}</div>
       <div style="font-size:17px; font-weight:800;">{{ total_billed|uzs }}</div>
     </div>
     <div style="padding:14px 16px; border:1px solid rgba(22,163,74,.35); border-radius:14px; background:rgba(22,163,74,.06);">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#16A34A;">Collected</div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#16A34A;">{% translate "Collected" %}</div>
       <div style="font-size:17px; font-weight:800; color:#16A34A;">{{ total_collected|uzs }}</div>
     </div>
     <div style="padding:14px 16px; border:1px solid rgba(220,38,38,.35); border-radius:14px; background:rgba(220,38,38,.05);">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#DC2626;">Outstanding</div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#DC2626;">{% translate "Outstanding" %}</div>
       <div style="font-size:17px; font-weight:800; color:#DC2626;">{{ total_outstanding|uzs }}</div>
     </div>
     <div style="padding:14px 16px; border:1px solid var(--ice-border,#E4E7EC); border-radius:14px;">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">Overdue invoices</div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">{% translate "Overdue invoices" %}</div>
       <div style="font-size:17px; font-weight:800;">{{ overdue_count }}</div>
     </div>
   </div>
@@ -43,48 +44,48 @@
   <div class="ice-form-section">
     <form method="get" class="ice-form-grid">
       <div>
-        <label class="form-label" for="month-filter">Month</label>
+        <label class="form-label" for="month-filter">{% translate "Month" %}</label>
         <input id="month-filter" type="month" name="month" class="form-control" value="{{ month_value }}" onchange="this.form.submit()">
       </div>
       <div>
-        <label class="form-label" for="status-filter">Status</label>
+        <label class="form-label" for="status-filter">{% translate "Status" %}</label>
         <select id="status-filter" name="status" class="form-control" onchange="this.form.submit()">
-          <option value="">All statuses</option>
+          <option value="">{% translate "All statuses" %}</option>
           {% for value, label in status_choices %}
           <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
-          <option value="overdue" {% if status == "overdue" %}selected{% endif %}>Overdue</option>
+          <option value="overdue" {% if status == "overdue" %}selected{% endif %}>{% translate "Overdue" %}</option>
         </select>
       </div>
       <div>
-        <label class="form-label" for="branch-filter">Branch</label>
+        <label class="form-label" for="branch-filter">{% translate "Branch" %}</label>
         <select id="branch-filter" name="branch" class="form-control" onchange="this.form.submit()">
-          <option value="">All branches</option>
+          <option value="">{% translate "All branches" %}</option>
           {% for b in branches %}
           <option value="{{ b.id }}" {% if selected_branch == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
           {% endfor %}
         </select>
       </div>
       <div>
-        <label class="form-label" for="group-filter">Group</label>
+        <label class="form-label" for="group-filter">{% translate "Group" %}</label>
         <select id="group-filter" name="group" class="form-control" onchange="this.form.submit()">
-          <option value="">All groups</option>
+          <option value="">{% translate "All groups" %}</option>
           {% for g in groups %}
           <option value="{{ g.id }}" {% if selected_group == g.id|stringformat:"s" %}selected{% endif %}>{{ g.name }}</option>
           {% endfor %}
         </select>
       </div>
-      <label class="ice-searchbar" aria-label="Search invoices">
+      <label class="ice-searchbar" aria-label="{% translate 'Search invoices' %}">
         <i class="fas fa-search" aria-hidden="true"></i>
-        <input type="search" class="ice-searchbar__input" data-ice-search placeholder="Search student, group, status..." autocomplete="off">
+        <input type="search" class="ice-searchbar__input" data-ice-search placeholder="{% translate 'Search student, group, status...' %}" autocomplete="off">
       </label>
     </form>
   </div>
 
   <div class="ice-empty-state" data-ice-empty-state hidden>
     <i class="fas fa-search" aria-hidden="true"></i>
-    <strong>No records found</strong>
-    <span>Try another student, group, or status.</span>
+    <strong>{% translate "No records found" %}</strong>
+    <span>{% translate "Try another student, group, or status." %}</span>
   </div>
 
   {% if invoices %}
@@ -93,14 +94,14 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Student</th>
-          <th>Group</th>
-          <th>Amount</th>
-          <th>Paid</th>
-          <th>Balance</th>
-          <th>Due</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>{% translate "Student" %}</th>
+          <th>{% translate "Group" %}</th>
+          <th>{% translate "Amount" %}</th>
+          <th>{% translate "Paid" %}</th>
+          <th>{% translate "Balance" %}</th>
+          <th>{% translate "Due" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th>{% translate "Actions" %}</th>
         </tr>
       </thead>
       <tbody>
@@ -115,28 +116,28 @@
           <td style="color:var(--ice-muted); font-size:12px;">{{ inv.due_date|date:"d M" }}</td>
           <td>
             {% if inv.status == 'paid' %}
-              <span class="sb sb-success"><i class="fas fa-check-circle me-1" style="font-size:9px;"></i>Paid</span>
+              <span class="sb sb-success"><i class="fas fa-check-circle me-1" style="font-size:9px;"></i>{% translate "Paid" %}</span>
             {% elif inv.status == 'cancelled' %}
-              <span class="sb" style="background:rgba(100,116,139,.10); color:var(--ice-muted);">Cancelled</span>
+              <span class="sb" style="background:rgba(100,116,139,.10); color:var(--ice-muted);">{% translate "Cancelled" %}</span>
             {% elif inv.is_overdue %}
-              <span class="sb" style="background:rgba(220,38,38,.12); color:#DC2626;"><i class="fas fa-exclamation-circle me-1" style="font-size:9px;"></i>Overdue</span>
+              <span class="sb" style="background:rgba(220,38,38,.12); color:#DC2626;"><i class="fas fa-exclamation-circle me-1" style="font-size:9px;"></i>{% translate "Overdue" %}</span>
             {% elif inv.status == 'partial' %}
-              <span class="sb" style="background:rgba(245,158,11,.12); color:#B45309;">Partial</span>
+              <span class="sb" style="background:rgba(245,158,11,.12); color:#B45309;">{% translate "Partial" %}</span>
             {% else %}
-              <span class="sb" style="background:rgba(56,189,248,.12); color:#0369A1;">Due</span>
+              <span class="sb" style="background:rgba(56,189,248,.12); color:#0369A1;">{% translate "Due" %}</span>
             {% endif %}
           </td>
           <td style="white-space:nowrap;">
             {% if inv.status != 'paid' and inv.status != 'cancelled' %}
-            <a href="{% url 'admin_record_payment' inv.id %}" class="ab-primary" title="Record payment"><i class="fas fa-cash-register me-1"></i>Record</a>
-            <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ab-secondary" title="Send reminder now" data-confirm-post="Send a payment reminder to {{ inv.student }}?"><i class="fas fa-bell me-1"></i>Remind</a>
+            <a href="{% url 'admin_record_payment' inv.id %}" class="ab-primary" title="{% translate 'Record payment' %}"><i class="fas fa-cash-register me-1"></i>{% translate "Record" %}</a>
+            <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ab-secondary" title="{% translate 'Send reminder now' %}" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Send a payment reminder to {{ student }}?{% endblocktranslate %}"><i class="fas fa-bell me-1"></i>{% translate "Remind" %}</a>
             {% endif %}
             {% if inv.paid_amount == 0 and inv.status != 'cancelled' %}
-            <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ab-danger" data-confirm-post="Cancel this invoice for {{ inv.student }}?"><i class="fas fa-ban me-1"></i>Cancel</a>
+            <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ab-danger" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Cancel this invoice for {{ student }}?{% endblocktranslate %}"><i class="fas fa-ban me-1"></i>{% translate "Cancel" %}</a>
             {% endif %}
             {% if is_super_admin %}
               {% for p in inv.payments.all %}
-              <a href="{% url 'admin_void_payment' p.id %}" class="ab-danger" data-confirm-post="Void {{ p.receipt_no }} ({{ p.amount|uzs }})? This cannot be undone."><i class="fas fa-undo me-1"></i>Void {{ p.receipt_no }}</a>
+              <a href="{% url 'admin_void_payment' p.id %}" class="ab-danger" data-confirm-post="{% blocktranslate trimmed with receipt=p.receipt_no amount=p.amount|uzs %}Void {{ receipt }} ({{ amount }})? This cannot be undone.{% endblocktranslate %}"><i class="fas fa-undo me-1"></i>{% blocktranslate trimmed with receipt=p.receipt_no %}Void {{ receipt }}{% endblocktranslate %}</a>
               {% endfor %}
             {% endif %}
           </td>
@@ -159,30 +160,30 @@
         </span>
         <div class="ice-mobile-card__main">
           <h3 class="ice-mobile-card__title">{{ inv.student }}</h3>
-          <div class="ice-mobile-card__subtitle">{{ inv.group.name|default:"One-off invoice" }} · {{ inv.period_label }}</div>
+          <div class="ice-mobile-card__subtitle">{{ inv.group.name|default:_("One-off invoice") }} · {{ inv.period|date:"F Y" }}</div>
         </div>
       </div>
       <div class="ice-mobile-card__meta">
         <span class="ice-chip"><i class="fas fa-coins" aria-hidden="true"></i><span>{{ inv.total_due|uzs }}</span></span>
         <span class="ice-chip ice-chip--success"><i class="fas fa-check" aria-hidden="true"></i><span>{{ inv.paid_amount|uzs }}</span></span>
-        <span class="ice-chip"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>Due {{ inv.due_date|date:"d M" }}</span></span>
+        <span class="ice-chip"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>{% blocktranslate trimmed with date=inv.due_date|date:"d M" %}Due {{ date }}{% endblocktranslate %}</span></span>
         {% if inv.status == 'paid' %}
-          <span class="ice-chip ice-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i><span>Paid</span></span>
+          <span class="ice-chip ice-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i><span>{% translate "Paid" %}</span></span>
         {% elif inv.status == 'cancelled' %}
-          <span class="ice-chip"><i class="fas fa-ban" aria-hidden="true"></i><span>Cancelled</span></span>
+          <span class="ice-chip"><i class="fas fa-ban" aria-hidden="true"></i><span>{% translate "Cancelled" %}</span></span>
         {% elif inv.is_overdue %}
-          <span class="ice-chip" style="border-color:rgba(220,38,38,.4); color:#DC2626;"><i class="fas fa-exclamation-circle" aria-hidden="true"></i><span>Overdue · {{ inv.balance|uzs }}</span></span>
+          <span class="ice-chip" style="border-color:rgba(220,38,38,.4); color:#DC2626;"><i class="fas fa-exclamation-circle" aria-hidden="true"></i><span>{% blocktranslate trimmed with amount=inv.balance|uzs %}Overdue · {{ amount }}{% endblocktranslate %}</span></span>
         {% else %}
           <span class="ice-chip ice-chip--info"><i class="fas fa-hourglass-half" aria-hidden="true"></i><span>{{ inv.get_status_display }} · {{ inv.balance|uzs }}</span></span>
         {% endif %}
       </div>
       <div class="ice-actions">
         {% if inv.status != 'paid' and inv.status != 'cancelled' %}
-        <a href="{% url 'admin_record_payment' inv.id %}" class="ice-action ice-action--primary"><i class="fas fa-cash-register" aria-hidden="true"></i> Record</a>
-        <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ice-action" data-confirm-post="Send a payment reminder to {{ inv.student }}?"><i class="fas fa-bell" aria-hidden="true"></i> Remind</a>
+        <a href="{% url 'admin_record_payment' inv.id %}" class="ice-action ice-action--primary"><i class="fas fa-cash-register" aria-hidden="true"></i> {% translate "Record" %}</a>
+        <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ice-action" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Send a payment reminder to {{ student }}?{% endblocktranslate %}"><i class="fas fa-bell" aria-hidden="true"></i> {% translate "Remind" %}</a>
         {% endif %}
         {% if inv.paid_amount == 0 and inv.status != 'cancelled' %}
-        <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ice-action ice-action--danger" data-confirm-post="Cancel this invoice for {{ inv.student }}?"><i class="fas fa-ban" aria-hidden="true"></i> Cancel</a>
+        <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ice-action ice-action--danger" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Cancel this invoice for {{ student }}?{% endblocktranslate %}"><i class="fas fa-ban" aria-hidden="true"></i> {% translate "Cancel" %}</a>
         {% endif %}
       </div>
     </article>
@@ -191,8 +192,8 @@
   {% else %}
   <div class="ice-empty-state">
     <i class="fas fa-file-invoice" aria-hidden="true"></i>
-    <strong>No invoices for {{ period|date:"F Y" }}</strong>
-    <span>Use “Generate Invoices” to bill all active enrollments for this month.</span>
+    <strong>{% blocktranslate trimmed with period=period|date:"F Y" %}No invoices for {{ period }}{% endblocktranslate %}</strong>
+    <span>{% translate "Use “Generate Invoices” to bill all active enrollments for this month." %}</span>
   </div>
   {% endif %}
 </div>

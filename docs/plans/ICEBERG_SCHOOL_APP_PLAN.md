@@ -92,8 +92,8 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 4/6 (P3.4, P3.5 dropped) |
-| P4 | App: choice screen, parent role, School screens | In progress — 2/11 (P4.11 dropped, P4.12 Release 2) |
+| P3 | Web screens for admins (D15: teachers use the app) | In progress — 7/8 (P3.9 claimed; P3.4, P3.5 dropped) |
+| P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
 | PL | Launch readiness: onboarding, support, training, consent | In progress — 1/7 |
 | P6 | Pilot and quality | Open — 1/6 |
@@ -150,6 +150,7 @@ integrations or extras that aren't in this plan without asking the owner.
 | D16 | Scope: a **simple tracking app**. No government-system integration (eMaktab, Kundalik) in Release 1 or 2; eMaktab comes later as P9 (D18). Online payments with **Payme or Click come last** (P8, after the first release). Offline register (P4.11) dropped. | **Decided 2026-10-26 (owner)** |
 | D17 | Admin web language: office staff need the **admin pages in Uzbek and Russian** (English stays). The admin web has no Django i18n today, so P3.0 adds it before the School admin pages. | **Decided 2026-10-27 (owner)** |
 | D18 | **eMaktab: the school does keep the state eMaktab journal** (required for general education schools). Connecting this app to eMaktab is a **future feature (P9), not in Release 1 or 2**. Until then teachers fill in eMaktab as they do today, and this app's register and gradebook serve parents and the office. Design the register, marks and term grades so they can later be sent to eMaktab or exported (store per-lesson and per-date data, use the same 2–5 scale and quarters as eMaktab, keep student identifiers). Don't build any eMaktab code before P9. | **Decided 2026-10-28 (owner)** |
+| D19 | **Admin web shell follows the plan mockups in both brands** (layout of screen 16: white sidebar, light topbar with chip, bell and initials avatar, serif/heavy page titles, rounded cards). Study Center uses the mockup palette (navy #103A57/#07233A, lime #CDF163, ice #38BDF0, stroke #D2DFEC) instead of the old cyan/teal gradients; Learning Center texts stay unchanged. Overrides the AGENTS.md "don't change Learning Center colors" rule for the admin shell. Asked for as "D18" by the coordinator; D18 was already taken (eMaktab), so recorded as D19. | **Decided 2026-11-01 (owner)** |
 
 Record each answer here with the date before starting the task that depends on it.
 
@@ -362,6 +363,8 @@ money is shown as `[summa]` because prices are not decided.
 | 18 | Web — parents list, search, "New parent" form (parent + first child) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18-web-parents.png](school-app-mockups/18-web-parents.png) | P3.3 |
 | 18b | Web — parent page: edit, reset password, link/unlink children, relation and main contact, link a parent of another branch by login ID + phone (D4) — **approved 2026-10-28 (owner delegated to the reviewer session)** | [18b-web-parent-page.png](school-app-mockups/18b-web-parent-page.png) | P3.3 |
 | 19 | Web — register report (admin): date and class filters, CSV export, which classes took the register and when, present/late/absent per class, absent and late pupils with arrival time and note — **approved 2026-10-30 (owner delegated to the reviewer session)** | [19-web-register-report.png](school-app-mockups/19-web-register-report.png) | P3.7 |
+| 16c | Web — Study Center students list in the same admin shell, Study Center palette (D19) — **waiting for owner approval** | [16c-web-center-students.png](school-app-mockups/16c-web-center-students.png) | P3.9 |
+| 16d | Web — Study Center admin home (dashboard) in the same shell (D19) — **waiting for owner approval** | [16d-web-center-home.png](school-app-mockups/16d-web-center-home.png) | P3.9 |
 | 20 | Teacher grade entry — Release 2 — **approved 2026-10-30 (owner delegated to the coordinator session)**: class subject picker, date and kind (Dars / Nazorat ishi / Imtihon), 2–5 per pupil (tap again to clear), pupils absent today dimmed | [20-grade-entry.png](school-app-mockups/20-grade-entry.png) | P4.7 |
 | 20b | Teacher quarter grades — Release 2 — **approved 2026-10-30 (owner delegated to the coordinator session)**: tabs 1–4 + Yillik, marks and average per pupil, suggestion (average rounded half up, `school.suggested_grade`) confirmed or changed by the teacher, "Baholanmadi" (not graded) | [20b-quarter-grades.png](school-app-mockups/20b-quarter-grades.png) | P4.7 |
 
@@ -826,7 +829,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [-] **P3.4** Teacher: daily register page on the web — dropped 2026-10-26 (D15: teachers use the app, P4.6).
 - [-] **P3.5** Teacher: gradebook page on the web — dropped 2026-10-26 (D15: teachers grade in the app,
       P4.7).
-- [ ] **P3.7** Admin: register report page (screen 19, approved 2026-10-30): for a date and
+- [x] **P3.7** Admin: register report page (screen 19, approved 2026-10-30): for a date and
       optional class, which classes took the register (time, homeroom teacher), present/late/absent
       counts and rate per class, the list of absent and late pupils with arrival time and note, CSV
       export of the same rows. Read-only (teachers take the register in the app, D15); data from
@@ -834,8 +837,60 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       `branching.filter_classes_for_user`. uz/ru/en. Done when: access tests (branch admin sees own
       branch only, teachers/pupils/parents get no page), CSV test, screenshot next to the mockup.
       Needs: P2.2, P3.0. Added 2026-10-28 (the "Register report" item of 6.4 had no task).
-- [ ] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
-      desktop in the PR.
+      — done 2026-10-31, PR #63; verified: full suite 562 OK, `RegisterReportAccessTests`,
+      `RegisterReportContentTests`, `RegisterReportCsvTests`; page `/maktab/register/`
+      (`school_register_report_views.py`); screenshot next to the mockup:
+      `docs/plans/school-app-screens/p3.7-register-report.png`.
+- [x] **P3.8** Admin: School board (`/maktab/`), the School admin's home page on the web: counts
+      (pupils, classes, teachers, parents), today's register (classes taken / not taken, link to the
+      register report), parents who haven't signed in yet, the current year and quarter (or a link to
+      set one up), quick links. Scoped through `branching.py`; uz/ru/en; light and dark. Done when:
+      access tests (branch admin sees own branch only, teachers/pupils get no page, anonymous → login),
+      empty states (no School branch, no classes, no current year), screenshot. Added 2026-10-31
+      (owner). — done 2026-10-31, PR #70; verified: full suite 572 OK, `test_school_board`
+      (branch admin sees own branch only, super admin all School branches, teacher/pupil/parent sent
+      home, anonymous → login, empty states, counts, uz/ru), page in `test_school_page_header`;
+      `school_board_views.py`, `hod_template/school/board.html`; screenshot
+      `docs/plans/school-app-screens/p3.8-school-board.png`. "Letter due" isn't shown: no login
+      letter field on main yet (PL.1), so the panel counts parents who never signed in.
+- [x] **P3.6** All School pages branded (`data-brand="school"`), in uz/ru/en, screenshots at 390 px and
+      desktop in the PR. — done 2026-10-30, PR #64; verified: full suite,
+      `test_school_page_header` (eyebrow, one title, year · quarter chip, Center admin page unchanged,
+      no period lookup on Center-branded pages), screenshots of all 8 Maktab pages at 390 and 1440 px
+      in uz/ru/en, light and dark. Notes: brand layer in `brand-school.css` (light sidebar, maroon
+      buttons, School wordmark), page header blocks `page_eyebrow`/`page_actions` in `base.html`
+      (empty for every other page), `school_period` in `context_processors.school_nav` is lazy. The
+      P3.1/P3.2 tables now stay visible and scroll sideways below 1025 px (`school-admin.css`).
+- [~] **P3.9** Admin web shell rebuilt to the mockups in both brands (D19; claimed 2026-11-01,
+      `feat/school-admin-shell`): one shell (white sidebar with the brand logo, short menu per brand, topbar
+      with year · quarter or branch chip, bell and initials avatar holding language, theme and sign-out),
+      School palette maroon/gold, Study Center palette navy/lime/ice (screens 16c, 16d), all through brand
+      CSS variables. School-only admins land on `/maktab/` (helper in `branching.py`). Then the School pages
+      (16–19) and the main Study Center pages (dashboard, students, teachers, groups, payments) to the
+      mockups; other pages inherit the shell. Also fixes the unreadable navy-sidebar text in the Study
+      Center admin. Done when: side-by-side images per mockup (light, dark, 390 px), uz/ru/en, full suite.
+      **Split (2026-11-01):** P3.9a shell (this branch: base template, sidebar, topbar, tokens, landing,
+      page header, UI kit), P3.9b School pages 16–19 and the board (another session, branched off the
+      shell), P3.9c Study Center pages (dashboard 16d, students 16c, teachers, groups, payments).
+      **Admin UI kit** (`static/dist/css/admin-shell.css`, loaded for admins only, every selector under
+      `html[data-shell="admin"]`; colours only through `--shell-*` tokens, so one markup serves both brands
+      and dark mode). Use these classes on admin pages; don't invent new ones, ask the shell owner instead:
+      - Page header: base.html blocks `page_eyebrow` (`<p class="page-eyebrow">…</p>`), `page_title`,
+        `page_subtitle`, `page_actions` (`<div class="page-actions">…buttons…</div>`). No breadcrumb.
+      - Buttons: `ui-btn ui-btn--primary` (maroon / lime), `ui-btn ui-btn--secondary` (outline);
+        add `ui-btn--sm` for row actions.
+      - Stat cards: `ui-stats` > `ui-stat` > `ui-stat-label`, `ui-stat-value`, optional `ui-stat-note`.
+      - Cards: `ui-card` > `ui-card-head` > `ui-card-title` + `ui-card-link` ("Ochish →").
+      - Filter bar: `ui-filters` > `ui-search` (`<i class="fas fa-search"></i><input>`) and `select.ui-select`.
+      - Table: `ui-table-wrap` > `table.ui-table` (tinted header, row lines, scrolls inside the card on
+        phones; don't add Bootstrap `.table`, which turns rows into phone cards); cells `ui-num`, `ui-end`;
+        row link `a.ui-open`.
+      - Badges: `ui-badge` + `ui-badge--ok` (keldi/toʻlangan), `--late` (kech/olinmagan), `--abs`
+        (yoʻq/qarzdor), `--muted`, `--accent` (counts).
+      - Others: `ui-avatar` (initials), `ui-empty` (empty state), `ui-split` (list + side panel).
+      - Tokens for anything else: `--shell-bg`, `--shell-surface`, `--shell-border`, `--shell-text`,
+        `--shell-muted`, `--shell-tint`, `--shell-title`, `--shell-eyebrow`, `--shell-link`,
+        `--shell-ok/-late/-abs` (+ `-bg`), `--shell-radius`.
 
 ### P4 — App
 
@@ -844,9 +899,28 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       2026-10-26, PR #31; verified: screens moved into `part` files (line-for-line identical), flutter
       analyze 0 warnings, flutter test 8 OK (`test/role_redirect_test.dart`), web build OK.
       `strings.dart` (1,199 lines of translations) stays one file.
-- [ ] **P4.2** Choice screen `/choose` + router redirects (first launch → choose → login; change link
-      on login) + widget tests for the redirects. Wording per D7.
-- [ ] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests.
+- [x] **P4.2** Choice screen `/choose` + router redirects (first launch → choose → login; change link
+      on login) + widget tests for the redirects. Wording per D7. — done 2026-10-30, PR #61; verified:
+      flutter analyze 0 warnings, flutter test 26 OK (`test/choose_screen_test.dart`,
+      `test/role_redirect_test.dart`), web build OK; screenshots at 390 px:
+      `docs/plans/school-app-screens/p4.2-choice-login.png`. Notes: `lastBrandProvider` now holds
+      `BrandChoice {brand, chosen, loaded}`; "chosen" = the `ice_brand` key exists, so a device that
+      already showed a brand skips `/choose`. `roleRedirect(..., brandChosen:)`: null keeps the splash.
+      The School login uses the School dark tokens and the white crest wordmark; the Study Center login
+      is unchanged apart from the "Iceberg Study Center · Boshqa tanlash" link.
+- [x] **P4.3** Brand from the account after login (5.1) incl. the one-time notice; tests — done 2026-10-31,
+      PR #68; verified: flutter analyze 0 warnings, flutter test 47 OK
+      (`test/change_password_test.dart`, `test/brand_notice_test.dart`), web build OK; School login next
+      to mockup 02 at 390 px: `docs/plans/school-app-screens/p4.3-school-login.png`. Also the **app half
+      of PL.1**: `IceUser.mustChangePassword` (`must_change_password` from login and `me/`) holds every
+      role on `/change-password` (back blocked, log out allowed) until `POST me/change-password/`
+      succeeds, then `me/` is reloaded and the user goes home; a 403 with `code ==
+      "password_change_required"` on any call (`ApiClient.onPasswordChangeRequired`) sends the user
+      there and re-checks `me/`. The 400 for `old_password` may be a string or a list (both handled).
+      Brand: after sign-in the account's brand wins; if it differs from the device's pick on `/choose`,
+      `BrandWatcher` (in `MaterialApp.builder`) shows one SnackBar and remembers the account brand, so it
+      shows once. The School login is now the light mockup-02 page (maroon header, white card, maroon
+      button with white text); the Study Center login is unchanged.
 - [ ] **P4.4** Parent shell with child switcher; Home shows today: attendance, lessons, homework due,
       unpaid invoice. Needs: P1.6.
 - [ ] **P4.5** Timetable screen (student, parent, teacher views). Needs: P2.1.
@@ -1010,10 +1084,98 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
 
+- 2026-11-11 — PL.1 (PR #58) brought up to main after P3.9b: the letter buttons and the class letters bar
+  now use the Admin UI kit (`ui-btn`, `ui-select`, `--shell-*` tokens); full suite 655 OK; proof
+  `school-app-screens/pl.1-login-letters.png`. P4.3 is merged, so #58 is free to merge.
+
 - 2026-10-31 — PL.1 done (PR #58): printed parent login letters and the first-login password change
   (API flag + 403 gate with `code` in the body). Migration `0051_customuser_must_change_password`
   (after P2.8's 0050). QA fixes: the app's login records `last_login`; class letters go only to
   parents who never signed in **and** still have an office-set password; `api_login` allowed.
+
+- 2026-11-04 — Web audit M2 part 2 (branch i18n/admin-pages-2, Python only): Student and Invoice
+  status labels and the "Level N" choices use gettext_lazy; the group form's Name label and the
+  branch field label ("Branch / Location", which a stale bound field showed as "Branch") follow the
+  language; the `uzs` filter's "ming"/"million"/"soʻm" are translated on pages (ru: "тыс."/"млн"/"сум")
+  while stored notification texts keep them; payments_views messages and page titles (generate,
+  one-off invoice, record payment, collections) use gettext/ngettext. No migration (0051 stays for
+  PL.1). Templates untouched (P3.9 restyles them); their remaining English text is for later.
+
+- 2026-11-04 — P3.9b (`feat/school-pages-redesign`): School classes (16), timetable (17), parents (18),
+  parent page (18b), register report (19) and the board `/maktab/` rebuilt on the Admin UI kit, colours
+  only from `--shell-*` tokens; the old P3.8 board CSS with fixed colours is gone. Classes gains a 4th stat
+  "Register taken today" and a today's present/late/absent column (`school.register_summaries`); the parent
+  page works without JS (relation and main-contact toggle submit on change, noscript Save). Deliberate
+  differences from the mockups: no CSV on classes, the class search box stays, the topbar search belongs
+  to the shell. P3.9 stays `[~]` until P3.9c (Study Center pages). Proof: `school-app-screens/p3.9b-*.png`.
+
+- 2026-11-04 — Web audit M2 part 1 (PR #73, i18n): admin Dashboard, Students, Teachers, Groups (list,
+  add, edit), Payments and the admin Profile now render in uz/ru, including the delete/archive/cancel/remind
+  confirm dialogs, page titles and group messages; form labels and messages use gettext (English wording
+  unchanged). Left for part 2: Student/Invoice status choices from the models, the payments action pages
+  (generate, add one-off, record, collections), the `uzs` "million" word, chart empty-state texts in the
+  dashboard scripts, and the other admin pages listed in the PR.
+
+- 2026-11-01 — P3.9 claimed (`feat/school-admin-shell`); D19 recorded (owner: admin shell follows the
+  mockups in both brands, Study Center navy/lime palette). Drew screens 16c and 16d
+  (`python build_mockups.py 16c-web-center-students 16d-web-center-home`) for owner approval before the
+  shell is built. Then P3.9a, the shell (owner approved 16c/16d): `admin-shell.css` (tokens + Admin UI
+  kit, `html[data-shell="admin"]` only), School-only menu and `/maktab/` landing
+  (`branching.is_school_only_admin`, `admin_home_url`), avatar menu with language/theme/sign-out, legacy
+  `.ice-hero`/`.ice-manage-*`/`.ice-action` on shell tokens (fixes dark Payments header, faint Edit buttons).
+  The navy-sidebar text bug predates P3.6 (June 2026 `mobile-adaptive.css` bright-mode rules beat
+  base.html's inline white text); the white admin sidebar ends it. Proof: `school-app-screens/p3.9a-*.png`.
+
+- 2026-10-31 — P4.3 done (PR #68, after #61): the app's "choose your password" screen for PL.1
+  and the brand-from-account notice. PL.1 (#58) can merge after this. Next on this line: P4.4 (parent shell).
+
+- 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
+  today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
+  quick links), first link in the sidebar's School group. When PL.1 adds login letters, show
+  "letter due" in the Parents panel.
+
+- 2026-11-01 — Web audit M3 (PR #72): month names on the web follow the page
+  language. Chart labels (admin and teacher dashboards, student charts) used `strftime("%b")`, always
+  English; now `date_format`. Payment pages show `invoice.period|date:"F Y"`; `period_label` stays
+  English for the stored notification texts. The "Russian in English" case from the audit didn't
+  reproduce on main (Django's month names already follow the language). Minor 4: the sign-in
+  footer already follows the brand cookie; a School admin's browser gets it when they sign in.
+  Tests in `test_month_names.py`.
+
+- 2026-10-31 — P3.8 done (PR #70): School board at `/maktab/`, the School admin's home page (counts,
+  today's register with a link to the P3.7 report, parents who never signed in, year and quarter,
+  quick links), first link in the sidebar's School group. When PL.1 adds login letters, show
+  "letter due" in the Parents panel.
+
+- 2026-10-31 — P2.8 push safety fixes from QA's review of #57 (PR #69):
+  FCM `INVALID_ARGUMENT` no longer deletes device tokens (only the FCM error codes `UNREGISTERED`
+  and `SENDER_ID_MISMATCH` do, not a bare 404; it is logged), and committed pushes go to one shared worker thread
+  instead of one thread per notification (monthly invoices). P2.8 stays `[~]` until the real phone test.
+
+- 2026-10-31 — Web audit fixes B1, M1 (PR #71): new students and teachers always get a branch (one-branch
+  admins get theirs, locked; super admins and admins of several branches must choose one they can
+  see, `branching.assignable_branches`/`admin_only_branch`); edits can't clear or move it out of
+  scope; the group form only lists and accepts teachers the admin can see. Also: edit student/teacher
+  no longer demands a new password, class form help texts in uz/ru, a clear message for a pupil
+  already in a class, and the classes search message only rendered when there are classes.
+
+- 2026-10-31 — P3.7 done (PR #63): admin register report `/maktab/register/` (Maktab →
+  Davomat hisoboti): date and class filters, per-class taken time/counts/rate, absent and late pupils,
+  CSV export; read-only, scoped by `branching.filter_classes_for_user`. Uses the P3.6 page header
+  (eyebrow, one title, "Download CSV" in `page_actions`), so the teal hero and the maroon-on-maroon
+  sidebar item seen before #64 are gone. CSV cells starting with = + - @ tab or CR get a leading
+  apostrophe (CSV injection), tested. Dark mode: `erpnext-style.css` forces every dark span to the
+  text colour with `!important`, so coloured spans on School pages need `!important` in dark rules.
+
+- 2026-10-30 — P3.6 done (PR #64; takeover of the unpushed `feat/school-p3.6-web-brand` work): all Maktab
+  web pages on the School brand, MAKTAB eyebrow over one title, year · quarter chip, tables kept on
+  phones. New School web pages: use the `page_eyebrow`/`page_actions` blocks and `school-admin.css`.
+
+- 2026-10-30 — P4.2 done (PR #61): first launch shows `/choose` (School | Study Center, UZ/RU/EN
+  pills), the pick brands the login and is remembered; the login links back. The School login keeps the dark
+  layout in maroon for now (accepted by the coordinator on the owner's behalf); mockup 02's light
+  card and maroon button move to P4.3. Next: P4.3 on branch feat/school-p4.3-account-brand
+  (password-change screen for PL.1 first, then the brand notice).
 
 - 2026-10-30 — PD.5 done: screens 20/20b (teacher grade entry, quarter grades) approved by the
   coordinator on the owner's behalf. P4.7 (Release 2) can be built against them.

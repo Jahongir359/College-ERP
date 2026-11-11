@@ -1,13 +1,13 @@
 {% load i18n %}{% comment %}Print login letters (PL.1). Use: include with action=<url> label=… confirm=…{% endcomment %}
 {% get_current_language as current %}{% get_available_languages as languages %}
-<form method="post" action="{{ action }}" target="_blank" class="school-inline-form school-letter-form">
+<form method="post" action="{{ action }}" target="_blank" class="school-header-form school-letter-form">
   {% csrf_token %}
   <input type="hidden" name="next" value="{{ request.get_full_path }}">
-  <label class="visually-hidden" for="letter-language">{% translate "Letter language" %}</label>
-  <select name="language" id="letter-language" class="form-control school-letter-lang" title="{% translate 'Letter language' %}">
+  <label class="sr-only" for="letter-language">{% translate "Letter language" %}</label>
+  <select name="language" id="letter-language" class="ui-select school-letter-lang" title="{% translate 'Letter language' %}">
     {% for code, name in languages %}<option value="{{ code }}"{% if code == current %} selected{% endif %}>{{ code|upper }}</option>{% endfor %}
   </select>
-  <button type="submit" class="ice-manage-action" data-confirm="{{ confirm }}" onclick="return confirm(this.dataset.confirm)">
+  <button type="submit" class="ui-btn ui-btn--secondary" data-confirm="{{ confirm }}" onclick="return confirm(this.dataset.confirm)">
     <i class="fas fa-print" aria-hidden="true"></i> {{ label }}
   </button>
 </form>

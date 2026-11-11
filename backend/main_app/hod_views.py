@@ -10,6 +10,8 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
+from django.utils.translation import gettext
 
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.password_validation import validate_password
@@ -249,7 +251,7 @@ def admin_home(request):
                 y -= 1
             first = date_type(y, m, 1)
             last = date_type(y + 1, 1, 1) if m == 12 else date_type(y, m + 1, 1)
-            result.append((first, last, first.strftime("%b")))
+            result.append((first, last, date_format(first, "M")))
         return result
 
     _months = _month_range(6)
@@ -388,14 +390,14 @@ def admin_home(request):
         .filter(start_date__gte=today)
         .order_by("start_date")[:5]
     )
-    upcoming_title = "Upcoming Classes"
+    upcoming_title = gettext("Upcoming Classes")
     if not upcoming_classes:
         upcoming_classes = list(
             groups_base.select_related("course", "teacher__admin", "branch").order_by(
                 "-updated_at"
             )[:5]
         )
-        upcoming_title = "Active Classes"
+        upcoming_title = gettext("Active Classes")
 
     today_attendance_groups = []
     for group in groups_base.select_related("course", "teacher__admin").order_by("name")[:5]:
@@ -422,7 +424,8 @@ def admin_home(request):
             {
                 "icon": "fa-user-plus",
                 "title": f"{student.admin.get_full_name() or student.admin.email}",
-                "meta": f"New student · {student.course or 'Course pending'}",
+                "meta": gettext("New student · %(course)s")
+                % {"course": student.course or gettext("Course pending")},
                 "at": student.admin.created_at,
                 "href": reverse("manage_student"),
             }
@@ -436,7 +439,8 @@ def admin_home(request):
             {
                 "icon": "fa-tasks",
                 "title": assignment.title,
-                "meta": f"Assignment · {assignment.group or 'No group'}",
+                "meta": gettext("Assignment · %(group)s")
+                % {"group": assignment.group or gettext("No group")},
                 "at": assignment.created_at,
                 "href": reverse("manage_group"),
             }
@@ -450,7 +454,7 @@ def admin_home(request):
             {
                 "icon": "fa-comments",
                 "title": message.sender.get_full_name() or message.sender.email,
-                "meta": f"Message in {message.thread.group.name}",
+                "meta": gettext("Message in %(group)s") % {"group": message.thread.group.name},
                 "at": message.created_at,
                 "href": reverse("messages"),
             }
@@ -459,69 +463,70 @@ def admin_home(request):
 
     metric_cards = [
         {
-            "label": "Students",
+            "label": gettext("Students"),
             "value": total_students,
             "icon": "fa-user-graduate",
             "href": reverse("manage_student"),
             "trend": pct_change(new_students_7, new_students_previous),
-            "trend_label": f"{new_students_7} new this week",
+            "trend_label": gettext("%(count)s new this week") % {"count": new_students_7},
             "progress": min(100, max(8, group_fill_pct)),
             "tone": "cyan",
         },
         {
-            "label": "Teachers",
+            "label": gettext("Teachers"),
             "value": total_staff,
             "icon": "fa-chalkboard-teacher",
             "href": reverse("manage_staff"),
             "trend": pct_change(new_staff_7, new_staff_previous),
-            "trend_label": f"{new_staff_7} added this week",
+            "trend_label": gettext("%(count)s added this week") % {"count": new_staff_7},
             "progress": min(100, max(8, round((total_staff / max(total_groups, 1)) * 20))),
             "tone": "blue",
         },
         {
-            "label": "Active Groups",
+            "label": gettext("Active Groups"),
             "value": total_groups,
             "icon": "fa-layer-group",
             "href": reverse("manage_group"),
             "trend": pct_change(new_groups_7, new_groups_previous),
-            "trend_label": f"{group_fill_pct}% capacity filled",
+            "trend_label": gettext("%(pct)s%% capacity filled") % {"pct": group_fill_pct},
             "progress": min(100, group_fill_pct),
             "tone": "navy",
         },
         {
-            "label": "Programs",
+            "label": gettext("Programs"),
             "value": total_course,
             "icon": "fa-graduation-cap",
             "href": reverse("manage_course"),
             "trend": pct_change(new_courses_7, new_courses_previous),
-            "trend_label": f"{new_courses_7} new this week",
+            "trend_label": gettext("%(count)s new this week") % {"count": new_courses_7},
             "progress": min(100, max(8, round((active_course_count / max(total_course, 1)) * 100))),
             "tone": "blue",
         },
         {
-            "label": "Attendance Today",
+            "label": gettext("Attendance Today"),
             "value": f"{attendance_today_rate}%",
             "icon": "fa-clipboard-check",
             "href": reverse("admin_view_attendance"),
             "trend": attendance_today_rate,
-            "trend_label": f"{today_attendance_present}/{today_attendance_total} present",
+            "trend_label": gettext("%(present)s/%(total)s present")
+            % {"present": today_attendance_present, "total": today_attendance_total},
             "progress": attendance_today_rate,
             "tone": "ice",
         },
         {
-            "label": "Registration Leads",
+            "label": gettext("Registration Leads"),
             "value": total_leads,
             "icon": "fa-user-clock",
             "href": reverse("manage_registration_leads"),
             "trend": pct_change(new_leads_7, new_leads_previous),
-            "trend_label": f"{new_leads_7} new this week",
+            "trend_label": gettext("%(count)s new this week") % {"count": new_leads_7},
             "progress": min(100, max(8, round((new_leads_7 / max(total_leads, 1)) * 100))),
             "tone": "cyan",
         },
     ]
 
     context = {
-        "page_title": "Administrative Dashboard",
+        "page_title": gettext("Administrative Dashboard"),
         "total_students": total_students,
         "total_staff": total_staff,
         "total_course": total_course,
@@ -559,7 +564,7 @@ def admin_home(request):
 @admin_only
 def add_staff(request):
     form = StaffForm(request.POST or None, request.FILES or None, user=request.user)
-    context = {"form": form, "page_title": "Add Teacher"}
+    context = {"form": form, "page_title": gettext("Add Teacher")}
     if request.method == "POST":
         if form.is_valid():
             first_name = form.cleaned_data.get("first_name")
@@ -596,13 +601,17 @@ def add_staff(request):
                 staff_obj.specialization = form.cleaned_data.get("specialization", "")
                 staff_obj.is_active = True
                 staff_obj.save()
-                messages.success(request, f"Teacher added successfully. Login ID: {login_id}")
+                messages.success(
+                    request,
+                    gettext("Teacher added successfully. Login ID: %(login_id)s")
+                    % {"login_id": login_id},
+                )
                 return redirect(reverse("add_staff"))
 
             except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+                messages.error(request, gettext("Could Not Add ") + str(e))
         else:
-            messages.error(request, "Please fulfil all requirements")
+            messages.error(request, gettext("Please fulfil all requirements"))
 
     return render(request, "hod_template/add_staff_template.html", context)
 
@@ -610,7 +619,7 @@ def add_staff(request):
 @admin_only
 def add_student(request):
     student_form = AddStudentForm(request.POST or None, request.FILES or None, user=request.user)
-    context = {"form": student_form, "page_title": "Add Student"}
+    context = {"form": student_form, "page_title": gettext("Add Student")}
     if request.method == "POST":
         if student_form.is_valid():
             first_name = student_form.cleaned_data.get("first_name")
@@ -661,18 +670,22 @@ def add_student(request):
                     )
                     messages.success(
                         request,
-                        f"Student added and enrolled in '{group.name}'. Login ID: {login_id}",
+                        gettext("Student added and enrolled in '%(group)s'. Login ID: %(login_id)s")
+                        % {"group": group.name, "login_id": login_id},
                     )
                 else:
                     messages.success(
                         request,
-                        f"Student {first_name} {last_name} added. Login ID: {login_id}. Enroll them in a group from the Enrollments page.",
+                        gettext(
+                            "Student %(first_name)s %(last_name)s added. Login ID: %(login_id)s. Enroll them in a group from the Enrollments page."
+                        )
+                        % {"first_name": first_name, "last_name": last_name, "login_id": login_id},
                     )
                 return redirect(reverse("add_student"))
             except Exception as e:
-                messages.error(request, "Could Not Add: " + str(e))
+                messages.error(request, gettext("Could Not Add: ") + str(e))
         else:
-            messages.error(request, "Please fix the errors below.")
+            messages.error(request, gettext("Please fix the errors below."))
     return render(request, "hod_template/add_student_template.html", context)
 
 
@@ -808,7 +821,7 @@ def manage_staff(request):
         allStaff = allStaff.filter(staff__branch_id=branch_id)
     context = {
         "allStaff": allStaff,
-        "page_title": "Manage Teachers",
+        "page_title": gettext("Manage Teachers"),
         "branches": branching.get_accessible_branches(request.user),
         "selected_branch": branch_id,
         "is_super_admin": branching.is_super_admin(request.user),
@@ -829,7 +842,7 @@ def manage_student(request):
         students = students.filter(student__branch_id=branch_id)
     context = {
         "students": students,
-        "page_title": "Manage Students",
+        "page_title": gettext("Manage Students"),
         "branches": branching.get_accessible_branches(request.user),
         "selected_branch": branch_id,
         "is_super_admin": branching.is_super_admin(request.user),
@@ -857,7 +870,7 @@ def edit_staff(request, staff_id):
     if not branching.filter_staff_for_user(
         request.user, Staff.objects.filter(id=staff_id)
     ).exists():
-        messages.error(request, "You don't have access to this teacher's branch.")
+        messages.error(request, gettext("You don't have access to this teacher's branch."))
         return redirect(reverse("manage_staff"))
     form = StaffEditForm(
         request.POST or None, request.FILES or None, instance=staff, user=request.user
@@ -866,7 +879,7 @@ def edit_staff(request, staff_id):
         "form": form,
         "staff_id": staff_id,
         "login_id": staff.admin.login_id or "—",
-        "page_title": "Edit Teacher",
+        "page_title": gettext("Edit Teacher"),
     }
     if request.method == "POST":
         if form.is_valid():
@@ -897,12 +910,12 @@ def edit_staff(request, staff_id):
                 staff.is_active = True
                 user.save()
                 staff.save()
-                messages.success(request, "Successfully Updated")
+                messages.success(request, gettext("Successfully Updated"))
                 return redirect(reverse("edit_staff", args=[staff_id]))
             except Exception as e:
-                messages.error(request, "Could Not Update " + str(e))
+                messages.error(request, gettext("Could Not Update ") + str(e))
         else:
-            messages.error(request, "Please fill form properly")
+            messages.error(request, gettext("Please fill form properly"))
     return render(request, "hod_template/edit_staff_template.html", context)
 
 
@@ -912,14 +925,14 @@ def edit_student(request, student_id):
     if not branching.filter_students_for_user(
         request.user, Student.objects.filter(id=student_id)
     ).exists():
-        messages.error(request, "You don't have access to this student's branch.")
+        messages.error(request, gettext("You don't have access to this student's branch."))
         return redirect(reverse("manage_student"))
     form = StudentForm(request.POST or None, instance=student, user=request.user)
     context = {
         "form": form,
         "student_id": student_id,
         "login_id": student.admin.login_id or "—",
-        "page_title": "Edit Student",
+        "page_title": gettext("Edit Student"),
     }
     if request.method == "POST":
         if form.is_valid():
@@ -951,12 +964,12 @@ def edit_student(request, student_id):
                 student.level = int(raw_level) if raw_level else None
                 user.save()
                 student.save()
-                messages.success(request, "Successfully Updated")
+                messages.success(request, gettext("Successfully Updated"))
                 return redirect(reverse("edit_student", args=[student_id]))
             except Exception as e:
-                messages.error(request, "Could Not Update " + str(e))
+                messages.error(request, gettext("Could Not Update ") + str(e))
         else:
-            messages.error(request, "Please Fill Form Properly!")
+            messages.error(request, gettext("Please Fill Form Properly!"))
     return render(request, "hod_template/edit_student_template.html", context)
 
 
@@ -1251,13 +1264,15 @@ def delete_staff(request, staff_id):
     if not branching.filter_staff_for_user(
         request.user, Staff.objects.filter(id=staff_id)
     ).exists():
-        messages.error(request, "You don't have permission to delete this teacher.")
+        messages.error(request, gettext("You don't have permission to delete this teacher."))
         return redirect(reverse("manage_staff"))
     try:
         staff_obj.admin.delete()
-        messages.success(request, "Staff deleted successfully!")
+        messages.success(request, gettext("Staff deleted successfully!"))
     except IntegrityError:
-        messages.error(request, "Could not delete staff because related attendance data exists.")
+        messages.error(
+            request, gettext("Could not delete staff because related attendance data exists.")
+        )
     return redirect(reverse("manage_staff"))
 
 
@@ -1268,7 +1283,7 @@ def delete_student(request, student_id):
     if not branching.filter_students_for_user(
         request.user, Student.objects.filter(id=student_id)
     ).exists():
-        messages.error(request, "You don't have permission to delete this student.")
+        messages.error(request, gettext("You don't have permission to delete this student."))
         return redirect(reverse("manage_student"))
     student_user = student_obj.admin
     try:
@@ -1276,9 +1291,11 @@ def delete_student(request, student_id):
             # AttendanceReport keeps a DO_NOTHING FK to Student, so remove it manually.
             AttendanceReport.objects.filter(student=student_obj).delete()
             student_user.delete()
-        messages.success(request, "Student deleted successfully!")
+        messages.success(request, gettext("Student deleted successfully!"))
     except IntegrityError:
-        messages.error(request, "Could not delete student because related records still exist.")
+        messages.error(
+            request, gettext("Could not delete student because related records still exist.")
+        )
     return redirect(reverse("manage_student"))
 
 
@@ -1845,7 +1862,7 @@ def manage_group(request):
         "hod_template/manage_group.html",
         {
             "groups": groups,
-            "page_title": "Manage Groups",
+            "page_title": gettext("Manage Groups"),
             "branches": branching.get_accessible_branches(request.user),
             "selected_branch": branch_id,
             "is_super_admin": branching.is_super_admin(request.user),
@@ -1857,7 +1874,7 @@ def manage_group(request):
 def admin_group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     if not branching.user_can_access_group(request.user, group):
-        messages.error(request, "You don't have access to this group's branch.")
+        messages.error(request, gettext("You don't have access to this group's branch."))
         return redirect(reverse("manage_group"))
     enrollments = (
         Enrollment.objects.filter(group=group, is_active=True)
@@ -1872,7 +1889,7 @@ def admin_group_detail(request, group_id):
             "group": group,
             "enrollments": enrollments,
             "total_inactive": total_all - enrollments.count(),
-            "page_title": f"{group.name} — Students",
+            "page_title": gettext("%(group)s — Students") % {"group": group.name},
         },
     )
 
@@ -1908,22 +1925,22 @@ def add_group(request):
             group = form.save(commit=False)
             # Branch admins can only create groups in branches they manage.
             if not branching.user_can_access_branch(request.user, group.branch):
-                messages.error(request, "You can only create groups in your own branches.")
+                messages.error(request, gettext("You can only create groups in your own branches."))
                 return render(
                     request,
                     "hod_template/add_group.html",
-                    {"form": form, "page_title": "Add Group"},
+                    {"form": form, "page_title": gettext("Add Group")},
                 )
             group.save()
             _notify_group_start_date(group)
-            messages.success(request, "Group created!")
+            messages.success(request, gettext("Group created!"))
             return redirect(reverse("manage_group"))
     return render(
         request,
         "hod_template/add_group.html",
         {
             "form": form,
-            "page_title": "Add Group",
+            "page_title": gettext("Add Group"),
         },
     )
 
@@ -1932,7 +1949,7 @@ def add_group(request):
 def edit_group(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     if not branching.user_can_access_group(request.user, group):
-        messages.error(request, "You don't have access to this group's branch.")
+        messages.error(request, gettext("You don't have access to this group's branch."))
         return redirect(reverse("manage_group"))
     old_start_date = group.start_date
     form = GroupForm(request.POST or None, instance=group, user=request.user)
@@ -1940,23 +1957,23 @@ def edit_group(request, group_id):
         if form.is_valid():
             updated = form.save(commit=False)
             if not branching.user_can_access_branch(request.user, updated.branch):
-                messages.error(request, "You can only assign groups to your own branches.")
+                messages.error(request, gettext("You can only assign groups to your own branches."))
                 return render(
                     request,
                     "hod_template/add_group.html",
-                    {"form": form, "page_title": "Edit Group"},
+                    {"form": form, "page_title": gettext("Edit Group")},
                 )
             updated.save()
             if updated.start_date and updated.start_date != old_start_date:
                 _notify_group_start_date(updated)
-            messages.success(request, "Group updated!")
+            messages.success(request, gettext("Group updated!"))
             return redirect(reverse("manage_group"))
     return render(
         request,
         "hod_template/add_group.html",
         {
             "form": form,
-            "page_title": "Edit Group",
+            "page_title": gettext("Edit Group"),
         },
     )
 
@@ -1966,7 +1983,7 @@ def edit_group(request, group_id):
 def delete_group(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     if not branching.user_can_access_group(request.user, group):
-        messages.error(request, "You don't have access to this group's branch.")
+        messages.error(request, gettext("You don't have access to this group's branch."))
         return redirect(reverse("manage_group"))
     student_count = Enrollment.objects.filter(group=group).count()
     attendance_count = Attendance.objects.filter(group=group).count()
@@ -1975,23 +1992,26 @@ def delete_group(request, group_id):
     if student_count or attendance_count or result_count:
         parts = []
         if student_count:
-            parts.append(f"{student_count} enrollment(s)")
+            parts.append(gettext("%(count)s enrollment(s)") % {"count": student_count})
         if attendance_count:
-            parts.append(f"{attendance_count} attendance record(s)")
+            parts.append(gettext("%(count)s attendance record(s)") % {"count": attendance_count})
         if result_count:
-            parts.append(f"{result_count} result(s)")
+            parts.append(gettext("%(count)s result(s)") % {"count": result_count})
         messages.warning(
             request,
-            f'Cannot delete "{group.name}" — it has {", ".join(parts)}. '
-            f"Archive it instead to hide it without losing data.",
+            gettext(
+                'Cannot delete "%(group)s" — it has %(parts)s. '
+                "Archive it instead to hide it without losing data."
+            )
+            % {"group": group.name, "parts": ", ".join(parts)},
         )
         return redirect(reverse("manage_group"))
 
     try:
         group.delete()
-        messages.success(request, f'Group "{group.name}" deleted.')
+        messages.success(request, gettext('Group "%(group)s" deleted.') % {"group": group.name})
     except Exception as e:
-        messages.error(request, f"Could not delete group: {e}")
+        messages.error(request, gettext("Could not delete group: %(error)s") % {"error": e})
     return redirect(reverse("manage_group"))
 
 
@@ -2000,12 +2020,15 @@ def delete_group(request, group_id):
 def archive_group(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     if not branching.user_can_access_group(request.user, group):
-        messages.error(request, "You don't have access to this group's branch.")
+        messages.error(request, gettext("You don't have access to this group's branch."))
         return redirect(reverse("manage_group"))
     group.is_archived = not group.is_archived
     group.save()
-    action = "archived" if group.is_archived else "restored"
-    messages.success(request, f'Group "{group.name}" {action}.')
+    if group.is_archived:
+        message = gettext('Group "%(group)s" archived.')
+    else:
+        message = gettext('Group "%(group)s" restored.')
+    messages.success(request, message % {"group": group.name})
     return redirect(reverse("manage_group"))
 
 

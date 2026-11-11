@@ -1,4 +1,43 @@
 /* Maktab admin pages (plan task P3.1, mockup 16). Builds on admin-manage-mobile.css. */
+
+/* Page header (P3.6): eyebrow over one title, actions on the right; the
+   breadcrumb takes the full row below. */
+.page-header:has(> .page-actions) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: 16px;
+}
+.page-header:has(> .page-actions) > nav { grid-column: 1 / -1; }
+.page-eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.page-eyebrow a { color: inherit; text-decoration: none; }
+.page-eyebrow a:hover { text-decoration: underline; }
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+@media (max-width: 640px) {
+  .page-header:has(> .page-actions) { grid-template-columns: minmax(0, 1fr); row-gap: 12px; }
+  .page-actions { justify-content: flex-start; }
+}
+
+/* admin-manage-mobile.css hides .ice-manage-table-wrap below 1025px in favour
+   of a card list; Maktab pages have no card list, so keep their tables and let
+   them scroll sideways. */
+@media (max-width: 1024px) {
+  .ice-manage-page .ice-manage-table-wrap { display: block; }
+  .ice-manage-page .ice-manage-table { min-width: 560px; }
+}
+
 .school-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -49,24 +88,46 @@
   .school-inline-form, .school-inline-form .form-control { width: 100%; }
 }
 
-/* Timetable week grid (P3.2, mockup 17) */
-.school-week-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.school-week { width: 100%; min-width: 860px; border-collapse: separate; border-spacing: 8px; }
-.school-week th { font-size: 14px; font-weight: 700; text-align: left; padding: 0 4px; }
-.school-week__period { width: 72px; white-space: nowrap; font-weight: 700; }
-.school-week__period span { display: block; font-weight: 600; opacity: .7; }
-.school-cell {
-  vertical-align: top;
-  padding: 8px;
-  border: 1px solid var(--ice-manage-border, rgba(127, 127, 127, .25));
-  border-radius: 12px;
-  background: var(--ice-surface, #fff);
+/* Timetable week grid (P3.2, mockup 17; kit tokens P3.9b) */
+html[data-shell="admin"][data-brand] .school-week-card { padding: 10px 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+html[data-shell="admin"][data-brand] .school-week { width: 100%; min-width: 860px; border-collapse: separate; border-spacing: 8px; }
+html[data-shell="admin"][data-brand] .school-week th { padding: 4px 6px 0; font-size: 14px; font-weight: 700; text-align: left; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .school-week td { padding: 0; vertical-align: top; }
+html[data-shell="admin"][data-brand] .school-week__period { width: 64px; white-space: nowrap; color: var(--shell-text) !important; }
+html[data-shell="admin"][data-brand] .school-week__period span { display: block; font-weight: 700; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .school-cell {
+  min-height: 72px;
+  padding: 8px 10px;
+  border: 1px solid var(--shell-border);
+  border-radius: var(--shell-radius-sm);
+  background: var(--shell-surface);
 }
-.school-cell select { width: 100%; min-width: 0; font-weight: 600; }
-.school-cell__teacher { display: block; margin-top: 4px; font-size: 12px; opacity: .75; }
-.school-cell--empty { border-style: dashed; }
-.school-cell--clash { border-color: #C0392B; background: #FBE9E7; }
-.school-cell__error { display: block; margin-top: 4px; font-size: 12px; font-weight: 700; color: #B03A2E; }
+html[data-shell="admin"][data-brand] .school-cell__subject {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-overflow: ellipsis;
+  color: var(--shell-text);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html[data-shell="admin"][data-brand] .school-cell__subject:focus-visible { outline: 2px solid var(--shell-primary); outline-offset: 2px; }
+html[data-shell="admin"][data-brand] .school-cell__subject option { color: var(--shell-text); background: var(--shell-surface); }
+html[data-shell="admin"][data-brand] .school-cell__teacher { display: block; margin-top: 2px; font-size: 13px; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .school-cell--empty { border-style: dashed; background: transparent; }
+html[data-shell="admin"][data-brand] .school-cell--empty .school-cell__subject { font-size: 13px; font-weight: 500; color: var(--shell-muted); text-align: center; text-align-last: center; }
+html[data-shell="admin"][data-brand] .school-cell--clash { border-color: var(--shell-abs); background: var(--shell-abs-bg); }
+html[data-shell="admin"][data-brand] .school-cell__error { display: block; margin-top: 2px; font-size: 13px; color: var(--shell-abs); }
+html[data-shell="admin"][data-brand] .school-hours-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; padding: 0; list-style: none; }
 .school-week-bar {
   display: flex;
   flex-wrap: wrap;
@@ -75,19 +136,11 @@
   gap: 12px;
   margin: 12px 0;
 }
-.school-hours-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
-.school-hours-list li {
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--ice-manage-border, rgba(127, 127, 127, .25));
-  font-size: 13px;
-}
-.school-hours-list .is-off { border-color: #C0392B; color: #B03A2E; font-weight: 700; }
 
 /* Parents list and parent page (P3.3, mockups 18 and 18b) */
 .school-split { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
 .school-split--detail { grid-template-columns: 300px minmax(0, 1fr); }
-.school-split > div { display: grid; gap: 16px; align-content: start; }
+.school-split > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-content: start; }
 .school-filter-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .school-filter-row .ice-manage-search { flex: 1 1 240px; margin: 0; }
 .school-filter-row .ice-manage-filter__select { flex: 0 1 180px; width: auto; margin: 0; }
@@ -143,23 +196,167 @@
 }
 .school-password code { font-size: 18px; letter-spacing: .06em; color: inherit; background: none; }
 @media (max-width: 960px) {
-  .school-split, .school-split--detail { grid-template-columns: 1fr; }
+  /* minmax(0, …): a plain 1fr track grows to its widest child (the children table). */
+  .school-split, .school-split--detail { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
   .school-pair { grid-template-columns: 1fr; }
 }
 
+
+/* ── P3.9b: Maktab pages on the Admin UI kit (mockups 16–19). Layout only;
+   colours come from the --shell-* tokens in admin-shell.css. ─────────────── */
+html[data-shell="admin"][data-brand] .school-page .school-help { margin: 10px 0 0; font-size: 13px; opacity: 1; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .school-header-form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0; }
+html[data-shell="admin"][data-brand] .school-date-field { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; font-weight: 600; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .school-form-end { display: flex; justify-content: flex-end; margin-top: 14px; }
+@media (max-width: 768px) {
+  html[data-shell="admin"][data-brand] .school-header-form,
+  html[data-shell="admin"][data-brand] .school-header-form .ui-select { width: 100%; }
+  html[data-shell="admin"][data-brand] .school-date-field { flex: 1 1 100%; }
+  html[data-shell="admin"][data-brand] .school-date-field .ui-select { flex: 1 1 auto; }
+}
+html[data-shell="admin"][data-brand] .school-page .school-sub { color: var(--shell-muted); font-size: 13px; }
+html[data-shell="admin"][data-brand] .school-page .school-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+html[data-shell="admin"][data-brand] .school-page .school-chips .fa-star { font-size: 11px; color: var(--shell-eyebrow); }
+html[data-shell="admin"][data-brand] .school-page .school-chip--other { border: 1px dashed var(--shell-border); background: transparent; }
+html[data-shell="admin"][data-brand] .school-page .school-help .fa-star { color: var(--shell-eyebrow); }
+
+/* Forms inside kit cards (parents, parent page). */
+html[data-shell="admin"][data-brand] .school-page .school-stack { display: grid; gap: 12px; margin: 0; }
+html[data-shell="admin"][data-brand] .school-page .school-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+html[data-shell="admin"][data-brand] .school-page .school-field label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 1;
+  color: var(--shell-text);
+}
+html[data-shell="admin"][data-brand] .school-page .school-field .form-control {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--shell-border) !important;
+  border-radius: var(--shell-radius-sm) !important;
+  background: var(--shell-surface) !important;
+  color: var(--shell-text) !important;
+  box-shadow: none !important;
+}
+html[data-shell="admin"][data-brand] .school-page .school-field .form-control:focus { outline: 2px solid var(--shell-primary); outline-offset: 1px; }
+html[data-shell="admin"][data-brand] .school-page .school-error { color: var(--shell-abs); }
+html[data-shell="admin"][data-brand] .school-page .school-check { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; font-weight: 500; color: var(--shell-text); }
+html[data-shell="admin"][data-brand] .school-page .school-check input { width: 18px; height: 18px; accent-color: var(--shell-primary); }
+html[data-shell="admin"][data-brand] .school-page .school-submit { width: 100%; }
+html[data-shell="admin"][data-brand] .school-page .page-eyebrow { margin: 6px 0 0; }
+
+/* Parent page (mockup 18b): details card on the left, children and link cards on the right. */
+html[data-shell="admin"][data-brand] .school-detail { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(0, 2.3fr); gap: 16px; align-items: start; }
+@media (max-width: 1100px) {
+  html[data-shell="admin"][data-brand] .school-detail { grid-template-columns: minmax(0, 1fr); }
+}
+html[data-shell="admin"][data-brand] .school-person { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+html[data-shell="admin"][data-brand] .school-person .ui-avatar { width: 48px; height: 48px; font-size: 16px; background: var(--shell-avatar-bg); color: var(--shell-avatar-text); }
+html[data-shell="admin"][data-brand] .school-person > div { display: grid; min-width: 0; }
+html[data-shell="admin"][data-brand] .school-person strong { font-size: 18px; color: var(--shell-text); }
+html[data-shell="admin"][data-brand] .school-flush { padding: 18px 0 0; overflow: hidden; }
+html[data-shell="admin"][data-brand] .school-flush > .ui-card-head { padding: 0 20px; }
+html[data-shell="admin"][data-brand] .school-flush > .ui-table-wrap { border: 0; border-radius: 0; box-shadow: none; }
+html[data-shell="admin"][data-brand] .school-pill-select { min-height: 36px; padding: 0 12px; border-radius: 999px !important; font-size: 13.5px; }
+html[data-shell="admin"][data-brand] .school-switch { position: relative; display: inline-block; width: 46px; height: 26px; margin: 0; vertical-align: middle; cursor: pointer; }
+html[data-shell="admin"][data-brand] .school-switch input {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  width: 46px;
+  height: 26px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--shell-tint);
+  border: 1px solid var(--shell-border);
+  cursor: pointer;
+  transition: background .15s ease;
+}
+html[data-shell="admin"][data-brand] .school-switch input::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--shell-surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / .25);
+  transition: transform .15s ease;
+}
+html[data-shell="admin"][data-brand] .school-switch input:checked { background: var(--shell-primary); border-color: var(--shell-primary); }
+html[data-shell="admin"][data-brand] .school-switch input:checked::after { transform: translateX(20px); }
+html[data-shell="admin"][data-brand] .school-switch input:focus-visible { outline: 2px solid var(--shell-primary); outline-offset: 2px; }
+html[data-shell="admin"][data-brand] .school-link-danger {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--shell-abs);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html[data-shell="admin"][data-brand] .school-link-danger:hover { text-decoration: underline; }
+html[data-shell="admin"][data-brand] .ui-btn.school-danger { color: var(--shell-abs) !important; }
+html[data-shell="admin"][data-brand] .school-add-child {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: 10px 12px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--shell-border);
+}
+html[data-shell="admin"][data-brand] .school-card-gold { border-color: var(--shell-avatar-bg); }
+html[data-shell="admin"][data-brand] .school-link-inline {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.6fr);
+  align-items: end;
+}
+html[data-shell="admin"][data-brand] .school-link-inline .school-pair { display: contents; }
+html[data-shell="admin"][data-brand] .school-link-inline .school-check { align-self: center; }
+html[data-shell="admin"][data-brand] .school-password { display: grid; gap: 4px; margin-bottom: 16px; border-color: var(--shell-ok); background: var(--shell-ok-bg); color: var(--shell-ok); }
+html[data-shell="admin"][data-brand] .school-password code { font-size: 18px; letter-spacing: .06em; color: inherit; background: none; }
+@media (max-width: 768px) {
+  html[data-shell="admin"][data-brand] .school-add-child,
+  html[data-shell="admin"][data-brand] .school-link-inline { grid-template-columns: minmax(0, 1fr); }
+  html[data-shell="admin"][data-brand] .school-page .school-pair { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* School board (P3.8) on the kit (P3.9b). */
+html[data-shell="admin"][data-brand] .school-board .board-stat { text-decoration: none; transition: border-color .15s ease; }
+html[data-shell="admin"][data-brand] .school-board .board-stat:hover { border-color: var(--shell-primary); }
+html[data-shell="admin"][data-brand] .school-board .board-progress__text { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; color: var(--shell-muted); font-size: 14px; }
+html[data-shell="admin"][data-brand] .school-board .board-progress__bar { height: 8px; border-radius: 999px; background: var(--shell-tint); overflow: hidden; }
+html[data-shell="admin"][data-brand] .school-board .board-progress__bar i { display: block; height: 100%; border-radius: inherit; background: var(--shell-primary); }
+html[data-shell="admin"][data-brand] .school-board .board-subhead { margin: 18px 0 8px; }
+html[data-shell="admin"][data-brand] .school-board .board-table { box-shadow: none; border-radius: var(--shell-radius-sm); }
+html[data-shell="admin"][data-brand] .school-board .board-table tbody tr:first-child td { border-top: 0 !important; }
+html[data-shell="admin"][data-brand] .school-board .board-ok { margin: 14px 0 0; }
+html[data-shell="admin"][data-brand] .school-board .board-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+html[data-shell="admin"][data-brand] .school-board .board-links .ui-btn { justify-content: flex-start; }
+html[data-shell="admin"][data-brand] .school-board .board-facts { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+html[data-shell="admin"][data-brand] .school-board .board-facts li { display: flex; align-items: baseline; gap: 10px; font-size: 14px; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .school-board .board-more { margin-top: 12px; }
+html[data-shell="admin"][data-brand] .school-board .board-branches { margin: 0 0 12px; }
+
 /* Login letters (PL.1) */
-.school-letter-form { flex-wrap: nowrap; align-items: center; }
-.school-letter-form .school-letter-lang { min-width: 0; width: auto; padding-right: 26px; }
-.school-letters-bar {
+html[data-shell="admin"][data-brand] .school-letter-form { display: inline-flex; flex-wrap: nowrap; align-items: center; gap: 6px; margin: 0; }
+html[data-shell="admin"][data-brand] .school-letter-form .school-letter-lang { min-width: 0; width: auto; }
+html[data-shell="admin"][data-brand] .school-letters-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  margin: 0 0 12px;
   padding: 10px 14px;
-  border: 1px dashed #E9C77E;
-  border-radius: 14px;
+  border: 1px dashed var(--shell-border);
+  border-radius: var(--shell-radius);
+  background: var(--shell-surface);
+  color: var(--shell-text);
   font-size: 14px;
 }

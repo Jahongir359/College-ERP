@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../auth/auth_state.dart';
+import '../../features/auth/screens/change_password_screen.dart';
+import '../../features/auth/screens/choose_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/coming_soon_screen.dart';
 
@@ -41,17 +43,29 @@ import '../../features/staff/screens/staff_profile_screen.dart';
 import '../../shared/screens/profile_hub_screen.dart';
 import '../../shared/screens/messages_screen.dart';
 import '../theme/brand.dart';
+import '../theme/brand_provider.dart';
 
 /// Where the router sends [auth]'s user when they open [path]; null means stay.
+/// [brandChosen] is whether this device picked School or Study Center on
+/// `/choose` (null while that is still being read from storage).
 /// Kept as a plain function so the role rules can be unit-tested.
-String? roleRedirect(AuthState auth, String path) {
+String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
   if (auth.status == AuthStatus.loading) return '/splash';
 
   if (auth.status == AuthStatus.unauthenticated) {
-    return path == '/login' ? null : '/login';
+    if (brandChosen == null) return '/splash';
+    // First launch: pick School or Study Center, then sign in.
+    if (!brandChosen) return path == '/choose' ? null : '/choose';
+    // The login screen links back to /choose to change the pick.
+    return path == '/login' || path == '/choose' ? null : '/login';
   }
 
   final user = auth.user!;
+
+  // A temporary password (PL.1): nothing else until the user picks their own.
+  if (user.mustChangePassword) {
+    return path == '/change-password' ? null : '/change-password';
+  }
 
   // Admin → coming-soon wall (admin dashboard ships on the web portal).
   // Parents too, until the parent screens are built (plan phase P5).
@@ -67,6 +81,8 @@ String? roleRedirect(AuthState auth, String path) {
 
   // Students → student app; bounce off auth/transitional routes.
   if (path == '/login' ||
+      path == '/choose' ||
+      path == '/change-password' ||
       path == '/splash' ||
       path == '/coming-soon' ||
       path.startsWith('/staff')) {
@@ -81,6 +97,8 @@ String? roleRedirect(AuthState auth, String path) {
 ///   - Staff   (user_type 2) → teacher portal /staff/*
 ///   - Admin   (user_type 1) → /coming-soon (admin web portal handles them)
 ///   - Parent  (user_type 4) → /coming-soon until the parent screens ship
+///   - Signed out → /choose on first launch, then /login
+///   - Temporary password (any role) → /change-password until it is changed
 ///
 /// Each role's sub-screens are nested inside the role's StatefulShellRoute
 /// branches so the bottom navigation bar persists and back-navigation works.
@@ -89,10 +107,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     refreshListenable: authListenable,
-    redirect: (context, state) =>
-        roleRedirect(ref.read(authProvider), state.matchedLocation),
+    redirect: (context, state) {
+      final choice = ref.read(lastBrandProvider);
+      return roleRedirect(
+        ref.read(authProvider),
+        state.matchedLocation,
+        brandChosen: choice.loaded ? choice.chosen : null,
+      );
+    },
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const _SplashScreen()),
+      GoRoute(path: '/choose', builder: (_, __) => const ChooseScreen()),
+      GoRoute(
+        path: '/change-password',
+        builder: (_, __) => const ChangePasswordScreen(),
+      ),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/coming-soon', builder: (_, __) => const ComingSoonScreen()),
 
@@ -329,6 +358,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 class _AuthListenable extends ChangeNotifier {
   _AuthListenable(Ref ref) {
     ref.listen(authProvider, (_, __) => notifyListeners());
+    ref.listen(lastBrandProvider, (_, __) => notifyListeners());
   }
 }
 

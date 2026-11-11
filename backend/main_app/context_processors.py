@@ -40,12 +40,51 @@ def student_theme(request):
 
 def school_nav(request):
     """``show_school_nav``: the admin sidebar's "Maktab" section, only for admins
-    who can see an Iceberg School branch (Study Center admins see no change)."""
+    who can see an Iceberg School branch (Study Center admins see no change).
+    ``school_only_admin`` and ``admin_home_url``: the admin shell's menu and home
+    link (P3.9)."""
     user = getattr(request, "user", None)
     if not (user and user.is_authenticated and str(user.user_type) == "1"):
-        return {"show_school_nav": False}
+        return {"show_school_nav": False, "school_only_admin": False}
     from . import branching
     from .models import Branch
 
     branches = branching.get_accessible_branches(user)
-    return {"show_school_nav": branches.filter(brand=Branch.BRAND_SCHOOL).exists()}
+    from django.utils.functional import SimpleLazyObject
+
+    show = branches.filter(brand=Branch.BRAND_SCHOOL).exists()
+    # Lazy: only School-branded pages read it (base.html checks the brand
+    # first), so Learning Center pages run no extra queries.
+    period = SimpleLazyObject(school_period_label) if show else ""
+    # P3.9: School-only admins get the short School menu and /maktab/ as home.
+    # Only admins who see a School branch can be School-only, so Study Center
+    # admins run no extra query.
+    school_only = show and branching.is_school_only_admin(user)
+    return {
+        "show_school_nav": show,
+        "school_period": period,
+        "school_only_admin": school_only,
+        "admin_home_url": branching.admin_home_url(user, school_only=school_only),
+        # Lazy: read only by the Study Center topbar (School shows the period).
+        "admin_branch_label": SimpleLazyObject(lambda: branching.admin_branch_label(user)),
+    }
+
+
+def school_period_label():
+    """``"2026–2027 · 1-chorak"`` for the School navbar chip (mockup 16): the
+    current academic year and the quarter today falls in (or the last one
+    that started). Empty when no academic year exists."""
+    from django.utils import timezone
+    from django.utils.translation import gettext as _
+
+    from .models import Session
+
+    year = Session.current()
+    if year is None:
+        return ""
+    today = timezone.localdate()
+    term = year.terms.filter(start_date__lte=today).order_by("-start_date").first()
+    if term is None:
+        return str(year)
+    name = term.name or _("Quarter %(number)s") % {"number": term.number}
+    return f"{year} · {name}"

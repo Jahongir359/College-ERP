@@ -117,6 +117,44 @@ def is_recovery_admin(user):
     return bool(email and email == recovery_email)
 
 
+def is_school_only_admin(user):
+    """True for a branch admin whose branches are all Iceberg School (P3.9).
+
+    Such an admin gets the short School menu and lands on the School board
+    (``/maktab/``). Super admins, Study Center admins and admins of mixed or no
+    branches keep the full menu and ``/admin/home/``.
+    """
+    profile = get_admin_profile(user)
+    if profile is None or profile.is_super_admin:
+        return False
+    brands = set(profile.branches.values_list("brand", flat=True))
+    return brands == {Branch.BRAND_SCHOOL}
+
+
+def admin_branch_label(user):
+    """Topbar chip of the admin shell (P3.9, mockup 16c): the branch a branch
+    admin manages, "All branches" for super admins, empty otherwise."""
+    from django.utils.translation import gettext as _
+
+    profile = get_admin_profile(user)
+    if profile is None:
+        return ""
+    if profile.is_super_admin:
+        return _("All branches")
+    names = list(profile.branches.values_list("name", flat=True)[:2])
+    return names[0] if len(names) == 1 else ""
+
+
+def admin_home_url(user, school_only=None):
+    """Home page of an admin: the School board for School-only admins, else the
+    admin dashboard. Pass ``school_only`` when it is already known."""
+    from django.urls import reverse
+
+    if school_only is None:
+        school_only = is_school_only_admin(user)
+    return reverse("school_board" if school_only else "admin_home")
+
+
 # ── Accessible branches ──────────────────────────────────────────────────────
 
 
@@ -159,6 +197,22 @@ def filter_branches_for_user(user, queryset):
         return queryset.filter(id__in=profile.branches.values_list("id", flat=True))
     # Teachers/students don't manage branches.
     return queryset.filter(id__in=get_accessible_branches(user).values_list("id", flat=True))
+
+
+def assignable_branches(user):
+    """Branches ``user`` may put a new or edited student, teacher or group in."""
+    return filter_branches_for_user(user, Branch.objects.all()).order_by("name")
+
+
+def admin_only_branch(user):
+    """The one branch of a branch admin who has exactly one, else None.
+
+    Super admins and admins of several branches get None: they must choose.
+    """
+    if is_super_admin(user) or get_admin_profile(user) is None:
+        return None
+    branches = list(assignable_branches(user)[:2])
+    return branches[0] if len(branches) == 1 else None
 
 
 def filter_students_for_user(user, queryset):

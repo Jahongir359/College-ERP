@@ -383,6 +383,10 @@ msgstr "Qizil katak — toʻqnashuv: oʻqituvchi yoki xona shu vaqtda band. Saql
 msgid "Years and quarters are shared by all branches."
 msgstr "Oʻquv yillari va choraklar barcha filiallar uchun umumiy."
 
+#, python-format
+msgid "Quarter %(number)s"
+msgstr "%(number)s-chorak"
+
 msgid "Only a super admin can change them."
 msgstr "Ularni faqat bosh administrator oʻzgartira oladi."
 
@@ -922,6 +926,84 @@ msgid_plural "%(n)s parents in %(name)s have not signed in yet."
 msgstr[0] "%(name)s sinfidagi %(n)s ota-ona hali kirmagan."
 msgstr[1] "%(name)s sinfidagi %(n)s ota-ona hali kirmagan."
 
+
+# School register report (P3.7)
+msgid "Register report"
+msgstr "Davomat hisoboti"
+
+msgid "Register taken"
+msgstr "Davomat olingan"
+
+msgid "classes"
+msgstr "sinf"
+
+msgid "Present"
+msgstr "Keldi"
+
+msgid "Late"
+msgstr "Kechikdi"
+
+msgid "Absent"
+msgstr "Kelmadi"
+
+msgid "Taken"
+msgstr "Olindi"
+
+msgid "Came"
+msgstr "Kelganlar"
+
+msgid "Not taken"
+msgstr "Olinmagan"
+
+msgid "Absent and late"
+msgstr "Kelmagan va kechikkanlar"
+
+msgid "Each pupil's parents were told in the app."
+msgstr "Har birining ota-onasiga ilovada xabar yuborildi."
+
+msgid "Class: all"
+msgstr "Sinf: hammasi"
+
+msgid "Download CSV"
+msgstr "CSV yuklab olish"
+
+msgid "Date"
+msgstr "Sana"
+
+msgid "Taken at"
+msgstr "Olingan vaqt"
+
+msgid "Attendance %"
+msgstr "Davomat %"
+
+msgid "Arrival time"
+msgstr "Kelgan vaqti"
+
+msgid "Note"
+msgstr "Izoh"
+
+msgid "Status"
+msgstr "Holat"
+
+msgid "No classes on this date"
+msgstr "Bu sanada sinflar yoʻq"
+
+msgid "Pick a school day inside an academic year."
+msgstr "Oʻquv yili ichidagi maktab kunini tanlang."
+
+msgid "Nobody is absent or late."
+msgstr "Kelmagan yoki kechikkan oʻquvchi yoʻq."
+
+msgid "Not taken — the homeroom teacher hasn't saved this day's register yet. Teachers take the register in the app; this page is read-only."
+msgstr "Olinmagan — sinf rahbari bu kungi davomatni hali saqlamagan. Davomatni oʻqituvchi ilovada oladi; bu sahifa faqat koʻrish uchun."
+
+msgctxt "one pupil"
+msgid "Late"
+msgstr "Kechikdi"
+
+msgctxt "one pupil"
+msgid "Absent"
+msgstr "Kelmadi"
 # Push notification titles (P2.8)
 msgid "New result"
 msgstr "Yangi natija"
@@ -940,3 +1022,1706 @@ msgstr "Bildirishnoma"
 
 msgid "Sent an attachment"
 msgstr "Fayl yubordi"
+
+# School board (P3.8)
+msgid "School board"
+msgstr "Maktab paneli"
+
+msgid "No School branch yet"
+msgstr "Hali maktab filiali yoʻq"
+
+msgid "This board shows Iceberg School numbers. None of the branches you manage is a School branch."
+msgstr "Bu panel Iceberg School raqamlarini koʻrsatadi. Siz boshqaradigan filiallarning hech biri maktab filiali emas."
+
+msgid "Pupils"
+msgstr "Oʻquvchilar"
+
+msgid "Today's register"
+msgstr "Bugungi davomat"
+
+msgid "Set up the academic year first; the register follows its classes."
+msgstr "Avval oʻquv yilini sozlang: davomat uning sinflari boʻyicha yuritiladi."
+
+msgid "No classes in this academic year yet."
+msgstr "Bu oʻquv yilida hali sinflar yoʻq."
+
+#, python-format
+msgid "%(taken)s of %(total)s classes took the register"
+msgstr "%(total)s ta sinfdan %(taken)s tasida davomat olindi"
+
+msgid "classes took the register"
+msgstr "sinfda davomat olindi"
+
+msgid "Not taken yet"
+msgstr "Hali olinmagan"
+
+msgid "No homeroom teacher"
+msgstr "Sinf rahbari yoʻq"
+
+msgid "Every class has taken today's register."
+msgstr "Barcha sinflarda bugungi davomat olindi."
+
+msgid "Open the register report"
+msgstr "Davomat hisobotini ochish"
+
+msgid "Quick links"
+msgstr "Tezkor havolalar"
+
+msgid "Register"
+msgstr "Davomat"
+
+msgid "No quarter has started yet."
+msgstr "Hali birorta chorak boshlanmagan."
+
+msgid "No current academic year is set."
+msgstr "Joriy oʻquv yili belgilanmagan."
+
+msgid "Set one up"
+msgstr "Sozlash"
+
+msgid "parents haven't signed in yet"
+msgstr "ota-ona hali tizimga kirmagan"
+
+msgid "pupils have no parent linked"
+msgstr "oʻquvchiga ota-ona bogʻlanmagan"
+
+msgid "Open parents"
+msgstr "Ota-onalarni ochish"
+
+# P3.9 admin shell
+msgid "Staff"
+msgstr "Xodimlar"
+
+msgid "Account menu"
+msgstr "Hisob menyusi"
+
+msgid "Dark mode"
+msgstr "Tungi rejim"
+
+msgid "Light mode"
+msgstr "Kunduzgi rejim"
+
+msgid "All branches"
+msgstr "Barcha filiallar"
+# Web audit fixes B1, M1 (2026-10-31)
+msgid "Choose a branch."
+msgstr "Filialni tanlang."
+
+msgid "Classroom or room number, e.g. Room 3A"
+msgstr "Sinf xonasi yoki xona raqami, masalan: 3A-xona"
+
+msgid "School classes only: the academic year."
+msgstr "Faqat maktab sinflari uchun: oʻquv yili."
+
+msgid "This student can't be added to this class: they are not in this branch."
+msgstr "Bu oʻquvchini sinfga qoʻshib boʻlmaydi: u bu filialda emas."
+
+#: main_app/templates/hod_template/school/
+msgid "Register taken today"
+msgstr "Bugun davomat olingan"
+
+#: main_app/templates/hod_template/school/
+msgid "Today's register (present / late / absent)"
+msgstr "Bugungi davomat (keldi / kech / yoʻq)"
+
+#: main_app/templates/hod_template/school/
+#, python-format
+msgid "Class: %(name)s"
+msgstr "Sinf: %(name)s"
+#: main_app/forms.py:61
+msgid "— Select branch —"
+msgstr "— Filialni tanlang —"
+
+#: main_app/forms.py:62 main_app/forms.py:674 main_app/forms.py:946
+msgid "Branch / Location"
+msgstr "Filial / Manzil"
+
+#: main_app/forms.py:82
+msgid "Date of birth cannot be in the future."
+msgstr "Tugʻilgan sana kelajakda boʻlishi mumkin emas."
+
+#: main_app/forms.py:84
+msgid "Please enter a valid date of birth."
+msgstr "Toʻgʻri tugʻilgan sanani kiriting."
+
+#: main_app/forms.py:101
+msgid "Male"
+msgstr "Erkak"
+
+#: main_app/forms.py:101
+msgid "Female"
+msgstr "Ayol"
+
+#: main_app/forms.py:102 main_app/templates/hod_template/manage_student.html:65
+msgid "Gender"
+msgstr "Jinsi"
+
+#: main_app/forms.py:108
+msgid "Date of Birth"
+msgstr "Tugʻilgan sana"
+
+#: main_app/forms.py:118
+msgid "Format: YYYY-MM-DD. Used to generate the unique login ID."
+msgstr "Format: YYYY-MM-DD. Yagona login ID yaratish uchun ishlatiladi."
+
+#: main_app/forms.py:121
+msgid "Address"
+msgstr "Manzil"
+
+#: main_app/forms.py:124
+msgid "e.g. Chilonzor 9, Tashkent"
+msgstr "masalan, Chilonzor 9, Toshkent"
+
+#: main_app/forms.py:130
+msgid "Profile pic"
+msgstr "Profil rasmi"
+
+#: main_app/forms.py:146
+msgid "Profile picture too large. Maximum size is 5 MB."
+msgstr "Profil rasmi juda katta. Eng koʻpi 5 MB."
+
+#: main_app/forms.py:173 main_app/forms.py:223 main_app/forms.py:351
+msgid "Phone Number"
+msgstr "Telefon raqami"
+
+#: main_app/forms.py:182 main_app/forms.py:232
+msgid "— No level assigned —"
+msgstr "— Daraja belgilanmagan —"
+
+#: main_app/forms.py:184 main_app/forms.py:234
+msgid "English Level"
+msgstr "Ingliz tili darajasi"
+
+#: main_app/forms.py:211
+msgid "— Select a Program —"
+msgstr "— Dasturni tanlang —"
+
+#: main_app/forms.py:212 main_app/forms.py:672 main_app/templates/hod_template/add_student_template.html:93
+msgid "Program"
+msgstr "Dastur"
+
+#: main_app/forms.py:216
+msgid "— Select a Class Group (optional) —"
+msgstr "— Guruhni tanlang (ixtiyoriy) —"
+
+#: main_app/forms.py:217
+msgid "Assign to Class Group"
+msgstr "Guruhga biriktirish"
+
+#: main_app/forms.py:264
+msgid "The selected class group does not belong to the chosen program."
+msgstr "Tanlangan guruh tanlangan dasturga tegishli emas."
+
+#: main_app/forms.py:272
+msgid "Selected group does not belong to the selected branch."
+msgstr "Tanlangan guruh tanlangan filialga tegishli emas."
+
+#: main_app/forms.py:289
+msgid "Email"
+msgstr "Email"
+
+#: main_app/forms.py:357 main_app/templates/hod_template/manage_staff.html:63
+msgid "Specialization"
+msgstr "Mutaxassislik"
+
+#: main_app/forms.py:361
+msgid "e.g. IELTS, Mathematics, Business English"
+msgstr "masalan, IELTS, Matematika, Business English"
+
+#: main_app/forms.py:675
+msgid "Room / Classroom"
+msgstr "Xona / Sinf xonasi"
+
+#: main_app/forms.py:676 main_app/templates/hod_template/home_content.html:313
+msgid "Schedule"
+msgstr "Jadval"
+
+#: main_app/forms.py:677
+msgid "Capacity (max students)"
+msgstr "Sigʻim (eng koʻp oʻquvchi)"
+
+#: main_app/forms.py:678
+msgid "Monthly fee (UZS soʻm)"
+msgstr "Oylik toʻlov (UZS soʻm)"
+
+#: main_app/forms.py:679
+msgid "Starting Date"
+msgstr "Boshlanish sanasi"
+
+#: main_app/forms.py:684
+msgid "Blank = course fee"
+msgstr "Boʻsh = kurs narxi"
+
+#: main_app/forms.py:939 main_app/forms.py:1015
+msgid "Billing month"
+msgstr "Hisob oyi"
+
+#: main_app/forms.py:941
+msgid "Invoices are created for every active enrollment in this month."
+msgstr "Shu oydagi har bir faol roʻyxatga olish uchun hisob-faktura yaratiladi."
+
+#: main_app/forms.py:947
+msgid "All my branches"
+msgstr "Barcha filiallarim"
+
+#: main_app/forms.py:951 main_app/forms.py:1025
+msgid "Payment due date"
+msgstr "Toʻlov muddati"
+
+#: main_app/forms.py:968 main_app/forms.py:1055
+msgid "Pick a month in the YYYY-MM format."
+msgstr "Oyni YYYY-MM formatida tanlang."
+
+#: main_app/forms.py:976 main_app/forms.py:1023
+msgid "Amount (UZS soʻm)"
+msgstr "Summa (UZS soʻm)"
+
+#: main_app/forms.py:977
+msgid "Payment method"
+msgstr "Toʻlov usuli"
+
+#: main_app/forms.py:978
+msgid "Payment date"
+msgstr "Toʻlov sanasi"
+
+#: main_app/forms.py:979 main_app/forms.py:1026
+msgid "Note (optional)"
+msgstr "Izoh (ixtiyoriy)"
+
+#: main_app/forms.py:983
+msgid "e.g. 200,000"
+msgstr "masalan, 200,000"
+
+#: main_app/forms.py:989
+msgid "e.g. receipt #, payer name"
+msgstr "masalan, chek raqami, toʻlovchi ismi"
+
+#: main_app/forms.py:1003
+msgid "Amount must be greater than zero."
+msgstr "Summa noldan katta boʻlishi kerak."
+
+#: main_app/forms.py:1024
+msgid "Discount (UZS soʻm)"
+msgstr "Chegirma (UZS soʻm)"
+
+#: main_app/forms.py:1030
+msgid "e.g. 600,000"
+msgstr "masalan, 600,000"
+
+#: main_app/forms.py:1037
+msgid "e.g. course books, exam fee"
+msgstr "masalan, darsliklar, imtihon toʻlovi"
+
+#: main_app/forms.py:1062
+msgid "Discount cannot exceed the invoice amount."
+msgstr "Chegirma hisob-faktura summasidan oshmasligi kerak."
+
+#: main_app/hod_views.py:392
+msgid "Upcoming Classes"
+msgstr "Yaqinlashayotgan darslar"
+
+#: main_app/hod_views.py:399
+msgid "Active Classes"
+msgstr "Faol guruhlar"
+
+#: main_app/hod_views.py:426
+#, python-format
+msgid "New student · %(course)s"
+msgstr "Yangi oʻquvchi · %(course)s"
+
+#: main_app/hod_views.py:427 main_app/templates/hod_template/home_content.html:246
+msgid "Course pending"
+msgstr "Kurs belgilanmagan"
+
+#: main_app/hod_views.py:441
+#, python-format
+msgid "Assignment · %(group)s"
+msgstr "Topshiriq · %(group)s"
+
+#: main_app/hod_views.py:442
+msgid "No group"
+msgstr "Guruh yoʻq"
+
+#: main_app/hod_views.py:456
+#, python-format
+msgid "Message in %(group)s"
+msgstr "%(group)s guruhida xabar"
+
+#: main_app/hod_views.py:470 main_app/hod_views.py:500 main_app/hod_views.py:521
+#, python-format
+msgid "%(count)s new this week"
+msgstr "Bu hafta %(count)s ta yangi"
+
+#: main_app/hod_views.py:480
+#, python-format
+msgid "%(count)s added this week"
+msgstr "Bu hafta %(count)s ta qoʻshildi"
+
+#: main_app/hod_views.py:485
+msgid "Active Groups"
+msgstr "Faol guruhlar"
+
+#: main_app/hod_views.py:490
+#, python-format
+msgid "%(pct)s%% capacity filled"
+msgstr "Sigʻimning %(pct)s%% toʻlgan"
+
+#: main_app/hod_views.py:495
+msgid "Programs"
+msgstr "Dasturlar"
+
+#: main_app/hod_views.py:505
+msgid "Attendance Today"
+msgstr "Bugungi davomat"
+
+#: main_app/hod_views.py:510 main_app/templates/hod_template/home_content.html:192
+#, python-format
+msgid "%(present)s/%(total)s present"
+msgstr "%(present)s/%(total)s keldi"
+
+#: main_app/hod_views.py:516 main_app/templates/hod_template/home_content.html:262
+msgid "Registration Leads"
+msgstr "Roʻyxatdan oʻtish arizalari"
+
+#: main_app/hod_views.py:528
+msgid "Administrative Dashboard"
+msgstr "Boshqaruv paneli"
+
+#: main_app/hod_views.py:566 main_app/templates/hod_template/add_staff_template.html:5 main_app/templates/hod_template/add_staff_template.html:102
+msgid "Add Teacher"
+msgstr "Oʻqituvchi qoʻshish"
+
+#: main_app/hod_views.py:605
+#, python-format
+msgid "Teacher added successfully. Login ID: %(login_id)s"
+msgstr "Oʻqituvchi qoʻshildi. Login ID: %(login_id)s"
+
+#: main_app/hod_views.py:611
+msgid "Could Not Add "
+msgstr "Qoʻshib boʻlmadi "
+
+#: main_app/hod_views.py:613
+msgid "Please fulfil all requirements"
+msgstr "Barcha talablarni bajaring"
+
+#: main_app/hod_views.py:621 main_app/templates/hod_template/add_student_template.html:122 main_app/templates/hod_template/home_content.html:27
+msgid "Add Student"
+msgstr "Oʻquvchi qoʻshish"
+
+#: main_app/hod_views.py:672
+#, python-format
+msgid "Student added and enrolled in '%(group)s'. Login ID: %(login_id)s"
+msgstr "Oʻquvchi qoʻshildi va '%(group)s' guruhiga yozildi. Login ID: %(login_id)s"
+
+#: main_app/hod_views.py:679
+#, python-format
+msgid "Student %(first_name)s %(last_name)s added. Login ID: %(login_id)s. Enroll them in a group from the Enrollments page."
+msgstr "%(first_name)s %(last_name)s oʻquvchi qoʻshildi. Login ID: %(login_id)s. Uni Roʻyxatga olish sahifasida guruhga yozing."
+
+#: main_app/hod_views.py:685
+msgid "Could Not Add: "
+msgstr "Qoʻshib boʻlmadi: "
+
+#: main_app/hod_views.py:687
+msgid "Please fix the errors below."
+msgstr "Quyidagi xatolarni tuzating."
+
+#: main_app/hod_views.py:823 main_app/templates/hod_template/manage_staff.html:16
+msgid "Manage Teachers"
+msgstr "Oʻqituvchilar"
+
+#: main_app/hod_views.py:872
+msgid "You don't have access to this teacher's branch."
+msgstr "Sizda bu oʻqituvchining filialiga ruxsat yoʻq."
+
+#: main_app/hod_views.py:881
+msgid "Edit Teacher"
+msgstr "Oʻqituvchini tahrirlash"
+
+#: main_app/hod_views.py:912 main_app/hod_views.py:966
+msgid "Successfully Updated"
+msgstr "Muvaffaqiyatli yangilandi"
+
+#: main_app/hod_views.py:915 main_app/hod_views.py:969
+msgid "Could Not Update "
+msgstr "Yangilab boʻlmadi "
+
+#: main_app/hod_views.py:917
+msgid "Please fill form properly"
+msgstr "Formani toʻgʻri toʻldiring"
+
+#: main_app/hod_views.py:927
+msgid "You don't have access to this student's branch."
+msgstr "Sizda bu oʻquvchining filialiga ruxsat yoʻq."
+
+#: main_app/hod_views.py:934
+msgid "Edit Student"
+msgstr "Oʻquvchini tahrirlash"
+
+#: main_app/hod_views.py:971
+msgid "Please Fill Form Properly!"
+msgstr "Formani toʻgʻri toʻldiring!"
+
+#: main_app/hod_views.py:1266
+msgid "You don't have permission to delete this teacher."
+msgstr "Sizda bu oʻqituvchini oʻchirishga ruxsat yoʻq."
+
+#: main_app/hod_views.py:1270
+msgid "Staff deleted successfully!"
+msgstr "Oʻqituvchi oʻchirildi!"
+
+#: main_app/hod_views.py:1273
+msgid "Could not delete staff because related attendance data exists."
+msgstr "Oʻqituvchini oʻchirib boʻlmadi: unga bogʻliq davomat maʼlumotlari bor."
+
+#: main_app/hod_views.py:1285
+msgid "You don't have permission to delete this student."
+msgstr "Sizda bu oʻquvchini oʻchirishga ruxsat yoʻq."
+
+#: main_app/hod_views.py:1293
+msgid "Student deleted successfully!"
+msgstr "Oʻquvchi oʻchirildi!"
+
+#: main_app/hod_views.py:1296
+msgid "Could not delete student because related records still exist."
+msgstr "Oʻquvchini oʻchirib boʻlmadi: unga bogʻliq yozuvlar hali bor."
+
+#: main_app/hod_views.py:1864 main_app/templates/hod_template/home_content.html:31 main_app/templates/hod_template/manage_group.html:16
+msgid "Manage Groups"
+msgstr "Guruhlar"
+
+#: main_app/hod_views.py:1927
+msgid "You can only create groups in your own branches."
+msgstr "Guruhlarni faqat oʻz filiallaringizda yarata olasiz."
+
+#: main_app/hod_views.py:1931 main_app/hod_views.py:1942 main_app/templates/hod_template/home_content.html:114
+msgid "Add Group"
+msgstr "Guruh qoʻshish"
+
+#: main_app/hod_views.py:1935
+msgid "Group created!"
+msgstr "Guruh yaratildi!"
+
+#: main_app/hod_views.py:1951 main_app/hod_views.py:1985
+msgid "You don't have access to this group's branch."
+msgstr "Sizda bu guruhning filialiga ruxsat yoʻq."
+
+#: main_app/hod_views.py:1959
+msgid "You can only assign groups to your own branches."
+msgstr "Guruhlarni faqat oʻz filiallaringizga biriktira olasiz."
+
+#: main_app/hod_views.py:1963 main_app/hod_views.py:1975
+msgid "Edit Group"
+msgstr "Guruhni tahrirlash"
+
+#: main_app/hod_views.py:1968
+msgid "Group updated!"
+msgstr "Guruh yangilandi!"
+
+#: main_app/hod_views.py:1994
+#, python-format
+msgid "%(count)s enrollment(s)"
+msgstr "%(count)s ta roʻyxatga olish"
+
+#: main_app/hod_views.py:1996
+#, python-format
+msgid "%(count)s attendance record(s)"
+msgstr "%(count)s ta davomat yozuvi"
+
+#: main_app/hod_views.py:1998
+#, python-format
+msgid "%(count)s result(s)"
+msgstr "%(count)s ta natija"
+
+#: main_app/hod_views.py:2002
+#, python-format
+msgid "Cannot delete \"%(group)s\" — it has %(parts)s. Archive it instead to hide it without losing data."
+msgstr "\"%(group)s\" guruhini oʻchirib boʻlmaydi — unda %(parts)s bor. Maʼlumotlarni yoʻqotmasdan yashirish uchun uni arxivlang."
+
+#: main_app/hod_views.py:2011
+#, python-format
+msgid "Group \"%(group)s\" deleted."
+msgstr "\"%(group)s\" guruhi oʻchirildi."
+
+#: main_app/hod_views.py:2013
+#, python-format
+msgid "Could not delete group: %(error)s"
+msgstr "Guruhni oʻchirib boʻlmadi: %(error)s"
+
+#: main_app/payments_views.py:381
+msgid "This invoice already has payments. Void the payments first (super admin only)."
+msgstr "Bu hisob-fakturada toʻlovlar bor. Avval toʻlovlarni bekor qiling (faqat super admin)."
+
+#: main_app/payments_views.py:385
+msgid "Invoice is already cancelled."
+msgstr "Hisob-faktura allaqachon bekor qilingan."
+
+#: main_app/payments_views.py:391
+#, python-format
+msgid "Invoice for %(student)s (%(period)s) cancelled."
+msgstr "%(student)s uchun hisob-faktura (%(period)s) bekor qilindi."
+
+#: main_app/payments_views.py:409
+msgid "Only the super admin can void payments."
+msgstr "Toʻlovlarni faqat super admin bekor qila oladi."
+
+#: main_app/payments_views.py:416
+#, python-format
+msgid "Payment %(receipt)s voided. Invoice balance restored."
+msgstr "%(receipt)s toʻlovi bekor qilindi. Hisob-faktura qoldigʻi tiklandi."
+
+#: main_app/payments_views.py:427
+#, python-format
+msgid "Reminder sent to %(student)s."
+msgstr "%(student)s ga eslatma yuborildi."
+
+#: main_app/payments_views.py:430
+msgid "This invoice is settled — no reminder needed."
+msgstr "Bu hisob-faktura toʻlangan — eslatma kerak emas."
+
+#: main_app/templates/hod_template/add_group.html:30
+msgid "Group Details"
+msgstr "Guruh maʼlumotlari"
+
+#: main_app/templates/hod_template/add_group.html:60
+msgid "Schedule & Capacity"
+msgstr "Jadval va sigʻim"
+
+#: main_app/templates/hod_template/add_group.html:66
+msgid "e.g. Mon/Wed 10:00–12:00"
+msgstr "masalan, Du/Chor 10:00–12:00"
+
+#: main_app/templates/hod_template/add_group.html:84
+msgid "Save Group"
+msgstr "Guruhni saqlash"
+
+#: main_app/templates/hod_template/add_group.html:87
+msgid "View All Groups"
+msgstr "Barcha guruhlar"
+
+#: main_app/templates/hod_template/add_staff_template.html:32 main_app/templates/hod_template/add_student_template.html:38 main_app/templates/hod_template/edit_staff_template.html:35
+msgid "Personal Information"
+msgstr "Shaxsiy maʼlumotlar"
+
+#: main_app/templates/hod_template/add_staff_template.html:53
+msgid "YYYY-MM-DD — used to generate the login ID."
+msgstr "YYYY-MM-DD — login ID yaratish uchun ishlatiladi."
+
+#: main_app/templates/hod_template/add_staff_template.html:58 main_app/templates/hod_template/add_student_template.html:62 main_app/templates/hod_template/edit_staff_template.html:58
+msgid "Account & Contact"
+msgstr "Hisob va aloqa"
+
+#: main_app/templates/hod_template/add_staff_template.html:78 main_app/templates/hod_template/edit_staff_template.html:81
+msgid "Teaching Assignment"
+msgstr "Dars biriktirish"
+
+#: main_app/templates/hod_template/add_staff_template.html:93 main_app/templates/hod_template/edit_staff_template.html:77
+msgid "Optional — PNG or JPG up to 5 MB."
+msgstr "Ixtiyoriy — PNG yoki JPG, 5 MB gacha."
+
+#: main_app/templates/hod_template/add_staff_template.html:105
+msgid "View All Teachers"
+msgstr "Barcha oʻqituvchilar"
+
+#: main_app/templates/hod_template/add_student_template.html:58
+msgid "YYYY-MM-DD — used to generate the login ID (e.g. IC052401)."
+msgstr "YYYY-MM-DD — login ID yaratish uchun ishlatiladi (masalan, IC052401)."
+
+#: main_app/templates/hod_template/add_student_template.html:86 main_app/templates/hod_template/edit_student_template.html:78
+msgid "Optional — PNG, JPG up to 5 MB."
+msgstr "Ixtiyoriy — PNG, JPG, 5 MB gacha."
+
+#: main_app/templates/hod_template/add_student_template.html:90
+msgid "Program & Class Assignment"
+msgstr "Dastur va guruhga biriktirish"
+
+#: main_app/templates/hod_template/add_student_template.html:98
+msgid "(filter groups)"
+msgstr "(guruhlarni saralash)"
+
+#: main_app/templates/hod_template/add_student_template.html:100
+msgid "— All Teachers —"
+msgstr "— Barcha oʻqituvchilar —"
+
+#: main_app/templates/hod_template/add_student_template.html:102
+msgid "Select program first."
+msgstr "Avval dasturni tanlang."
+
+#: main_app/templates/hod_template/add_student_template.html:105
+msgid "Class Group"
+msgstr "Guruh"
+
+#: main_app/templates/hod_template/add_student_template.html:105
+msgid "(optional)"
+msgstr "(ixtiyoriy)"
+
+#: main_app/templates/hod_template/add_student_template.html:108
+msgid "Select program to load groups."
+msgstr "Guruhlarni yuklash uchun dasturni tanlang."
+
+#: main_app/templates/hod_template/add_student_template.html:114 main_app/templates/hod_template/edit_student_template.html:97
+msgid "English level 1–6. Leave blank for non-English programs."
+msgstr "Ingliz tili darajasi 1–6. Ingliz tili boʻlmagan dasturlar uchun boʻsh qoldiring."
+
+#: main_app/templates/hod_template/add_student_template.html:125
+msgid "View All Students"
+msgstr "Barcha oʻquvchilar"
+
+#: main_app/templates/hod_template/edit_staff_template.html:14 main_app/templates/hod_template/edit_student_template.html:14
+msgid "Login ID:"
+msgstr "Login ID:"
+
+#: main_app/templates/hod_template/edit_staff_template.html:15 main_app/templates/hod_template/edit_student_template.html:15
+msgid "— read-only, cannot be changed"
+msgstr "— faqat oʻqish uchun, oʻzgartirib boʻlmaydi"
+
+#: main_app/templates/hod_template/edit_staff_template.html:61 main_app/templates/hod_template/edit_student_template.html:61
+msgid "New Password"
+msgstr "Yangi parol"
+
+#: main_app/templates/hod_template/edit_staff_template.html:61 main_app/templates/hod_template/edit_student_template.html:61
+msgid "(leave blank to keep)"
+msgstr "(oʻzgartirmaslik uchun boʻsh qoldiring)"
+
+#: main_app/templates/hod_template/edit_staff_template.html:105
+msgid "Update Teacher"
+msgstr "Oʻqituvchini yangilash"
+
+#: main_app/templates/hod_template/edit_staff_template.html:108
+msgid "Back to Teachers"
+msgstr "Oʻqituvchilarga qaytish"
+
+#: main_app/templates/hod_template/edit_student_template.html:86
+msgid "Program Assignment"
+msgstr "Dasturga biriktirish"
+
+#: main_app/templates/hod_template/edit_student_template.html:111
+msgid "Update Student"
+msgstr "Oʻquvchini yangilash"
+
+#: main_app/templates/hod_template/edit_student_template.html:114
+msgid "Back to Students"
+msgstr "Oʻquvchilarga qaytish"
+
+#: main_app/templates/hod_template/home_content.html:6 main_app/templates/hod_template/home_content.html:7
+msgid "Admin Dashboard"
+msgstr "Admin paneli"
+
+#: main_app/templates/hod_template/home_content.html:20
+msgid "ICEBERG Command Center"
+msgstr "ICEBERG boshqaruv markazi"
+
+#: main_app/templates/hod_template/home_content.html:22
+#, python-format
+msgid "Welcome back, %(name)s"
+msgstr "Xush kelibsiz, %(name)s"
+
+#: main_app/templates/hod_template/home_content.html:23
+msgid "Run admissions, groups, attendance, teacher activity, and student performance from one premium operating surface."
+msgstr "Qabul, guruhlar, davomat, oʻqituvchilar faoliyati va oʻquvchilar natijalarini bir joydan boshqaring."
+
+#: main_app/templates/hod_template/home_content.html:35
+msgid "Profile Settings"
+msgstr "Profil sozlamalari"
+
+#: main_app/templates/hod_template/home_content.html:39
+msgid "Today snapshot"
+msgstr "Bugungi holat"
+
+#: main_app/templates/hod_template/home_content.html:42 main_app/templates/hod_template/home_content.html:51
+msgid "Today"
+msgstr "Bugun"
+
+#: main_app/templates/hod_template/home_content.html:48
+#, python-format
+msgid "%(present)s present out of %(total)s attendance records today."
+msgstr "Bugun %(total)s ta davomat yozuvidan %(present)s tasi keldi."
+
+#: main_app/templates/hod_template/home_content.html:54
+msgid "No classes recorded yet today. Attendance appears here as teachers take it."
+msgstr "Bugun hali darslar qayd etilmagan. Oʻqituvchilar davomat olganda u shu yerda chiqadi."
+
+#: main_app/templates/hod_template/home_content.html:58
+#, python-format
+msgid "%(count)s pending leads"
+msgstr "%(count)s ta kutilayotgan ariza"
+
+#: main_app/templates/hod_template/home_content.html:63
+msgid "Dashboard statistics"
+msgstr "Panel statistikasi"
+
+#: main_app/templates/hod_template/home_content.html:88
+msgid "Admin quick actions"
+msgstr "Admin tezkor amallari"
+
+#: main_app/templates/hod_template/home_content.html:91
+msgid "Fast Path"
+msgstr "Tezkor yoʻl"
+
+#: main_app/templates/hod_template/home_content.html:92 main_app/templates/main_app/profile_hub.html:105
+msgid "Quick Actions"
+msgstr "Tezkor amallar"
+
+#: main_app/templates/hod_template/home_content.html:100
+msgid "Create an account and profile"
+msgstr "Hisob va profil yaratish"
+
+#: main_app/templates/hod_template/home_content.html:105
+msgid "Set course and branch access"
+msgstr "Kurs va filialga ruxsat berish"
+
+#: main_app/templates/hod_template/home_content.html:109
+msgid "Add Program"
+msgstr "Dastur qoʻshish"
+
+#: main_app/templates/hod_template/home_content.html:110
+msgid "Organize learning tracks"
+msgstr "Taʼlim yoʻnalishlarini tartiblash"
+
+#: main_app/templates/hod_template/home_content.html:115
+msgid "Schedule a class group"
+msgstr "Guruh jadvalini tuzish"
+
+#: main_app/templates/hod_template/home_content.html:119
+msgid "Enroll Student"
+msgstr "Oʻquvchini yozish"
+
+#: main_app/templates/hod_template/home_content.html:120
+msgid "Place students into groups"
+msgstr "Oʻquvchilarni guruhlarga joylash"
+
+#: main_app/templates/hod_template/home_content.html:125
+msgid "Review class records"
+msgstr "Dars yozuvlarini koʻrish"
+
+#: main_app/templates/hod_template/home_content.html:129
+msgid "Group Messages"
+msgstr "Guruh xabarlari"
+
+#: main_app/templates/hod_template/home_content.html:130
+msgid "Open active conversations"
+msgstr "Faol suhbatlarni ochish"
+
+#: main_app/templates/hod_template/home_content.html:135
+msgid "Reply to staff feedback"
+msgstr "Xodimlar fikriga javob berish"
+
+#: main_app/templates/hod_template/home_content.html:145
+msgid "Branch Intelligence"
+msgstr "Filiallar tahlili"
+
+#: main_app/templates/hod_template/home_content.html:146
+msgid "Branch Performance — Monthly"
+msgstr "Filiallar koʻrsatkichi — oylik"
+
+#: main_app/templates/hod_template/home_content.html:148
+msgid "Last 6 months"
+msgstr "Soʻnggi 6 oy"
+
+#: main_app/templates/hod_template/home_content.html:166
+msgid "Analytics"
+msgstr "Tahlil"
+
+#: main_app/templates/hod_template/home_content.html:167
+msgid "Monthly Attendance Rate"
+msgstr "Oylik davomat darajasi"
+
+#: main_app/templates/hod_template/home_content.html:169
+msgid "View report"
+msgstr "Hisobotni koʻrish"
+
+#: main_app/templates/hod_template/home_content.html:182
+msgid "Live Ops"
+msgstr "Jonli holat"
+
+#: main_app/templates/hod_template/home_content.html:183
+msgid "Today's Attendance"
+msgstr "Bugungi davomat"
+
+#: main_app/templates/hod_template/home_content.html:199
+msgid "No attendance has been taken today."
+msgstr "Bugun davomat olinmagan."
+
+#: main_app/templates/hod_template/home_content.html:210
+msgid "Pulse"
+msgstr "Faollik"
+
+#: main_app/templates/hod_template/home_content.html:211
+msgid "Recent Activity"
+msgstr "Soʻnggi faollik"
+
+#: main_app/templates/hod_template/home_content.html:226
+msgid "Activity will appear here as the center runs."
+msgstr "Markaz ishlagan sari faollik shu yerda chiqadi."
+
+#: main_app/templates/hod_template/home_content.html:235
+msgid "Latest Arrivals"
+msgstr "Yangi kelganlar"
+
+#: main_app/templates/hod_template/home_content.html:236
+msgid "New Enrollments"
+msgstr "Yangi yozilganlar"
+
+#: main_app/templates/hod_template/home_content.html:246
+#, python-format
+msgid "Joined %(date)s"
+msgstr "Qoʻshilgan: %(date)s"
+
+#: main_app/templates/hod_template/home_content.html:252
+msgid "No recent enrollments yet."
+msgstr "Hali yangi yozilganlar yoʻq."
+
+#: main_app/templates/hod_template/home_content.html:261
+msgid "Follow Up"
+msgstr "Kuzatish"
+
+#: main_app/templates/hod_template/home_content.html:264
+msgid "All leads"
+msgstr "Barchasi"
+
+#: main_app/templates/hod_template/home_content.html:278
+msgid "No registration leads yet."
+msgstr "Hali arizalar yoʻq."
+
+#: main_app/templates/hod_template/home_content.html:287
+msgid "Teaching Load"
+msgstr "Dars yuklamasi"
+
+#: main_app/templates/hod_template/home_content.html:288
+msgid "Faculty Pulse"
+msgstr "Oʻqituvchilar faolligi"
+
+#: main_app/templates/hod_template/home_content.html:290
+#, python-format
+msgid "%(count)s active"
+msgstr "%(count)s faol"
+
+#: main_app/templates/hod_template/home_content.html:298
+#, python-format
+msgid "%(n)s group"
+msgid_plural "%(n)s groups"
+msgstr[0] "%(n)s ta guruh"
+msgstr[1] "%(n)s ta guruh"
+
+#: main_app/templates/hod_template/home_content.html:298
+msgid "No course"
+msgstr "Kurs yoʻq"
+
+#: main_app/templates/hod_template/home_content.html:304
+msgid "No teachers assigned yet."
+msgstr "Hali oʻqituvchilar biriktirilmagan."
+
+#: main_app/templates/hod_template/home_content.html:316
+msgid "Groups"
+msgstr "Guruhlar"
+
+#: main_app/templates/hod_template/home_content.html:325 main_app/templates/hod_template/manage_group.html:75 main_app/templates/hod_template/manage_group.html:134
+msgid "Active"
+msgstr "Faol"
+
+#: main_app/templates/hod_template/home_content.html:325
+msgid "Now"
+msgstr "Hozir"
+
+#: main_app/templates/hod_template/home_content.html:336
+msgid "No classes configured yet."
+msgstr "Hali guruhlar sozlanmagan."
+
+#: main_app/templates/hod_template/home_content.html:347
+msgid "Growth"
+msgstr "Oʻsish"
+
+#: main_app/templates/hod_template/home_content.html:348
+msgid "New Students — Monthly"
+msgstr "Yangi oʻquvchilar — oylik"
+
+#: main_app/templates/hod_template/home_content.html:360
+msgid "Sessions"
+msgstr "Darslar"
+
+#: main_app/templates/hod_template/home_content.html:361
+msgid "Monthly Sessions Taken"
+msgstr "Oylik oʻtilgan darslar"
+
+#: main_app/templates/hod_template/home_content.html:373
+msgid "Outcomes"
+msgstr "Natijalar"
+
+#: main_app/templates/hod_template/home_content.html:374
+msgid "Monthly Attendance Rate & Sessions"
+msgstr "Oylik davomat va darslar"
+
+#: main_app/templates/hod_template/manage_group.html:17
+msgid "Manage class groups, teachers, branches, and enrollments."
+msgstr "Guruhlar, oʻqituvchilar, filiallar va roʻyxatga olishlarni boshqaring."
+
+#: main_app/templates/hod_template/manage_group.html:21 main_app/templates/hod_template/manage_staff.html:21 main_app/templates/hod_template/manage_student.html:21
+msgid "total"
+msgstr "jami"
+
+#: main_app/templates/hod_template/manage_group.html:28
+msgid "Search groups"
+msgstr "Guruhlarni qidirish"
+
+#: main_app/templates/hod_template/manage_group.html:30
+msgid "Search groups, teachers, branches..."
+msgstr "Guruh, oʻqituvchi, filial qidirish..."
+
+#: main_app/templates/hod_template/manage_group.html:35 main_app/templates/hod_template/manage_group.html:103 main_app/templates/hod_template/manage_group.html:180
+msgid "No groups found"
+msgstr "Guruhlar topilmadi"
+
+#: main_app/templates/hod_template/manage_group.html:36
+msgid "Try another group, teacher, course, branch, or status."
+msgstr "Boshqa guruh, oʻqituvchi, kurs, filial yoki holatni sinab koʻring."
+
+#: main_app/templates/hod_template/manage_group.html:44 main_app/templates/hod_template/manage_payments.html:70 main_app/templates/hod_template/manage_payments.html:98
+msgid "Group"
+msgstr "Guruh"
+
+#: main_app/templates/hod_template/manage_group.html:45 main_app/templates/hod_template/manage_staff.html:60 main_app/templates/hod_template/manage_student.html:60
+msgid "Course"
+msgstr "Kurs"
+
+#: main_app/templates/hod_template/manage_group.html:49
+msgid "Start Date"
+msgstr "Boshlanish sanasi"
+
+#: main_app/templates/hod_template/manage_group.html:51 main_app/templates/hod_template/manage_payments.html:104 main_app/templates/hod_template/manage_staff.html:66
+msgid "Actions"
+msgstr "Amallar"
+
+#: main_app/templates/hod_template/manage_group.html:66 main_app/templates/hod_template/manage_group.html:144
+msgid "No teacher"
+msgstr "Oʻqituvchi yoʻq"
+
+#: main_app/templates/hod_template/manage_group.html:69 main_app/templates/hod_template/manage_group.html:147
+#, python-format
+msgid "%(n)s student"
+msgid_plural "%(n)s students"
+msgstr[0] "%(n)s ta oʻquvchi"
+msgstr[1] "%(n)s ta oʻquvchi"
+
+#: main_app/templates/hod_template/manage_group.html:73 main_app/templates/hod_template/manage_group.html:132
+msgid "Archived"
+msgstr "Arxivlangan"
+
+#: main_app/templates/hod_template/manage_group.html:84 main_app/templates/hod_template/manage_group.html:164 main_app/templates/hod_template/manage_staff.html:113
+msgid "Edit"
+msgstr "Tahrirlash"
+
+#: main_app/templates/hod_template/manage_group.html:89 main_app/templates/hod_template/manage_group.html:169
+msgid "Restore"
+msgstr "Tiklash"
+
+#: main_app/templates/hod_template/manage_group.html:89 main_app/templates/hod_template/manage_group.html:169
+msgid "Archive"
+msgstr "Arxivlash"
+
+#: main_app/templates/hod_template/manage_group.html:104 main_app/templates/hod_template/manage_group.html:181
+msgid "Create a group and assign a course, teacher, and branch."
+msgstr "Guruh yarating va unga kurs, oʻqituvchi va filial biriktiring."
+
+#: main_app/templates/hod_template/manage_group.html:149
+#, python-format
+msgid "Start %(date)s"
+msgstr "Boshlanishi: %(date)s"
+
+#: main_app/templates/hod_template/manage_payments.html:14
+msgid "Tuition invoices, collections, and debtors for this month."
+msgstr "Shu oy uchun oʻqish hisob-fakturalari, tushumlar va qarzdorlar."
+
+#: main_app/templates/hod_template/manage_payments.html:18
+msgid "Collections"
+msgstr "Tushumlar"
+
+#: main_app/templates/hod_template/manage_payments.html:19
+msgid "Generate Invoices"
+msgstr "Hisob-fakturalarni yaratish"
+
+#: main_app/templates/hod_template/manage_payments.html:20
+msgid "One-off Invoice"
+msgstr "Bir martalik hisob-faktura"
+
+#: main_app/templates/hod_template/manage_payments.html:21
+msgid "CSV"
+msgstr "CSV"
+
+#: main_app/templates/hod_template/manage_payments.html:27
+msgid "Billed"
+msgstr "Hisoblangan"
+
+#: main_app/templates/hod_template/manage_payments.html:31
+msgid "Collected"
+msgstr "Yigʻilgan"
+
+#: main_app/templates/hod_template/manage_payments.html:35
+msgid "Outstanding"
+msgstr "Qarz"
+
+#: main_app/templates/hod_template/manage_payments.html:39
+msgid "Overdue invoices"
+msgstr "Muddati oʻtgan hisob-fakturalar"
+
+#: main_app/templates/hod_template/manage_payments.html:47
+msgid "Month"
+msgstr "Oy"
+
+#: main_app/templates/hod_template/manage_payments.html:53
+msgid "All statuses"
+msgstr "Barcha holatlar"
+
+#: main_app/templates/hod_template/manage_payments.html:57 main_app/templates/hod_template/manage_payments.html:123
+msgid "Overdue"
+msgstr "Muddati oʻtgan"
+
+#: main_app/templates/hod_template/manage_payments.html:72
+msgid "All groups"
+msgstr "Barcha guruhlar"
+
+#: main_app/templates/hod_template/manage_payments.html:78
+msgid "Search invoices"
+msgstr "Hisob-fakturalarni qidirish"
+
+#: main_app/templates/hod_template/manage_payments.html:80
+msgid "Search student, group, status..."
+msgstr "Oʻquvchi, guruh, holat qidirish..."
+
+#: main_app/templates/hod_template/manage_payments.html:87
+msgid "No records found"
+msgstr "Yozuvlar topilmadi"
+
+#: main_app/templates/hod_template/manage_payments.html:88
+msgid "Try another student, group, or status."
+msgstr "Boshqa oʻquvchi, guruh yoki holatni sinab koʻring."
+
+#: main_app/templates/hod_template/manage_payments.html:99
+msgid "Amount"
+msgstr "Summa"
+
+#: main_app/templates/hod_template/manage_payments.html:100 main_app/templates/hod_template/manage_payments.html:119 main_app/templates/hod_template/manage_payments.html:171
+msgid "Paid"
+msgstr "Toʻlangan"
+
+#: main_app/templates/hod_template/manage_payments.html:101
+msgid "Balance"
+msgstr "Qoldiq"
+
+#: main_app/templates/hod_template/manage_payments.html:102 main_app/templates/hod_template/manage_payments.html:127
+msgid "Due"
+msgstr "Toʻlanishi kerak"
+
+#: main_app/templates/hod_template/manage_payments.html:121 main_app/templates/hod_template/manage_payments.html:173
+msgid "Cancelled"
+msgstr "Bekor qilingan"
+
+#: main_app/templates/hod_template/manage_payments.html:125
+msgid "Partial"
+msgstr "Qisman"
+
+#: main_app/templates/hod_template/manage_payments.html:132
+msgid "Record payment"
+msgstr "Toʻlovni qayd etish"
+
+#: main_app/templates/hod_template/manage_payments.html:132 main_app/templates/hod_template/manage_payments.html:182
+msgid "Record"
+msgstr "Qayd etish"
+
+#: main_app/templates/hod_template/manage_payments.html:133
+msgid "Send reminder now"
+msgstr "Hozir eslatma yuborish"
+
+#: main_app/templates/hod_template/manage_payments.html:133 main_app/templates/hod_template/manage_payments.html:183
+msgid "Remind"
+msgstr "Eslatish"
+
+#: main_app/templates/hod_template/manage_payments.html:140
+#, python-format
+msgid "Void %(receipt)s (%(amount)s)? This cannot be undone."
+msgstr "%(receipt)s (%(amount)s) bekor qilinsinmi? Buni qaytarib boʻlmaydi."
+
+#: main_app/templates/hod_template/manage_payments.html:140
+#, python-format
+msgid "Void %(receipt)s"
+msgstr "%(receipt)s ni bekor qilish"
+
+#: main_app/templates/hod_template/manage_payments.html:169
+#, python-format
+msgid "Due %(date)s"
+msgstr "Muddat: %(date)s"
+
+#: main_app/templates/hod_template/manage_payments.html:175
+#, python-format
+msgid "Overdue · %(amount)s"
+msgstr "Muddati oʻtgan · %(amount)s"
+
+#: main_app/templates/hod_template/manage_payments.html:195
+#, python-format
+msgid "No invoices for %(period)s"
+msgstr "%(period)s uchun hisob-fakturalar yoʻq"
+
+#: main_app/templates/hod_template/manage_payments.html:196
+msgid "Use “Generate Invoices” to bill all active enrollments for this month."
+msgstr "Shu oydagi barcha faol roʻyxatga olishlar uchun hisob chiqarish uchun “Hisob-fakturalarni yaratish” tugmasini bosing."
+
+#: main_app/templates/hod_template/manage_staff.html:17
+msgid "Manage teacher accounts and course assignments."
+msgstr "Oʻqituvchi hisoblari va kurs biriktirishlarini boshqaring."
+
+#: main_app/templates/hod_template/manage_staff.html:28
+msgid "Search teachers"
+msgstr "Oʻqituvchilarni qidirish"
+
+#: main_app/templates/hod_template/manage_staff.html:30
+msgid "Search teachers, ID, course..."
+msgstr "Oʻqituvchi, ID, kurs qidirish..."
+
+#: main_app/templates/hod_template/manage_staff.html:44 main_app/templates/hod_template/manage_student.html:44
+msgid "Branch:"
+msgstr "Filial:"
+
+#: main_app/templates/hod_template/manage_staff.html:49 main_app/templates/hod_template/manage_staff.html:128 main_app/templates/hod_template/manage_staff.html:194
+msgid "No teachers found"
+msgstr "Oʻqituvchilar topilmadi"
+
+#: main_app/templates/hod_template/manage_staff.html:50
+msgid "Try another name, login ID, course, phone, or specialization."
+msgstr "Boshqa ism, login ID, kurs, telefon yoki mutaxassislikni sinab koʻring."
+
+#: main_app/templates/hod_template/manage_staff.html:62 main_app/templates/hod_template/manage_student.html:64
+msgid "Phone"
+msgstr "Telefon"
+
+#: main_app/templates/hod_template/manage_staff.html:64 main_app/templates/hod_template/manage_student.html:66
+msgid "Birthday"
+msgstr "Tugʻilgan kun"
+
+#: main_app/templates/hod_template/manage_staff.html:97 main_app/templates/hod_template/manage_student.html:98
+msgid "No branch"
+msgstr "Filial yoʻq"
+
+#: main_app/templates/hod_template/manage_staff.html:107 main_app/templates/hod_template/manage_staff.html:176
+msgid "Inactive"
+msgstr "Nofaol"
+
+#: main_app/templates/hod_template/manage_staff.html:129 main_app/templates/hod_template/manage_staff.html:195
+msgid "Add a teacher account to start assigning groups and courses."
+msgstr "Guruh va kurslarni biriktirish uchun oʻqituvchi hisobini qoʻshing."
+
+#: main_app/templates/hod_template/manage_staff.html:156 main_app/templates/hod_template/manage_student.html:166
+msgid "No ID"
+msgstr "ID yoʻq"
+
+#: main_app/templates/hod_template/manage_student.html:16
+msgid "Manage Students"
+msgstr "Oʻquvchilar"
+
+#: main_app/templates/hod_template/manage_student.html:17
+msgid "Manage student accounts, profiles, and enrollment information."
+msgstr "Oʻquvchi hisoblari, profillari va roʻyxatga olish maʼlumotlarini boshqaring."
+
+#: main_app/templates/hod_template/manage_student.html:28
+msgid "Search students"
+msgstr "Oʻquvchilarni qidirish"
+
+#: main_app/templates/hod_template/manage_student.html:30
+msgid "Search students, ID, course..."
+msgstr "Oʻquvchi, ID, kurs qidirish..."
+
+#: main_app/templates/hod_template/manage_student.html:49 main_app/templates/hod_template/manage_student.html:138 main_app/templates/hod_template/manage_student.html:204
+msgid "No students found"
+msgstr "Oʻquvchilar topilmadi"
+
+#: main_app/templates/hod_template/manage_student.html:50
+msgid "Try another name, login ID, course, status, or level."
+msgstr "Boshqa ism, login ID, kurs, holat yoki darajani sinab koʻring."
+
+#: main_app/templates/hod_template/manage_student.html:62
+msgid "Level"
+msgstr "Daraja"
+
+#: main_app/templates/hod_template/manage_student.html:103 main_app/templates/hod_template/manage_student.html:177
+#, python-format
+msgid "Level %(level)s"
+msgstr "%(level)s-daraja"
+
+#: main_app/templates/hod_template/manage_student.html:105
+msgid "No level"
+msgstr "Daraja yoʻq"
+
+#: main_app/templates/hod_template/manage_student.html:114
+msgid "No status"
+msgstr "Holat yoʻq"
+
+#: main_app/templates/hod_template/manage_student.html:139 main_app/templates/hod_template/manage_student.html:205
+msgid "Add students and enroll them into groups."
+msgstr "Oʻquvchilarni qoʻshing va guruhlarga yozing."
+
+#: main_app/templates/main_app/profile_hub.html:5
+msgid "My Profile / Settings"
+msgstr "Mening profilim / Sozlamalar"
+
+#: main_app/templates/main_app/profile_hub.html:16
+msgid "Choose Your Avatar"
+msgstr "Avatarni tanlang"
+
+#: main_app/templates/main_app/profile_hub.html:17
+msgid "Close avatar picker"
+msgstr "Avatar tanlashni yopish"
+
+#: main_app/templates/main_app/profile_hub.html:25
+msgid "Save Avatar"
+msgstr "Avatarni saqlash"
+
+#: main_app/templates/main_app/profile_hub.html:31
+msgid "Avatar saved"
+msgstr "Avatar saqlandi"
+
+#: main_app/templates/main_app/profile_hub.html:51
+msgid "Change profile avatar"
+msgstr "Profil avatarini oʻzgartirish"
+
+#: main_app/templates/main_app/profile_hub.html:72
+msgid "Profile details"
+msgstr "Profil maʼlumotlari"
+
+#: main_app/templates/main_app/profile_hub.html:82
+msgid "Log Out"
+msgstr "Chiqish"
+
+#: main_app/templates/main_app/profile_hub.html:83
+msgid "End this signed-in session"
+msgstr "Ushbu seansni tugatish"
+
+#: main_app/templates/main_app/profile_hub.html:92
+msgid "Profile summary"
+msgstr "Profil xulosasi"
+
+#: main_app/templates/main_app/profile_hub.html:106
+msgid "Fast path"
+msgstr "Tezkor yoʻl"
+
+#: main_app/templates/main_app/profile_hub.html:111
+msgid "Edit info"
+msgstr "Maʼlumotlarni tahrirlash"
+
+#: main_app/templates/main_app/profile_hub.html:111
+msgid "Name, phone, birthday"
+msgstr "Ism, telefon, tugʻilgan kun"
+
+#: main_app/templates/main_app/profile_hub.html:115
+msgid "Photo"
+msgstr "Rasm"
+
+#: main_app/templates/main_app/profile_hub.html:115
+msgid "Avatar and profile visual"
+msgstr "Avatar va profil koʻrinishi"
+
+#: main_app/templates/main_app/profile_hub.html:119
+msgid "Update account security"
+msgstr "Hisob xavfsizligini yangilash"
+
+#: main_app/templates/main_app/profile_hub.html:123
+msgid "Open conversations"
+msgstr "Suhbatlarni ochish"
+
+#: main_app/templates/main_app/profile_hub.html:132
+#, python-format
+msgid "%(n)s item"
+msgid_plural "%(n)s items"
+msgstr[0] "%(n)s ta element"
+msgstr[1] "%(n)s ta element"
+
+#: main_app/templates/main_app/profile_hub.html:165
+msgid "Theme preference"
+msgstr "Mavzu tanlovi"
+
+#: main_app/templates/main_app/profile_hub.html:166
+msgid "Use bright theme"
+msgstr "Yorugʻ mavzuni ishlatish"
+
+#: main_app/templates/main_app/profile_hub.html:170
+msgid "Bright"
+msgstr "Yorugʻ"
+
+#: main_app/templates/main_app/profile_hub.html:171
+msgid "Light Ice surfaces"
+msgstr "Yorugʻ muzli fon"
+
+#: main_app/templates/main_app/profile_hub.html:173
+msgid "Use dark theme"
+msgstr "Qorongʻi mavzuni ishlatish"
+
+#: main_app/templates/main_app/profile_hub.html:177
+msgid "Dark"
+msgstr "Qorongʻi"
+
+#: main_app/templates/main_app/profile_hub.html:178
+msgid "Deep Navy glass"
+msgstr "Toʻq koʻk shisha"
+
+#: main_app/templates/main_app/profile_hub.html:180
+msgid "Use system theme"
+msgstr "Tizim mavzusini ishlatish"
+
+#: main_app/templates/main_app/profile_hub.html:184
+msgid "System"
+msgstr "Tizim"
+
+#: main_app/templates/main_app/profile_hub.html:185
+msgid "Match device"
+msgstr "Qurilmaga moslash"
+
+#: main_app/templates/main_app/profile_hub.html:189
+msgid "Theme saved"
+msgstr "Mavzu saqlandi"
+
+#: main_app/templates/main_app/profile_hub.html:218
+msgid "Edit Profile"
+msgstr "Profilni tahrirlash"
+
+#: main_app/templates/main_app/profile_hub.html:219
+msgid "Update details and password"
+msgstr "Maʼlumotlar va parolni yangilash"
+
+#: main_app/templates/main_app/profile_hub.html:242
+msgid "Saving a new password may end your current session."
+msgstr "Yangi parolni saqlash joriy seansni tugatishi mumkin."
+
+#: main_app/templates/main_app/profile_hub.html:249
+msgid "Save Changes"
+msgstr "Oʻzgarishlarni saqlash"
+
+#: main_app/templates/hod_template/home_content.html
+msgctxt "dashboard date chip"
+msgid "Active"
+msgstr "Faol"
+
+#: main_app/templates/hod_template/home_content.html
+msgid "Program pending"
+msgstr "Dastur belgilanmagan"
+
+#: main_app/templates/hod_template/home_content.html
+msgid "Teacher pending"
+msgstr "Oʻqituvchi belgilanmagan"
+
+#: main_app/templates/hod_template/manage_payments.html
+msgid "One-off invoice"
+msgstr "Bir martalik hisob-faktura"
+
+#: main_app/templates/hod_template/manage_staff.html
+msgid "No phone"
+msgstr "Telefon yoʻq"
+
+#: main_app/templates/main_app/profile_hub.html:85
+msgid "Log out of Iceberg"
+msgstr "Icebergdan chiqish"
+
+#: main_app/views.py:583
+msgid "Branch not assigned"
+msgstr "Filial biriktirilmagan"
+
+#: main_app/views.py:586
+msgid "Email not set"
+msgstr "Email kiritilmagan"
+
+#: main_app/views.py:589
+msgid "Super Admin"
+msgstr "Super admin"
+
+#: main_app/views.py:589
+msgid "Branch Admin"
+msgstr "Filial admini"
+
+#: main_app/views.py:601
+msgid "Branch / Center Settings"
+msgstr "Filial / markaz sozlamalari"
+
+#: main_app/views.py:608
+msgid "User Management Shortcuts"
+msgstr "Foydalanuvchilarni boshqarish"
+
+#: main_app/views.py:609
+msgid "Teachers, students, and accounts"
+msgstr "Oʻqituvchilar, oʻquvchilar va hisoblar"
+
+#: main_app/views.py:615
+msgid "Teacher Settings"
+msgstr "Oʻqituvchi sozlamalari"
+
+#: main_app/views.py:616
+#, python-format
+msgid "%(count)s teachers"
+msgstr "%(count)s ta oʻqituvchi"
+
+#: main_app/views.py:622
+msgid "Student Settings"
+msgstr "Oʻquvchi sozlamalari"
+
+#: main_app/views.py:623
+#, python-format
+msgid "%(count)s students"
+msgstr "%(count)s ta oʻquvchi"
+
+#: main_app/views.py:629
+msgid "Course / Group Settings"
+msgstr "Kurs / guruh sozlamalari"
+
+#: main_app/views.py:630
+msgid "Courses, groups, enrollments"
+msgstr "Kurslar, guruhlar, roʻyxatga olishlar"
+
+#: main_app/views.py:636
+msgid "System Preferences"
+msgstr "Tizim sozlamalari"
+
+#: main_app/views.py:637
+msgid "Leaderboard rules and seasons"
+msgstr "Reyting qoidalari va mavsumlari"
+
+#: main_app/views.py:643
+msgid "Reports / Dashboard Preferences"
+msgstr "Hisobotlar / panel sozlamalari"
+
+#: main_app/views.py:644
+msgid "Attendance and stories"
+msgstr "Davomat va hikoyalar"
+
+#: main_app/views.py:657
+msgid "Administration"
+msgstr "Boshqaruv"
+
+#: main_app/views.py:693
+msgid "Your account role is not configured correctly."
+msgstr "Hisobingiz roli notoʻgʻri sozlangan."
+
+#: main_app/views.py:703
+msgid "Profile updated."
+msgstr "Profil yangilandi."
+
+#: main_app/views.py:708
+#, python-format
+msgid "Could not update your profile: %(error)s"
+msgstr "Profilni yangilab boʻlmadi: %(error)s"
+
+#: main_app/views.py:711
+msgid "Please fix the highlighted profile fields."
+msgstr "Belgilangan profil maydonlarini tuzating."
+
+#: main_app/views.py:718
+msgid "Name, contact details, birthday, and profile basics"
+msgstr "Ism, aloqa maʼlumotlari, tugʻilgan kun va profil asoslari"
+
+#: main_app/views.py:725
+msgid "Change Profile Avatar"
+msgstr "Profil avatarini oʻzgartirish"
+
+#: main_app/views.py:726
+msgid "Choose a profile sticker"
+msgstr "Profil stikerini tanlang"
+
+#: main_app/views.py:732
+msgid "Change Password"
+msgstr "Parolni oʻzgartirish"
+
+#: main_app/views.py:733
+msgid "Account credentials"
+msgstr "Kirish maʼlumotlari"
+
+#: main_app/views.py:744
+msgid "Theme / Appearance"
+msgstr "Mavzu / koʻrinish"
+
+#: main_app/views.py:745
+msgid "Dark, bright, or system mode"
+msgstr "Qorongʻi, yorugʻ yoki tizim rejimi"
+
+#: main_app/views.py:756 main_app/views.py:775
+msgid "Announcements and alerts"
+msgstr "Eʼlonlar va ogohlantirishlar"
+
+#: main_app/views.py:763 main_app/views.py:782
+msgid "Group chat and conversations"
+msgstr "Guruh chati va suhbatlar"
+
+#: main_app/views.py:793
+msgid "Team and group conversations"
+msgstr "Jamoa va guruh suhbatlari"
+
+#: main_app/views.py:804
+msgid "Help & Support"
+msgstr "Yordam va qoʻllab-quvvatlash"
+
+#: main_app/views.py:805
+msgid "Review student feedback"
+msgstr "Oʻquvchilar fikrlarini koʻrish"
+
+#: main_app/views.py:812
+msgid "Review teacher messages"
+msgstr "Oʻqituvchilar xabarlarini koʻrish"
+
+#: main_app/views.py:819
+msgid "Follow up with interested students"
+msgstr "Qiziqqan oʻquvchilar bilan bogʻlanish"
+
+#: main_app/views.py:828 main_app/views.py:845
+msgid "Help & Feedback"
+msgstr "Yordam va fikr-mulohaza"
+
+#: main_app/views.py:829
+msgid "Contact admin"
+msgstr "Admin bilan bogʻlanish"
+
+#: main_app/views.py:835 main_app/views.py:852
+msgid "Apply for Leave"
+msgstr "Taʼtil soʻrash"
+
+#: main_app/views.py:836 main_app/views.py:853
+msgid "Request time off"
+msgstr "Dam olish soʻrash"
+
+#: main_app/views.py:846
+msgid "Contact your teacher or admin"
+msgstr "Oʻqituvchi yoki admin bilan bogʻlanish"
+
+#: main_app/views.py:861
+msgid "About Iceberg"
+msgstr "Iceberg haqida"
+
+#: main_app/views.py:882
+msgid "Account"
+msgstr "Hisob"
+
+#: main_app/views.py:883
+msgid "Preferences"
+msgstr "Sozlamalar"
+
+#: main_app/views.py:885
+msgid "Support"
+msgstr "Yordam"
+
+#: main_app/templates/hod_template/manage_group.html
+msgctxt "group status"
+msgid "Active"
+msgstr "Faol"
+
+msgid "this student"
+msgstr "bu oʻquvchi"
+
+msgid "this teacher"
+msgstr "bu oʻqituvchi"
+
+#, python-format
+msgid "Delete %(name)s? All attendance records will be removed. This cannot be undone."
+msgstr "Rostdan ham oʻchirasizmi: %(name)s? Barcha davomat yozuvlari oʻchiriladi. Buni ortga qaytarib boʻlmaydi."
+
+#, python-format
+msgid "Delete %(name)s? Their account and all related data will be removed. This cannot be undone."
+msgstr "Rostdan ham oʻchirasizmi: %(name)s? Hisobi va unga bogʻliq barcha maʼlumotlar oʻchiriladi. Buni ortga qaytarib boʻlmaydi."
+
+msgid "Delete this group? This is only allowed when no records are linked."
+msgstr "Guruh oʻchirilsinmi? Bunga faqat guruhga hech qanday yozuv bogʻlanmagan boʻlsa ruxsat beriladi."
+
+msgid "Archive this group?"
+msgstr "Guruh arxivga olinsinmi?"
+
+msgid "Restore this group?"
+msgstr "Guruh arxivdan qaytarilsinmi?"
+
+#, python-format
+msgid "Send a payment reminder to %(student)s?"
+msgstr "Toʻlov eslatmasi yuborilsinmi: %(student)s?"
+
+#, python-format
+msgid "Cancel this invoice for %(student)s?"
+msgstr "%(student)s uchun hisob-faktura bekor qilinsinmi?"
+
+#, python-format
+msgid "%(group)s — Students"
+msgstr "%(group)s — Oʻquvchilar"
+
+#, python-format
+msgid "Group \"%(group)s\" archived."
+msgstr "\"%(group)s\" guruhi arxivga olindi."
+
+#, python-format
+msgid "Group \"%(group)s\" restored."
+msgstr "\"%(group)s\" guruhi arxivdan qaytarildi."
+
+msgid "Central profile and settings hub for Iceberg"
+msgstr "Iceberg profil va sozlamalar markazi"
+
+#: main_app/school_forms.py
+msgid "Choose a pupil"
+msgstr "Oʻquvchini tanlang"
+
+msgid "Suspended"
+msgstr "Toʻxtatilgan"
+
+msgid "Partially paid"
+msgstr "Qisman toʻlangan"
+
+#, python-format
+msgid "%(amount)s million"
+msgstr "%(amount)s million"
+
+#, python-format
+msgid "%(amount)s ming"
+msgstr "%(amount)s ming"
+
+#, python-format
+msgid "%(amount)s soʻm"
+msgstr "%(amount)s soʻm"
+
+msgid "No active enrollments matched your selection."
+msgstr "Tanlovingizga mos faol roʻyxatga olish topilmadi."
+
+msgid "Generate Monthly Invoices"
+msgstr "Oylik hisob-fakturalarni yaratish"
+
+#, python-format
+msgid "Invoice created for %(student)s."
+msgstr "%(student)s uchun hisob-faktura yaratildi."
+
+msgid "Add One-off Invoice"
+msgstr "Bir martalik hisob-faktura qoʻshish"
+
+msgid "This invoice is cancelled — payments cannot be recorded on it."
+msgstr "Bu hisob-faktura bekor qilingan — unga toʻlov yozib boʻlmaydi."
+
+#, python-format
+msgid "Recorded %(amount)s from %(student)s. Invoice is now %(status)s."
+msgstr "%(student)s dan %(amount)s qabul qilindi. Hisob-faktura holati: %(status)s."
+
+msgid "Record Payment"
+msgstr "Toʻlovni yozish"
+
+#, python-format
+msgid "Created %(count)s invoice for %(period)s."
+msgid_plural "Created %(count)s invoices for %(period)s."
+msgstr[0] "%(period)s uchun %(count)s ta hisob-faktura yaratildi."
+msgstr[1] "%(period)s uchun %(count)s ta hisob-faktura yaratildi."
+
+#, python-format
+msgid "%(count)s already existed and was skipped."
+msgid_plural "%(count)s already existed and were skipped."
+msgstr[0] "%(count)s tasi avval yaratilgan, oʻtkazib yuborildi."
+msgstr[1] "%(count)s tasi avval yaratilgan, oʻtkazib yuborildi."
+
+#, python-format
+msgid "%(count)s enrollment has no monthly fee set (set a fee on the group or its course, then generate again)."
+msgid_plural "%(count)s enrollments have no monthly fee set (set a fee on the group or its course, then generate again)."
+msgstr[0] "%(count)s ta roʻyxatga olishda oylik toʻlov belgilanmagan (guruh yoki uning kursiga toʻlov belgilab, qayta yarating)."
+msgstr[1] "%(count)s ta roʻyxatga olishda oylik toʻlov belgilanmagan (guruh yoki uning kursiga toʻlov belgilab, qayta yarating)."
+
+#: main_app/school_forms.py
+msgid "Choose a teacher"
+msgstr "Oʻqituvchini tanlang"
+
+#: main_app/school_forms.py
+msgid "Choose a course"
+msgstr "Kursni tanlang"
+
+#: main_app/school_forms.py
+msgid "Choose a subject"
+msgstr "Fanni tanlang"

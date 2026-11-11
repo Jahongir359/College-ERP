@@ -1,0 +1,136 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ day|date:"j E Y, l" }}</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  <form method="get" class="school-header-form">
+    <input type="date" name="date" value="{{ day|date:'Y-m-d' }}" class="ui-select" aria-label="{% translate 'Date' %}" onchange="this.form.submit()">
+    <select name="class" class="ui-select" aria-label="{% translate 'Class' %}" onchange="this.form.submit()">
+      <option value="">{% translate "Class: all" %}</option>
+      {% for c in all_classes %}
+      <option value="{{ c.pk }}" {% if group and c.pk == group.pk %}selected{% endif %}>{{ c.name }}{% if show_branch %} · {{ c.branch.name }}{% endif %}</option>
+      {% endfor %}
+    </select>
+    <noscript><button type="submit" class="ui-btn ui-btn--secondary">{% translate "Show" %}</button></noscript>
+  </form>
+  <a href="?date={{ day|date:'Y-m-d' }}{% if group %}&amp;class={{ group.pk }}{% endif %}&amp;export=csv" class="ui-btn ui-btn--secondary">
+    <i class="fas fa-download" aria-hidden="true"></i> {% translate "Download CSV" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/school-register-report.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="school-page school-report">
+  <div class="ui-stats">
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Register taken" %}</div>
+      <div class="ui-stat-value">{{ taken_count }} / {{ rows|length }}</div><span class="ui-stat-note">{% translate "classes" %}</span>
+    </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Present" %}</div>
+      <div class="ui-stat-value report-present">{{ present }}</div>
+    </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Late" %}</div>
+      <div class="ui-stat-value report-late">{{ late }}</div>
+    </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Absent" %}</div>
+      <div class="ui-stat-value report-absent">{{ absent }}</div>
+    </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Attendance" %}</div>
+      <div class="ui-stat-value">{% if rate is not None %}{{ rate }}%{% else %}—{% endif %}</div>
+    </div>
+  </div>
+
+  <div class="ui-split">
+    <div>
+      <div class="ui-table-wrap" data-no-table-enhance>
+        <table class="ui-table">
+          <thead>
+            <tr>
+              <th>{% translate "Class" %}</th>
+              {% if show_branch %}<th>{% translate "Branch" %}</th>{% endif %}
+              <th>{% translate "Homeroom teacher" %}</th>
+              <th class="ui-num">{% translate "Students" %}</th>
+              <th>{% translate "Taken" %}</th>
+              <th class="ui-num">{% translate "Present" %}</th>
+              <th class="ui-num">{% translate "Late" %}</th>
+              <th class="ui-num">{% translate "Absent" %}</th>
+              <th>{% translate "Came" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+            <tr>
+              <td class="school-nowrap"><strong>{{ r.group.name }}</strong></td>
+              {% if show_branch %}<td>{{ r.group.branch.name }}</td>{% endif %}
+              <td>{{ r.teacher|default:"—" }}</td>
+              <td class="ui-num">{{ r.pupils }}</td>
+              {% if r.taken %}
+              <td><span class="ui-badge ui-badge--ok"><i class="fas fa-check" aria-hidden="true"></i> {{ r.taken_at|time:"H:i" }}</span></td>
+              <td class="ui-num"><strong>{{ r.present }}</strong></td>
+              <td class="ui-num report-late">{{ r.late|default:"–" }}</td>
+              <td class="ui-num report-absent">{{ r.absent|default:"–" }}</td>
+              <td class="school-nowrap">
+                <span class="report-bar" aria-hidden="true"><span style="width: {{ r.rate|default:0 }}%"></span></span>
+                <strong>{{ r.rate }}%</strong>
+              </td>
+              {% else %}
+              <td><span class="ui-badge ui-badge--late">{% translate "Not taken" %}</span></td>
+              <td class="ui-num">—</td><td class="ui-num">—</td><td class="ui-num">—</td><td>—</td>
+              {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9">
+                <div class="ui-empty">
+                  <strong>{% translate "No classes on this date" %}</strong><br>
+                  {% translate "Pick a school day inside an academic year." %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="school-help">{% translate "Not taken — the homeroom teacher hasn't saved this day's register yet. Teachers take the register in the app; this page is read-only." %}</p>
+    </div>
+
+    <aside class="ui-card">
+      <div class="ui-card-head">
+        <h2 class="ui-card-title">{% translate "Absent and late" %}</h2>
+        <span class="ui-badge ui-badge--muted">{{ pupils|length }}</span>
+      </div>
+      {% if pupils %}
+      <p class="school-help"><i class="fas fa-paper-plane" aria-hidden="true"></i> {% translate "Each pupil's parents were told in the app." %}</p>
+      <ul class="report-pupils">
+        {% for p in pupils %}
+        <li>
+          <div>
+            <strong>{{ p.student.admin.get_full_name }}</strong>
+            <small>{{ p.attendance.group.name }}{% if p.note %} · {{ p.note }}{% endif %}</small>
+          </div>
+          {% if p.status == 2 %}
+          <span class="ui-badge ui-badge--late">{% translate "Late" context "one pupil" %}{% if p.arrival_time %} {{ p.arrival_time|time:"H:i" }}{% endif %}</span>
+          {% else %}
+          <span class="ui-badge ui-badge--abs">{% translate "Absent" context "one pupil" %}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <div class="ui-empty">{% translate "Nobody is absent or late." %}</div>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock content %}

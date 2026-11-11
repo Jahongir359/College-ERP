@@ -10,7 +10,8 @@ from django.db import OperationalError, ProgrammingError, models
 from django.db.models import Q
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-from django.utils.translation import gettext_lazy
+from django.utils.functional import lazy
+from django.utils.translation import gettext, gettext_lazy
 from datetime import datetime, timedelta
 
 
@@ -244,17 +245,25 @@ class Book(models.Model):
         return str(self.name) + " [" + str(self.isbn) + "]"
 
 
+def _level_text(level):
+    return gettext("Level %(level)s") % {"level": level}
+
+
+# "Level 3" in the page language, worked out when it is shown (P3.0 / web audit M2).
+_level_label = lazy(_level_text, str)
+
+
 class Student(models.Model):
     STATUS_ACTIVE = "active"
     STATUS_INACTIVE = "inactive"
     STATUS_SUSPENDED = "suspended"
     STATUS_CHOICES = [
-        (STATUS_ACTIVE, "Active"),
-        (STATUS_INACTIVE, "Inactive"),
-        (STATUS_SUSPENDED, "Suspended"),
+        (STATUS_ACTIVE, gettext_lazy("Active")),
+        (STATUS_INACTIVE, gettext_lazy("Inactive")),
+        (STATUS_SUSPENDED, gettext_lazy("Suspended")),
     ]
 
-    LEVEL_CHOICES = [(i, f"Level {i}") for i in range(1, 7)]
+    LEVEL_CHOICES = [(i, _level_label(i)) for i in range(1, 7)]
 
     THEME_DARK = "dark"
     THEME_BRIGHT = "bright"
@@ -1690,10 +1699,10 @@ class Invoice(models.Model):
     STATUS_PAID = "paid"
     STATUS_CANCELLED = "cancelled"
     STATUS_CHOICES = [
-        (STATUS_DUE, "Due"),
-        (STATUS_PARTIAL, "Partially paid"),
-        (STATUS_PAID, "Paid"),
-        (STATUS_CANCELLED, "Cancelled"),
+        (STATUS_DUE, gettext_lazy("Due")),
+        (STATUS_PARTIAL, gettext_lazy("Partially paid")),
+        (STATUS_PAID, gettext_lazy("Paid")),
+        (STATUS_CANCELLED, gettext_lazy("Cancelled")),
     ]
 
     student = models.ForeignKey(Student, on_delete=models.PROTECT, related_name="invoices")

@@ -1,0 +1,87 @@
+{% load i18n %}{# P3.9: short menu for admins whose branches are all Iceberg School (mockup 16). #}
+{% url 'school_board' as school_board_url %}
+<div class="nav-item">
+    <a href="{{ school_board_url }}" class="nav-link {% if request.path == school_board_url %}active{% endif %}">
+        <i class="nav-icon fas fa-th-large"></i>
+        <span class="nav-text">{% translate "Dashboard" %}</span>
+    </a>
+</div>
+<div class="nav-item">
+    {% url 'manage_student' as manage_student %}
+    <a href="{{ manage_student }}" class="nav-link {% if 'student/manage' in request.path or 'student/add' in request.path or 'student/edit' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-user-graduate"></i>
+        <span class="nav-text">{% translate "Students" %}</span>
+    </a>
+</div>
+<div class="nav-item">
+    {% url 'manage_staff' as manage_staff %}
+    <a href="{{ manage_staff }}" class="nav-link {% if 'staff/manage' in request.path or 'staff/add' in request.path or 'staff/edit' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-chalkboard-teacher"></i>
+        <span class="nav-text">{% translate "Staff" %}</span>
+    </a>
+</div>
+
+<h6 class="nav-section-title">{% translate "School" %}</h6>
+<div class="nav-item">
+    {% url 'school_classes' as school_classes_url %}
+    <a href="{{ school_classes_url }}" class="nav-link {% if 'maktab/classes' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-door-open"></i>
+        <span class="nav-text">{% translate "Classes" %}</span>
+    </a>
+</div>
+<div class="nav-item">
+    {% url 'school_timetable' as school_timetable_url %}
+    <a href="{{ school_timetable_url }}" class="nav-link {% if 'maktab/timetable' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-calendar-alt"></i>
+        <span class="nav-text">{% translate "Timetable" %}</span>
+    </a>
+</div>
+<div class="nav-item">
+    {% url 'school_register_report' as school_register_report_url %}
+    <a href="{{ school_register_report_url }}" class="nav-link {% if 'maktab/register' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-clipboard-check"></i>
+        <span class="nav-text">{% translate "Register report" %}</span>
+    </a>
+</div>
+<div class="nav-item">
+    {% url 'school_parents' as school_parents_url %}
+    <a href="{{ school_parents_url }}" class="nav-link {% if 'maktab/parents' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-users"></i>
+        <span class="nav-text">{% translate "Parents" %}</span>
+    </a>
+</div>
+<div class="nav-item nav-item--quiet">
+    {% url 'school_bells' as school_bells_url %}
+    <a href="{{ school_bells_url }}" class="nav-link {% if 'maktab/bells' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-bell"></i>
+        <span class="nav-text">{% translate "Bell times" %}</span>
+    </a>
+</div>
+<div class="nav-item nav-item--quiet">
+    {% url 'school_years' as school_years_url %}
+    <a href="{{ school_years_url }}" class="nav-link {% if 'maktab/years' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-calendar-week"></i>
+        <span class="nav-text">{% translate "Academic year" %}</span>
+    </a>
+</div>
+
+<h6 class="nav-section-title">{% translate "Finance" %}</h6>
+<div class="nav-item">
+    {% url 'admin_payments' as admin_payments_url %}
+    <a href="{{ admin_payments_url }}" class="nav-link {% if 'admin/payments' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-wallet"></i>
+        <span class="nav-text">{% translate "Payments" %}</span>
+    </a>
+</div>
+
+<h6 class="nav-section-title">{% translate "Communication" %}</h6>
+<div class="nav-item">
+    {% url 'messages' as messages_url %}
+    <a href="{{ messages_url }}" class="nav-link {% if 'messages' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-comments"></i>
+        <span class="nav-text">{% translate "Messages" %}</span>
+        {% if unread_message_count > 0 %}
+        <span class="badge badge-danger badge-pill ml-auto">{{ unread_message_count }}</span>
+        {% endif %}
+    </a>
+</div>

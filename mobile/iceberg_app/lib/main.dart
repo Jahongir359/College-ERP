@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/router/app_router.dart';
 import 'core/settings/app_settings.dart';
+import 'core/theme/brand_notice.dart';
 import 'core/theme/brand_provider.dart';
 import 'core/theme/ice_tokens.dart';
 
@@ -38,11 +39,6 @@ class IcebergApp extends ConsumerWidget {
     final settings = ref.watch(appSettingsProvider);
     final router = ref.watch(appRouterProvider);
     final brand = ref.watch(brandProvider);
-    // Remember the brand so the splash/login keep it after sign-out.
-    ref.listen(
-      brandProvider,
-      (_, next) => ref.read(lastBrandProvider.notifier).remember(next),
-    );
 
     // Apply the ICEBERG design system (underline-free textTheme + the user's
     // chosen accent) as the GLOBAL theme so every screen is themed — including
@@ -73,7 +69,9 @@ class IcebergApp extends ConsumerWidget {
             decorationColor: Colors.transparent,
             decorationThickness: 0,
           ),
-          child: child ?? const SizedBox.shrink(),
+          // Remembers the brand and tells the user when the account
+          // switched it (plan 5.1).
+          child: BrandWatcher(child: child ?? const SizedBox.shrink()),
         );
       },
     );

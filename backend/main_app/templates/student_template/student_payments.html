@@ -73,7 +73,7 @@
       <div class="st-invoice-card {% if inv.is_overdue %}overdue{% endif %}">
         <div class="st-invoice-top">
           <div>
-            <div class="st-invoice-period">{{ inv.period_label }}</div>
+            <div class="st-invoice-period">{{ inv.period|date:"F Y" }}</div>
             <div class="st-invoice-group">{{ inv.group.name|default:"Additional charge" }}{% if inv.note %} · {{ inv.note }}{% endif %}</div>
           </div>
           <div class="st-invoice-amount-wrap">
@@ -124,7 +124,7 @@
         <div class="st-pay-body">
           <div class="st-pay-receipt">{{ p.receipt_no }}</div>
           <div class="st-pay-meta">
-            {{ p.invoice.period_label }} · {{ p.get_method_display }} · {{ p.paid_on }}
+            {{ p.invoice.period|date:"F Y" }} · {{ p.get_method_display }} · {{ p.paid_on }}
           </div>
         </div>
         <div class="st-pay-right">

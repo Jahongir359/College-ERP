@@ -46,7 +46,7 @@ python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py collectstatic --noinput --dry-run -v 0
 python manage.py compilemessages    # web translations (uz/ru); needs gettext, tests need it
-python manage.py test               # 563 tests passing as of 2026-10-31
+python manage.py test               # 655 tests passing as of 2026-11-11
 ```
 
 Backend tests live in `backend/main_app/tests/` (one file per topic). App tests live in
@@ -81,8 +81,10 @@ when `mobile/iceberg_app/` changes; run the same locally where Flutter is instal
 
 - Prefer small, additive changes. Migrations: additive only, generated with `makemigrations`.
 - Match the surrounding code style; don't reformat files you aren't changing.
-- Don't change existing Learning Center colors or copy; brand work goes through the brand layer
-  described in the plan.
+- Don't change existing Learning Center copy (texts); brand work goes through the brand layer
+  described in the plan. Exception (plan decision D19, 2026-11-01, owner): the admin web shell follows
+  the plan mockups in both brands, so Study Center admin colors move to the mockup palette (navy
+  #103A57/#07233A, lime #CDF163, ice #38BDF0).
 - Commit messages follow `type(scope): summary`, e.g. `feat(brand): add Branch.brand field`,
   `fix(web): …`, `i18n(mobile): …`.
 - Commit or push only when the owner asks; branch off `main` first.
