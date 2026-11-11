@@ -2,10 +2,12 @@
 collections and the payment and enrollment forms. Kit markup, no old hero,
 Uzbek and Russian text, and other branches stay out of reach."""
 
-from django.urls import reverse
-from django.utils import translation
+from datetime import timedelta
 
-from main_app.models import CustomUser, Invoice
+from django.urls import reverse
+from django.utils import timezone, translation
+
+from main_app.models import CustomUser, DashboardStory, Invoice, VocabularyDay
 
 from . import test_admin_center_pages as base
 
@@ -81,3 +83,77 @@ class CenterAdminMorePagesTests(base.CenterAdminPagesTests):
         far = Invoice.objects.get(student=self.far)
         response = self.client.get(reverse("admin_record_payment", args=[far.pk]))
         self.assertNotEqual(response.status_code, 200)
+
+
+class CenterContentPagesTests(base.CenterAdminPagesTests):
+    """Vocabulary days, stories, the story form and the enrollments list (P3.9 follow-up, part 2)."""
+
+    def page(self, name, *args, lang="en"):
+        CustomUser.objects.filter(pk=self.admin_user.pk).update(language=lang)
+        response = self.client.get(reverse(name, args=args))
+        self.assertEqual(response.status_code, 200, name)
+        return response.content.decode()
+
+    def _days(self):
+        now = timezone.now()
+        out = VocabularyDay.objects.create(
+            group=self.group,
+            day_number=1,
+            title="Travel",
+            created_by=self.staff,
+            release_at=now - timedelta(days=1),
+        )
+        VocabularyDay.objects.create(
+            group=self.group,
+            day_number=2,
+            created_by=self.staff,
+            release_at=now + timedelta(days=2),
+        )
+        VocabularyDay.objects.create(
+            group=self.group_b,
+            day_number=1,
+            title="Far day",
+            created_by=self.staff,
+            release_at=now,
+        )
+        return out
+
+    def test_vocabulary_days_page_works_with_days_and_counts_them(self):
+        # Before, this page raised an error as soon as one vocabulary day existed.
+        self._days()
+        response = self.client.get(reverse("manage_vocabulary_days"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["released_count"], 1)
+        self.assertEqual(len(response.context["days"]), 2)  # the other branch's day is not listed
+        html = response.content.decode()
+        self.assertIn('class="ui-table"', html)
+        self.assertIn("Travel", html)
+        self.assertNotIn("Far day", html)
+        self.assertNotIn("mvd-hero", html)
+
+    def test_vocabulary_days_empty_state_in_uzbek(self):
+        html = self.page("manage_vocabulary_days", lang="uz")
+        self.assertIn("Hali lugʻat kunlari yoʻq", html)
+        translation.deactivate_all()
+
+    def test_stories_list_and_form(self):
+        DashboardStory.objects.create(title="New IELTS group", created_by=self.admin_user)
+        html = self.page("manage_stories", lang="ru")
+        self.assertIn("New IELTS group", html)
+        self.assertIn("Новая история", html)
+        self.assertIn("admin-story", html)
+        self.assertNotIn("ice-manage-hero", html)
+        html = self.page("add_story", lang="uz")
+        self.assertIn("Hikoya turi", html)
+        self.assertIn("Muddatsiz", html)
+        self.assertNotIn('class="sf-head"', html)
+        translation.deactivate_all()
+
+    def test_enrollments_list(self):
+        html = self.page("manage_enrollment", lang="uz")
+        self.assertIn('class="page-eyebrow"', html)
+        self.assertNotIn("ice-manage-hero", html)
+        self.assertIn("Oʻquvchini qabul qilish", html)
+        self.assertIn(str(self.paid), html)
+        self.assertNotIn(str(self.far), html)
+        translation.deactivate_all()

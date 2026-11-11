@@ -1,21 +1,20 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
+{% load static i18n %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'manage_stories' %}">{% translate "Stories" %}</a></p>{% endblock page_eyebrow %}
 {% block page_title %}{{ page_title }}{% endblock %}
-{% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'manage_stories' %}">Stories</a></li>
-<li class="breadcrumb-item active">{{ action }}</li>
-{% endblock %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'manage_stories' %}" class="ui-btn ui-btn--secondary">← {% translate "All stories" %}</a>
+</div>{% endblock page_actions %}
 
 {% block custom_css %}
 <style>
-.sf { --sf-bg: #F4F6FB; --sf-surf: #fff; --sf-bdr: #E2EAF4; --sf-text: #0C1A36;
-      --sf-muted: #64748B; --sf-cyan: #06B6D4; --sf-navy: #0C1F45;
-      --sf-radius: 16px; }
-.dark-mode .sf { --sf-bg: #08121F; --sf-surf: #0D1B2F; --sf-bdr: #18304F;
-                 --sf-text: #E2E8F0; --sf-muted: #8CA4BE; }
+/* Colours come from the admin shell tokens, so both brands and dark mode match. */
+.sf { --sf-bg: var(--shell-tint); --sf-surf: var(--shell-surface); --sf-bdr: var(--shell-border);
+      --sf-text: var(--shell-text); --sf-muted: var(--shell-muted); --sf-cyan: var(--shell-primary);
+      --sf-navy: var(--shell-primary); --sf-radius: 16px; }
 
 .sf-card {
-  max-width: 680px; margin: 0 auto;
+  max-width: 680px; margin: 0;
   background: var(--sf-surf); border: 1.5px solid var(--sf-bdr);
   border-radius: 20px; overflow: hidden;
   box-shadow: 0 4px 24px rgba(12,31,69,.08);
@@ -90,13 +89,12 @@
 }
 .sf-group-label:hover { border-color: var(--sf-cyan); color: var(--sf-text); }
 .sf-group-chip:checked + .sf-group-label {
-  background: rgba(6,182,212,.12); border-color: var(--sf-cyan);
+  background: var(--shell-tint); border-color: var(--sf-cyan);
   color: var(--sf-cyan);
 }
 .sf-group-label .sf-check { display: none; }
 .sf-group-chip:checked + .sf-group-label .sf-check { display: inline; }
 .dark-mode .sf-group-label { background: rgba(255,255,255,.04); }
-.dark-mode .sf-group-chip:checked + .sf-group-label { background: rgba(6,182,212,.16); }
 
 /* Expiry section */
 .sf-expiry-presets {
@@ -108,7 +106,7 @@
   color: var(--sf-muted); cursor: pointer; transition: all .15s;
 }
 .sf-expiry-btn:hover, .sf-expiry-btn.active {
-  border-color: var(--sf-cyan); background: rgba(6,182,212,.1); color: var(--sf-cyan);
+  border-color: var(--sf-cyan); background: var(--shell-tint); color: var(--sf-cyan);
 }
 .sf-expiry-custom-toggle {
   font-size: 12px; color: var(--sf-muted); cursor: pointer;
@@ -140,8 +138,8 @@
 .sf-actions { display: flex; gap: 10px; margin-top: 4px; }
 .sf-submit {
   flex: 1; padding: 13px 24px; border-radius: 12px;
-  background: linear-gradient(135deg, #0C1F45, #1B3F7A);
-  color: #fff; font-size: 15px; font-weight: 700; border: none; cursor: pointer;
+  background: var(--shell-btn-bg); box-shadow: var(--shell-btn-shadow);
+  color: var(--shell-btn-text); font-size: 15px; font-weight: 700; border: none; cursor: pointer;
   transition: opacity .15s;
 }
 .sf-submit:hover { opacity: .9; }
@@ -159,10 +157,6 @@
 {% block content %}
 <div class="sf">
 <div class="sf-card">
-  <div class="sf-head">
-    <i class="fas fa-film" style="color:var(--sf-cyan);"></i>
-    {{ page_title }}
-  </div>
   <div class="sf-body">
 
     {% if form.non_field_errors %}
@@ -172,7 +166,7 @@
     {% if not storage_ok %}
     <div class="sf-warn">
       <i class="fas fa-exclamation-triangle" style="margin-top:1px;flex-shrink:0;"></i>
-      <span>Images are saved to local disk. On DigitalOcean App Platform they will disappear after the next redeploy. Set <strong>SPACES_KEY</strong>, <strong>SPACES_SECRET</strong> and <strong>SPACES_BUCKET</strong> environment variables to enable persistent cloud storage.</span>
+      <span>{% translate "Images are saved on the disk of this server and may disappear after the next deploy. Ask the site administrator to set up file storage (the SPACES settings)." %}</span>
     </div>
     {% endif %}
 
@@ -181,14 +175,14 @@
 
       <!-- Title -->
       <div class="sf-field">
-        <label class="sf-label">Title <span class="req">*</span></label>
+        <label class="sf-label">{% translate "Title" %} <span class="req">*</span></label>
         {{ form.title }}
         {% if form.title.errors %}<div class="sf-err">{{ form.title.errors.0 }}</div>{% endif %}
       </div>
 
       <!-- Body -->
       <div class="sf-field" style="margin-top:16px;">
-        <label class="sf-label">Body text</label>
+        <label class="sf-label">{% translate "Text" %}</label>
         {{ form.body }}
         {% if form.body.errors %}<div class="sf-err">{{ form.body.errors.0 }}</div>{% endif %}
       </div>
@@ -196,12 +190,12 @@
       <!-- Type + Emoji row -->
       <div class="sf-row" style="margin-top:16px;">
         <div class="sf-field">
-          <label class="sf-label">Story type</label>
+          <label class="sf-label">{% translate "Story type" %}</label>
           {{ form.story_type }}
           {% if form.story_type.errors %}<div class="sf-err">{{ form.story_type.errors.0 }}</div>{% endif %}
         </div>
         <div class="sf-field">
-          <label class="sf-label">Emoji (no image)</label>
+          <label class="sf-label">{% translate "Emoji (when there is no image)" %}</label>
           {{ form.emoji }}
           {% if form.emoji.errors %}<div class="sf-err">{{ form.emoji.errors.0 }}</div>{% endif %}
         </div>
@@ -209,7 +203,7 @@
 
       <!-- Background colour -->
       <div class="sf-field" style="margin-top:16px;">
-        <label class="sf-label">Card colour (shown without image)</label>
+        <label class="sf-label">{% translate "Card colour (when there is no image)" %}</label>
         <div class="sf-color-row">
           <input type="color" id="sf-color-pick" value="{{ form.bg_color.value|default:'#0C1F45' }}"
                  oninput="document.getElementById('sf-color-text').value=this.value;document.getElementById('sf-color-swatch').style.background=this.value;"
@@ -217,7 +211,7 @@
           <div id="sf-color-swatch" class="sf-color-swatch"
                style="background:{{ form.bg_color.value|default:'#0C1F45' }};"
                onclick="document.getElementById('sf-color-pick').click();"
-               title="Pick colour"></div>
+               title="{% translate "Pick a colour" %}"></div>
           <input type="text" id="sf-color-text" class="form-control"
                  value="{{ form.bg_color.value|default:'#0C1F45' }}" maxlength="7"
                  oninput="var v=this.value;if(/^#[0-9a-fA-F]{6}$/.test(v)){document.getElementById('sf-color-swatch').style.background=v;document.getElementById('sf-color-pick').value=v;}"
@@ -230,26 +224,26 @@
 
       <!-- Image upload -->
       <div class="sf-field" style="margin-top:16px;">
-        <label class="sf-label">Cover image (optional)</label>
+        <label class="sf-label">{% translate "Cover image (optional)" %}</label>
         {{ form.image }}
         {% if story and story.image %}
         <div class="sf-img-preview" id="sf-img-current">
           <img src="{{ story.image.url }}" alt="Current image" onerror="document.getElementById('sf-img-current').style.display='none';">
-          <div class="sf-img-preview-label">Current image — upload a new one to replace</div>
+          <div class="sf-img-preview-label">{% translate "Current image. Upload a new one to replace it." %}</div>
         </div>
         {% endif %}
-        <div class="sf-hint">Recommended: 800×400 px or wider. JPG or PNG.</div>
+        <div class="sf-hint">{% translate "Recommended: 800×400 px or wider. JPG or PNG." %}</div>
         {% if form.image.errors %}<div class="sf-err">{{ form.image.errors.0 }}</div>{% endif %}
         <!-- Live preview of new selection -->
         <div class="sf-img-preview" id="sf-img-new" style="display:none;">
           <img id="sf-img-new-img" src="" alt="New image preview">
-          <div class="sf-img-preview-label">New image selected</div>
+          <div class="sf-img-preview-label">{% translate "New image selected" %}</div>
         </div>
       </div>
 
       <!-- Target groups -->
       <div class="sf-field" style="margin-top:16px;">
-        <label class="sf-label">Target groups <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(leave all unchecked to show to everyone)</span></label>
+        <label class="sf-label">{% translate "Groups" %} <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">({% translate "leave all unticked to show it to everyone" %})</span></label>
         <div class="sf-groups-grid" id="sf-groups">
           {% for choice in form.target_groups %}
           <input type="checkbox" class="sf-group-chip" name="target_groups"
@@ -261,7 +255,7 @@
           </label>
           {% endfor %}
           {% if not form.target_groups %}
-          <span style="font-size:13px;color:var(--sf-muted);">No groups available.</span>
+          <span style="font-size:13px;color:var(--sf-muted);">{% translate "No groups available." %}</span>
           {% endif %}
         </div>
         {% if form.target_groups.errors %}<div class="sf-err">{{ form.target_groups.errors.0 }}</div>{% endif %}
@@ -269,29 +263,29 @@
 
       <!-- Expiry -->
       <div class="sf-field" style="margin-top:16px;">
-        <label class="sf-label">Expires after</label>
+        <label class="sf-label">{% translate "Expires after" %}</label>
         <div class="sf-expiry-presets">
-          <button type="button" class="sf-expiry-btn" data-hours="1">1 hour</button>
-          <button type="button" class="sf-expiry-btn" data-hours="24">24 hours</button>
-          <button type="button" class="sf-expiry-btn" data-hours="72">3 days</button>
-          <button type="button" class="sf-expiry-btn" data-hours="168">7 days</button>
-          <button type="button" class="sf-expiry-btn" data-hours="0">Never</button>
-          <button type="button" class="sf-expiry-btn" data-hours="custom" id="sf-expiry-custom-btn">Custom…</button>
+          <button type="button" class="sf-expiry-btn" data-hours="1">{% translate "1 hour" %}</button>
+          <button type="button" class="sf-expiry-btn" data-hours="24">{% translate "24 hours" %}</button>
+          <button type="button" class="sf-expiry-btn" data-hours="72">{% translate "3 days" %}</button>
+          <button type="button" class="sf-expiry-btn" data-hours="168">{% translate "7 days" %}</button>
+          <button type="button" class="sf-expiry-btn" data-hours="0">{% translate "Never" %}</button>
+          <button type="button" class="sf-expiry-btn" data-hours="custom" id="sf-expiry-custom-btn">{% translate "Other date…" %}</button>
         </div>
         <div class="sf-expiry-custom" id="sf-expiry-custom-wrap" style="display:none;">
           {{ form.expires_at }}
-          <div class="sf-hint">Leave blank (Never) to keep the story visible indefinitely.</div>
+          <div class="sf-hint">{% translate "Leave blank to keep the story visible with no end date." %}</div>
         </div>
         {% if form.expires_at.errors %}<div class="sf-err">{{ form.expires_at.errors.0 }}</div>{% endif %}
       </div>
 
       <!-- Is active toggle -->
       <div class="sf-field" style="margin-top:16px;">
-        <label class="sf-label">Visibility</label>
+        <label class="sf-label">{% translate "Visibility" %}</label>
         <div class="sf-toggle-row">
           <div>
-            <div class="sf-toggle-text">Show on student dashboards</div>
-            <div class="sf-toggle-sub">Disable to hide without deleting</div>
+            <div class="sf-toggle-text">{% translate "Show on the student home screen" %}</div>
+            <div class="sf-toggle-sub">{% translate "Turn off to hide it without deleting" %}</div>
           </div>
           <label style="display:flex;align-items:center;cursor:pointer;">
             <input type="checkbox" class="sf-toggle-input" name="is_active"
@@ -303,9 +297,9 @@
 
       <div class="sf-actions" style="margin-top:8px;">
         <button type="submit" class="sf-submit">
-          <i class="fas fa-save me-1"></i> {{ action }} Story
+          <i class="fas fa-save me-1"></i> {% translate "Save" %}
         </button>
-        <a href="{% url 'manage_stories' %}" class="sf-cancel">Cancel</a>
+        <a href="{% url 'manage_stories' %}" class="sf-cancel">{% translate "Cancel" %}</a>
       </div>
     </form>
 

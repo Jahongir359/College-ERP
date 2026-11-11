@@ -1,101 +1,48 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
-{% block page_title %}Dashboard Stories{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">Stories</li>{% endblock %}
+{% load static i18n %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "Vocabulary & Content" %}</p>{% endblock page_eyebrow %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "Cards shown in the stories strip on the student home screen." %}</p>{% endblock page_subtitle %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'add_story' %}" class="ui-btn ui-btn--primary"><i class="fas fa-plus" aria-hidden="true"></i> {% translate "New story" %}</a>
+</div>{% endblock page_actions %}
 
 {% block custom_css %}
-<link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
-<style>
-.story-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-.story-card {
-  background: var(--ice-surface); border: 1.5px solid var(--ice-border);
-  border-radius: 18px; overflow: hidden;
-  box-shadow: 0 3px 14px rgba(12,31,69,.07);
-}
-.story-thumb {
-  height: 140px; display: flex; align-items: center; justify-content: center;
-  font-size: 52px; position: relative;
-}
-.story-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.story-thumb-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.55));
-}
-.story-type-pill {
-  position: absolute; top: 10px; left: 10px;
-  padding: 3px 10px; border-radius: 999px;
-  background: rgba(0,0,0,.45); color: #fff;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
-  backdrop-filter: blur(4px);
-}
-.story-expired { position: absolute; top: 10px; right: 10px; padding: 3px 10px; border-radius: 999px; background: #EF4444; color: #fff; font-size: 10px; font-weight: 700; }
-.story-inactive { position: absolute; top: 10px; right: 10px; padding: 3px 10px; border-radius: 999px; background: #94A3B8; color: #fff; font-size: 10px; font-weight: 700; }
-.story-body { padding: 14px 16px; }
-.story-title { font-size: 15px; font-weight: 800; color: var(--ice-text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.story-meta { font-size: 11px; color: var(--ice-muted); margin-bottom: 10px; }
-.story-actions { display: flex; gap: 8px; }
-.btn-sm { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
-.btn-edit { background: var(--ice-surface2); color: var(--ice-text); border: 1.5px solid var(--ice-border); }
-.btn-del  { background: rgba(239,68,68,.08); color: #DC2626; border: 1.5px solid rgba(239,68,68,.2); }
-</style>
-{% endblock %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
+{% endblock custom_css %}
 
 {% block content %}
-<div class="ice-manage-page">
-
-  {# ── Hero ──────────────────────────────────────────────────────────── #}
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-film"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">Dashboard Stories</h2>
-        <p class="ice-manage-hero__subtitle">Cards shown in the student dashboard stories strip.</p>
-      </div>
-    </div>
-    <div class="ice-manage-hero__actions">
-      <span class="ice-manage-count">{{ stories|length }}&nbsp;total</span>
-      <a href="{% url 'add_story' %}" class="ice-manage-add-btn">
-        <i class="fas fa-plus" aria-hidden="true"></i> New Story
-      </a>
-    </div>
-  </section>
-
-{% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
-
+<div class="admin-list-page">
 {% if stories %}
-<div class="story-grid">
+<div class="admin-story-grid">
   {% for s in stories %}
-  <div class="story-card">
-    <div class="story-thumb" style="{% if not s.image %}background:{{ s.bg_color }};{% endif %}">
-      {% if s.image %}<img src="{{ s.image.url }}" alt="">
-      <div class="story-thumb-overlay"></div>
-      {% else %}{{ s.emoji }}{% endif %}
-      <span class="story-type-pill">{{ s.get_story_type_display }}</span>
-      {% if not s.is_active %}<span class="story-inactive">Inactive</span>
-      {% elif s.expires_at and s.expires_at < now %}<span class="story-expired">Expired</span>{% endif %}
+  <article class="ui-card admin-story">
+    <div class="admin-story__thumb" style="{% if not s.image %}background:{{ s.bg_color }};{% endif %}">
+      {% if s.image %}<img src="{{ s.image.url }}" alt="">{% else %}{{ s.emoji }}{% endif %}
+      <span class="admin-story__type">{{ s.get_story_type_display }}</span>
+      {% if not s.is_active %}<span class="ui-badge ui-badge--muted admin-story__state">{% translate "Inactive" %}</span>
+      {% elif s.expires_at and s.expires_at < now %}<span class="ui-badge ui-badge--abs admin-story__state">{% translate "Expired" %}</span>{% endif %}
     </div>
-    <div class="story-body">
-      <div class="story-title">{{ s.title }}</div>
-      <div class="story-meta">
-        By {{ s.created_by.get_full_name }} · {{ s.created_at|date:"M j, Y" }}
-        {% if s.target_groups.exists %} · {{ s.target_groups.count }} group{{ s.target_groups.count|pluralize }}{% else %} · All students{% endif %}
-      </div>
-      <div class="story-actions">
-        <a href="{% url 'edit_story' s.id %}" class="btn-sm btn-edit"><i class="fas fa-edit"></i> Edit</a>
-        <a href="{% url 'delete_story' s.id %}" class="btn-sm btn-del"
-           data-confirm-post="Delete this story?"><i class="fas fa-trash"></i> Delete</a>
+    <div class="admin-story__body">
+      <h2 class="admin-story__title">{{ s.title }}</h2>
+      <p class="admin-list-sub">
+        {{ s.created_by.get_full_name }} · {{ s.created_at|date:"d.m.Y" }} ·
+        {% with n=s.target_groups.count %}{% if n %}{% blocktranslate count n=n %}{{ n }} group{% plural %}{{ n }} groups{% endblocktranslate %}{% else %}{% translate "All students" %}{% endif %}{% endwith %}
+      </p>
+      <div class="admin-story__actions">
+        <a href="{% url 'edit_story' s.id %}" class="ui-btn ui-btn--secondary ui-btn--sm"><i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}</a>
+        <a href="{% url 'delete_story' s.id %}" class="ui-btn ui-btn--secondary ui-btn--sm admin-list-owed"
+           data-confirm-post="{% translate 'Delete this story?' %}"><i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}</a>
       </div>
     </div>
-  </div>
+  </article>
   {% endfor %}
 </div>
 {% else %}
-<div class="ice-manage-empty">
-  <i class="fas fa-film" aria-hidden="true"></i>
-  <strong>No stories yet</strong>
-  <span><a href="{% url 'add_story' %}">Create your first story →</a></span>
+<div class="ui-card ui-empty">
+  <strong>{% translate "No stories yet" %}</strong>
+  <p><a href="{% url 'add_story' %}" class="ui-btn ui-btn--secondary ui-btn--sm">{% translate "Create the first story" %}</a></p>
 </div>
 {% endif %}
-
 </div>
 {% endblock %}

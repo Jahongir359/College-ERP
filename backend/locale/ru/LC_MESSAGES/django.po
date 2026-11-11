@@ -2950,3 +2950,167 @@ msgid_plural "%(n)s inactive"
 msgstr[0] "%(n)s неактивный"
 msgstr[1] "%(n)s неактивных"
 msgstr[2] "%(n)s неактивных"
+
+# P3.9 follow-up, part 2: vocabulary days, stories, story form, enrollments
+msgid "1 hour"
+msgstr "1 час"
+
+msgid "24 hours"
+msgstr "24 часа"
+
+msgid "3 days"
+msgstr "3 дня"
+
+msgid "7 days"
+msgstr "7 дней"
+
+msgid "All stories"
+msgstr "Все истории"
+
+msgid "All students"
+msgstr "Все ученики"
+
+msgid "Card colour (when there is no image)"
+msgstr "Цвет карточки (если нет изображения)"
+
+msgid "Cards shown in the stories strip on the student home screen."
+msgstr "Карточки в ленте историй на главном экране ученика."
+
+msgid "Completed by"
+msgstr "Выполнили"
+
+msgid "Cover image (optional)"
+msgstr "Обложка (необязательно)"
+
+msgid "Create the first story"
+msgstr "Создать первую историю"
+
+msgid "Current image. Upload a new one to replace it."
+msgstr "Текущее изображение. Загрузите новое, чтобы заменить."
+
+msgid "Day"
+msgstr "День"
+
+msgid "Days"
+msgstr "Дни"
+
+msgid "Delete this story?"
+msgstr "Удалить эту историю?"
+
+msgid "Edit story"
+msgstr "Изменить историю"
+
+msgid "Emoji (when there is no image)"
+msgstr "Эмодзи (если нет изображения)"
+
+msgid "Enroll a student into a group to see them here."
+msgstr "Зачислите ученика в группу, и он появится здесь."
+
+msgid "Enrollments"
+msgstr "Зачисления"
+
+msgid "Expired"
+msgstr "Истекла"
+
+msgid "Expires after"
+msgstr "Срок показа"
+
+msgid "Images are saved on the disk of this server and may disappear after the next deploy. Ask the site administrator to set up file storage (the SPACES settings)."
+msgstr "Изображения хранятся на диске этого сервера и могут пропасть после следующего обновления. Попросите администратора сайта настроить хранилище файлов (параметры SPACES)."
+
+msgid "Leave blank to keep the story visible with no end date."
+msgstr "Оставьте пустым, чтобы история показывалась без срока."
+
+msgid "Never"
+msgstr "Без срока"
+
+msgid "New image selected"
+msgstr "Выбрано новое изображение"
+
+msgid "New story"
+msgstr "Новая история"
+
+msgid "No enrollments found"
+msgstr "Зачисления не найдены"
+
+msgid "No enrollments yet"
+msgstr "Зачислений пока нет"
+
+msgid "No groups available."
+msgstr "Нет доступных групп."
+
+msgid "No stories yet"
+msgstr "Историй пока нет"
+
+msgid "No vocabulary days yet"
+msgstr "Словарных дней пока нет"
+
+msgid "Other date…"
+msgstr "Другая дата…"
+
+msgid "Pick a colour"
+msgstr "Выберите цвет"
+
+msgid "Recommended: 800×400 px or wider. JPG or PNG."
+msgstr "Рекомендуется: 800×400 px или шире. JPG или PNG."
+
+msgid "Release date"
+msgstr "Дата выхода"
+
+msgid "Released"
+msgstr "Вышел"
+
+msgid "Remove this enrollment?"
+msgstr "Удалить это зачисление?"
+
+msgid "Scheduled"
+msgstr "Запланирован"
+
+msgid "Search enrollments"
+msgstr "Поиск зачислений"
+
+msgid "Search student, group, course…"
+msgstr "Поиск: ученик, группа, курс…"
+
+msgid "Show on the student home screen"
+msgstr "Показывать на главном экране ученика"
+
+msgid "Story type"
+msgstr "Тип истории"
+
+msgid "Teachers create vocabulary days in the app."
+msgstr "Учителя создают словарные дни в приложении."
+
+msgid "Text"
+msgstr "Текст"
+
+msgid "Title"
+msgstr "Заголовок"
+
+msgid "Try a different student, group or course."
+msgstr "Попробуйте другого ученика, группу или курс."
+
+msgid "Turn off to hide it without deleting"
+msgstr "Выключите, чтобы скрыть без удаления"
+
+msgid "Visibility"
+msgstr "Видимость"
+
+msgid "Vocabulary days"
+msgstr "Словарные дни"
+
+msgid "Vocabulary days created by teachers in your groups."
+msgstr "Словарные дни, созданные учителями в ваших группах."
+
+msgid "Who is in which group. Remove enrollments that are out of date."
+msgstr "Кто в какой группе. Удаляйте устаревшие зачисления."
+
+msgid "Words"
+msgstr "Слова"
+
+msgid "leave all unticked to show it to everyone"
+msgstr "не отмечайте ничего, чтобы показать всем"
+
+#, python-format
+msgid "Day %(n)s"
+msgstr "День %(n)s"

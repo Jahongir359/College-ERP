@@ -2143,7 +2143,7 @@ def manage_enrollment(request):
             "enrollments": enrollments,
             "groups": groups,
             "selected_group": group_id,
-            "page_title": "Enrollments",
+            "page_title": gettext("Enrollments"),
         },
     )
 
@@ -2277,10 +2277,11 @@ def manage_vocabulary_days(request):
     days = (
         VocabularyDay.objects.filter(group__in=accessible_groups)
         .select_related("group", "created_by__admin")
-        .prefetch_related("words", "completions")
+        # Not "word_count": that is a property on the model, and annotating over it
+        # raised an error as soon as one vocabulary day existed.
         .annotate(
-            word_count=Count("words", distinct=True),
-            completion_count=Count("completions", distinct=True),
+            n_words=Count("words", distinct=True),
+            n_completions=Count("completions", distinct=True),
         )
         .order_by("-created_at")
     )
@@ -2289,7 +2290,9 @@ def manage_vocabulary_days(request):
         "hod_template/manage_vocabulary_days.html",
         {
             "days": days,
-            "page_title": "Manage Vocabulary Days",
+            "released_count": sum(1 for d in days if d.is_released),
+            "word_total": sum(d.n_words for d in days),
+            "page_title": gettext("Vocabulary days"),
         },
     )
 
@@ -2318,7 +2321,7 @@ def manage_stories(request):
         {
             "stories": stories,
             "now": tz.now(),
-            "page_title": "Dashboard Stories",
+            "page_title": gettext("Stories"),
         },
     )
 
@@ -2357,7 +2360,7 @@ def add_story(request):
         "hod_template/story_form.html",
         {
             "form": form,
-            "page_title": "New Story",
+            "page_title": gettext("New story"),
             "action": "Add",
             "storage_ok": _story_storage_ok(),
         },
@@ -2385,7 +2388,7 @@ def edit_story(request, story_id):
         {
             "form": form,
             "story": story,
-            "page_title": "Edit Story",
+            "page_title": gettext("Edit story"),
             "action": "Save",
             "storage_ok": _story_storage_ok(),
         },

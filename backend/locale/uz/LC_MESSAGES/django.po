@@ -2938,3 +2938,167 @@ msgid "%(n)s inactive"
 msgid_plural "%(n)s inactive"
 msgstr[0] "%(n)s nofaol"
 msgstr[1] "%(n)s nofaol"
+
+# P3.9 follow-up, part 2: vocabulary days, stories, story form, enrollments
+msgid "1 hour"
+msgstr "1 soat"
+
+msgid "24 hours"
+msgstr "24 soat"
+
+msgid "3 days"
+msgstr "3 kun"
+
+msgid "7 days"
+msgstr "7 kun"
+
+msgid "All stories"
+msgstr "Barcha hikoyalar"
+
+msgid "All students"
+msgstr "Barcha oʻquvchilar"
+
+msgid "Card colour (when there is no image)"
+msgstr "Karta rangi (rasm boʻlmasa)"
+
+msgid "Cards shown in the stories strip on the student home screen."
+msgstr "Oʻquvchining bosh sahifasidagi hikoyalar qatorida koʻrinadigan kartalar."
+
+msgid "Completed by"
+msgstr "Bajarganlar"
+
+msgid "Cover image (optional)"
+msgstr "Muqova rasmi (ixtiyoriy)"
+
+msgid "Create the first story"
+msgstr "Birinchi hikoyani yarating"
+
+msgid "Current image. Upload a new one to replace it."
+msgstr "Joriy rasm. Almashtirish uchun yangisini yuklang."
+
+msgid "Day"
+msgstr "Kun"
+
+msgid "Days"
+msgstr "Kunlar"
+
+msgid "Delete this story?"
+msgstr "Bu hikoya oʻchirilsinmi?"
+
+msgid "Edit story"
+msgstr "Hikoyani tahrirlash"
+
+msgid "Emoji (when there is no image)"
+msgstr "Emoji (rasm boʻlmasa)"
+
+msgid "Enroll a student into a group to see them here."
+msgstr "Bu yerda koʻrish uchun oʻquvchini guruhga qabul qiling."
+
+msgid "Enrollments"
+msgstr "Qabullar"
+
+msgid "Expired"
+msgstr "Muddati tugagan"
+
+msgid "Expires after"
+msgstr "Amal qilish muddati"
+
+msgid "Images are saved on the disk of this server and may disappear after the next deploy. Ask the site administrator to set up file storage (the SPACES settings)."
+msgstr "Rasmlar shu server diskida saqlanadi va keyingi yangilanishdan soʻng yoʻqolishi mumkin. Sayt administratoridan fayl omborini sozlashni soʻrang (SPACES sozlamalari)."
+
+msgid "Leave blank to keep the story visible with no end date."
+msgstr "Hikoya muddatsiz koʻrinishi uchun boʻsh qoldiring."
+
+msgid "Never"
+msgstr "Muddatsiz"
+
+msgid "New image selected"
+msgstr "Yangi rasm tanlandi"
+
+msgid "New story"
+msgstr "Yangi hikoya"
+
+msgid "No enrollments found"
+msgstr "Qabullar topilmadi"
+
+msgid "No enrollments yet"
+msgstr "Hali qabullar yoʻq"
+
+msgid "No groups available."
+msgstr "Guruhlar yoʻq."
+
+msgid "No stories yet"
+msgstr "Hali hikoyalar yoʻq"
+
+msgid "No vocabulary days yet"
+msgstr "Hali lugʻat kunlari yoʻq"
+
+msgid "Other date…"
+msgstr "Boshqa sana…"
+
+msgid "Pick a colour"
+msgstr "Rang tanlang"
+
+msgid "Recommended: 800×400 px or wider. JPG or PNG."
+msgstr "Tavsiya: 800×400 px yoki kengroq. JPG yoki PNG."
+
+msgid "Release date"
+msgstr "Chiqish sanasi"
+
+msgid "Released"
+msgstr "Chiqarilgan"
+
+msgid "Remove this enrollment?"
+msgstr "Bu qabul olib tashlansinmi?"
+
+msgid "Scheduled"
+msgstr "Rejalashtirilgan"
+
+msgid "Search enrollments"
+msgstr "Qabullarni qidirish"
+
+msgid "Search student, group, course…"
+msgstr "Oʻquvchi, guruh, kurs qidirish…"
+
+msgid "Show on the student home screen"
+msgstr "Oʻquvchining bosh sahifasida koʻrsatish"
+
+msgid "Story type"
+msgstr "Hikoya turi"
+
+msgid "Teachers create vocabulary days in the app."
+msgstr "Oʻqituvchilar lugʻat kunlarini ilovada yaratadi."
+
+msgid "Text"
+msgstr "Matn"
+
+msgid "Title"
+msgstr "Sarlavha"
+
+msgid "Try a different student, group or course."
+msgstr "Boshqa oʻquvchi, guruh yoki kursni sinab koʻring."
+
+msgid "Turn off to hide it without deleting"
+msgstr "Oʻchirmasdan yashirish uchun oʻchirib qoʻying"
+
+msgid "Visibility"
+msgstr "Koʻrinishi"
+
+msgid "Vocabulary days"
+msgstr "Lugʻat kunlari"
+
+msgid "Vocabulary days created by teachers in your groups."
+msgstr "Guruhlaringizda oʻqituvchilar yaratgan lugʻat kunlari."
+
+msgid "Who is in which group. Remove enrollments that are out of date."
+msgstr "Kim qaysi guruhda. Eskirgan qabullarni olib tashlang."
+
+msgid "Words"
+msgstr "Soʻzlar"
+
+msgid "leave all unticked to show it to everyone"
+msgstr "hammaga koʻrsatish uchun hech birini belgilamang"
+
+#, python-format
+msgid "Day %(n)s"
+msgstr "%(n)s-kun"
