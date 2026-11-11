@@ -2,144 +2,142 @@
 {% load i18n %}
 {% load static %}
 {% load uzs %}
+{% block page_eyebrow %}<p class="page-eyebrow">{{ period|date:"F Y" }}</p>{% endblock page_eyebrow %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "Tuition invoices, collections, and debtors for this month." %}</p>{% endblock page_subtitle %}
+{% block page_actions %}<div class="page-actions">
+  <a href="?month={{ month_value }}&status={{ status }}&branch={{ selected_branch }}&group={{ selected_group }}&export=csv" class="ui-btn ui-btn--secondary"><i class="fas fa-download" aria-hidden="true"></i>{% translate "CSV" %}</a>
+  <a href="{% url 'admin_collections' %}?month={{ month_value }}" class="ui-btn ui-btn--secondary"><i class="fas fa-chart-column" aria-hidden="true"></i>{% translate "Collections" %}</a>
+  <a href="{% url 'admin_add_invoice' %}" class="ui-btn ui-btn--secondary"><i class="fas fa-plus" aria-hidden="true"></i>{% translate "One-off Invoice" %}</a>
+  <a href="{% url 'admin_generate_invoices' %}" class="ui-btn ui-btn--primary"><i class="fas fa-file-invoice" aria-hidden="true"></i>{% translate "Generate Invoices" %}</a>
+</div>{% endblock page_actions %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
+{% endblock custom_css %}
 
 {% block content %}
-<div class="ice-mobile-page" data-ice-search-scope>
-  <section class="ice-hero">
-    <div class="ice-hero__main">
-      <span class="ice-hero__icon" aria-hidden="true"><i class="fas fa-money-bill-wave"></i></span>
-      <div class="ice-hero__copy">
-        <h2 class="ice-hero__title">{{ page_title }} · {{ period|date:"F Y" }}</h2>
-        <p class="ice-hero__subtitle">{% translate "Tuition invoices, collections, and debtors for this month." %}</p>
-      </div>
+{# P3.9c, in the style of mockup 16c. Search and empty state keep the data-ice-search hooks. #}
+<div class="ice-mobile-page admin-list-page" data-ice-search-scope>
+  <section class="ui-stats" aria-label="{% translate 'Payments' %}">
+    <div class="ui-stat" data-stat="billed">
+      <div class="ui-stat-label">{% translate "Billed" %}</div>
+      <span class="ui-stat-value ui-stat-value--money">{{ total_billed|uzs }}</span>
     </div>
-    <div class="ice-hero__actions">
-      <a href="{% url 'admin_collections' %}?month={{ month_value }}" class="ice-action ice-action--primary"><i class="fas fa-chart-column" aria-hidden="true"></i> {% translate "Collections" %}</a>
-      <a href="{% url 'admin_generate_invoices' %}" class="ice-action"><i class="fas fa-file-invoice" aria-hidden="true"></i> {% translate "Generate Invoices" %}</a>
-      <a href="{% url 'admin_add_invoice' %}" class="ice-action"><i class="fas fa-plus" aria-hidden="true"></i> {% translate "One-off Invoice" %}</a>
-      <a href="?month={{ month_value }}&status={{ status }}&branch={{ selected_branch }}&group={{ selected_group }}&export=csv" class="ice-action"><i class="fas fa-download" aria-hidden="true"></i> {% translate "CSV" %}</a>
+    <div class="ui-stat ui-stat--ok" data-stat="collected">
+      <div class="ui-stat-label">{% translate "Collected" %}</div>
+      <span class="ui-stat-value ui-stat-value--money">{{ total_collected|uzs }}</span>
     </div>
+    <div class="ui-stat ui-stat--abs" data-stat="outstanding">
+      <div class="ui-stat-label">{% translate "Outstanding" %}</div>
+      <span class="ui-stat-value ui-stat-value--money">{{ total_outstanding|uzs }}</span>
+    </div>
+    <a class="ui-stat" href="?month={{ month_value }}&status=overdue&branch={{ selected_branch }}&group={{ selected_group }}" data-stat="overdue">
+      <div class="ui-stat-label">{% translate "Overdue invoices" %}</div>
+      <span class="ui-stat-value">{{ overdue_count }}</span>
+    </a>
   </section>
 
-  <div class="ice-form-section" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px;">
-    <div style="padding:14px 16px; border:1px solid var(--ice-border,#E4E7EC); border-radius:14px;">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">{% translate "Billed" %}</div>
-      <div style="font-size:17px; font-weight:800;">{{ total_billed|uzs }}</div>
-    </div>
-    <div style="padding:14px 16px; border:1px solid rgba(22,163,74,.35); border-radius:14px; background:rgba(22,163,74,.06);">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#16A34A;">{% translate "Collected" %}</div>
-      <div style="font-size:17px; font-weight:800; color:#16A34A;">{{ total_collected|uzs }}</div>
-    </div>
-    <div style="padding:14px 16px; border:1px solid rgba(220,38,38,.35); border-radius:14px; background:rgba(220,38,38,.05);">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#DC2626;">{% translate "Outstanding" %}</div>
-      <div style="font-size:17px; font-weight:800; color:#DC2626;">{{ total_outstanding|uzs }}</div>
-    </div>
-    <div style="padding:14px 16px; border:1px solid var(--ice-border,#E4E7EC); border-radius:14px;">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">{% translate "Overdue invoices" %}</div>
-      <div style="font-size:17px; font-weight:800;">{{ overdue_count }}</div>
-    </div>
-  </div>
+  <form method="get" class="ui-filters">
+    <label class="ui-search" aria-label="{% translate 'Search invoices' %}">
+      <i class="fas fa-search" aria-hidden="true"></i>
+      <input type="search" data-ice-search placeholder="{% translate 'Search student, group, status...' %}" autocomplete="off">
+    </label>
+    <label for="month-filter" class="visually-hidden">{% translate "Month" %}</label>
+    <input id="month-filter" type="month" name="month" class="ui-select" value="{{ month_value }}" onchange="this.form.submit()">
+    <label for="status-filter" class="visually-hidden">{% translate "Status" %}</label>
+    <select id="status-filter" name="status" class="ui-select" onchange="this.form.submit()">
+      <option value="">{% translate "All statuses" %}</option>
+      {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+      <option value="overdue" {% if status == "overdue" %}selected{% endif %}>{% translate "Overdue" %}</option>
+    </select>
+    {% if branches|length > 1 %}
+    <label for="branch-filter" class="visually-hidden">{% translate "Branch" %}</label>
+    <select id="branch-filter" name="branch" class="ui-select" onchange="this.form.submit()">
+      <option value="">{% translate "All branches" %}</option>
+      {% for b in branches %}
+      <option value="{{ b.id }}" {% if selected_branch == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
+    <label for="group-filter" class="visually-hidden">{% translate "Group" %}</label>
+    <select id="group-filter" name="group" class="ui-select" onchange="this.form.submit()">
+      <option value="">{% translate "All groups" %}</option>
+      {% for g in groups %}
+      <option value="{{ g.id }}" {% if selected_group == g.id|stringformat:"s" %}selected{% endif %}>{{ g.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
 
-  <div class="ice-form-section">
-    <form method="get" class="ice-form-grid">
-      <div>
-        <label class="form-label" for="month-filter">{% translate "Month" %}</label>
-        <input id="month-filter" type="month" name="month" class="form-control" value="{{ month_value }}" onchange="this.form.submit()">
-      </div>
-      <div>
-        <label class="form-label" for="status-filter">{% translate "Status" %}</label>
-        <select id="status-filter" name="status" class="form-control" onchange="this.form.submit()">
-          <option value="">{% translate "All statuses" %}</option>
-          {% for value, label in status_choices %}
-          <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-          <option value="overdue" {% if status == "overdue" %}selected{% endif %}>{% translate "Overdue" %}</option>
-        </select>
-      </div>
-      <div>
-        <label class="form-label" for="branch-filter">{% translate "Branch" %}</label>
-        <select id="branch-filter" name="branch" class="form-control" onchange="this.form.submit()">
-          <option value="">{% translate "All branches" %}</option>
-          {% for b in branches %}
-          <option value="{{ b.id }}" {% if selected_branch == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div>
-        <label class="form-label" for="group-filter">{% translate "Group" %}</label>
-        <select id="group-filter" name="group" class="form-control" onchange="this.form.submit()">
-          <option value="">{% translate "All groups" %}</option>
-          {% for g in groups %}
-          <option value="{{ g.id }}" {% if selected_group == g.id|stringformat:"s" %}selected{% endif %}>{{ g.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <label class="ice-searchbar" aria-label="{% translate 'Search invoices' %}">
-        <i class="fas fa-search" aria-hidden="true"></i>
-        <input type="search" class="ice-searchbar__input" data-ice-search placeholder="{% translate 'Search student, group, status...' %}" autocomplete="off">
-      </label>
-    </form>
-  </div>
-
-  <div class="ice-empty-state" data-ice-empty-state hidden>
-    <i class="fas fa-search" aria-hidden="true"></i>
-    <strong>{% translate "No records found" %}</strong>
-    <span>{% translate "Try another student, group, or status." %}</span>
+  <div class="ui-empty ui-card" data-ice-empty-state hidden>
+    <strong>{% translate "No records found" %}</strong><br>
+    {% translate "Try another student, group, or status." %}
   </div>
 
   {% if invoices %}
-  <div class="ice-table-card ice-desktop-only">
-    <table class="dt">
+  <div class="ui-table-wrap ice-desktop-only" data-no-table-enhance>
+    <table class="ui-table">
       <thead>
         <tr>
-          <th>#</th>
           <th>{% translate "Student" %}</th>
-          <th>{% translate "Group" %}</th>
-          <th>{% translate "Amount" %}</th>
-          <th>{% translate "Paid" %}</th>
-          <th>{% translate "Balance" %}</th>
+          <th class="ui-num">{% translate "Amount" %}</th>
+          <th class="ui-num">{% translate "Paid" %}</th>
+          <th class="ui-num">{% translate "Balance" %}</th>
           <th>{% translate "Due" %}</th>
           <th>{% translate "Status" %}</th>
-          <th>{% translate "Actions" %}</th>
+          <th class="ui-end"><span class="visually-hidden">{% translate "Actions" %}</span></th>
         </tr>
       </thead>
       <tbody>
         {% for inv in invoices %}
         <tr data-ice-search-item data-ice-search-text="{{ inv.student }} {{ inv.student.admin.login_id }} {{ inv.group.name }} {{ inv.get_status_display }} {% if inv.is_overdue %}overdue{% endif %}">
-          <td style="color:var(--ice-muted);">{{ forloop.counter }}</td>
-          <td style="font-weight:600;">{{ inv.student }}</td>
-          <td style="color:var(--ice-muted);">{{ inv.group.name|default:"—" }}</td>
-          <td>{{ inv.total_due|uzs_plain }}</td>
-          <td style="color:#16A34A;">{{ inv.paid_amount|uzs_plain }}</td>
-          <td style="font-weight:700; {% if inv.balance > 0 and inv.status != 'cancelled' %}color:#DC2626;{% endif %}">{{ inv.balance|uzs_plain }}</td>
-          <td style="color:var(--ice-muted); font-size:12px;">{{ inv.due_date|date:"d M" }}</td>
+          <td>
+            <div class="admin-list-person">
+              {% if inv.student.admin.profile_pic %}
+              <img class="ui-avatar" src="{{ inv.student.admin.profile_pic.url }}" alt="">
+              {% else %}
+              <span class="ui-avatar" aria-hidden="true">{{ inv.student.admin.first_name|first|upper }}{{ inv.student.admin.last_name|first|upper }}</span>
+              {% endif %}
+              <span class="admin-list-person__copy">
+                <b>{{ inv.student }}</b>
+                <small>{{ inv.group.name|default:_("One-off invoice") }}</small>
+              </span>
+            </div>
+          </td>
+          <td class="ui-num admin-list-nowrap">{{ inv.total_due|uzs_plain }}</td>
+          <td class="ui-num admin-list-nowrap">{{ inv.paid_amount|uzs_plain }}</td>
+          <td class="ui-num admin-list-nowrap">{% if inv.balance > 0 and inv.status != 'cancelled' %}<b class="admin-list-owed">{{ inv.balance|uzs_plain }}</b>{% else %}{{ inv.balance|uzs_plain }}{% endif %}</td>
+          <td class="admin-list-muted admin-list-nowrap">{{ inv.due_date|date:"j M" }}</td>
           <td>
             {% if inv.status == 'paid' %}
-              <span class="sb sb-success"><i class="fas fa-check-circle me-1" style="font-size:9px;"></i>{% translate "Paid" %}</span>
+              <span class="ui-badge ui-badge--ok">{% translate "Paid" %}</span>
             {% elif inv.status == 'cancelled' %}
-              <span class="sb" style="background:rgba(100,116,139,.10); color:var(--ice-muted);">{% translate "Cancelled" %}</span>
+              <span class="ui-badge ui-badge--muted">{% translate "Cancelled" %}</span>
             {% elif inv.is_overdue %}
-              <span class="sb" style="background:rgba(220,38,38,.12); color:#DC2626;"><i class="fas fa-exclamation-circle me-1" style="font-size:9px;"></i>{% translate "Overdue" %}</span>
+              <span class="ui-badge ui-badge--abs">{% translate "Overdue" %}</span>
             {% elif inv.status == 'partial' %}
-              <span class="sb" style="background:rgba(245,158,11,.12); color:#B45309;">{% translate "Partial" %}</span>
+              <span class="ui-badge ui-badge--late">{% translate "Partial" %}</span>
             {% else %}
-              <span class="sb" style="background:rgba(56,189,248,.12); color:#0369A1;">{% translate "Due" %}</span>
+              <span class="ui-badge ui-badge--accent">{% translate "Due" %}</span>
             {% endif %}
           </td>
-          <td style="white-space:nowrap;">
-            {% if inv.status != 'paid' and inv.status != 'cancelled' %}
-            <a href="{% url 'admin_record_payment' inv.id %}" class="ab-primary" title="{% translate 'Record payment' %}"><i class="fas fa-cash-register me-1"></i>{% translate "Record" %}</a>
-            <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="ab-secondary" title="{% translate 'Send reminder now' %}" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Send a payment reminder to {{ student }}?{% endblocktranslate %}"><i class="fas fa-bell me-1"></i>{% translate "Remind" %}</a>
-            {% endif %}
-            {% if inv.paid_amount == 0 and inv.status != 'cancelled' %}
-            <a href="{% url 'admin_cancel_invoice' inv.id %}" class="ab-danger" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Cancel this invoice for {{ student }}?{% endblocktranslate %}"><i class="fas fa-ban me-1"></i>{% translate "Cancel" %}</a>
-            {% endif %}
-            {% if is_super_admin %}
-              {% for p in inv.payments.all %}
-              <a href="{% url 'admin_void_payment' p.id %}" class="ab-danger" data-confirm-post="{% blocktranslate trimmed with receipt=p.receipt_no amount=p.amount|uzs %}Void {{ receipt }} ({{ amount }})? This cannot be undone.{% endblocktranslate %}"><i class="fas fa-undo me-1"></i>{% blocktranslate trimmed with receipt=p.receipt_no %}Void {{ receipt }}{% endblocktranslate %}</a>
-              {% endfor %}
-            {% endif %}
+          <td class="ui-end">
+            <div class="admin-list-actions">
+              {% if inv.status != 'paid' and inv.status != 'cancelled' %}
+              <a href="{% url 'admin_record_payment' inv.id %}" class="ui-btn ui-btn--primary ui-btn--sm" title="{% translate 'Record payment' %}">{% translate "Record" %}</a>
+              <a href="{% url 'admin_send_payment_reminder' inv.id %}" class="admin-list-delete admin-list-icon" title="{% translate 'Send reminder now' %}" aria-label="{% translate 'Send reminder now' %}" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Send a payment reminder to {{ student }}?{% endblocktranslate %}"><i class="fas fa-bell" aria-hidden="true"></i></a>
+              {% endif %}
+              {% if inv.paid_amount == 0 and inv.status != 'cancelled' %}
+              <a href="{% url 'admin_cancel_invoice' inv.id %}" class="admin-list-delete" title="{% translate 'Cancel' %}" aria-label="{% translate 'Cancel' %}" data-confirm-post="{% blocktranslate trimmed with student=inv.student %}Cancel this invoice for {{ student }}?{% endblocktranslate %}"><i class="fas fa-ban" aria-hidden="true"></i></a>
+              {% endif %}
+              {% if is_super_admin %}
+                {% for p in inv.payments.all %}
+                <a href="{% url 'admin_void_payment' p.id %}" class="ui-open admin-list-void" data-confirm-post="{% blocktranslate trimmed with receipt=p.receipt_no amount=p.amount|uzs %}Void {{ receipt }} ({{ amount }})? This cannot be undone.{% endblocktranslate %}">{% blocktranslate trimmed with receipt=p.receipt_no %}Void {{ receipt }}{% endblocktranslate %}</a>
+                {% endfor %}
+              {% endif %}
+            </div>
           </td>
         </tr>
         {% endfor %}
@@ -190,10 +188,9 @@
     {% endfor %}
   </div>
   {% else %}
-  <div class="ice-empty-state">
-    <i class="fas fa-file-invoice" aria-hidden="true"></i>
-    <strong>{% blocktranslate trimmed with period=period|date:"F Y" %}No invoices for {{ period }}{% endblocktranslate %}</strong>
-    <span>{% translate "Use “Generate Invoices” to bill all active enrollments for this month." %}</span>
+  <div class="ui-empty ui-card">
+    <strong>{% blocktranslate trimmed with period=period|date:"F Y" %}No invoices for {{ period }}{% endblocktranslate %}</strong><br>
+    {% translate "Use “Generate Invoices” to bill all active enrollments for this month." %}
   </div>
   {% endif %}
 </div>
