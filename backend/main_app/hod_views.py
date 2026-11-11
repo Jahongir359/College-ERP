@@ -525,8 +525,24 @@ def admin_home(request):
         },
     ]
 
+    # Admin home to mockup 16d (P3.9c): greeting, money this month, overdue.
+    from .payments import dashboard_payment_summary
+
+    hour = timezone.localtime().hour
+    if hour < 12:
+        greeting = gettext("Good morning, %(name)s")
+    elif hour < 18:
+        greeting = gettext("Good afternoon, %(name)s")
+    else:
+        greeting = gettext("Good evening, %(name)s")
+    greeting %= {"name": user.first_name or user.get_full_name() or user.email}
+    pay_summary = dashboard_payment_summary(students_base, _months, today=today)
+
     context = {
         "page_title": gettext("Administrative Dashboard"),
+        "greeting": greeting,
+        "pay_summary": pay_summary,
+        "new_groups_7": new_groups_7,
         "total_students": total_students,
         "total_staff": total_staff,
         "total_course": total_course,
@@ -819,8 +835,24 @@ def manage_staff(request):
     branch_id = request.GET.get("branch")
     if branch_id:
         allStaff = allStaff.filter(staff__branch_id=branch_id)
+    # P3.9c: numbers above the list and each teacher's active groups.
+    groups_by_staff = {}
+    for staff_id, name in Group.objects.filter(teacher__in=allowed, is_archived=False).values_list(
+        "teacher_id", "name"
+    ):
+        groups_by_staff.setdefault(staff_id, []).append(name)
+    allStaff = list(allStaff)
+    for user_row in allStaff:
+        user_row.group_names = groups_by_staff.get(user_row.staff.id, [])
+    staff_stats = {
+        "total": len(allStaff),
+        "active": sum(1 for u in allStaff if u.staff.is_active),
+        "groups": sum(len(u.group_names) for u in allStaff),
+        "without_group": sum(1 for u in allStaff if not u.group_names),
+    }
     context = {
         "allStaff": allStaff,
+        "staff_stats": staff_stats,
         "page_title": gettext("Manage Teachers"),
         "branches": branching.get_accessible_branches(request.user),
         "selected_branch": branch_id,
@@ -840,8 +872,49 @@ def manage_student(request):
     branch_id = request.GET.get("branch")
     if branch_id:
         students = students.filter(student__branch_id=branch_id)
+    # Mockup 16c (P3.9c): numbers above the list, groups and payment state per row.
+    from .payments import student_payment_states
+
+    today = timezone.localdate()
+    scoped = Student.objects.filter(admin__in=students)
+    pay_states = student_payment_states(scoped, today=today)
+    groups_by_student = {}
+    for student_id, name in Enrollment.objects.filter(
+        student__in=scoped, is_active=True, group__is_archived=False
+    ).values_list("student_id", "group__name"):
+        groups_by_student.setdefault(student_id, []).append(name)
+    students = list(students)
+    for user_row in students:
+        sid = user_row.student.id
+        user_row.pay_state = pay_states.get(sid, "")
+        user_row.group_names = groups_by_student.get(sid, [])
+    total = len(students)
+    in_groups = sum(1 for u in students if u.group_names)
+    present_today = (
+        AttendanceReport.objects.filter(
+            student__in=scoped,
+            attendance__date=today,
+            status__in=[AttendanceReport.PRESENT, AttendanceReport.LATE],
+        )
+        .values("student")
+        .distinct()
+        .count()
+    )
+    student_stats = {
+        "total": total,
+        "new_this_month": sum(
+            1
+            for u in students
+            if u.created_at and timezone.localdate(u.created_at) >= today.replace(day=1)
+        ),
+        "in_groups": in_groups,
+        "in_groups_pct": round(in_groups / total * 100) if total else 0,
+        "debtors": sum(1 for u in students if u.pay_state == "debt"),
+        "present_today": present_today,
+    }
     context = {
         "students": students,
+        "student_stats": student_stats,
         "page_title": gettext("Manage Students"),
         "branches": branching.get_accessible_branches(request.user),
         "selected_branch": branch_id,
@@ -1857,11 +1930,21 @@ def manage_group(request):
     branch_id = request.GET.get("branch")
     if branch_id:
         groups = groups.filter(branch_id=branch_id)
+    # P3.9c: numbers above the list.
+    groups = list(groups)
+    active = [g for g in groups if not g.is_archived]
+    group_stats = {
+        "active": len(active),
+        "students": sum(g.enrolled_count for g in active),
+        "no_teacher": sum(1 for g in active if not g.teacher_id),
+        "archived": len(groups) - len(active),
+    }
     return render(
         request,
         "hod_template/manage_group.html",
         {
             "groups": groups,
+            "group_stats": group_stats,
             "page_title": gettext("Manage Groups"),
             "branches": branching.get_accessible_branches(request.user),
             "selected_branch": branch_id,

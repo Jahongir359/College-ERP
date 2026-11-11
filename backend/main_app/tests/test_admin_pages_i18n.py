@@ -16,7 +16,7 @@ PASSWORD = "Pass12345!"
 
 # page -> (uz text, ru text) that must show once the admin picks the language.
 PAGES = {
-    "admin_home": ("Tezkor amallar", "Быстрые действия"),
+    "admin_home": ("Bu oy toʻlangan", "Оплачено в этом месяце"),
     "manage_student": ("Oʻquvchilarni qidirish", "Поиск учеников"),
     "add_student": ("Shaxsiy maʼlumotlar", "Личные данные"),
     "edit_student": ("Oʻquvchini yangilash", "Обновить ученика"),
@@ -78,8 +78,8 @@ class AdminPagesTranslatedTests(TestCase):
     def test_english_stays_the_same(self):
         self._use("en")
         html = self.client.get(reverse("admin_home")).content.decode()
-        self.assertIn("Quick Actions", html)
-        self.assertIn("Welcome back, T U", html)
+        self.assertIn("Paid this month", html)
+        self.assertRegex(html, r"Good (morning|afternoon|evening), T\b")
         html = self.client.get(reverse("manage_group")).content.decode()
         self.assertIn("Search groups", html)
 
@@ -95,7 +95,7 @@ class AdminPagesTranslatedTests(TestCase):
         html = self.client.get(reverse("add_group")).content.decode()
         self.assertIn("Filial / Manzil", html)
         html = self.client.get(reverse("admin_home")).content.decode()
-        self.assertIn("Xush kelibsiz, T U", html)
+        self.assertRegex(html, r"Xayrli (tong|kun|kech), T\b")
 
     def _messages(self, response):
         return [str(m) for m in get_messages(response.wsgi_request)]

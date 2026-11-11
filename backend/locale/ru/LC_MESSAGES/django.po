@@ -2572,6 +2572,65 @@ msgstr "Группа «%(group)s» возвращена из архива."
 msgid "Central profile and settings hub for Iceberg"
 msgstr "Центр профиля и настроек Iceberg"
 
+# P3.9c admin home (mockup 16d)
+#, python-format
+msgid "Good morning, %(name)s"
+msgstr "Доброе утро, %(name)s"
+
+#, python-format
+msgid "Good afternoon, %(name)s"
+msgstr "Добрый день, %(name)s"
+
+#, python-format
+msgid "Good evening, %(name)s"
+msgstr "Добрый вечер, %(name)s"
+
+msgid "Paid this month"
+msgstr "Оплачено в этом месяце"
+
+#, python-format
+msgid "%(rate)s%% of this month's invoices"
+msgstr "%(rate)s%% от счетов этого месяца"
+
+msgid "Payments · 6 months"
+msgstr "Платежи · 6 месяцев"
+
+#, python-format
+msgid "%(count)s student has an overdue payment"
+msgid_plural "%(count)s students have overdue payments"
+msgstr[0] "У %(count)s ученика просрочена оплата"
+msgstr[1] "У %(count)s учеников просрочена оплата"
+msgstr[2] "У %(count)s учеников просрочена оплата"
+
+msgid "Send a reminder or open the list."
+msgstr "Отправьте напоминание или откройте список."
+
+msgid "No overdue payments."
+msgstr "Просроченных платежей нет."
+
+msgid "New leads"
+msgstr "Новые заявки"
+
+msgid "No new leads."
+msgstr "Новых заявок нет."
+
+# P3.9c students list (mockup 16c)
+#, python-format
+msgid "+%(count)s this month"
+msgstr "+%(count)s в этом месяце"
+
+msgid "In active groups"
+msgstr "В активных группах"
+
+msgid "With overdue payments"
+msgstr "С просрочкой оплаты"
+
+msgid "Present today"
+msgstr "Сегодня на занятиях"
+
+msgid "Without a group"
+msgstr "Без группы"
+
 #: main_app/school_forms.py
 msgid "Choose a pupil"
 msgstr "Выберите ученика"

@@ -1,0 +1,215 @@
+/* ============================================================================
+   Admin pages on the shell (P3.9c): Study Center home (mockup 16d), students
+   (16c), teachers, groups and payments. School admins use the same pages, so
+   nothing here names a brand: colours come from the --shell-* tokens in
+   admin-shell.css, which differ per brand and theme.
+
+   SAFETY RULE: every selector starts with  html[data-shell="admin"]
+   (admins only). Loaded by those page templates after their own sheets.
+   ========================================================================== */
+
+/* Kit stat cards used as links. */
+html[data-shell="admin"][data-brand] a.ui-stat { display: block; color: inherit; text-decoration: none; }
+html[data-shell="admin"][data-brand] a.ui-stat:hover { border-color: var(--shell-primary-hover); }
+
+/* ── Home (16d) ─────────────────────────────────────────────────────────── */
+
+/* admin-dashboard-2026.css palette → shell tokens (lower analytics cards). */
+html[data-shell="admin"][data-brand] .admin-dashboard {
+  --ib-navy: var(--shell-primary);
+  --ib-ocean: var(--shell-primary-hover);
+  --ib-cyan: var(--shell-primary-hover);
+  --ib-ice: var(--shell-tint);
+  --ib-text: var(--shell-text);
+  --ib-muted: var(--shell-muted);
+  --ib-border: var(--shell-border);
+  --ib-surface: var(--shell-surface);
+  --ib-surface-strong: var(--shell-surface);
+  --ib-shadow: var(--shell-shadow);
+  --ib-shadow-soft: var(--shell-shadow);
+  gap: 14px;
+}
+html[data-shell="admin"][data-brand] .admin-dashboard::before,
+html[data-shell="admin"][data-brand] .admin-dashboard::after { display: none !important; }
+html[data-shell="admin"][data-brand] .admin-dashboard .ui-stats { margin: 0; }
+html[data-shell="admin"][data-brand] .admin-card {
+  background: var(--shell-surface) !important;
+  border: 1px solid var(--shell-border) !important;
+  border-radius: var(--shell-radius) !important;
+  box-shadow: var(--shell-shadow) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--shell-text) !important;
+}
+html[data-shell="admin"][data-brand] .admin-card h2 { color: var(--shell-title) !important; font-size: 16px; font-weight: 700; }
+html[data-shell="admin"][data-brand] .admin-section-kicker { color: var(--shell-eyebrow) !important; }
+html[data-shell="admin"][data-brand] .admin-link { color: var(--shell-link) !important; }
+html[data-shell="admin"][data-brand] .admin-card small,
+html[data-shell="admin"][data-brand] .admin-card p { color: var(--shell-muted); }
+
+html[data-shell="admin"][data-brand] .admin-home-row { gap: 14px; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+@media (max-width: 1100px) {
+  html[data-shell="admin"][data-brand] .admin-home-row { grid-template-columns: minmax(0, 1fr); }
+}
+html[data-shell="admin"][data-brand] .admin-home-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 230px;
+  padding-top: 8px;
+}
+html[data-shell="admin"][data-brand] .admin-home-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  height: 100%;
+  min-width: 0;
+}
+html[data-shell="admin"][data-brand] .admin-home-bar__fill {
+  width: min(34px, 100%);
+  border-radius: 10px 10px 4px 4px;
+  background: var(--shell-tint);
+  box-shadow: inset 0 0 0 1px var(--shell-border);
+}
+html[data-shell="admin"][data-brand="center"] .admin-home-bar__fill { background: #BFDDF0; box-shadow: none; }
+html[data-shell="admin"][data-brand="center"][data-theme="dark"] .admin-home-bar__fill { background: #1C3A52; }
+html[data-shell="admin"][data-brand] .admin-home-bar.is-current .admin-home-bar__fill {
+  background: var(--shell-primary);
+  box-shadow: none;
+}
+html[data-shell="admin"][data-brand="center"][data-theme="dark"] .admin-home-bar.is-current .admin-home-bar__fill { background: #38BDF0; }
+html[data-shell="admin"][data-brand] .admin-home-bar__label { font-size: 11.5px; color: var(--shell-muted); }
+
+html[data-shell="admin"][data-brand] .admin-home-list { display: flex; flex-direction: column; }
+html[data-shell="admin"][data-brand] .admin-home-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--shell-border);
+}
+html[data-shell="admin"][data-brand] .admin-home-item__main { flex: 1; min-width: 0; }
+html[data-shell="admin"][data-brand] .admin-home-item__main b,
+html[data-shell="admin"][data-brand] .admin-home-item__main small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html[data-shell="admin"][data-brand] .admin-home-item__main b { font-size: 14px; color: var(--shell-text); }
+html[data-shell="admin"][data-brand] .admin-home-item__main small { font-size: 12px; color: var(--shell-muted); }
+
+/* Overdue alert: the deep card of 16d (navy for the Study Center, maroon for
+   the School); calm variant when nothing is overdue. */
+html[data-shell="admin"][data-brand] .admin-home-alert {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  text-decoration: none;
+  background: var(--shell-title) !important;
+  border-color: var(--shell-title) !important;
+  color: #FFFFFF !important;
+}
+html[data-shell="admin"][data-brand][data-theme="dark"] .admin-home-alert {
+  background: var(--shell-tint) !important;
+  border-color: var(--shell-border) !important;
+}
+html[data-shell="admin"][data-brand] .admin-home-alert__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 14px;
+  background: rgb(255 255 255 / .1);
+  color: var(--shell-avatar-bg);
+}
+html[data-shell="admin"][data-brand] .admin-home-alert__text { flex: 1; min-width: 0; }
+html[data-shell="admin"][data-brand] .admin-home-alert__text b,
+html[data-shell="admin"][data-brand] .admin-home-alert__text small { display: block; }
+html[data-shell="admin"][data-brand] .admin-home-alert__text b { font-size: 15px; color: #FFFFFF; }
+html[data-shell="admin"][data-brand] .admin-home-alert__text small { font-size: 13px; color: rgb(255 255 255 / .75); }
+html[data-shell="admin"][data-brand] .admin-home-alert .ui-btn--primary {
+  background: var(--shell-avatar-bg);
+  color: var(--shell-avatar-text) !important;
+  box-shadow: none;
+}
+html[data-shell="admin"][data-brand] .admin-home-alert--calm {
+  background: var(--shell-surface) !important;
+  border-color: var(--shell-border) !important;
+}
+html[data-shell="admin"][data-brand] .admin-home-alert--calm .admin-home-alert__icon {
+  background: var(--shell-ok-bg);
+  color: var(--shell-ok);
+}
+html[data-shell="admin"][data-brand] .admin-home-alert--calm .admin-home-alert__text b { color: var(--shell-text); }
+
+@media (max-width: 768px) {
+  html[data-shell="admin"][data-brand] .admin-home-bars { height: 170px; gap: 6px; }
+}
+
+/* ── Lists: students (16c), teachers, groups ────────────────────────────── */
+
+html[data-shell="admin"][data-brand] .admin-list-page { gap: 14px; }
+html[data-shell="admin"][data-brand] .admin-list-page .ui-stats,
+html[data-shell="admin"][data-brand] .admin-list-page .ui-filters { margin: 0; }
+html[data-shell="admin"][data-brand] .admin-list-filter { display: contents; }
+html[data-shell="admin"][data-brand] .admin-list-branch { align-self: center; }
+html[data-shell="admin"][data-brand] .admin-list-person { display: flex; align-items: center; gap: 10px; min-width: 0; }
+html[data-shell="admin"][data-brand] img.ui-avatar { object-fit: cover; padding: 0; }
+html[data-shell="admin"][data-brand] .admin-list-person__copy { min-width: 0; }
+html[data-shell="admin"][data-brand] .admin-list-person__copy b,
+html[data-shell="admin"][data-brand] .admin-list-person__copy small { display: block; }
+html[data-shell="admin"][data-brand] .admin-list-person__copy b { font-weight: 700; color: var(--shell-text); }
+html[data-shell="admin"][data-brand] .admin-list-person__copy small { font-size: 12px; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .admin-list-muted { color: var(--shell-muted) !important; font-size: 13px; }
+html[data-shell="admin"][data-brand] .admin-list-nowrap { white-space: nowrap; }
+html[data-shell="admin"][data-brand] .admin-list-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  white-space: nowrap;
+}
+html[data-shell="admin"][data-brand] .admin-list-delete {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  color: var(--shell-muted) !important;
+  text-decoration: none;
+}
+html[data-shell="admin"][data-brand] .admin-list-delete:hover {
+  background: var(--shell-abs-bg);
+  color: var(--shell-abs) !important;
+}
+/* Neutral icon buttons (edit, archive) share the delete button's size; only
+   delete turns red on hover. */
+html[data-shell="admin"][data-brand] .admin-list-icon:hover {
+  background: var(--shell-tint);
+  color: var(--shell-link) !important;
+}
+
+/* ── Payments ───────────────────────────────────────────────────────────── */
+
+html[data-shell="admin"][data-brand] .ui-stat--ok .ui-stat-value { color: var(--shell-ok) !important; }
+html[data-shell="admin"][data-brand] .ui-stat--abs .ui-stat-value { color: var(--shell-abs) !important; }
+html[data-shell="admin"][data-brand] .admin-list-owed { color: var(--shell-abs) !important; }
+html[data-shell="admin"][data-brand] .admin-list-void { font-size: 12px; }
+html[data-shell="admin"][data-brand] input[type="month"].ui-select { min-width: 150px; }
+
+/* Phones and tablets get the card list (admin-manage-mobile.css); the kit
+   table wrap would otherwise stay visible next to it. */
+@media (max-width: 1024px) {
+  html[data-shell="admin"][data-brand] .admin-list-page .ice-manage-table-wrap { display: none !important; }
+}
+@media (max-width: 768px) {
+  html[data-shell="admin"][data-brand] .admin-list-page .ui-stat-value { font-size: 22px; }
+}
+/* Money values are long ("4.8 million soʻm"): a size that keeps them on one line. */
+html[data-shell="admin"][data-brand] .admin-list-page .ui-stat-value--money { font-size: 22px; }

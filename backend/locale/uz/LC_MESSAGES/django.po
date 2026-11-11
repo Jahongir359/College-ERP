@@ -2567,6 +2567,64 @@ msgstr "\"%(group)s\" guruhi arxivdan qaytarildi."
 msgid "Central profile and settings hub for Iceberg"
 msgstr "Iceberg profil va sozlamalar markazi"
 
+# P3.9c admin home (mockup 16d)
+#, python-format
+msgid "Good morning, %(name)s"
+msgstr "Xayrli tong, %(name)s"
+
+#, python-format
+msgid "Good afternoon, %(name)s"
+msgstr "Xayrli kun, %(name)s"
+
+#, python-format
+msgid "Good evening, %(name)s"
+msgstr "Xayrli kech, %(name)s"
+
+msgid "Paid this month"
+msgstr "Bu oy toʻlangan"
+
+#, python-format
+msgid "%(rate)s%% of this month's invoices"
+msgstr "Bu oygi hisoblarning %(rate)s%%"
+
+msgid "Payments · 6 months"
+msgstr "Toʻlovlar · 6 oy"
+
+#, python-format
+msgid "%(count)s student has an overdue payment"
+msgid_plural "%(count)s students have overdue payments"
+msgstr[0] "%(count)s ta oʻquvchining toʻlovi kechikkan"
+msgstr[1] "%(count)s ta oʻquvchining toʻlovi kechikkan"
+
+msgid "Send a reminder or open the list."
+msgstr "Eslatma yuboring yoki roʻyxatni oching."
+
+msgid "No overdue payments."
+msgstr "Kechikkan toʻlovlar yoʻq."
+
+msgid "New leads"
+msgstr "Yangi arizalar"
+
+msgid "No new leads."
+msgstr "Yangi arizalar yoʻq."
+
+# P3.9c students list (mockup 16c)
+#, python-format
+msgid "+%(count)s this month"
+msgstr "+%(count)s bu oy"
+
+msgid "In active groups"
+msgstr "Faol guruhlarda"
+
+msgid "With overdue payments"
+msgstr "Qarzdorlar"
+
+msgid "Present today"
+msgstr "Bugun darsda"
+
+msgid "Without a group"
+msgstr "Guruhsiz"
+
 #: main_app/school_forms.py
 msgid "Choose a pupil"
 msgstr "Oʻquvchini tanlang"
