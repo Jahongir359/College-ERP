@@ -5,10 +5,6 @@
 {% block page_actions %}
 <div class="page-actions">
   <a href="{% url 'school_parents' %}" class="ui-btn ui-btn--secondary">← {% translate "All parents" %}</a>
-  {% url 'school_parent_letter' parent.pk as letter_url %}
-  {% translate "Print login letter" as letter_label %}
-  {% translate "Print a login letter? It gives this parent a new temporary password; the old one stops working." as letter_confirm %}
-  {% include "hod_template/school/_letter_form.html" with action=letter_url label=letter_label confirm=letter_confirm %}
   <form method="post" action="{% url 'school_parent_reset_password' parent.pk %}" class="school-header-form">
     {% csrf_token %}
     <button type="submit" class="ui-btn ui-btn--secondary"
@@ -59,6 +55,33 @@
         <button type="submit" class="ui-btn ui-btn--primary school-submit">{% translate "Save" %}</button>
       </form>
       <p class="school-help">{% translate "“Reset password” gives a new temporary password; hand it to the parent." %}</p>
+      <div class="school-login-actions">
+        {% url 'school_parent_letter' parent.pk as letter_url %}
+        {% translate "Print login letter" as letter_label %}
+        {% translate "Print a login letter? It gives this parent a new temporary password; the old one stops working." as letter_confirm %}
+        {% include "hod_template/school/_letter_form.html" with action=letter_url label=letter_label confirm=letter_confirm %}
+        <form method="post" action="{% url 'school_parent_login_sms' parent.pk %}" class="school-header-form">
+          {% csrf_token %}
+          <button type="submit" class="ui-btn ui-btn--secondary"
+                  data-confirm="{% translate 'Send this parent an SMS with their login ID and the link to the app? No password is sent.' %}"
+                  onclick="return confirm(this.dataset.confirm)">
+            <i class="fas fa-comment-dots" aria-hidden="true"></i> {% translate "Send login by SMS" %}
+          </button>
+        </form>
+      </div>
+      <h3 class="school-resets-title">{% translate "Password resets" %}</h3>
+      {% if resets %}
+      <ul class="school-resets">
+        {% for reset in resets %}
+        <li>
+          <span>{{ reset.created_at|date:"d.m.Y H:i" }}</span>
+          <span>{{ reset.get_method_display }}{% if reset.by %} · {{ reset.by.get_full_name|default:reset.by.email }}{% endif %}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="school-help">{% translate "No password resets yet." %}</p>
+      {% endif %}
     </aside>
 
     <div class="school-stack">

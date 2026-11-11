@@ -1011,8 +1011,23 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       the app's login now records `last_login` via `update_last_login`), uz/ru/en, each with a new temporary
       password and a QR (segno) to `APP_DOWNLOAD_URL` (blank: `/download/`). Demo parents aren't flagged.
       The SMS with login ID and store link (D14) and SMS resets (D13) are PL.2.
-- [ ] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
-      with an audit log). Tests.
+- [~] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
+      with an audit log). Tests. — **backend and web half done** 2026-11-11, branch
+      `feat/school-pl2-password-reset` (PR #80); verified: full suite 700 OK,
+      `test_parent_password_reset` (19). Notes: public `POST /api/v1/auth/password-reset/`
+      `{login_id, phone}` always answers the same 200 and, when both match one active parent, texts a
+      6-digit code (Eskiz, `payments._send_sms`; stored hashed, 10 minutes, 5 wrong tries, one a minute
+      and 5 a day per phone, 20 requests an hour per address); `POST …/password-reset/confirm/`
+      `{login_id, code, new_password}` sets the parent's own password (no forced change), signs out
+      their old sessions, and answers 400 `code: "invalid_code"` for every failure. Rules in
+      `parents_sms.py`. Every reset is written to `PasswordResetLog` (office, admin API, login letter,
+      SMS; who did it) and listed on the parent page (`branching.filter_password_resets_for_user`).
+      D14: "Send login by SMS" on the parent page texts the login ID and the app link, never a
+      password. Migration `0052_password_reset_log_sms_code` (new model `SmsResetCode`; the older
+      `PasswordResetCode` is the email flow of `password_recovery.py`). The letter and SMS buttons
+      moved from the page header into the parent card (the header was too crowded). **Still open:**
+      the app's "Forgot password?" screens (app work is paused); the owner's Eskiz account with the
+      message texts approved (`docs/DEPLOYMENT.md`), then one real SMS on staging.
 - [ ] **PL.3** One-page guides in uz/ru: for parents (install, log in, what each tab shows) and for
       teachers (register, timetable, messages). In `docs/guides/` and as printable PDFs.
 - [ ] **PL.4** Teacher training session held (owner); questions collected into the guides.
@@ -1090,6 +1105,11 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-11-11 — PL.2 backend and web half (`feat/school-pl2-password-reset`, on top of #58): parents' SMS
+  code reset API, reset audit log on the parent page, "Send login by SMS". Migration 0052. Next on this
+  line: the app's "Forgot password?" screens against `auth/password-reset/` (+ `confirm/`); Eskiz
+  account and approved texts (owner). Proof `school-app-screens/pl.2-parent-page.png`.
 
 - 2026-11-11 — PL.1 (PR #58) brought up to main after P3.9b: the letter buttons and the class letters bar
   now use the Admin UI kit (`ui-btn`, `ui-select`, `--shell-*` tokens); full suite 655 OK; proof

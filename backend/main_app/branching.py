@@ -368,6 +368,19 @@ def filter_parents_for_user(user, queryset):
     return queryset.none()
 
 
+def filter_password_resets_for_user(user, queryset):
+    """Filter a PasswordResetLog queryset (PL.2): admins see the resets of parents they
+    can see (``filter_parents_for_user``); everyone else sees none. Read-only audit."""
+    from .models import Parent
+
+    if is_super_admin(user):
+        return queryset
+    if get_admin_profile(user) is not None:
+        visible = filter_parents_for_user(user, Parent.objects.all())
+        return queryset.filter(user__in=visible.values("admin"))
+    return queryset.none()
+
+
 def filter_parent_links_for_user(user, queryset):
     """Filter a ParentChild queryset: admins see links to children in their
     branches; a parent sees their own links. Everyone else sees none."""

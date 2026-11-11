@@ -360,3 +360,10 @@ html[data-shell="admin"][data-brand] .school-letters-bar {
   color: var(--shell-text);
   font-size: 14px;
 }
+
+/* Password reset log on the parent page (PL.2) */
+html[data-shell="admin"][data-brand] .school-resets-title { margin: 18px 0 8px; font-size: 13px; font-weight: 700; color: var(--shell-title); }
+html[data-shell="admin"][data-brand] .school-resets { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--shell-muted); }
+html[data-shell="admin"][data-brand] .school-resets li { display: flex; justify-content: space-between; gap: 10px; padding-top: 6px; border-top: 1px solid var(--shell-border); }
+html[data-shell="admin"][data-brand] .school-resets li span:last-child { color: var(--shell-text); text-align: end; }
+html[data-shell="admin"][data-brand] .school-login-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }

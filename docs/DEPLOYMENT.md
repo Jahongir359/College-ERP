@@ -151,6 +151,7 @@ See `/.env.example` for a complete, commented list of all environment variables.
 | `APP_STORE_URL_ANDROID` | No | Google Play page the app's "update" screen opens; also printed on parent login letters |
 | `APP_STORE_URL_IOS` | No | App Store page the app's "update" screen opens; also printed on parent login letters |
 | `APP_DOWNLOAD_URL` | No | Page the QR code on printed parent login letters opens (one link for both phones, e.g. a page with both store buttons). Blank: this site's `/download/` |
+| `ESKIZ_EMAIL`, `ESKIZ_PASSWORD`, `ESKIZ_FROM` | No | Eskiz SMS account (sender name, default `4546`). Used for payment reminders, parents' password reset codes and the login SMS (PL.2). Blank email: no SMS is sent, and parents reset passwords through the school office. Eskiz approves message texts before delivering them: submit the reset code text ("Iceberg: parolni tiklash kodi … . 10 daqiqa amal qiladi. Hech kimga bermang." and its ru/en versions) and the login text ("Iceberg School: login ID … . Ilovani yuklab oling: …") from `backend/locale/*/LC_MESSAGES/django.po` |
 | `CSRF_TRUSTED_ORIGINS` | No | Comma-separated trusted origins |
 | `REGISTRATION_LEADS_API_TOKEN` | No | Token for public registration API |
 | `RECOVERY_ADMIN_EMAIL` | No | Fallback admin login email |
