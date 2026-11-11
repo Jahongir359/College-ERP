@@ -37,6 +37,20 @@
         <noscript><button type="submit" class="ui-btn ui-btn--secondary">{% translate "Search" %}</button></noscript>
       </form>
 
+      {% if group %}
+      <div class="school-letters-bar">
+        {% if letters_waiting %}
+        <span>{% blocktranslate count n=letters_waiting with name=group.name %}{{ n }} parent in {{ name }} has not signed in yet.{% plural %}{{ n }} parents in {{ name }} have not signed in yet.{% endblocktranslate %}</span>
+        {% url 'school_class_parent_letters' group.pk as letters_url %}
+        {% translate "Print login letters" as letters_label %}
+        {% translate "Print login letters for the parents who have not signed in yet? Each gets a new temporary password." as letters_confirm %}
+        {% include "hod_template/school/_letter_form.html" with action=letters_url label=letters_label confirm=letters_confirm %}
+        {% else %}
+        <span>{% blocktranslate with name=group.name %}Every parent in {{ name }} has already signed in.{% endblocktranslate %}</span>
+        {% endif %}
+      </div>
+      {% endif %}
+
       <div class="ui-table-wrap" data-no-table-enhance>
         <table class="ui-table">
           <thead>

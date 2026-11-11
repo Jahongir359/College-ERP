@@ -121,6 +121,16 @@ urlpatterns = [
         name="school_parent_reset_password",
     ),
     path(
+        "maktab/parents/<int:pk>/letter/",
+        school_parent_views.parent_letter,
+        name="school_parent_letter",
+    ),
+    path(
+        "maktab/classes/<int:class_pk>/parent-letters/",
+        school_parent_views.class_letters,
+        name="school_class_parent_letters",
+    ),
+    path(
         "maktab/parents/<int:pk>/delete/",
         school_parent_views.parent_delete,
         name="school_parent_delete",

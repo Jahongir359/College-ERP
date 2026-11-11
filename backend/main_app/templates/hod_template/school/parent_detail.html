@@ -5,6 +5,10 @@
 {% block page_actions %}
 <div class="page-actions">
   <a href="{% url 'school_parents' %}" class="ui-btn ui-btn--secondary">← {% translate "All parents" %}</a>
+  {% url 'school_parent_letter' parent.pk as letter_url %}
+  {% translate "Print login letter" as letter_label %}
+  {% translate "Print a login letter? It gives this parent a new temporary password; the old one stops working." as letter_confirm %}
+  {% include "hod_template/school/_letter_form.html" with action=letter_url label=letter_label confirm=letter_confirm %}
   <form method="post" action="{% url 'school_parent_reset_password' parent.pk %}" class="school-header-form">
     {% csrf_token %}
     <button type="submit" class="ui-btn ui-btn--secondary"

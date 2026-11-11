@@ -843,6 +843,90 @@ msgstr "%(name)s %(date)s kuni %(class)s sinfiga kechikib keldi, soat %(time)s d
 msgid "%(name)s was marked late in class %(class)s on %(date)s."
 msgstr "%(name)s %(date)s kuni %(class)s sinfiga kechikib keldi."
 
+# Parent login letters (PL.1)
+
+#, python-format
+msgid "Every parent in %(name)s has already signed in."
+msgstr "%(name)s sinfidagi barcha ota-onalar allaqachon kirgan."
+
+msgid "Letter language"
+msgstr "Xat tili"
+
+msgid "Print login letter"
+msgstr "Kirish xatini chop etish"
+
+msgid "Print a login letter? It gives this parent a new temporary password; the old one stops working."
+msgstr "Kirish xati chop etilsinmi? Ota-onaga yangi vaqtinchalik parol beriladi; eskisi ishlamay qoladi."
+
+msgid "Login letters"
+msgstr "Kirish xatlari"
+
+msgid "Back"
+msgstr "Orqaga"
+
+msgid "Print"
+msgstr "Chop etish"
+
+msgid "Each letter has a new temporary password; the old ones no longer work. Print now: these passwords are not shown again."
+msgstr "Har bir xatda yangi vaqtinchalik parol bor; eskilari endi ishlamaydi. Hozir chop eting: bu parollar boshqa koʻrsatilmaydi."
+
+msgid "Your login to the Iceberg app"
+msgstr "Iceberg ilovasiga kirish maʼlumotlaringiz"
+
+#, python-format
+msgid "Dear %(name)s, in the app you can see your child's timetable, attendance, homework and payments, and write to the teachers."
+msgstr "Hurmatli %(name)s, ilovada farzandingizning dars jadvali, davomati, uy vazifalari va toʻlovlarini koʻrasiz hamda oʻqituvchilarga yozishingiz mumkin."
+
+msgid "Your children at school"
+msgstr "Maktabdagi farzandlaringiz"
+
+msgid "Install the app."
+msgstr "Ilovani oʻrnating."
+
+msgid "Scan the code with your phone's camera and open the link."
+msgstr "Telefon kamerasi bilan kodni skanerlang va havolani oching."
+
+msgid "Open the app and choose “Iceberg School”."
+msgstr "Ilovani oching va “Iceberg School”ni tanlang."
+
+msgid "Sign in with:"
+msgstr "Quyidagilar bilan kiring:"
+
+msgid "Temporary password"
+msgstr "Vaqtinchalik parol"
+
+msgid "Choose your own password."
+msgstr "Oʻz parolingizni tanlang."
+
+msgid "The app asks for it right after the first sign-in. Don't share it with anyone."
+msgstr "Ilova birinchi kirishdan soʻng darhol uni soʻraydi. Uni hech kimga bermang."
+
+#, python-format
+msgid "No smartphone? You can also sign in from a browser: %(url)s"
+msgstr "Smartfon yoʻqmi? Brauzer orqali ham kirishingiz mumkin: %(url)s"
+
+msgid "Lost this letter or forgot your password? Ask the school office for a new one."
+msgstr "Xatni yoʻqotdingizmi yoki parolni unutdingizmi? Maktab ofisidan yangisini soʻrang."
+
+msgid "Print login letters"
+msgstr "Kirish xatlarini chop etish"
+
+msgid "Print login letters for the parents who have not signed in yet? Each gets a new temporary password."
+msgstr "Hali kirmagan ota-onalar uchun kirish xatlari chop etilsinmi? Har biriga yangi vaqtinchalik parol beriladi."
+
+#, python-format
+msgid "%(n)s login letter"
+msgid_plural "%(n)s login letters"
+msgstr[0] "%(n)s ta kirish xati"
+msgstr[1] "%(n)s ta kirish xati"
+
+#, python-format
+msgid "%(n)s parent in %(name)s has not signed in yet."
+msgid_plural "%(n)s parents in %(name)s have not signed in yet."
+msgstr[0] "%(name)s sinfidagi %(n)s ota-ona hali kirmagan."
+msgstr[1] "%(name)s sinfidagi %(n)s ota-ona hali kirmagan."
+
+
 # School register report (P3.7)
 msgid "Register report"
 msgstr "Davomat hisoboti"

@@ -342,3 +342,21 @@ html[data-shell="admin"][data-brand] .school-board .board-facts { display: grid;
 html[data-shell="admin"][data-brand] .school-board .board-facts li { display: flex; align-items: baseline; gap: 10px; font-size: 14px; color: var(--shell-muted); }
 html[data-shell="admin"][data-brand] .school-board .board-more { margin-top: 12px; }
 html[data-shell="admin"][data-brand] .school-board .board-branches { margin: 0 0 12px; }
+
+/* Login letters (PL.1) */
+html[data-shell="admin"][data-brand] .school-letter-form { display: inline-flex; flex-wrap: nowrap; align-items: center; gap: 6px; margin: 0; }
+html[data-shell="admin"][data-brand] .school-letter-form .school-letter-lang { min-width: 0; width: auto; }
+html[data-shell="admin"][data-brand] .school-letters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px dashed var(--shell-border);
+  border-radius: var(--shell-radius);
+  background: var(--shell-surface);
+  color: var(--shell-text);
+  font-size: 14px;
+}
