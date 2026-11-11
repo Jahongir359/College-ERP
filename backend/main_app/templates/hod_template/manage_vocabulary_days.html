@@ -1,132 +1,67 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
-{% block title %}Manage Vocabulary Days — Iceberg Admin{% endblock %}
-{% block page_title %}Manage Vocabulary Days{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">Vocabulary Days</li>{% endblock %}
+{% load static i18n %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "Vocabulary" %}</p>{% endblock page_eyebrow %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "Vocabulary days created by teachers in your groups." %}</p>{% endblock page_subtitle %}
 
 {% block custom_css %}
-<style>
-.mvd-page { display:flex; flex-direction:column; gap:18px; }
-.mvd-hero {
-  padding:20px 22px; border-radius:18px;
-  background:linear-gradient(135deg,#0C1F45,#1B3F7A); color:#fff;
-  box-shadow:0 10px 28px rgba(12,31,69,.22);
-  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
-}
-.mvd-hero h2 { font-size:20px; font-weight:900; margin:0 0 4px; }
-.mvd-hero p  { font-size:13px; color:rgba(255,255,255,.72); margin:0; }
-
-.mvd-table { width:100%; border-collapse:collapse; }
-.mvd-table th { padding:10px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#64748B; background:#F8FAFC; border-bottom:1px solid #E8EDF5; text-align:left; }
-.mvd-table td { padding:12px 14px; font-size:13px; border-bottom:1px solid #F8FAFC; vertical-align:middle; }
-.mvd-table tr:last-child td { border-bottom:none; }
-.mvd-table tr:hover td { background:#FAFCFF; }
-
-.released-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700; background:rgba(6,182,212,.12); color:#0E7490; }
-.scheduled-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700; background:#FEF9C3; color:#92400E; }
-
-.table-card { background:#fff; border-radius:16px; box-shadow:0 4px 14px rgba(12,31,69,.07); overflow:hidden; }
-.table-card-head { padding:14px 18px; border-bottom:1px solid #E8EDF5; display:flex; align-items:center; justify-content:space-between; }
-.table-card-head h3 { font-size:14px; font-weight:800; color:#0F172A; margin:0; }
-
-.stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.stat-card { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:0 3px 12px rgba(12,31,69,.07); text-align:center; }
-.stat-num { font-size:28px; font-weight:900; color:#0C1F45; }
-.stat-lbl { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#64748B; margin-top:4px; }
-</style>
-{% endblock %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
+{% endblock custom_css %}
 
 {% block content %}
-<div class="mvd-page">
-
-  <div class="mvd-hero">
-    <div>
-      <h2><i class="fas fa-calendar-alt me-2"></i>Vocabulary Days</h2>
-      <p>All vocabulary day sets created by teachers across all groups.</p>
+<div class="admin-list-page">
+  <section class="ui-stats" aria-label="{{ page_title }}">
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Days" %}</div>
+      <span class="ui-stat-value">{{ days|length }}</span>
     </div>
-  </div>
-
-  <!-- Summary stats -->
-  <div class="stat-row">
-    <div class="stat-card">
-      <div class="stat-num">{{ days|length }}</div>
-      <div class="stat-lbl">Total Days</div>
+    <div class="ui-stat ui-stat--ok">
+      <div class="ui-stat-label">{% translate "Released" %}</div>
+      <span class="ui-stat-value">{{ released_count }}</span>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" style="color:#10B981;">
-        {% with count=0 %}
-          {% for d in days %}{% if d.is_released %}{% with count=count|add:1 %}{% endwith %}{% endif %}{% endfor %}
-          {{ days|length }}
-        {% endwith %}
-      </div>
-      <div class="stat-lbl">Released</div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Words" %}</div>
+      <span class="ui-stat-value">{{ word_total }}</span>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" style="color:#06B6D4;">
-        {% with total=0 %}
-          {% for d in days %}{% with total=total|add:d.word_count %}{% endwith %}{% endfor %}
-          —
-        {% endwith %}
-      </div>
-      <div class="stat-lbl">Total Words</div>
-    </div>
-  </div>
+  </section>
 
   {% if days %}
-  <div class="table-card">
-    <div class="table-card-head">
-      <h3><i class="fas fa-list-ul me-2" style="color:#06B6D4;"></i>All Vocabulary Days</h3>
-      <span style="font-size:12px;color:#94A3B8;">{{ days|length }} day{% if days|length != 1 %}s{% endif %}</span>
-    </div>
-    <div style="overflow-x:auto;">
-      <table class="mvd-table">
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Group</th>
-            <th>Teacher</th>
-            <th>Words</th>
-            <th>Completions</th>
-            <th>Status</th>
-            <th>Release Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for d in days %}
-          <tr>
-            <td>
-              <div style="font-weight:800;color:#0F172A;">Day {{ d.day_number }}</div>
-              {% if d.title %}<div style="font-size:12px;color:#64748B;">{{ d.title }}</div>{% endif %}
-            </td>
-            <td style="font-weight:600;">{{ d.group.name }}</td>
-            <td>{{ d.created_by.admin.get_full_name }}</td>
-            <td>
-              <span style="font-weight:700;color:#1B3F7A;">{{ d.word_count }}</span>
-            </td>
-            <td>
-              <span style="font-weight:700;color:#10B981;">{{ d.completion_count }}</span>
-            </td>
-            <td>
-              {% if d.is_released %}
-              <span class="released-badge"><i class="fas fa-circle" style="font-size:7px;"></i> Released</span>
-              {% else %}
-              <span class="scheduled-badge"><i class="fas fa-clock" style="font-size:9px;"></i> Scheduled</span>
-              {% endif %}
-            </td>
-            <td style="color:#64748B;font-size:12px;">{{ d.release_at|date:"M j, Y H:i" }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <div class="ui-table-wrap" data-no-table-enhance>
+    <table class="ui-table">
+      <thead>
+        <tr>
+          <th>{% translate "Day" %}</th>
+          <th>{% translate "Group" %}</th>
+          <th>{% translate "Teacher" %}</th>
+          <th class="ui-num">{% translate "Words" %}</th>
+          <th class="ui-num">{% translate "Completed by" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th>{% translate "Release date" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in days %}
+        <tr>
+          <td>
+            <strong>{% blocktranslate with n=d.day_number %}Day {{ n }}{% endblocktranslate %}</strong>
+            {% if d.title %}<small class="admin-list-sub">{{ d.title }}</small>{% endif %}
+          </td>
+          <td>{{ d.group.name }}</td>
+          <td>{{ d.created_by.admin.get_full_name }}</td>
+          <td class="ui-num">{{ d.n_words }}</td>
+          <td class="ui-num">{{ d.n_completions }}</td>
+          <td>{% if d.is_released %}<span class="ui-badge ui-badge--ok">{% translate "Released" %}</span>{% else %}<span class="ui-badge ui-badge--late">{% translate "Scheduled" %}</span>{% endif %}</td>
+          <td>{{ d.release_at|date:"d.m.Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
   {% else %}
-  <div style="background:#fff;border-radius:16px;box-shadow:0 4px 14px rgba(12,31,69,.07);padding:56px 24px;text-align:center;">
-    <i class="fas fa-calendar-plus" style="font-size:40px;color:#CBD5E1;display:block;margin-bottom:14px;"></i>
-    <div style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:6px;">No vocabulary days yet</div>
-    <p style="font-size:13px;color:#64748B;margin:0;">Teachers create vocabulary days from their dashboard.</p>
+  <div class="ui-card ui-empty">
+    <strong>{% translate "No vocabulary days yet" %}</strong>
+    <p>{% translate "Teachers create vocabulary days in the app." %}</p>
   </div>
   {% endif %}
-
 </div>
 {% endblock %}

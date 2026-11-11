@@ -1120,6 +1120,15 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   (after P2.8's 0050). QA fixes: the app's login records `last_login`; class letters go only to
   parents who never signed in **and** still have an office-set password; `api_login` allowed.
 
+- 2026-11-11 — P3.9 follow-up, part 2 (`feat/center-admin-pages-3`): vocabulary days, stories, the story
+  form and the enrollments list are on the Admin UI kit and in uz/ru. **Bug fixed:** the vocabulary days
+  page raised an error as soon as one vocabulary day existed (the view annotated `word_count`, which is a
+  property on `VocabularyDay`); its "Released" and "Words" numbers were also wrong. Proof
+  `school-app-screens/p3.9e-pages.png`. Still open: admin_manage_seasons and admin_leaderboard_settings
+  (super admin only), the home's lower charts, phone card chips (`admin-manage-mobile.css`), choice and
+  field labels that come from models and forms (story type "Announcement", "Story title" placeholder,
+  "Student" on the one-off invoice).
+
 - 2026-11-11 — P3.9 follow-up, part 1 (`feat/center-admin-pages-2`, on top of #79): the group page, collections,
   generate invoices, one-off invoice, record payment and enroll student are on the Admin UI kit and in
   uz/ru. The old form card (`.page-card`, `.pf-*`: every add/edit form in both brands) now takes shell

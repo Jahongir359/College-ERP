@@ -1,42 +1,28 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
+{% load static i18n %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'manage_group' %}">{% translate "Groups" %}</a></p>{% endblock page_eyebrow %}
 {% block page_title %}{{ page_title }}{% endblock %}
-
+{% block page_subtitle %}<p class="page-subtitle">{% translate "Who is in which group. Remove enrollments that are out of date." %}</p>{% endblock %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'add_enrollment' %}" class="ui-btn ui-btn--primary"><i class="fas fa-plus" aria-hidden="true"></i> {% translate "Enroll student" %}</a>
+</div>{% endblock page_actions %}
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
 {% endblock custom_css %}
-
-{% block page_subtitle %}<p class="page-subtitle">Review student group membership and remove outdated enrollments.</p>{% endblock %}
-
 {% block content %}
 <div class="ice-manage-page" data-manage-search-scope>
 
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-id-card"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">Enrollments</h2>
-        <p class="ice-manage-hero__subtitle">Review student group membership and remove outdated enrollments.</p>
-      </div>
-    </div>
-    <div class="ice-manage-hero__actions">
-      <span class="ice-manage-count"><span data-manage-visible-count>{{ enrollments|length }}</span>&nbsp;enrollment{{ enrollments|length|pluralize }}</span>
-      <a href="{% url 'add_enrollment' %}" class="ice-manage-add-btn">
-        <i class="fas fa-plus" aria-hidden="true"></i> Add Enrollment
-      </a>
-    </div>
-  </section>
-
-  <label class="ice-manage-search" aria-label="Search enrollments">
+  <label class="ice-manage-search" aria-label="{% translate "Search enrollments" %}">
     <i class="fas fa-search" aria-hidden="true"></i>
     <input type="search" class="ice-manage-search__input" data-manage-search
-           placeholder="Search student, group, course…" autocomplete="off">
+           placeholder="{% translate "Search student, group, course…" %}" autocomplete="off">
   </label>
 
   <form method="get" class="ice-manage-filter">
-    <label for="group-filter" class="ice-manage-filter__label"><i class="fas fa-layer-group" aria-hidden="true"></i> Group</label>
+    <label for="group-filter" class="ice-manage-filter__label"><i class="fas fa-layer-group" aria-hidden="true"></i> {% translate "Group" %}</label>
     <select id="group-filter" name="group" class="ice-manage-filter__select" onchange="this.form.submit()">
-      <option value="">All Groups</option>
+      <option value="">{% translate "All groups" %}</option>
       {% for g in groups %}
       <option value="{{ g.id }}" {% if selected_group == g.id|stringformat:"s" %}selected{% endif %}>
         {{ g.name }}{% if g.course %} — {{ g.course.name }}{% endif %}
@@ -47,8 +33,8 @@
 
   <div class="ice-manage-empty" data-manage-empty-state hidden>
     <i class="fas fa-search" aria-hidden="true"></i>
-    <strong>No enrollments found</strong>
-    <span>Try a different student, group, or course.</span>
+    <strong>{% translate "No enrollments found" %}</strong>
+    <span>{% translate "Try a different student, group or course." %}</span>
   </div>
 
   {% if enrollments %}
@@ -57,13 +43,13 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Student</th>
-          <th>Course</th>
-          <th>Group</th>
-          <th>Teacher</th>
-          <th>Enrolled</th>
-          <th>Status</th>
-          <th>Action</th>
+          <th>{% translate "Student" %}</th>
+          <th>{% translate "Course" %}</th>
+          <th>{% translate "Group" %}</th>
+          <th>{% translate "Teacher" %}</th>
+          <th>{% translate "Enrolled on" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th><span class="sr-only">{% translate "Remove" %}</span></th>
         </tr>
       </thead>
       <tbody>
@@ -82,7 +68,7 @@
               </span>
               <span class="ice-manage-person__copy">
                 <span class="ice-manage-person__name">{{ e.student }}</span>
-                <span class="ice-manage-person__sub">{{ e.student.admin.login_id|default:"No ID" }}</span>
+                <span class="ice-manage-person__sub">{{ e.student.admin.login_id|default:_("No ID") }}</span>
               </span>
             </div>
           </td>
@@ -92,16 +78,16 @@
           <td style="color:var(--ice-muted); font-size:12px;">{{ e.enrolled_on }}</td>
           <td>
             {% if e.is_active %}
-              <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-circle" style="font-size:7px;"></i> Active</span>
+              <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-circle" style="font-size:7px;"></i> {% translate "Active" %}</span>
             {% else %}
-              <span class="ice-manage-chip"><i class="fas fa-circle" style="font-size:7px;"></i> Inactive</span>
+              <span class="ice-manage-chip"><i class="fas fa-circle" style="font-size:7px;"></i> {% translate "Inactive" %}</span>
             {% endif %}
           </td>
           <td>
             <div class="ice-manage-actions">
               <a href="{% url 'delete_enrollment' e.id %}" class="ice-manage-action ice-manage-action--danger"
-                 data-confirm-post="Remove this enrollment?">
-                <i class="fas fa-times" aria-hidden="true"></i> Remove
+                 data-confirm-post="{% translate "Remove this enrollment?" %}">
+                <i class="fas fa-times" aria-hidden="true"></i> {% translate "Remove" %}
               </a>
             </div>
           </td>
@@ -111,8 +97,8 @@
           <td colspan="8">
             <div class="ice-manage-empty">
               <i class="fas fa-id-card" aria-hidden="true"></i>
-              <strong>No enrollments found</strong>
-              <span>Enroll a student into a group to see them here.</span>
+              <strong>{% translate "No enrollments found" %}</strong>
+              <span>{% translate "Enroll a student into a group to see them here." %}</span>
             </div>
           </td>
         </tr>
@@ -141,19 +127,19 @@
         </div>
       </div>
       <div class="ice-manage-card__chips">
-        <span class="ice-manage-chip"><i class="fas fa-id-badge" aria-hidden="true"></i> {{ e.student.admin.login_id|default:"No ID" }}</span>
-        <span class="ice-manage-chip"><i class="fas fa-chalkboard-teacher" aria-hidden="true"></i> {{ e.group.teacher|default:"No teacher" }}</span>
+        <span class="ice-manage-chip"><i class="fas fa-id-badge" aria-hidden="true"></i> {{ e.student.admin.login_id|default:_("No ID") }}</span>
+        <span class="ice-manage-chip"><i class="fas fa-chalkboard-teacher" aria-hidden="true"></i> {{ e.group.teacher|default:_("No teacher") }}</span>
         <span class="ice-manage-chip"><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ e.enrolled_on }}</span>
         {% if e.is_active %}
-          <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i> Active</span>
+          <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i> {% translate "Active" %}</span>
         {% else %}
-          <span class="ice-manage-chip"><i class="fas fa-pause-circle" aria-hidden="true"></i> Inactive</span>
+          <span class="ice-manage-chip"><i class="fas fa-pause-circle" aria-hidden="true"></i> {% translate "Inactive" %}</span>
         {% endif %}
       </div>
       <div class="ice-manage-actions">
         <a href="{% url 'delete_enrollment' e.id %}" class="ice-manage-action ice-manage-action--danger"
-           data-confirm-post="Remove this enrollment?">
-          <i class="fas fa-times" aria-hidden="true"></i> Remove
+           data-confirm-post="{% translate "Remove this enrollment?" %}">
+          <i class="fas fa-times" aria-hidden="true"></i> {% translate "Remove" %}
         </a>
       </div>
     </article>
@@ -163,8 +149,8 @@
   {% else %}
   <div class="ice-manage-empty">
     <i class="fas fa-id-card" aria-hidden="true"></i>
-    <strong>No enrollments yet</strong>
-    <span>Enroll a student into a group to see them here.</span>
+    <strong>{% translate "No enrollments yet" %}</strong>
+    <span>{% translate "Enroll a student into a group to see them here." %}</span>
   </div>
   {% endif %}
 
