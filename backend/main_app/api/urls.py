@@ -5,6 +5,7 @@ from . import (
     admin_views,
     marks_views,
     parent_messages,
+    password_reset_views,
     register_views,
     school_views,
     student_views,
@@ -17,6 +18,16 @@ urlpatterns = [
     # ── Auth ─────────────────────────────────────────────────────────────────
     path("auth/login/", views.LoginView.as_view(), name="api_login"),
     path("auth/logout/", views.LogoutView.as_view(), name="api_logout"),
+    path(
+        "auth/password-reset/",
+        password_reset_views.PasswordResetRequestView.as_view(),
+        name="api_password_reset",
+    ),
+    path(
+        "auth/password-reset/confirm/",
+        password_reset_views.PasswordResetConfirmView.as_view(),
+        name="api_password_reset_confirm",
+    ),
     # ── Profile (all roles) ───────────────────────────────────────────────────
     path("me/", views.MeView.as_view(), name="api_me"),
     path("me/change-password/", views.ChangePasswordView.as_view(), name="api_change_password"),

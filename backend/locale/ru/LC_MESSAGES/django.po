@@ -2735,3 +2735,58 @@ msgstr "Выберите курс"
 #: main_app/school_forms.py
 msgid "Choose a subject"
 msgstr "Выберите предмет"
+
+# PL.2 parents' password reset by SMS, login SMS, reset log
+msgid "Office"
+msgstr "Школьный офис"
+
+msgid "Office (API)"
+msgstr "Школьный офис (API)"
+
+msgid "Login letter"
+msgstr "Письмо для входа"
+
+msgid "SMS code (the parent)"
+msgstr "SMS-код (сам родитель)"
+
+#, python-format
+msgid "Iceberg: your password reset code is %(code)s. It works for %(minutes)s minutes. Do not share it."
+msgstr "Iceberg: код для сброса пароля %(code)s. Действует %(minutes)s минут. Никому не сообщайте."
+
+#, python-format
+msgid "Iceberg School: your login ID is %(login)s. Get the app: %(url)s"
+msgstr "Iceberg School: ваш логин %(login)s. Скачайте приложение: %(url)s"
+
+msgid "Login ID and phone number are required."
+msgstr "Нужны логин и номер телефона."
+
+#, python-format
+msgid "If the login ID and phone number match, a code was sent by SMS. It works for %(minutes)s minutes."
+msgstr "Если логин и номер телефона совпадают, код отправлен по SMS. Он действует %(minutes)s минут."
+
+msgid "Login ID, code and new password are required."
+msgstr "Нужны логин, код и новый пароль."
+
+msgid "The code is wrong or no longer works. Ask for a new one."
+msgstr "Код неверный или больше не действует. Запросите новый."
+
+msgid "Password changed. Sign in with the new password."
+msgstr "Пароль изменён. Войдите с новым паролем."
+
+msgid "SMS with the login ID sent."
+msgstr "SMS с логином отправлено."
+
+msgid "The SMS was not sent. Check the phone number, or SMS is not set up on this site."
+msgstr "SMS не отправлено. Проверьте номер телефона, или SMS на этом сайте не настроены."
+
+msgid "Send this parent an SMS with their login ID and the link to the app? No password is sent."
+msgstr "Отправить этому родителю SMS с логином и ссылкой на приложение? Пароль не отправляется."
+
+msgid "Send login by SMS"
+msgstr "Отправить логин по SMS"
+
+msgid "Password resets"
+msgstr "Сбросы пароля"
+
+msgid "No password resets yet."
+msgstr "Пароль ещё не сбрасывали."

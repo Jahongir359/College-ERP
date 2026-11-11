@@ -19,7 +19,7 @@ import secrets
 from django.db import transaction
 
 from . import branching
-from .models import CustomUser, Parent, ParentChild
+from .models import CustomUser, Parent, ParentChild, PasswordResetLog
 
 LOGIN_PREFIX = "PR"
 
@@ -137,7 +137,12 @@ def create_parent(first_name, last_name, phone, password, student, relation, is_
 
 
 @transaction.atomic
-def update_parent(parent, first_name=None, last_name=None, phone=None, password=None):
+def update_parent(
+    parent, first_name=None, last_name=None, phone=None, password=None, by=None, method=None
+):
+    """Change a parent's details. A new ``password`` is one the office chose: the parent
+    must change it after signing in (PL.1), and the reset is written to the audit log
+    (``PasswordResetLog``, PL.2) with ``by`` (the admin) and ``method``."""
     user = parent.admin
     if first_name is not None:
         user.first_name = first_name
@@ -147,6 +152,10 @@ def update_parent(parent, first_name=None, last_name=None, phone=None, password=
         user.set_password(password)
         user.must_change_password = True  # set by the office: temporary until changed (PL.1)
     user.save()
+    if password:
+        PasswordResetLog.objects.create(
+            user=user, by=by, method=method or PasswordResetLog.METHOD_OFFICE
+        )
     if phone is not None:
         parent.phone = phone
         parent.save(update_fields=["phone"])

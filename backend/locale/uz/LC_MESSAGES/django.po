@@ -2725,3 +2725,58 @@ msgstr "Kursni tanlang"
 #: main_app/school_forms.py
 msgid "Choose a subject"
 msgstr "Fanni tanlang"
+
+# PL.2 parents' password reset by SMS, login SMS, reset log
+msgid "Office"
+msgstr "Maktab idorasi"
+
+msgid "Office (API)"
+msgstr "Maktab idorasi (API)"
+
+msgid "Login letter"
+msgstr "Kirish xati"
+
+msgid "SMS code (the parent)"
+msgstr "SMS kod (ota-ona oʻzi)"
+
+#, python-format
+msgid "Iceberg: your password reset code is %(code)s. It works for %(minutes)s minutes. Do not share it."
+msgstr "Iceberg: parolni tiklash kodi %(code)s. %(minutes)s daqiqa amal qiladi. Hech kimga bermang."
+
+#, python-format
+msgid "Iceberg School: your login ID is %(login)s. Get the app: %(url)s"
+msgstr "Iceberg School: login ID %(login)s. Ilovani yuklab oling: %(url)s"
+
+msgid "Login ID and phone number are required."
+msgstr "Login ID va telefon raqami kerak."
+
+#, python-format
+msgid "If the login ID and phone number match, a code was sent by SMS. It works for %(minutes)s minutes."
+msgstr "Login ID va telefon raqami mos kelsa, SMS orqali kod yuborildi. U %(minutes)s daqiqa amal qiladi."
+
+msgid "Login ID, code and new password are required."
+msgstr "Login ID, kod va yangi parol kerak."
+
+msgid "The code is wrong or no longer works. Ask for a new one."
+msgstr "Kod notoʻgʻri yoki endi ishlamaydi. Yangisini soʻrang."
+
+msgid "Password changed. Sign in with the new password."
+msgstr "Parol oʻzgartirildi. Yangi parol bilan kiring."
+
+msgid "SMS with the login ID sent."
+msgstr "Login ID yozilgan SMS yuborildi."
+
+msgid "The SMS was not sent. Check the phone number, or SMS is not set up on this site."
+msgstr "SMS yuborilmadi. Telefon raqamini tekshiring yoki bu saytda SMS sozlanmagan."
+
+msgid "Send this parent an SMS with their login ID and the link to the app? No password is sent."
+msgstr "Bu ota-onaga login ID va ilova havolasi yozilgan SMS yuborilsinmi? Parol yuborilmaydi."
+
+msgid "Send login by SMS"
+msgstr "Loginni SMS orqali yuborish"
+
+msgid "Password resets"
+msgstr "Parol tiklashlar"
+
+msgid "No password resets yet."
+msgstr "Hali parol tiklanmagan."

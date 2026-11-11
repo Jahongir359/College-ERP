@@ -126,6 +126,11 @@ urlpatterns = [
         name="school_parent_letter",
     ),
     path(
+        "maktab/parents/<int:pk>/login-sms/",
+        school_parent_views.parent_login_sms,
+        name="school_parent_login_sms",
+    ),
+    path(
         "maktab/classes/<int:class_pk>/parent-letters/",
         school_parent_views.class_letters,
         name="school_class_parent_letters",

@@ -1,5 +1,5 @@
 """Admin web pages for Iceberg School parents (plan task P3.3, mockups 18 and 18b),
-and their printed login letters (PL.1, D14).
+their printed login letters (PL.1, D14), the login SMS and the password reset log (PL.2).
 
 Admins only (D15). Which parents and children an admin sees is decided in
 ``branching.py``; the rules for creating parents and linking children (one login
@@ -21,9 +21,9 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from . import branching, parents
+from . import branching, parents, parents_sms
 from .decorators import admin_only
-from .models import Enrollment, Group, Parent, ParentChild, Session
+from .models import Enrollment, Group, Parent, ParentChild, PasswordResetLog, Session
 from .school_forms import (
     ParentChildForm,
     ParentForm,
@@ -194,6 +194,10 @@ def _detail(request, parent, form=None, new_password=None):
         "child_form": ParentChildForm(user=request.user, prefix="child"),
         "link_form": ParentLinkByLoginForm(user=request.user, prefix="link"),
         "new_password": new_password,
+        # The last password resets, newest first (PL.2 audit log).
+        "resets": branching.filter_password_resets_for_user(
+            request.user, PasswordResetLog.objects.filter(user=parent.admin).select_related("by")
+        )[:10],
     }
     return render(request, "hod_template/school/parent_detail.html", context)
 
@@ -221,8 +225,25 @@ def parent_reset_password(request, pk):
     a message, so it never sits in the session or a cookie)."""
     parent = _parent_or_404(request, pk)
     password = parents.temporary_password()
-    parents.update_parent(parent, password=password)
+    parents.update_parent(
+        parent, password=password, by=request.user, method=PasswordResetLog.METHOD_OFFICE
+    )
     return _detail(request, parent, new_password=password)
+
+
+@admin_only
+@require_POST
+def parent_login_sms(request, pk):
+    """Text the parent their login ID and the link to the app (D14). No password."""
+    parent = _parent_or_404(request, pk)
+    if parents_sms.send_login_sms(parent, _download_url(request)):
+        messages.success(request, _("SMS with the login ID sent."))
+    else:
+        messages.error(
+            request,
+            _("The SMS was not sent. Check the phone number, or SMS is not set up on this site."),
+        )
+    return redirect("school_parent_detail", pk=parent.pk)
 
 
 @admin_only
@@ -325,7 +346,9 @@ def _letters(request, parents_list):
         letters = []
         for parent in parents_list:
             password = parents.temporary_password()
-            parents.update_parent(parent, password=password)
+            parents.update_parent(
+                parent, password=password, by=request.user, method=PasswordResetLog.METHOD_LETTER
+            )
             links = list(parents.visible_links(request.user, parent))
             class_of = _class_names([link.student_id for link in links])
             children = [

@@ -26,6 +26,7 @@ from ..models import (
     Lesson,
     LessonClashError,
     Parent,
+    PasswordResetLog,
     Staff,
     Subject,
 )
@@ -279,7 +280,9 @@ class ParentDetailView(APIView):
         form = ParentForm(data, user=request.user, instance=parent)
         if not form.is_valid():
             return _form_errors(form)
-        parents.update_parent(parent, **form.cleaned_data)
+        parents.update_parent(
+            parent, **form.cleaned_data, by=request.user, method=PasswordResetLog.METHOD_API
+        )
         return Response(_parent_dict(request, parent))
 
     def delete(self, request, pk):
