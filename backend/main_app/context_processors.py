@@ -73,7 +73,8 @@ def school_nav(request):
 def school_period_label():
     """``"2026–2027 · 1-chorak"`` for the School navbar chip (mockup 16): the
     current academic year and the quarter today falls in (or the last one
-    that started). Empty when no academic year exists."""
+    that started), in the active language. Empty when no academic year
+    exists."""
     from django.utils import timezone
     from django.utils.translation import gettext as _
 
@@ -86,5 +87,8 @@ def school_period_label():
     term = year.terms.filter(start_date__lte=today).order_by("-start_date").first()
     if term is None:
         return str(year)
-    name = term.name or _("Quarter %(number)s") % {"number": term.number}
+    # The quarter by number in the page language ("1-chorak", "1-я четверть",
+    # "Quarter 1"); the term's own name is a single free-text label, so it
+    # would not follow the language (#75 review).
+    name = _("Quarter %(number)s") % {"number": term.number}
     return f"{year} · {name}"

@@ -217,7 +217,9 @@ class ClassForm(forms.ModelForm):
         )
         self.fields["letter"].required = True
         self.fields["teacher"].queryset = _staff_choices(user)
+        self.fields["teacher"].empty_label = _("Choose a teacher")
         self.fields["course"].queryset = Course.objects.filter(is_active=True).order_by("name")
+        self.fields["course"].empty_label = _("Choose a course")
         if self.instance.pk is None:
             from .school import school_course
 
@@ -329,7 +331,9 @@ class ClassSubjectForm(forms.ModelForm):
         )
         if self.instance.pk:
             self.fields["subject"].disabled = True
+        self.fields["subject"].empty_label = _("Choose a subject")
         self.fields["teacher"].queryset = _staff_choices(user)
+        self.fields["teacher"].empty_label = _("Choose a teacher")
         for field in self.visible_fields():
             field.field.widget.attrs["class"] = "form-control"
 

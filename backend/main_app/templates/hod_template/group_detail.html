@@ -1,282 +1,78 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
-{% block page_title %}{{ page_title }}{% endblock %}
-{% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'manage_group' %}">Groups</a></li>
-<li class="breadcrumb-item active">{{ group.name }}</li>
-{% endblock %}
+{% load static i18n %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'manage_group' %}">{% translate "Groups" %}</a></p>{% endblock page_eyebrow %}
+{% block page_title %}{{ group.name }}{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% if group.is_archived %}{% translate "Archived" %} · {% endif %}{% if group.teacher %}{{ group.teacher.admin.get_full_name }}{% else %}{% translate "No teacher assigned" %}{% endif %}{% if group.schedule %} · {{ group.schedule }}{% endif %}</p>{% endblock page_subtitle %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'manage_group' %}" class="ui-btn ui-btn--secondary">← {% translate "All groups" %}</a>
+  <a href="{% url 'add_enrollment' %}?group={{ group.id }}" class="ui-btn ui-btn--primary"><i class="fas fa-plus" aria-hidden="true"></i> {% translate "Enroll student" %}</a>
+</div>{% endblock page_actions %}
 
 {% block custom_css %}
-<style>
-.gd-page { display: flex; flex-direction: column; gap: 18px; }
-
-.gd-hero {
-  padding: 24px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #0C1F45, #1B3F7A);
-  color: #fff;
-  box-shadow: 0 10px 28px rgba(12,31,69,.22);
-}
-.gd-hero-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
-.gd-back-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 14px; border-radius: 9px;
-  background: rgba(255,255,255,.14); color: #fff;
-  font-size: 12px; font-weight: 700; text-decoration: none;
-  border: 1.5px solid rgba(255,255,255,.2);
-  transition: background .12s;
-}
-.gd-back-btn:hover { background: rgba(255,255,255,.22); color: #fff; text-decoration: none; }
-
-.gd-title { font-size: 24px; font-weight: 900; margin: 0 0 4px; letter-spacing: -.3px; }
-.gd-subtitle { font-size: 13px; color: rgba(255,255,255,.72); margin: 0; }
-
-.gd-meta-row { display: flex; flex-wrap: wrap; gap: 10px; }
-.gd-meta-item {
-  display: flex; align-items: center; gap: 7px;
-  padding: 8px 14px; border-radius: 10px;
-  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
-}
-.gd-meta-item i { font-size: 12px; color: rgba(255,255,255,.6); }
-.gd-meta-value { font-size: 13px; font-weight: 700; }
-.gd-meta-label { font-size: 10px; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .5px; }
-
-.gd-teacher-chip {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 16px; border-radius: 12px;
-  background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.2);
-  margin-bottom: 16px;
-}
-.gd-teacher-av {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,.2); border: 2px solid rgba(255,255,255,.3);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; flex-shrink: 0;
-}
-.gd-teacher-name { font-size: 15px; font-weight: 800; }
-.gd-teacher-tag  { font-size: 11px; color: rgba(255,255,255,.65); }
-
-/* Student table card */
-.stu-card {
-  background: #fff; border-radius: 16px;
-  border: 1.5px solid #E8EDF5;
-  box-shadow: 0 4px 14px rgba(12,31,69,.07);
-  overflow: hidden;
-}
-.stu-card-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px;
-  background: #F8FAFC; border-bottom: 1.5px solid #E8EDF5;
-  flex-wrap: wrap; gap: 10px;
-}
-.stu-card-title { font-size: 14px; font-weight: 700; color: #0F172A; display: flex; align-items: center; gap: 8px; }
-.stu-card-title i { color: #0891B2; }
-
-.stu-table { width: 100%; border-collapse: collapse; }
-.stu-table th {
-  padding: 11px 16px;
-  font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .6px;
-  color: #94A3B8; background: #F8FAFC;
-  border-bottom: 1.5px solid #E8EDF5;
-  white-space: nowrap;
-}
-.stu-table td {
-  padding: 13px 16px;
-  font-size: 13px; color: #1E293B;
-  border-bottom: 1px solid #F1F5F9;
-  vertical-align: middle;
-}
-.stu-table tr:last-child td { border-bottom: none; }
-.stu-table tbody tr { transition: background .1s; }
-.stu-table tbody tr:hover { background: #F8FAFC; }
-
-.stu-id-badge {
-  display: inline-flex; align-items: center;
-  padding: 3px 10px; border-radius: 6px;
-  background: #EFF6FF; color: #1E40AF;
-  font-size: 12px; font-weight: 700; font-family: monospace;
-  border: 1px solid rgba(30,64,175,.15);
-  letter-spacing: .5px;
-}
-.stu-name { font-weight: 700; color: #0F172A; }
-.stu-sub  { font-size: 11px; color: #64748B; margin-top: 2px; }
-
-.level-badge {
-  display: inline-flex; align-items: center;
-  padding: 2px 8px; border-radius: 6px;
-  background: #ECFDF5; color: #065F46;
-  font-size: 11px; font-weight: 700;
-  border: 1px solid rgba(6,95,70,.15);
-}
-
-.status-chip {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 9px; border-radius: 999px;
-  font-size: 11px; font-weight: 600;
-}
-.status-chip.active   { background: rgba(16,185,129,.1); color: #065F46; }
-.status-chip.inactive { background: rgba(100,116,139,.1); color: #475569; }
-.status-chip.suspended{ background: rgba(239,68,68,.1); color: #B91C1C; }
-
-.empty-row td { text-align: center; padding: 56px 20px; color: #94A3B8; font-size: 13px; }
-
-@media (max-width: 640px) {
-  .stu-table th:nth-child(5),
-  .stu-table td:nth-child(5),
-  .stu-table th:nth-child(6),
-  .stu-table td:nth-child(6) { display: none; }
-}
-</style>
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
 {% endblock custom_css %}
 
 {% block content %}
-<div class="gd-page">
-
-  <!-- Hero -->
-  <div class="gd-hero">
-    <div class="gd-hero-top">
-      <div>
-        <div class="gd-title">{{ group.name }}</div>
-        <div class="gd-subtitle">
-          {% if group.is_archived %}<i class="fas fa-archive me-1"></i>Archived &nbsp;·&nbsp; {% endif %}
-          Group details and enrolled students
-        </div>
-      </div>
-      <a href="{% url 'manage_group' %}" class="gd-back-btn">
-        <i class="fas fa-arrow-left"></i> All Groups
-      </a>
+<div class="admin-list-page">
+  <div class="ui-stats">
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Students" %}</div>
+      <span class="ui-stat-value">{{ enrollments|length }}{% if group.capacity %} <small class="ui-stat-note">/ {{ group.capacity }}</small>{% endif %}</span>
+      {% if total_inactive %}<span class="ui-stat-note">{% blocktranslate count n=total_inactive %}{{ n }} inactive{% plural %}{{ n }} inactive{% endblocktranslate %}</span>{% endif %}
     </div>
-
-    <!-- Teacher -->
-    <div class="gd-teacher-chip">
-      <div class="gd-teacher-av">
-        {% if group.teacher %}{{ group.teacher.admin.first_name|first|upper }}{{ group.teacher.admin.last_name|first|upper }}{% else %}?{% endif %}
-      </div>
-      <div>
-        <div class="gd-teacher-name">
-          {% if group.teacher %}{{ group.teacher.admin.get_full_name }}{% else %}No teacher assigned{% endif %}
-        </div>
-        <div class="gd-teacher-tag"><i class="fas fa-chalkboard-teacher me-1"></i>Assigned Teacher</div>
-      </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Course" %}</div>
+      <span class="ui-stat-value ui-stat-value--text">{{ group.course.name|default:"—" }}</span>
     </div>
-
-    <!-- Meta chips -->
-    <div class="gd-meta-row">
-      {% if group.course %}
-      <div class="gd-meta-item">
-        <i class="fas fa-graduation-cap"></i>
-        <div>
-          <div class="gd-meta-value">{{ group.course.name }}</div>
-          <div class="gd-meta-label">Program</div>
-        </div>
-      </div>
-      {% endif %}
-      {% if group.branch %}
-      <div class="gd-meta-item">
-        <i class="fas fa-map-marker-alt"></i>
-        <div>
-          <div class="gd-meta-value">{{ group.branch }}</div>
-          <div class="gd-meta-label">Branch</div>
-        </div>
-      </div>
-      {% endif %}
-      {% if group.schedule %}
-      <div class="gd-meta-item">
-        <i class="fas fa-clock"></i>
-        <div>
-          <div class="gd-meta-value">{{ group.schedule }}</div>
-          <div class="gd-meta-label">Schedule</div>
-        </div>
-      </div>
-      {% endif %}
-      {% if group.start_date %}
-      <div class="gd-meta-item">
-        <i class="fas fa-calendar-alt"></i>
-        <div>
-          <div class="gd-meta-value">{{ group.start_date|date:"M j, Y" }}</div>
-          <div class="gd-meta-label">Start Date</div>
-        </div>
-      </div>
-      {% endif %}
-      <div class="gd-meta-item">
-        <i class="fas fa-users"></i>
-        <div>
-          <div class="gd-meta-value">{{ enrollments|length }}{% if group.capacity %} / {{ group.capacity }}{% endif %}</div>
-          <div class="gd-meta-label">Enrolled{% if group.capacity %} / Capacity{% endif %}</div>
-        </div>
-      </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Branch" %}</div>
+      <span class="ui-stat-value ui-stat-value--text">{{ group.branch|default:"—" }}</span>
+    </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Start date" %}</div>
+      <span class="ui-stat-value ui-stat-value--text">{% if group.start_date %}{{ group.start_date|date:"d.m.Y" }}{% else %}—{% endif %}</span>
     </div>
   </div>
 
-  <!-- Enrolled students table -->
-  <div class="stu-card">
-    <div class="stu-card-header">
-      <div class="stu-card-title">
-        <i class="fas fa-users"></i>
-        Enrolled Students
-        <span style="font-size:12px; color:#64748B; font-weight:400;">{{ enrollments|length }} active</span>
-        {% if total_inactive %}<span style="font-size:12px; color:#94A3B8; font-weight:400;">&nbsp;({{ total_inactive }} inactive)</span>{% endif %}
-      </div>
-      <a href="{% url 'add_enrollment' %}?group={{ group.id }}" class="btn btn-primary btn-sm">
-        <i class="fas fa-user-plus me-1"></i> Enroll Student
-      </a>
-    </div>
-    <div style="overflow-x:auto;">
-      <table class="stu-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Student ID</th>
-            <th>Full Name</th>
-            <th>Course / Program</th>
-            <th>Level</th>
-            <th>Status</th>
-            <th>Phone</th>
-            <th>Enrolled On</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for e in enrollments %}
-          <tr>
-            <td style="color:#CBD5E1; width:36px;">{{ forloop.counter }}</td>
-            <td>
-              <span class="stu-id-badge">{{ e.student.admin.login_id|default:"—" }}</span>
-            </td>
-            <td>
-              <div class="stu-name">{{ e.student.admin.get_full_name|default:e.student.admin.username }}</div>
-              {% if e.student.admin.email %}<div class="stu-sub">{{ e.student.admin.email }}</div>{% endif %}
-            </td>
-            <td style="color:#475569;">{{ e.student.course.name|default:"—" }}</td>
-            <td>
-              {% if e.student.level %}
-                <span class="level-badge">Level {{ e.student.level }}</span>
-              {% else %}
-                <span style="color:#CBD5E1;">—</span>
-              {% endif %}
-            </td>
-            <td>
-              <span class="status-chip {{ e.student.status }}">
-                {% if e.student.status == 'active' %}<i class="fas fa-circle" style="font-size:6px;"></i>{% endif %}
-                {{ e.student.get_status_display }}
-              </span>
-            </td>
-            <td style="color:#64748B; font-size:12px;">{{ e.student.phone|default:"—" }}</td>
-            <td style="color:#94A3B8; font-size:12px;">{{ e.enrolled_on|date:"M j, Y" }}</td>
-          </tr>
-          {% empty %}
-          <tr class="empty-row">
-            <td colspan="8">
-              <i class="fas fa-user-slash" style="font-size:32px; opacity:.2; display:block; margin-bottom:10px;"></i>
-              No students enrolled in this group yet.
-              <br><a href="{% url 'add_enrollment' %}?group={{ group.id }}" style="margin-top:8px; display:inline-block;">Enroll a student</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <div class="ui-table-wrap" data-no-table-enhance>
+    <table class="ui-table">
+      <thead>
+        <tr>
+          <th>{% translate "Student" %}</th>
+          <th>{% translate "Login ID" %}</th>
+          <th>{% translate "Course" %}</th>
+          <th>{% translate "Level" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th>{% translate "Phone number" %}</th>
+          <th>{% translate "Enrolled on" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in enrollments %}
+        <tr>
+          <td>
+            <strong>{{ e.student.admin.get_full_name|default:e.student.admin.username }}</strong>
+            {% if e.student.admin.email %}<small class="admin-list-sub">{{ e.student.admin.email }}</small>{% endif %}
+          </td>
+          <td>{{ e.student.admin.login_id|default:"—" }}</td>
+          <td>{{ e.student.course.name|default:"—" }}</td>
+          <td>{% if e.student.level %}{{ e.student.get_level_display }}{% else %}—{% endif %}</td>
+          <td><span class="ui-badge {% if e.student.status == 'active' %}ui-badge--ok{% elif e.student.status == 'suspended' %}ui-badge--abs{% else %}ui-badge--muted{% endif %}">{{ e.student.get_status_display }}</span></td>
+          <td>{{ e.student.phone|default:"—" }}</td>
+          <td>{{ e.enrolled_on|date:"d.m.Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7">
+            <div class="ui-empty">
+              <p>{% translate "No students enrolled in this group yet." %}</p>
+              <a href="{% url 'add_enrollment' %}?group={{ group.id }}" class="ui-btn ui-btn--secondary ui-btn--sm">{% translate "Enroll student" %}</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
-
 </div>
 {% endblock %}

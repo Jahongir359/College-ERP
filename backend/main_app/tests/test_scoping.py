@@ -47,6 +47,8 @@ SCHOOL_MODULES = (
     "api/family.py",
     "api/parent_messages.py",
     "parents.py",
+    "parents_sms.py",
+    "api/password_reset_views.py",
     "school.py",
     "school_admin_views.py",
     "school_board_views.py",

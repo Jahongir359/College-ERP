@@ -1,39 +1,40 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
+{% load static i18n %}
 {% load uzs %}
-{% block title %}{{ page_title }} — Iceberg Study Center{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'admin_payments' %}">{% translate "Payments" %}</a></p>{% endblock page_eyebrow %}
 {% block page_title %}{{ page_title }}{% endblock page_title %}
-{% block breadcrumb %}<li class="breadcrumb-item"><a href="{% url 'admin_payments' %}">Payments</a></li><li class="breadcrumb-item active">Record</li>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ invoice.student }} · {{ invoice.period|date:"F Y" }}{% if invoice.group %} · {{ invoice.group.name }}{% endif %}</p>{% endblock page_subtitle %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'admin_payments' %}" class="ui-btn ui-btn--secondary">← {% translate "Back to payments" %}</a>
+</div>{% endblock page_actions %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
+{% endblock custom_css %}
 
 {% block content %}
-<div class="page-card" style="max-width:640px;">
-  <div class="page-card-header">
-    <i class="fas fa-cash-register"></i>
-    <div>
-      <div class="page-card-title">{{ page_title }}</div>
-      <div class="page-card-subtitle">{{ invoice.student }} · {{ invoice.period|date:"F Y" }}{% if invoice.group %} · {{ invoice.group.name }}{% endif %}</div>
+<div class="admin-form-page">
+  <div class="ui-stats">
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Invoice total" %}</div>
+      <span class="ui-stat-value ui-stat-value--text">{{ invoice.total_due|uzs }}</span>
+    </div>
+    <div class="ui-stat ui-stat--ok">
+      <div class="ui-stat-label">{% translate "Already paid" %}</div>
+      <span class="ui-stat-value ui-stat-value--text">{{ invoice.paid_amount|uzs }}</span>
+    </div>
+    <div class="ui-stat ui-stat--abs">
+      <div class="ui-stat-label">{% translate "Remaining balance" %}</div>
+      <span class="ui-stat-value ui-stat-value--text">{{ invoice.balance|uzs }}</span>
+    </div>
+    <div class="ui-stat">
+      <div class="ui-stat-label">{% translate "Due date" %}</div>
+      <span class="ui-stat-value ui-stat-value--text">{{ invoice.due_date|date:"d.m.Y" }}</span>
     </div>
   </div>
-
-  <div style="margin:0 22px 6px; padding:14px 16px; border:1px solid var(--ice-border,#E4E7EC); border-radius:14px; display:flex; flex-wrap:wrap; gap:14px 28px;">
-    <div>
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">Invoice total</div>
-      <div style="font-size:16px; font-weight:800;">{{ invoice.total_due|uzs }}</div>
-    </div>
-    <div>
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">Already paid</div>
-      <div style="font-size:16px; font-weight:800; color:#16A34A;">{{ invoice.paid_amount|uzs }}</div>
-    </div>
-    <div>
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">Remaining balance</div>
-      <div style="font-size:16px; font-weight:800; color:#DC2626;">{{ invoice.balance|uzs }}</div>
-    </div>
-    <div>
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ice-muted,#64748B);">Due date</div>
-      <div style="font-size:16px; font-weight:800;">{{ invoice.due_date }}</div>
-    </div>
+  <div class="page-card">
+    {% translate "Record payment" as button_text %}
+    {% include "main_app/form_template.html" with messages=messages form=form button_text=button_text %}
   </div>
-
-  {% include "main_app/form_template.html" with messages=messages form=form button_text="Record Payment" %}
 </div>
 {% endblock content %}

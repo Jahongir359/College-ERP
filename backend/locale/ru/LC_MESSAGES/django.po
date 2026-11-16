@@ -845,6 +845,92 @@ msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s, пришё
 msgid "%(name)s was marked late in class %(class)s on %(date)s."
 msgstr "%(name)s опоздал(а) в класс %(class)s %(date)s."
 
+# Parent login letters (PL.1)
+
+#, python-format
+msgid "Every parent in %(name)s has already signed in."
+msgstr "Все родители класса %(name)s уже входили в приложение."
+
+msgid "Letter language"
+msgstr "Язык письма"
+
+msgid "Print login letter"
+msgstr "Распечатать письмо со входом"
+
+msgid "Print a login letter? It gives this parent a new temporary password; the old one stops working."
+msgstr "Распечатать письмо со входом? Родитель получит новый временный пароль; старый перестанет работать."
+
+msgid "Login letters"
+msgstr "Письма со входом"
+
+msgid "Back"
+msgstr "Назад"
+
+msgid "Print"
+msgstr "Печать"
+
+msgid "Each letter has a new temporary password; the old ones no longer work. Print now: these passwords are not shown again."
+msgstr "В каждом письме новый временный пароль; старые больше не работают. Распечатайте сейчас: эти пароли больше не будут показаны."
+
+msgid "Your login to the Iceberg app"
+msgstr "Ваш вход в приложение Iceberg"
+
+#, python-format
+msgid "Dear %(name)s, in the app you can see your child's timetable, attendance, homework and payments, and write to the teachers."
+msgstr "Уважаемый(ая) %(name)s, в приложении вы увидите расписание, посещаемость, домашние задания и оплаты вашего ребёнка, а также сможете писать учителям."
+
+msgid "Your children at school"
+msgstr "Ваши дети в школе"
+
+msgid "Install the app."
+msgstr "Установите приложение."
+
+msgid "Scan the code with your phone's camera and open the link."
+msgstr "Наведите камеру телефона на код и откройте ссылку."
+
+msgid "Open the app and choose “Iceberg School”."
+msgstr "Откройте приложение и выберите «Iceberg School»."
+
+msgid "Sign in with:"
+msgstr "Войдите с этими данными:"
+
+msgid "Temporary password"
+msgstr "Временный пароль"
+
+msgid "Choose your own password."
+msgstr "Придумайте свой пароль."
+
+msgid "The app asks for it right after the first sign-in. Don't share it with anyone."
+msgstr "Приложение попросит его сразу после первого входа. Никому его не сообщайте."
+
+#, python-format
+msgid "No smartphone? You can also sign in from a browser: %(url)s"
+msgstr "Нет смартфона? Можно войти и через браузер: %(url)s"
+
+msgid "Lost this letter or forgot your password? Ask the school office for a new one."
+msgstr "Потеряли письмо или забыли пароль? Попросите новый в канцелярии школы."
+
+msgid "Print login letters"
+msgstr "Распечатать письма со входом"
+
+msgid "Print login letters for the parents who have not signed in yet? Each gets a new temporary password."
+msgstr "Распечатать письма для родителей, которые ещё не входили? Каждый получит новый временный пароль."
+
+#, python-format
+msgid "%(n)s login letter"
+msgid_plural "%(n)s login letters"
+msgstr[0] "%(n)s письмо"
+msgstr[1] "%(n)s письма"
+msgstr[2] "%(n)s писем"
+
+#, python-format
+msgid "%(n)s parent in %(name)s has not signed in yet."
+msgid_plural "%(n)s parents in %(name)s have not signed in yet."
+msgstr[0] "%(n)s родитель из %(name)s ещё не входил."
+msgstr[1] "%(n)s родителя из %(name)s ещё не входили."
+msgstr[2] "%(n)s родителей из %(name)s ещё не входили."
+
+
 # School register report (P3.7)
 msgid "Register report"
 msgstr "Отчёт о посещаемости"
@@ -2572,6 +2658,65 @@ msgstr "Группа «%(group)s» возвращена из архива."
 msgid "Central profile and settings hub for Iceberg"
 msgstr "Центр профиля и настроек Iceberg"
 
+# P3.9c admin home (mockup 16d)
+#, python-format
+msgid "Good morning, %(name)s"
+msgstr "Доброе утро, %(name)s"
+
+#, python-format
+msgid "Good afternoon, %(name)s"
+msgstr "Добрый день, %(name)s"
+
+#, python-format
+msgid "Good evening, %(name)s"
+msgstr "Добрый вечер, %(name)s"
+
+msgid "Paid this month"
+msgstr "Оплачено в этом месяце"
+
+#, python-format
+msgid "%(rate)s%% of this month's invoices"
+msgstr "%(rate)s%% от счетов этого месяца"
+
+msgid "Payments · 6 months"
+msgstr "Платежи · 6 месяцев"
+
+#, python-format
+msgid "%(count)s student has an overdue payment"
+msgid_plural "%(count)s students have overdue payments"
+msgstr[0] "У %(count)s ученика просрочена оплата"
+msgstr[1] "У %(count)s учеников просрочена оплата"
+msgstr[2] "У %(count)s учеников просрочена оплата"
+
+msgid "Send a reminder or open the list."
+msgstr "Отправьте напоминание или откройте список."
+
+msgid "No overdue payments."
+msgstr "Просроченных платежей нет."
+
+msgid "New leads"
+msgstr "Новые заявки"
+
+msgid "No new leads."
+msgstr "Новых заявок нет."
+
+# P3.9c students list (mockup 16c)
+#, python-format
+msgid "+%(count)s this month"
+msgstr "+%(count)s в этом месяце"
+
+msgid "In active groups"
+msgstr "В активных группах"
+
+msgid "With overdue payments"
+msgstr "С просрочкой оплаты"
+
+msgid "Present today"
+msgstr "Сегодня на занятиях"
+
+msgid "Without a group"
+msgstr "Без группы"
+
 #: main_app/school_forms.py
 msgid "Choose a pupil"
 msgstr "Выберите ученика"
@@ -2637,3 +2782,171 @@ msgid_plural "%(count)s enrollments have no monthly fee set (set a fee on the gr
 msgstr[0] "У %(count)s зачисления не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
 msgstr[1] "У %(count)s зачислений не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
 msgstr[2] "У %(count)s зачислений не указана ежемесячная плата (укажите плату у группы или её курса и создайте снова)."
+
+#: main_app/school_forms.py
+msgid "Choose a teacher"
+msgstr "Выберите учителя"
+
+#: main_app/school_forms.py
+msgid "Choose a course"
+msgstr "Выберите курс"
+
+#: main_app/school_forms.py
+msgid "Choose a subject"
+msgstr "Выберите предмет"
+
+# PL.2 parents' password reset by SMS, login SMS, reset log
+msgid "Office"
+msgstr "Школьный офис"
+
+msgid "Office (API)"
+msgstr "Школьный офис (API)"
+
+msgid "Login letter"
+msgstr "Письмо для входа"
+
+msgid "SMS code (the parent)"
+msgstr "SMS-код (сам родитель)"
+
+#, python-format
+msgid "Iceberg: your password reset code is %(code)s. It works for %(minutes)s minutes. Do not share it."
+msgstr "Iceberg: код для сброса пароля %(code)s. Действует %(minutes)s минут. Никому не сообщайте."
+
+#, python-format
+msgid "Iceberg School: your login ID is %(login)s. Get the app: %(url)s"
+msgstr "Iceberg School: ваш логин %(login)s. Скачайте приложение: %(url)s"
+
+msgid "Login ID and phone number are required."
+msgstr "Нужны логин и номер телефона."
+
+#, python-format
+msgid "If the login ID and phone number match, a code was sent by SMS. It works for %(minutes)s minutes."
+msgstr "Если логин и номер телефона совпадают, код отправлен по SMS. Он действует %(minutes)s минут."
+
+msgid "Login ID, code and new password are required."
+msgstr "Нужны логин, код и новый пароль."
+
+msgid "The code is wrong or no longer works. Ask for a new one."
+msgstr "Код неверный или больше не действует. Запросите новый."
+
+msgid "Password changed. Sign in with the new password."
+msgstr "Пароль изменён. Войдите с новым паролем."
+
+msgid "SMS with the login ID sent."
+msgstr "SMS с логином отправлено."
+
+msgid "The SMS was not sent. Check the phone number, or SMS is not set up on this site."
+msgstr "SMS не отправлено. Проверьте номер телефона, или SMS на этом сайте не настроены."
+
+msgid "Send this parent an SMS with their login ID and the link to the app? No password is sent."
+msgstr "Отправить этому родителю SMS с логином и ссылкой на приложение? Пароль не отправляется."
+
+msgid "Send login by SMS"
+msgstr "Отправить логин по SMS"
+
+msgid "Password resets"
+msgstr "Сбросы пароля"
+
+msgid "No password resets yet."
+msgstr "Пароль ещё не сбрасывали."
+
+# P3.9d group page, collections and payment forms
+msgid "All enrollments"
+msgstr "Все зачисления"
+
+msgid "Already paid"
+msgstr "Уже оплачено"
+
+msgid "Back to payments"
+msgstr "Назад к платежам"
+
+msgid "Bill a single student for something outside regular tuition: books, exam fees, a custom plan."
+msgstr "Выставьте одному ученику счёт сверх обычной оплаты: книги, экзаменационный сбор, особый план."
+
+msgid "Choose a group"
+msgstr "Выберите группу"
+
+msgid "Choose a student"
+msgstr "Выберите ученика"
+
+msgid "Collection rate"
+msgstr "Доля сбора"
+
+msgid "Create invoice"
+msgstr "Создать счёт"
+
+msgid "Creates one tuition invoice per active enrollment for the chosen month. Already-invoiced students are skipped, so it is safe to run again."
+msgstr "Создаёт один счёт за обучение на каждое активное зачисление за выбранный месяц. Ученики, у которых счёт уже есть, пропускаются, поэтому запускать повторно безопасно."
+
+msgid "Due date"
+msgstr "Срок оплаты"
+
+msgid "Enroll student"
+msgstr "Зачислить ученика"
+
+msgid "Enrolled on"
+msgstr "Дата зачисления"
+
+msgid "Enrollment status"
+msgstr "Статус зачисления"
+
+msgid "Expected"
+msgstr "Ожидается"
+
+msgid "Expected vs collected tuition across every branch."
+msgstr "Ожидаемая и собранная оплата по всем филиалам."
+
+msgid "Expected vs collected tuition across your groups."
+msgstr "Ожидаемая и собранная оплата по вашим группам."
+
+msgid "Generate invoices"
+msgstr "Создать счета"
+
+msgid "Invoice total"
+msgstr "Сумма счёта"
+
+msgid "Invoices"
+msgstr "Счета"
+
+msgid "Needs attention: overdue and partial payers"
+msgstr "Требуют внимания: просроченные и частичные оплаты"
+
+msgid "No invoices for this month yet."
+msgstr "За этот месяц счетов пока нет."
+
+msgid "No students enrolled in this group yet."
+msgstr "В эту группу пока никто не зачислен."
+
+msgid "No teacher assigned"
+msgstr "Учитель не назначен"
+
+msgid "Pick a group, then choose the student to place in it."
+msgstr "Выберите группу, затем ученика, которого нужно в неё зачислить."
+
+msgid "Rate"
+msgstr "Доля"
+
+msgid "Remaining balance"
+msgstr "Остаток"
+
+msgid "Start date"
+msgstr "Дата начала"
+
+#, python-format
+msgid "%(kind)s lagging the most: %(name)s"
+msgstr "Больше всего долгов — %(kind)s: %(name)s"
+
+#, python-format
+msgid "%(amount)s outstanding · %(rate)s%% collected"
+msgstr "%(amount)s долга · собрано %(rate)s%%"
+
+#, python-format
+msgid "Expected vs collected by %(kind)s"
+msgstr "Ожидается и собрано: %(kind)s"
+
+#, python-format
+msgid "%(n)s inactive"
+msgid_plural "%(n)s inactive"
+msgstr[0] "%(n)s неактивный"
+msgstr[1] "%(n)s неактивных"
+msgstr[2] "%(n)s неактивных"

@@ -92,10 +92,10 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
 | PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
-| P3 | Web screens for admins (D15: teachers use the app) | In progress — 7/8 (P3.9 claimed; P3.4, P3.5 dropped) |
+| P3 | Web screens for admins (D15: teachers use the app) | Done 2026-11-11 — 8/8 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 5/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
-| PL | Launch readiness: onboarding, support, training, consent | Open — 0/7 |
+| PL | Launch readiness: onboarding, support, training, consent | In progress — 1/7 |
 | P6 | Pilot and quality | Open — 1/6 |
 | P7 | Release to Google Play and the App Store | Open — 0/5 |
 | P8 | Online payments with Payme or Click (after the first release, D16) | Open — 0/3 |
@@ -861,7 +861,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       buttons, School wordmark), page header blocks `page_eyebrow`/`page_actions` in `base.html`
       (empty for every other page), `school_period` in `context_processors.school_nav` is lazy. The
       P3.1/P3.2 tables now stay visible and scroll sideways below 1025 px (`school-admin.css`).
-- [~] **P3.9** Admin web shell rebuilt to the mockups in both brands (D19; claimed 2026-11-01,
+- [x] **P3.9** Admin web shell rebuilt to the mockups in both brands (D19; claimed 2026-11-01,
       `feat/school-admin-shell`): one shell (white sidebar with the brand logo, short menu per brand, topbar
       with year · quarter or branch chip, bell and initials avatar holding language, theme and sign-out),
       School palette maroon/gold, Study Center palette navy/lime/ice (screens 16c, 16d), all through brand
@@ -869,6 +869,9 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       (16–19) and the main Study Center pages (dashboard, students, teachers, groups, payments) to the
       mockups; other pages inherit the shell. Also fixes the unreadable navy-sidebar text in the Study
       Center admin. Done when: side-by-side images per mockup (light, dark, 390 px), uz/ru/en, full suite.
+      — done 2026-11-11 (P3.9a PR #74, P3.9b PR #75, P3.9c PR #79); verified: full
+      suite 643 OK, `test_admin_center_pages`, side-by-side images `school-app-screens/p3.9a-*.png`,
+      `p3.9b-*.png`, `p3.9c-*.png`. Pages still on old colours are listed in the 2026-11-04 P3.9c log line.
       **Split (2026-11-01):** P3.9a shell (this branch: base template, sidebar, topbar, tokens, landing,
       page header, UI kit), P3.9b School pages 16–19 and the board (another session, branched off the
       shell), P3.9c Study Center pages (dashboard 16d, students 16c, teachers, groups, payments).
@@ -888,6 +891,10 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       - Badges: `ui-badge` + `ui-badge--ok` (keldi/toʻlangan), `--late` (kech/olinmagan), `--abs`
         (yoʻq/qarzdor), `--muted`, `--accent` (counts).
       - Others: `ui-avatar` (initials), `ui-empty` (empty state), `ui-split` (list + side panel).
+      - Forms (P3.9c, from P3.9b's `.school-field`/`.school-switch`): `ui-field` > `label` + input/select/
+        textarea (optional `ui-field-help`, `ui-field-error`); toggle `label.ui-switch` > checkbox.
+      - Tables that already have their own search: put `data-no-table-enhance` on the wrap, or
+        `iceberg-interactive.js` adds a second search bar and sort arrows.
       - Tokens for anything else: `--shell-bg`, `--shell-surface`, `--shell-border`, `--shell-text`,
         `--shell-muted`, `--shell-tint`, `--shell-title`, `--shell-eyebrow`, `--shell-link`,
         `--shell-ok/-late/-abs` (+ `-bg`), `--shell-radius`.
@@ -1002,10 +1009,38 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### PL — Launch readiness (non-code and support)
 
-- [ ] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
-      pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3.
-- [ ] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
-      with an audit log). Tests.
+- [x] **PL.1** Parent onboarding: login letter template (login ID, temporary password, QR to the store
+      pages) printable from the admin parents page; first login forces a password change. Needs: D14, P3.3. — done
+      2026-10-30, PR #58 (**merge after the app's choose-password screen in P4.3**); verified: full suite
+      563 OK (2026-10-31, after merging main with P2.8 and the QA fixes), `test_parent_onboarding`. Migration
+      `0051_customuser_must_change_password`. Notes: `CustomUser.must_change_password` is set whenever the
+      office sets a parent's password (`parents.create_parent`/`update_parent`: new parent, reset, letter)
+      and cleared by `me/change-password/`. The API returns it in the login response and `me/`;
+      `api/authentication.py` (the DRF default) answers 403 `{"detail": …, "code": "password_change_required"}` to everything except
+      login, `me/`, change-password, logout, fcm-token and app/version until it's changed (the web login sends
+      parents to `/app/`, which uses the API). Letters: "Print login letter" on the parent page, "Print
+      login letters" for a class (only parents who never signed in and still have an office-set
+      password: `school_parent_views._letter_due`, `last_login` empty and `must_change_password` true;
+      the app's login now records `last_login` via `update_last_login`), uz/ru/en, each with a new temporary
+      password and a QR (segno) to `APP_DOWNLOAD_URL` (blank: `/download/`). Demo parents aren't flagged.
+      The SMS with login ID and store link (D14) and SMS resets (D13) are PL.2.
+- [~] **PL.2** Password reset for parents per D13 (SMS provider integration, or an office reset flow
+      with an audit log). Tests. — **backend and web half done** 2026-11-11, branch
+      `feat/school-pl2-password-reset` (PR #80); verified: full suite 700 OK,
+      `test_parent_password_reset` (19). Notes: public `POST /api/v1/auth/password-reset/`
+      `{login_id, phone}` always answers the same 200 and, when both match one active parent, texts a
+      6-digit code (Eskiz, `payments._send_sms`; stored hashed, 10 minutes, 5 wrong tries, one a minute
+      and 5 a day per phone, 20 requests an hour per address); `POST …/password-reset/confirm/`
+      `{login_id, code, new_password}` sets the parent's own password (no forced change), signs out
+      their old sessions, and answers 400 `code: "invalid_code"` for every failure. Rules in
+      `parents_sms.py`. Every reset is written to `PasswordResetLog` (office, admin API, login letter,
+      SMS; who did it) and listed on the parent page (`branching.filter_password_resets_for_user`).
+      D14: "Send login by SMS" on the parent page texts the login ID and the app link, never a
+      password. Migration `0052_password_reset_log_sms_code` (new model `SmsResetCode`; the older
+      `PasswordResetCode` is the email flow of `password_recovery.py`). The letter and SMS buttons
+      moved from the page header into the parent card (the header was too crowded). **Still open:**
+      the app's "Forgot password?" screens (app work is paused); the owner's Eskiz account with the
+      message texts approved (`docs/DEPLOYMENT.md`), then one real SMS on staging.
 - [ ] **PL.3** One-page guides in uz/ru: for parents (install, log in, what each tab shows) and for
       teachers (register, timetable, messages). In `docs/guides/` and as printable PDFs.
 - [ ] **PL.4** Teacher training session held (owner); questions collected into the guides.
@@ -1088,6 +1123,40 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   mockups 04/05) instead of "Tez kunda"; plus parent read access to assignments/ (for P4.4 Home).
   Local screenshots need `SCHOOL_BRAND_ENABLED=True`, else demo parents get the Study Center brand.
   Next on this line: P4.5 timetable tab, then P4.8 (homework, payments, messages).
+
+- 2026-11-11 — PL.2 backend and web half (`feat/school-pl2-password-reset`, on top of #58): parents' SMS
+  code reset API, reset audit log on the parent page, "Send login by SMS". Migration 0052. Next on this
+  line: the app's "Forgot password?" screens against `auth/password-reset/` (+ `confirm/`); Eskiz
+  account and approved texts (owner). Proof `school-app-screens/pl.2-parent-page.png`.
+
+- 2026-11-11 — PL.1 (PR #58) brought up to main after P3.9b: the letter buttons and the class letters bar
+  now use the Admin UI kit (`ui-btn`, `ui-select`, `--shell-*` tokens); full suite 655 OK; proof
+  `school-app-screens/pl.1-login-letters.png`. P4.3 is merged, so #58 is free to merge.
+
+- 2026-10-31 — PL.1 done (PR #58): printed parent login letters and the first-login password change
+  (API flag + 403 gate with `code` in the body). Migration `0051_customuser_must_change_password`
+  (after P2.8's 0050). QA fixes: the app's login records `last_login`; class letters go only to
+  parents who never signed in **and** still have an office-set password; `api_login` allowed.
+
+- 2026-11-11 — P3.9 follow-up, part 1 (`feat/center-admin-pages-2`, on top of #79): the group page, collections,
+  generate invoices, one-off invoice, record payment and enroll student are on the Admin UI kit and in
+  uz/ru. The old form card (`.page-card`, `.pf-*`: every add/edit form in both brands) now takes shell
+  tokens in `admin-shell.css` section 7c, so its submit button is the kit's primary button. Collections
+  chart colours come from the tokens. Proof `school-app-screens/p3.9d-*.png`. Still on old colours or in
+  English: manage_vocabulary_days, story_form, manage_stories, admin_manage_seasons,
+  admin_leaderboard_settings (super admin only), manage_enrollment, the home's lower charts, phone card
+  chips (`admin-manage-mobile.css`), model field labels on forms (e.g. "Student" on the one-off invoice).
+
+- 2026-11-04 — P3.9c Study Center pages (`feat/center-admin-pages`): admin home to 16d (greeting, four
+  numbers with this month's paid total, 6-month payments bars, today's attendance, overdue alert, new
+  leads; `payments.dashboard_payment_summary`), students to 16c (numbers, payment badge per pupil from
+  `payments.student_payment_states`), teachers, groups and payments in the same kit style; phones keep
+  the card lists. Shell follow-ups from the #75 review: quarter chip follows the language, logo can't be
+  squeezed, `ui-field`/`ui-switch` in the kit, accent badge readable in dark. Proof:
+  `school-app-screens/p3.9c-*.png`. Still on old hard-coded colours (follow-up): group_detail,
+  collections, record_payment, generate_invoices, add_enrollment, manage_vocabulary_days, story_form,
+  manage_stories, admin_manage_seasons, admin_leaderboard_settings, the home's lower analytics charts
+  (JS colours) and the phone card chips on the list pages (`admin-manage-mobile.css`).
 
 - 2026-11-04 — Web audit M2 part 2 (branch i18n/admin-pages-2, Python only): Student and Invoice
   status labels and the "Level N" choices use gettext_lazy; the group form's Name label and the

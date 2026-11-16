@@ -1,63 +1,19 @@
 {% extends 'main_app/base.html' %}
-{% load static %}
-{% block title %}{{ page_title }} — Iceberg Study Center{% endblock %}
-{% block page_title %}{{ page_title }}{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">Enroll Student</li>{% endblock %}
+{% load static i18n %}
+{% block page_eyebrow %}<p class="page-eyebrow"><a href="{% url 'manage_group' %}">{% translate "Groups" %}</a></p>{% endblock page_eyebrow %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "Pick a group, then choose the student to place in it." %}</p>{% endblock page_subtitle %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'manage_enrollment' %}" class="ui-btn ui-btn--secondary">← {% translate "All enrollments" %}</a>
+</div>{% endblock page_actions %}
 
 {% block custom_css %}
-<style>
-.enroll-info {
-  display: none;
-  margin: -6px 0 20px;
-  padding: 12px 14px;
-  border: 1px solid rgba(56,189,248,.45);
-  border-radius: 14px;
-  background: rgba(0,207,232,.08);
-  color: var(--ice-navy-mid, #0B4F8A);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.6;
-}
-.enroll-info i { margin-right: 6px; color: var(--ice-cyan, #00CFE8); }
-.dark-mode .enroll-info {
-  border-color: rgba(103,232,249,.3);
-  background: rgba(103,232,249,.08);
-  color: #A5F3FC;
-}
-.enroll-secondary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  margin: 10px 22px 22px;
-  border: 1px solid var(--ice-border, #E4E7EC);
-  border-radius: 12px;
-  color: var(--ice-muted, #64748B);
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: none;
-  transition: color .15s, border-color .15s;
-}
-.enroll-secondary:hover {
-  color: var(--ice-navy, #071A52);
-  border-color: rgba(56,189,248,.6);
-  text-decoration: none;
-}
-.dark-mode .enroll-secondary { border-color: rgba(255,255,255,.12); color: #A8B7C8; }
-</style>
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
 {% endblock custom_css %}
 
 {% block content %}
-<div class="page-card" style="max-width:640px;">
-  <div class="page-card-header">
-    <i class="fas fa-id-card"></i>
-    <div>
-      <div class="page-card-title">{{ page_title }}</div>
-      <div class="page-card-subtitle">Pick a group, then choose the student to place in it</div>
-    </div>
-  </div>
-
+<div class="admin-form-page">
+<div class="page-card">
   <form method="POST" id="enroll_form">
     {% csrf_token %}
     <div class="pf-body">
@@ -71,9 +27,9 @@
 
       {# Step 1: Select Group #}
       <div class="pf-field">
-        <label class="pf-label" for="group_select">Group <span class="text-danger">*</span></label>
+        <label class="pf-label" for="group_select">{% translate "Group" %} <span class="text-danger">*</span></label>
         <select id="group_select" name="group" class="form-control" required>
-          <option value="">— Choose a group —</option>
+          <option value="">{% translate "Choose a group" %}</option>
           {% for g in groups %}
           <option value="{{ g.id }}" {% if posted.group == g.id|stringformat:"s" %}selected{% endif %}>
             {{ g.name }}{% if g.course %} · {{ g.course.name }}{% endif %}
@@ -84,18 +40,18 @@
       </div>
 
       {# Group info panel (shown after selection) #}
-      <div id="group_info" class="enroll-info" role="status">
+      <div id="group_info" class="admin-form-note" role="status">
         <i class="fas fa-info-circle" aria-hidden="true"></i>
         <span id="gi_teacher"></span> &nbsp;·&nbsp; <span id="gi_program"></span>
-        &nbsp;·&nbsp; <span id="gi_enrolled"></span>/<span id="gi_capacity"></span> enrolled
+        &nbsp;·&nbsp; {% translate "Students" %}: <span id="gi_enrolled"></span>/<span id="gi_capacity"></span>
         {% if gi_schedule %}&nbsp;·&nbsp; <span id="gi_schedule"></span>{% endif %}
       </div>
 
       {# Step 2: Select Student #}
       <div class="pf-field">
-        <label class="pf-label" for="student_select">Student <span class="text-danger">*</span></label>
+        <label class="pf-label" for="student_select">{% translate "Student" %} <span class="text-danger">*</span></label>
         <select id="student_select" name="student" class="form-control" required>
-          <option value="">— Select a student —</option>
+          <option value="">{% translate "Choose a student" %}</option>
           {% for s in students %}
           <option value="{{ s.id }}" {% if posted.student == s.id|stringformat:"s" %}selected{% endif %}>
             {{ s }} {% if s.course %}· {{ s.course.name }}{% endif %}
@@ -107,10 +63,10 @@
 
       {# Step 3: Enrollment Status #}
       <div class="pf-field">
-        <label class="pf-label" for="enroll_status">Enrollment Status</label>
+        <label class="pf-label" for="enroll_status">{% translate "Enrollment status" %}</label>
         <select id="enroll_status" name="is_active" class="form-control">
-          <option value="True" {% if not posted or posted.is_active == 'True' %}selected{% endif %}>Active</option>
-          <option value="False" {% if posted.is_active == 'False' %}selected{% endif %}>Inactive</option>
+          <option value="True" {% if not posted or posted.is_active == 'True' %}selected{% endif %}>{% translate "Active" %}</option>
+          <option value="False" {% if posted.is_active == 'False' %}selected{% endif %}>{% translate "Inactive" %}</option>
         </select>
       </div>
 
@@ -118,14 +74,12 @@
 
     <div class="pf-footer">
       <button type="submit" class="pf-submit">
-        <i class="fas fa-user-check me-1"></i> Enroll Student
+        <i class="fas fa-user-check me-1"></i> {% translate "Enroll student" %}
       </button>
     </div>
   </form>
 
-  <a href="{% url 'manage_enrollment' %}" class="enroll-secondary">
-    <i class="fas fa-list" aria-hidden="true"></i> View All Enrollments
-  </a>
+</div>
 </div>
 {% endblock %}
 
@@ -145,8 +99,8 @@ function loadGroupInfo(groupId) {
   })
   .then(r => r.json())
   .then(d => {
-    document.getElementById('gi_teacher').textContent = 'Teacher: ' + d.teacher;
-    document.getElementById('gi_program').textContent = 'Program: ' + d.program;
+    document.getElementById('gi_teacher').textContent = '{% filter escapejs %}{% translate "Teacher" %}{% endfilter %}: ' + d.teacher;
+    document.getElementById('gi_program').textContent = '{% filter escapejs %}{% translate "Course" %}{% endfilter %}: ' + d.program;
     document.getElementById('gi_enrolled').textContent = d.enrolled_count;
     document.getElementById('gi_capacity').textContent = d.capacity;
     document.getElementById('group_info').style.display = 'block';

@@ -84,7 +84,8 @@ class MonthNameTests(TestCase):
                 html = self.client.get(
                     reverse("admin_payments") + "?month=2026-10"
                 ).content.decode()
-                self.assertIn(f"· {LONG[lang]}</h2>", html)
+                # The page eyebrow names the month (P3.9c header).
+                self.assertIn(f'class="page-eyebrow">{LONG[lang]}</p>', html)
                 # The invoice's mobile card shows the month in the same language.
                 self.assertIn(f"· {LONG[lang]}</div>", html)
                 others = [v for k, v in LONG.items() if k != lang]

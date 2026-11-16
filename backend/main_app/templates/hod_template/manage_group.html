@@ -1,107 +1,127 @@
 {% extends 'main_app/base.html' %}
 {% load i18n %}
 {% load static %}
-{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "Teaching" %}</p>{% endblock page_eyebrow %}
+{% block page_title %}{% translate "Groups" %}{% endblock %}
+{% block page_actions %}<div class="page-actions">
+  <a href="{% url 'add_group' %}" class="ui-btn ui-btn--primary"><i class="fas fa-plus" aria-hidden="true"></i>{% translate "Add Group" %}</a>
+</div>{% endblock page_actions %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/admin-pages.css' %}">
 {% endblock custom_css %}
 
 {% block content %}
-<div class="ice-manage-page" data-manage-search-scope>
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-layer-group"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">{% translate "Manage Groups" %}</h2>
-        <p class="ice-manage-hero__subtitle">{% translate "Manage class groups, teachers, branches, and enrollments." %}</p>
-      </div>
+{# P3.9c, in the style of mockup 16c. Search, count and empty state keep the admin-manage-mobile.js hooks. #}
+<div class="ice-manage-page admin-list-page" data-manage-search-scope>
+  <section class="ui-stats" aria-label="{% translate 'Groups' %}">
+    <div class="ui-stat" data-stat="active">
+      <div class="ui-stat-label">{% translate "Active Groups" %}</div>
+      <span class="ui-stat-value">{{ group_stats.active }}</span>
+      <span class="ui-stat-note"><span data-manage-visible-count>{{ groups|length }}</span> {% translate "total" %}</span>
     </div>
-    <div class="ice-manage-hero__actions">
-      <span class="ice-manage-count"><span data-manage-visible-count>{{ groups|length }}</span>&nbsp;{% translate "total" %}</span>
-      <a href="{% url 'add_group' %}" class="ice-manage-add-btn">
-        <i class="fas fa-plus" aria-hidden="true"></i> {% translate "Add Group" %}
-      </a>
+    <a class="ui-stat" href="{% url 'manage_student' %}" data-stat="students">
+      <div class="ui-stat-label">{% translate "In active groups" %}</div>
+      <span class="ui-stat-value">{{ group_stats.students }}</span>
+    </a>
+    <div class="ui-stat" data-stat="no-teacher">
+      <div class="ui-stat-label">{% translate "No teacher" %}</div>
+      <span class="ui-stat-value">{{ group_stats.no_teacher }}</span>
+    </div>
+    <div class="ui-stat" data-stat="archived">
+      <div class="ui-stat-label">{% translate "Archived" %}</div>
+      <span class="ui-stat-value">{{ group_stats.archived }}</span>
     </div>
   </section>
 
-  <label class="ice-manage-search" aria-label="{% translate 'Search groups' %}">
-    <i class="fas fa-search" aria-hidden="true"></i>
-    <input type="search" class="ice-manage-search__input" data-manage-search placeholder="{% translate 'Search groups, teachers, branches...' %}" autocomplete="off">
-  </label>
-
-  <div class="ice-manage-empty" data-manage-empty-state hidden>
-    <i class="fas fa-search" aria-hidden="true"></i>
-    <strong>{% translate "No groups found" %}</strong>
-    <span>{% translate "Try another group, teacher, course, branch, or status." %}</span>
+  <div class="ui-filters">
+    <label class="ui-search" aria-label="{% translate 'Search groups' %}">
+      <i class="fas fa-search" aria-hidden="true"></i>
+      <input type="search" data-manage-search placeholder="{% translate 'Search groups, teachers, branches...' %}" autocomplete="off">
+    </label>
+    {% if is_super_admin %}
+    <form method="get" class="admin-list-filter">
+      <label for="branch-filter" class="visually-hidden">{% translate "Branch" %}</label>
+      <select id="branch-filter" name="branch" class="ui-select" onchange="this.form.submit()">
+        <option value="">{% translate "All branches" %}</option>
+        {% for b in branches %}
+        <option value="{{ b.id }}" {% if selected_branch == b.id|stringformat:'s' %}selected{% endif %}>{{ b.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    {% elif branches %}
+    <span class="ui-badge ui-badge--muted admin-list-branch"><i class="fas fa-code-branch" aria-hidden="true"></i>{% for b in branches %}{{ b.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+    {% endif %}
   </div>
 
-  <div class="ice-manage-table-wrap">
-    <table class="ice-manage-table">
+  <div class="ui-empty ui-card" data-manage-empty-state hidden>
+    <strong>{% translate "No groups found" %}</strong><br>
+    {% translate "Try another group, teacher, course, branch, or status." %}
+  </div>
+
+  <div class="ui-table-wrap ice-manage-table-wrap" data-no-table-enhance>
+    <table class="ui-table">
       <thead>
         <tr>
-          <th>#</th>
           <th>{% translate "Group" %}</th>
-          <th>{% translate "Course" %}</th>
-          <th>{% translate "Branch" %}</th>
           <th>{% translate "Teacher" %}</th>
           <th>{% translate "Students" %}</th>
           <th>{% translate "Start Date" %}</th>
           <th>{% translate "Status" %}</th>
-          <th>{% translate "Actions" %}</th>
+          <th class="ui-end"><span class="visually-hidden">{% translate "Actions" %}</span></th>
         </tr>
       </thead>
       <tbody>
         {% for group in groups %}
         <tr data-manage-search-item
             data-manage-search-text="{{ group.name }} {{ group.course.name }} {{ group.branch.name }} {% if group.teacher %}{{ group.teacher.admin.get_full_name }} {{ group.teacher.admin.email }}{% endif %} {{ group.schedule }} {{ group.room }} {% if group.is_archived %}archived{% else %}active{% endif %}">
-          <td>{{ forloop.counter }}</td>
-          <td><strong>{{ group.name }}</strong></td>
-          <td>{{ group.course.name|default:_("No course") }}</td>
-          <td>{{ group.branch.name|default:_("No branch") }}</td>
           <td>
-            {% if group.teacher %}
-              {{ group.teacher.admin.get_full_name|default:group.teacher.admin.email }}
-            {% else %}
-              {% translate "No teacher" %}
-            {% endif %}
+            <div class="admin-list-person">
+              <span class="ui-avatar" aria-hidden="true">{{ group.name|first|upper }}</span>
+              <span class="admin-list-person__copy">
+                <b>{{ group.name }}</b>
+                <small>{{ group.course.name|default:_("No course") }}{% if group.schedule %} · {{ group.schedule }}{% endif %}{% if group.room %} · {{ group.room }}{% endif %}{% if is_super_admin and group.branch %} · {{ group.branch.name }}{% endif %}</small>
+              </span>
+            </div>
           </td>
-          <td><span class="ice-manage-chip"><i class="fas fa-users" aria-hidden="true"></i> {% blocktranslate trimmed count n=group.enrolled_count %}{{ n }} student{% plural %}{{ n }} students{% endblocktranslate %}</span></td>
-          <td>{{ group.start_date|date:"M j, Y"|default:_("Not set") }}</td>
+          <td>{% if group.teacher %}{{ group.teacher.admin.get_full_name|default:group.teacher.admin.email }}{% else %}<span class="ui-badge ui-badge--late">{% translate "No teacher" %}</span>{% endif %}</td>
+          <td class="admin-list-nowrap"><b>{{ group.enrolled_count }}</b><span class="admin-list-muted"> / {{ group.capacity }}</span></td>
+          <td class="admin-list-muted admin-list-nowrap">{{ group.start_date|date:"j E Y"|default:_("Not set") }}</td>
           <td>
             {% if group.is_archived %}
-            <span class="ice-manage-chip ice-manage-chip--muted"><i class="fas fa-archive" aria-hidden="true"></i> {% translate "Archived" %}</span>
+            <span class="ui-badge ui-badge--muted">{% translate "Archived" %}</span>
             {% else %}
-            <span class="ice-manage-chip ice-manage-chip--success"><i class="fas fa-check-circle" aria-hidden="true"></i> {% translate "Active" context "group status" %}</span>
+            <span class="ui-badge ui-badge--ok">{% translate "Active" context "group status" %}</span>
             {% endif %}
           </td>
-          <td>
-            <div class="ice-manage-actions">
-              <a href="{% url 'admin_group_detail' group.id %}" class="ice-manage-action ice-manage-action--primary">
-                <i class="fas fa-users" aria-hidden="true"></i> {% translate "Students" %}
+          <td class="ui-end">
+            <div class="admin-list-actions">
+              <a href="{% url 'admin_group_detail' group.id %}" class="ui-open">{% translate "Students" %} →</a>
+              <a href="{% url 'edit_group' group.id %}" class="admin-list-delete admin-list-icon"
+                 title="{% translate 'Edit' %}" aria-label="{% translate 'Edit' %}">
+                <i class="fas fa-pen" aria-hidden="true"></i>
               </a>
-              <a href="{% url 'edit_group' group.id %}" class="ice-manage-action">
-                <i class="fas fa-edit" aria-hidden="true"></i> {% translate "Edit" %}
-              </a>
-              <a href="{% url 'archive_group' group.id %}" class="ice-manage-action ice-manage-action--warning"
+              <a href="{% url 'archive_group' group.id %}" class="admin-list-delete admin-list-icon"
+                 title="{% if group.is_archived %}{% translate 'Restore' %}{% else %}{% translate 'Archive' %}{% endif %}"
+                 aria-label="{% if group.is_archived %}{% translate 'Restore' %}{% else %}{% translate 'Archive' %}{% endif %}"
                  data-confirm-post="{% if group.is_archived %}{% translate "Restore this group?" %}{% else %}{% translate "Archive this group?" %}{% endif %}">
                 <i class="fas fa-{% if group.is_archived %}undo{% else %}archive{% endif %}" aria-hidden="true"></i>
-                {% if group.is_archived %}{% translate "Restore" %}{% else %}{% translate "Archive" %}{% endif %}
               </a>
-              <a href="{% url 'delete_group' group.id %}" class="ice-manage-action ice-manage-action--danger"
+              <a href="{% url 'delete_group' group.id %}" class="admin-list-delete"
+                 title="{% translate 'Delete' %}" aria-label="{% translate 'Delete' %}"
                  data-confirm-post="{% translate "Delete this group? This is only allowed when no records are linked." %}">
-                <i class="fas fa-trash" aria-hidden="true"></i> {% translate "Delete" %}
+                <i class="fas fa-trash" aria-hidden="true"></i>
               </a>
             </div>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="9">
-            <div class="ice-manage-empty">
-              <i class="fas fa-layer-group" aria-hidden="true"></i>
-              <strong>{% translate "No groups found" %}</strong>
-              <span>{% translate "Create a group and assign a course, teacher, and branch." %}</span>
+          <td colspan="6">
+            <div class="ui-empty">
+              <strong>{% translate "No groups found" %}</strong><br>
+              {% translate "Create a group and assign a course, teacher, and branch." %}
             </div>
           </td>
         </tr>

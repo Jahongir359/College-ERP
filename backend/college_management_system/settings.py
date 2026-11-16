@@ -413,6 +413,9 @@ MIN_APP_VERSION_IOS = os.environ.get("MIN_APP_VERSION_IOS", "").strip()
 # Store pages the app's "update" screen opens; blank until the listings exist (P5).
 APP_STORE_URL_ANDROID = os.environ.get("APP_STORE_URL_ANDROID", "").strip()
 APP_STORE_URL_IOS = os.environ.get("APP_STORE_URL_IOS", "").strip()
+# Page the QR code on printed parent login letters opens (PL.1); one link for both
+# phones, e.g. a page with both store buttons. Blank: this site's /download/ page.
+APP_DOWNLOAD_URL = os.environ.get("APP_DOWNLOAD_URL", "").strip()
 
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     # Full SMTP — used in production when credentials are configured.
@@ -502,7 +505,8 @@ if not DEBUG:
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # JWT, plus the first-login password change (PL.1).
+        "main_app.api.authentication.PasswordChangeJWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
