@@ -456,6 +456,29 @@ class S {
     'Could not save. Check your internet and try again.': 'Saqlab boʻlmadi. Internetni tekshirib, qayta urinib koʻring.',
     'Save and continue': 'Saqlash va davom etish',
     'Your account is in {brand}, so the app has switched to it.': 'Akkauntingiz {brand}ga tegishli, shuning uchun ilova unga oʻtdi.',
+
+    // ── Forgot password (PL.2) ────────────────────────────────────────────
+    'Forgot password?': 'Parolni unutdingizmi?',
+    'Forgot your password?': 'Parolni unutdingizmi?',
+    'Parents: enter your login ID and the phone number the school has for you. We will send a code by SMS.': 'Ota-onalar: login ID va maktabga bergan telefon raqamingizni kiriting. SMS orqali kod yuboramiz.',
+    'Login ID': 'Login ID',
+    'Phone number': 'Telefon raqami',
+    'Enter the full phone number.': 'Telefon raqamini toʻliq kiriting.',
+    'Send code': 'Kod yuborish',
+    'Teachers and students: ask the school office for a new password.': 'Oʻqituvchilar va oʻquvchilar: yangi parolni maktab maʼmuriyatidan soʻrang.',
+    'Enter the code': 'Kodni kiriting',
+    'If the login ID and phone number match, a 6-digit code was sent by SMS. It works for 10 minutes.': 'Login ID va telefon raqami mos kelsa, SMS orqali 6 xonali kod yuborildi. Kod 10 daqiqa amal qiladi.',
+    'Code from the SMS': 'SMS dagi kod',
+    'Enter the 6 digits.': '6 ta raqamni kiriting.',
+    'Save new password': 'Yangi parolni saqlash',
+    'Send the code again': 'Kodni qayta yuborish',
+    'No SMS after a few minutes? Ask the school office.': 'Bir necha daqiqada SMS kelmadimi? Maktab maʼmuriyatiga murojaat qiling.',
+    'Back to sign in': 'Kirish sahifasiga qaytish',
+    'Password changed. Sign in with the new password.': 'Parol oʻzgartirildi. Yangi parol bilan kiring.',
+    'Too many tries. Please try again later.': 'Urinishlar juda koʻp. Keyinroq qayta urinib koʻring.',
+    'The code is wrong or no longer works. Ask for a new one.': 'Kod notoʻgʻri yoki eskirgan. Yangi kod soʻrang.',
+    'Choose a stronger password.': 'Kuchliroq parol tanlang.',
+    'Something went wrong. Check your internet and try again.': 'Xatolik yuz berdi. Internetni tekshirib, qayta urinib koʻring.',
   };
 
   static const _ru = <String, String>{
@@ -910,6 +933,29 @@ class S {
     'Could not save. Check your internet and try again.': 'Не удалось сохранить. Проверьте интернет и попробуйте ещё раз.',
     'Save and continue': 'Сохранить и продолжить',
     'Your account is in {brand}, so the app has switched to it.': 'Ваш аккаунт относится к {brand}, поэтому приложение переключилось.',
+
+    // ── Forgot password (PL.2) ────────────────────────────────────────────
+    'Forgot password?': 'Забыли пароль?',
+    'Forgot your password?': 'Забыли пароль?',
+    'Parents: enter your login ID and the phone number the school has for you. We will send a code by SMS.': 'Родители: введите логин и номер телефона, который вы оставили школе. Мы отправим код по SMS.',
+    'Login ID': 'Логин (ID)',
+    'Phone number': 'Номер телефона',
+    'Enter the full phone number.': 'Введите номер телефона полностью.',
+    'Send code': 'Отправить код',
+    'Teachers and students: ask the school office for a new password.': 'Учителя и ученики: попросите новый пароль в администрации школы.',
+    'Enter the code': 'Введите код',
+    'If the login ID and phone number match, a 6-digit code was sent by SMS. It works for 10 minutes.': 'Если логин и номер телефона совпадают, по SMS отправлен код из 6 цифр. Он действует 10 минут.',
+    'Code from the SMS': 'Код из SMS',
+    'Enter the 6 digits.': 'Введите 6 цифр.',
+    'Save new password': 'Сохранить новый пароль',
+    'Send the code again': 'Отправить код ещё раз',
+    'No SMS after a few minutes? Ask the school office.': 'SMS не пришло за несколько минут? Обратитесь в администрацию школы.',
+    'Back to sign in': 'Назад ко входу',
+    'Password changed. Sign in with the new password.': 'Пароль изменён. Войдите с новым паролем.',
+    'Too many tries. Please try again later.': 'Слишком много попыток. Попробуйте позже.',
+    'The code is wrong or no longer works. Ask for a new one.': 'Код неверный или больше не действует. Запросите новый.',
+    'Choose a stronger password.': 'Придумайте более надёжный пароль.',
+    'Something went wrong. Check your internet and try again.': 'Что-то пошло не так. Проверьте интернет и попробуйте ещё раз.',
   };
 
   static const _ko = <String, String>{
@@ -1361,6 +1407,29 @@ class S {
     'Could not save. Check your internet and try again.': '저장하지 못했습니다. 인터넷을 확인하고 다시 시도하세요.',
     'Save and continue': '저장하고 계속',
     'Your account is in {brand}, so the app has switched to it.': '계정이 {brand}에 속해 있어 앱이 전환되었습니다.',
+
+    // ── Forgot password (PL.2) ────────────────────────────────────────────
+    'Forgot password?': '비밀번호를 잊으셨나요?',
+    'Forgot your password?': '비밀번호를 잊으셨나요?',
+    'Parents: enter your login ID and the phone number the school has for you. We will send a code by SMS.': '학부모: 로그인 ID와 학교에 등록된 전화번호를 입력하세요. SMS로 코드를 보내드립니다.',
+    'Login ID': '로그인 ID',
+    'Phone number': '전화번호',
+    'Enter the full phone number.': '전화번호를 모두 입력하세요.',
+    'Send code': '코드 보내기',
+    'Teachers and students: ask the school office for a new password.': '교사와 학생: 학교 사무실에 새 비밀번호를 요청하세요.',
+    'Enter the code': '코드를 입력하세요',
+    'If the login ID and phone number match, a 6-digit code was sent by SMS. It works for 10 minutes.': '로그인 ID와 전화번호가 일치하면 SMS로 6자리 코드가 전송되었습니다. 10분 동안 유효합니다.',
+    'Code from the SMS': 'SMS 코드',
+    'Enter the 6 digits.': '6자리 숫자를 입력하세요.',
+    'Save new password': '새 비밀번호 저장',
+    'Send the code again': '코드 다시 보내기',
+    'No SMS after a few minutes? Ask the school office.': '몇 분이 지나도 SMS가 오지 않나요? 학교 사무실에 문의하세요.',
+    'Back to sign in': '로그인으로 돌아가기',
+    'Password changed. Sign in with the new password.': '비밀번호가 변경되었습니다. 새 비밀번호로 로그인하세요.',
+    'Too many tries. Please try again later.': '시도 횟수가 너무 많습니다. 나중에 다시 시도하세요.',
+    'The code is wrong or no longer works. Ask for a new one.': '코드가 틀렸거나 더 이상 유효하지 않습니다. 새 코드를 요청하세요.',
+    'Choose a stronger password.': '더 강력한 비밀번호를 선택하세요.',
+    'Something went wrong. Check your internet and try again.': '문제가 발생했습니다. 인터넷을 확인하고 다시 시도하세요.',
   };
 
   /// Translate [key] (the English string doubles as the key).

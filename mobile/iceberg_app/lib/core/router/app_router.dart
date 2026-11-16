@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../auth/auth_state.dart';
 import '../../features/auth/screens/change_password_screen.dart';
 import '../../features/auth/screens/choose_screen.dart';
+import '../../features/auth/screens/forgot_password_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/coming_soon_screen.dart';
 
@@ -56,8 +57,11 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
     if (brandChosen == null) return '/splash';
     // First launch: pick School or Study Center, then sign in.
     if (!brandChosen) return path == '/choose' ? null : '/choose';
-    // The login screen links back to /choose to change the pick.
-    return path == '/login' || path == '/choose' ? null : '/login';
+    // The login screen links back to /choose to change the pick, and to
+    // /forgot-password (PL.2).
+    return path == '/login' || path == '/choose' || path == '/forgot-password'
+        ? null
+        : '/login';
   }
 
   final user = auth.user!;
@@ -83,6 +87,7 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
   if (path == '/login' ||
       path == '/choose' ||
       path == '/change-password' ||
+      path == '/forgot-password' ||
       path == '/splash' ||
       path == '/coming-soon' ||
       path.startsWith('/staff')) {
@@ -123,6 +128,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const ChangePasswordScreen(),
       ),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (_, __) => const ForgotPasswordScreen(),
+      ),
       GoRoute(path: '/coming-soon', builder: (_, __) => const ComingSoonScreen()),
 
       // ── Staff shell (5 bottom-nav branches) ──────────────────────────────

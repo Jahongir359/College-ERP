@@ -1025,9 +1025,16 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
       D14: "Send login by SMS" on the parent page texts the login ID and the app link, never a
       password. Migration `0052_password_reset_log_sms_code` (new model `SmsResetCode`; the older
       `PasswordResetCode` is the email flow of `password_recovery.py`). The letter and SMS buttons
-      moved from the page header into the parent card (the header was too crowded). **Still open:**
-      the app's "Forgot password?" screens (app work is paused); the owner's Eskiz account with the
-      message texts approved (`docs/DEPLOYMENT.md`), then one real SMS on staging.
+      moved from the page header into the parent card (the header was too crowded). **App half done**
+      2026-11-16, branch `feat/school-pl2-forgot-password`; verified: flutter analyze 0 warnings,
+      flutter test 62 OK (`test/forgot_password_test.dart`, 12). The login has "Parolni
+      unutdingizmi?" where mockup 02 puts it (both brands; the Study Center keeps its line below);
+      `/forgot-password` (`ForgotPasswordScreen`, `PasswordResetApi`) asks for login ID + phone, always
+      moves on to the code step, then code + new password, and returns to the login with a message.
+      The two reset screens have no mockup: built like the "choose your password" screen, proof
+      `school-app-screens/pl.2-forgot-password.png` (uz/ru, light/dark) **waiting for owner
+      approval**. **Still open:** the owner's Eskiz account with the message texts approved
+      (`docs/DEPLOYMENT.md`), then one real SMS on staging.
 - [ ] **PL.3** One-page guides in uz/ru: for parents (install, log in, what each tab shows) and for
       teachers (register, timetable, messages). In `docs/guides/` and as printable PDFs.
 - [ ] **PL.4** Teacher training session held (owner); questions collected into the guides.
@@ -1105,6 +1112,13 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-11-16 — PL.2 app half (`feat/school-pl2-forgot-password`): "Forgot password?" on the login and
+  the two reset screens against `auth/password-reset/` (+ `confirm/`); 21 strings in uz/ru/ko. No
+  mockup existed for the reset screens, so the owner approves them from
+  `school-app-screens/pl.2-forgot-password.png`. Touches `app_router.dart` (`roleRedirect` lets signed-out
+  users open `/forgot-password`) and `strings.dart` (one block at the end of each map), so expect small
+  conflicts with #65, #77, #66, #67. PL.2 stays `[~]` until a real SMS arrives on staging (Eskiz, owner).
 
 - 2026-11-11 — PL.2 backend and web half (`feat/school-pl2-password-reset`, on top of #58): parents' SMS
   code reset API, reset audit log on the parent page, "Send login by SMS". Migration 0052. Next on this
