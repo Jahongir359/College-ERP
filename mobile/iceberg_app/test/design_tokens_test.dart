@@ -265,15 +265,22 @@ void main() {
 
     test('every other path behaves exactly like roleRedirect', () {
       for (final debug in [true, false]) {
-        auths.forEach((name, auth) {
-          for (final path in ['/login', '/student/home', '/staff/home']) {
-            expect(
-              appRedirect(auth, path, debug: debug),
-              roleRedirect(auth, path),
-              reason: '$name $path',
-            );
-          }
-        });
+        for (final chosen in [true, false, null]) {
+          auths.forEach((name, auth) {
+            for (final path in [
+              '/login',
+              '/choose',
+              '/student/home',
+              '/staff/home',
+            ]) {
+              expect(
+                appRedirect(auth, path, brandChosen: chosen, debug: debug),
+                roleRedirect(auth, path, brandChosen: chosen),
+                reason: '$name $path chosen: $chosen',
+              );
+            }
+          });
+        }
       }
     });
   });
