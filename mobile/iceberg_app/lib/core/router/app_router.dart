@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../auth/auth_state.dart';
 import '../../features/auth/screens/change_password_screen.dart';
+import '../../features/parent/parent_home_screen.dart';
+import '../../features/parent/parent_shell.dart';
 import '../../features/auth/screens/choose_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/coming_soon_screen.dart';
@@ -68,9 +70,13 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
   }
 
   // Admin → coming-soon wall (admin dashboard ships on the web portal).
-  // Parents too, until the parent screens are built (plan phase P5).
-  if (user.isAdmin || user.isParent) {
+  if (user.isAdmin) {
     return path == '/coming-soon' ? null : '/coming-soon';
+  }
+
+  // Parents → parent app (P4.4).
+  if (user.isParent) {
+    return path.startsWith('/parent/') ? null : '/parent/home';
   }
 
   // Staff (teachers) → teacher portal.
@@ -85,6 +91,7 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
       path == '/change-password' ||
       path == '/splash' ||
       path == '/coming-soon' ||
+      path.startsWith('/parent') ||
       path.startsWith('/staff')) {
     return '/student/home';
   }
@@ -96,7 +103,7 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
 ///   - Student (user_type 3) → full /student/* experience
 ///   - Staff   (user_type 2) → teacher portal /staff/*
 ///   - Admin   (user_type 1) → /coming-soon (admin web portal handles them)
-///   - Parent  (user_type 4) → /coming-soon until the parent screens ship
+///   - Parent  (user_type 4) → parent app /parent/* (Home, P4.4)
 ///   - Signed out → /choose on first launch, then /login
 ///   - Temporary password (any role) → /change-password until it is changed
 ///
@@ -124,6 +131,53 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/coming-soon', builder: (_, __) => const ComingSoonScreen()),
+
+      // ── Parent shell (5 bottom-nav branches, P4.4) ───────────────────────
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            ParentShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/parent/home',
+              builder: (_, __) => const ParentHomeScreen(),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/parent/timetable',
+              builder: (_, __) => const ParentSoonTab(
+                title: 'Timetable',
+                icon: Icons.calendar_today_rounded,
+              ),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/parent/homework',
+              builder: (_, __) => const ParentSoonTab(
+                title: 'Homework',
+                icon: Icons.import_contacts_outlined,
+              ),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/parent/messages',
+              builder: (_, __) => const ParentSoonTab(
+                title: 'Messages',
+                icon: Icons.chat_bubble_rounded,
+              ),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/parent/profile',
+              builder: (_, __) => const ParentProfileTab(),
+            ),
+          ]),
+        ],
+      ),
 
       // ── Staff shell (5 bottom-nav branches) ──────────────────────────────
       StatefulShellRoute.indexedStack(

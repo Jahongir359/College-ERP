@@ -60,7 +60,7 @@ void main() {
       );
       expect(
         roleRedirect(AuthState.auth(_user('4')), '/choose'),
-        '/coming-soon',
+        '/parent/home',
       );
       expect(
         roleRedirect(AuthState.auth(_user('3')), '/choose', brandChosen: false),
@@ -76,12 +76,28 @@ void main() {
       expect(roleRedirect(auth, '/coming-soon'), isNull);
     });
 
-    test('parents see the coming-soon wall until their screens ship', () {
+    test('parents get the parent app, and only parents', () {
       final auth = AuthState.auth(_user('4'));
       expect(auth.user!.isParent, isTrue);
-      expect(roleRedirect(auth, '/login'), '/coming-soon');
-      expect(roleRedirect(auth, '/student/home'), '/coming-soon');
-      expect(roleRedirect(auth, '/coming-soon'), isNull);
+      expect(roleRedirect(auth, '/login'), '/parent/home');
+      expect(roleRedirect(auth, '/student/home'), '/parent/home');
+      expect(roleRedirect(auth, '/staff/home'), '/parent/home');
+      expect(roleRedirect(auth, '/coming-soon'), '/parent/home');
+      expect(roleRedirect(auth, '/parent/home'), isNull);
+      expect(roleRedirect(auth, '/parent/profile'), isNull);
+      // Nobody else reaches the parent app.
+      expect(
+        roleRedirect(AuthState.auth(_user('1')), '/parent/home'),
+        '/coming-soon',
+      );
+      expect(
+        roleRedirect(AuthState.auth(_user('2')), '/parent/home'),
+        '/staff/home',
+      );
+      expect(
+        roleRedirect(AuthState.auth(_user('3')), '/parent/home'),
+        '/student/home',
+      );
     });
 
     test('teachers stay in the teacher portal', () {

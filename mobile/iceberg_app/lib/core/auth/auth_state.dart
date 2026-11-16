@@ -1,11 +1,55 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../api/api_client.dart';
 
 // ─── User model ──────────────────────────────────────────────────────────────
+/// A parent's linked child, from `children` in login and `me/`.
+class ParentChildInfo {
+  final int id;
+  final String name;
+  final String className; // '' when the child has no class yet
+  final String brand;
+
+  const ParentChildInfo({
+    required this.id,
+    required this.name,
+    this.className = '',
+    this.brand = 'school',
+  });
+
+  /// "AK" for "Aziza Karimova".
+  String get initials {
+    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
+    return parts.take(2).map((p) => p[0].toUpperCase()).join();
+  }
+
+  String get firstName => name.trim().split(RegExp(r'\s+')).first;
+
+  factory ParentChildInfo.fromJson(Map<String, dynamic> j) => ParentChildInfo(
+    id: j['id'] as int,
+    name: (j['name'] ?? '') as String,
+    // `class` is {id, name, …} or null; a plain name is accepted too.
+    className: switch (j['class']) {
+      final Map c => (c['name'] ?? '').toString(),
+      final String name => name,
+      _ => '',
+    },
+    brand: (j['brand'] ?? 'school') as String,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'class': className.isEmpty ? null : {'name': className},
+    'brand': brand,
+  };
+}
+
 class IceUser {
   final int id;
   final String email;
@@ -20,6 +64,8 @@ class IceUser {
   // Signed in with a temporary password (PL.1): the app shows only
   // /change-password until the user picks their own.
   final bool mustChangePassword;
+  // Parents only: the children they may see (empty for other roles).
+  final List<ParentChildInfo> children;
 
   const IceUser({
     required this.id,
@@ -33,6 +79,7 @@ class IceUser {
     this.roleProfile,
     this.brand = 'center',
     this.mustChangePassword = false,
+    this.children = const [],
   });
 
   String get fullName => '$firstName $lastName'.trim();
@@ -57,6 +104,10 @@ class IceUser {
     // Older servers and cached users have no brand → Learning Center.
     brand: j['brand'] ?? 'center',
     mustChangePassword: j['must_change_password'] == true,
+    children: [
+      for (final c in (j['children'] as List? ?? const []))
+        if (c is Map) ParentChildInfo.fromJson(Map<String, dynamic>.from(c)),
+    ],
   );
 
   Map<String, dynamic> toJson() => {
@@ -71,6 +122,7 @@ class IceUser {
     'role_profile': roleProfile,
     'brand': brand,
     'must_change_password': mustChangePassword,
+    'children': [for (final c in children) c.toJson()],
   };
 }
 

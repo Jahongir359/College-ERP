@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 
 from ... import branching
 from ...models import Assignment, Enrollment, Staff, Student, Submission
+from ..family import student_for_request
 from ..permissions import IsStudent
 from ..serializers import (
     AssignmentDetailSerializer,
@@ -43,7 +44,22 @@ class AssignmentListView(APIView):
         return qs.none()
 
     def get(self, request):
-        qs = self._queryset(request.user).select_related("subject").order_by("-created_at")
+        if str(request.user.user_type) == "4":
+            # Parents (plan P4.4, P4.8): one child's homework, read-only, chosen
+            # with ?student=<id> (family.py). No submission data: status stays None.
+            # The child must always be named here, even in a one-child family.
+            if not request.query_params.get("student", "").strip():
+                return Response({"detail": "Student not found."}, status=status.HTTP_404_NOT_FOUND)
+            student, error = student_for_request(request)
+            if error is not None:
+                return error
+            groups = Enrollment.objects.filter(student=student, is_active=True).values("group_id")
+            qs = Assignment.objects.select_related("group", "created_by__admin").filter(
+                group_id__in=groups
+            )
+        else:
+            qs = self._queryset(request.user)
+        qs = qs.select_related("subject").order_by("-created_at")
 
         context = {"request": request}
         if str(request.user.user_type) == "3":
