@@ -415,12 +415,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             validator: (v) => (v == null || v.isEmpty) ? s('Required') : null,
           ),
+          // "Forgot password?" (PL.2): parents reset it with an SMS code.
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              key: const ValueKey('login-forgot'),
+              onPressed: _loading ? null : () => context.go('/forgot-password'),
+              style: TextButton.styleFrom(
+                foregroundColor: t.isDark ? t.textHi : t.accentInk,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                minimumSize: const Size(0, 44),
+              ),
+              child: Text(
+                s('Forgot password?'),
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
           AnimatedSize(
             duration: 300.ms,
             child: _error == null
-                ? const SizedBox(height: 20)
+                ? const SizedBox(height: 4)
                 : Container(
-                        margin: const EdgeInsets.only(top: 14),
+                        margin: const EdgeInsets.only(top: 6, bottom: 14),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 12,
@@ -485,14 +505,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
             ),
           ),
-          const SizedBox(height: 16),
-          Center(
-            child: Text(
-              s('Contact your administrator to reset your password.'),
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: t.textLow),
+          // The School page follows mockup 02 (the link above is enough);
+          // the Study Center keeps its line.
+          if (!ref.watch(brandProvider).isSchool) ...[
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                s('Contact your administrator to reset your password.'),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: t.textLow),
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
