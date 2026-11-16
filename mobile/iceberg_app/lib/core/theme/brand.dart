@@ -51,6 +51,28 @@ class SchoolColors {
   static const darkText = Color(0xFFF4E9E7);
   static const darkMuted = Color(0xFFBFA5A2);
   static const darkFill = Color(0xFF8E2A2A);
+
+  // Gold highlight (plan 6.2, the website's gold): achievements, top grades
+  // and the active child chip only. [gold] is a fill or ring, never text on
+  // white; text uses [goldInk] on light surfaces and [goldSoft] on dark ones.
+  static const gold = Color(0xFFC9973F);
+  static const goldInk = Color(0xFF8A5A12);
+  static const goldSoft = Color(0xFFE9C77E);
+
+  // Attendance status pills (mockups 4–13): text colour on its soft fill,
+  // always shown with an icon and a word (plan 6.1 rule 5).
+  static const present = Color(0xFF17633A);
+  static const presentBg = Color(0xFFE3F4EA);
+  static const late = Color(0xFF8A5A12);
+  static const lateBg = Color(0xFFFBF0D9);
+  static const absent = Color(0xFFA8322A);
+  static const absentBg = Color(0xFFFBE6E3);
+  static const darkPresent = Color(0xFF7FD3A0);
+  static const darkPresentBg = Color(0xFF12301F);
+  static const darkLate = Color(0xFFE9C77E);
+  static const darkLateBg = Color(0xFF33260F);
+  static const darkAbsent = Color(0xFFF2A39A);
+  static const darkAbsentBg = Color(0xFF3A1513);
 }
 
 /// Brand-aware replacements for the fixed Learning Center [IceColors]

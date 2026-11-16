@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -44,6 +45,7 @@ import '../../shared/screens/profile_hub_screen.dart';
 import '../../shared/screens/messages_screen.dart';
 import '../theme/brand.dart';
 import '../theme/brand_provider.dart';
+import '../../features/debug/component_sheet_screen.dart';
 
 /// Where the router sends [auth]'s user when they open [path]; null means stay.
 /// [brandChosen] is whether this device picked School or Study Center on
@@ -92,6 +94,28 @@ String? roleRedirect(AuthState auth, String path, {bool? brandChosen = true}) {
   return null;
 }
 
+/// [roleRedirect] plus one debug-only exception (PD.1): in debug builds the
+/// component sheet opens for anyone. [debug] defaults to the compile-time
+/// [kDebugMode], so release and profile builds keep [roleRedirect] exactly.
+String? appRedirect(
+  AuthState auth,
+  String path, {
+  bool? brandChosen = true,
+  bool debug = kDebugMode,
+}) {
+  if (debug && path == componentSheetPath) return null;
+  return roleRedirect(auth, path, brandChosen: brandChosen);
+}
+
+/// Routes that exist only in debug builds (none in release or profile).
+List<RouteBase> debugRoutes({bool debug = kDebugMode}) => [
+  if (debug)
+    GoRoute(
+      path: componentSheetPath,
+      builder: (_, state) => ComponentSheetScreen.fromState(state),
+    ),
+];
+
 /// Routing by role:
 ///   - Student (user_type 3) → full /student/* experience
 ///   - Staff   (user_type 2) → teacher portal /staff/*
@@ -109,13 +133,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: authListenable,
     redirect: (context, state) {
       final choice = ref.read(lastBrandProvider);
-      return roleRedirect(
+      return appRedirect(
         ref.read(authProvider),
         state.matchedLocation,
         brandChosen: choice.loaded ? choice.chosen : null,
       );
     },
     routes: [
+      ...debugRoutes(),
       GoRoute(path: '/splash', builder: (_, __) => const _SplashScreen()),
       GoRoute(path: '/choose', builder: (_, __) => const ChooseScreen()),
       GoRoute(

@@ -91,7 +91,7 @@ it. Fix it like any other task. Never silently "fix" another task's code without
 | P0 | Foundations: hosting, domain, open PRs merged, staging, monitoring | In progress — 1/8 |
 | P1 | ERP school data model: years and quarters, classes, subjects, parents | Done — 8/8 |
 | P2 | ERP school features: timetable, register, gradebook, parent messages, push | In progress — 7/8 |
-| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 6/9 (mockups 1–20b drawn) |
+| PD | Design: rules, mockups, owner approval (before P3/P4 code) | In progress — 7/9 (mockups 1–20b drawn) |
 | P3 | Web screens for admins (D15: teachers use the app) | Done 2026-11-11 — 8/8 (P3.4, P3.5 dropped) |
 | P4 | App: choice screen, parent role, School screens | In progress — 4/11 (P4.11 dropped, P4.12 Release 2) |
 | P5 | Store readiness (Android and iPhone builds, listings, policies) | Open — 0/9 |
@@ -735,9 +735,12 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 
 ### PD — Design (before P3/P4 code for each screen)
 
-- [ ] **PD.1** Design rules in code: bundle Fraunces (School display text), School gold highlight token, type scale and spacing constants in
+- [x] **PD.1** Design rules in code: bundle Fraunces (School display text), School gold highlight token, type scale and spacing constants in
       `IceTokens` (app) and brand CSS (web) per section 6.2; a small "component sheet" screen in debug
-      builds showing buttons, chips, cards, status pills, empty/error states in both brands, light/dark.
+      builds showing buttons, chips, cards, status pills, empty/error states in both brands, light/dark. — done 2026-10-31, PR #65; verified: full suite
+      701 OK, flutter test 69 OK, `test/design_tokens_test.dart` (tokens, contrast, Study Center tokens unchanged, sheet
+      renders), `SchoolBrandStylesheetTests.test_defines_design_rule_tokens`; screenshot
+      `school-app-screens/pd1-components.png`
 - [x] **PD.2** Mockups: choice screen and login (both brands) — done 2026-10-23, PR #27; screens 1–3 in
       section 6.0 (Uzbek; ru/en and dark are checked with real screenshots in the build PR, 0.1).
 - [x] **PD.3** Mockups: parent home with child switcher (light and dark), attendance calendar, homework,
@@ -1105,6 +1108,12 @@ Not scheduled: start only when the owner says so, after Release 2. The school ke
 ## 11. Progress log
 
 Newest first. One line per session: date — tasks — PR — note for the next agent.
+
+- 2026-10-31 — PD.1 done (PR #65): Fraunces 600 bundled (OFL; Latin only, Cyrillic and ʻ fall back to
+  Inter), School gold `SchoolColors.gold/goldInk/goldSoft` and `IceTokens.highlight*`, `IceType` and
+  `IceSpace` in `lib/core/theme/ice_type.dart`, the same tokens in `brand-school.css`, debug-only
+  component sheet at `/debug/components`. Build screens with these; don't hard-code sizes or gold.
+  Brought up to main 2026-11-16 (after P4.2, P4.3): the router's `appRedirect` wraps `roleRedirect`.
 
 - 2026-11-11 — PL.2 backend and web half (`feat/school-pl2-password-reset`, on top of #58): parents' SMS
   code reset API, reset audit log on the parent page, "Send login by SMS". Migration 0052. Next on this
