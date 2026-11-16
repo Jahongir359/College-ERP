@@ -738,7 +738,7 @@ parent (other child) 403/404**, anonymous 401. Write them as one table-driven te
 - [x] **PD.1** Design rules in code: bundle Fraunces (School display text), School gold highlight token, type scale and spacing constants in
       `IceTokens` (app) and brand CSS (web) per section 6.2; a small "component sheet" screen in debug
       builds showing buttons, chips, cards, status pills, empty/error states in both brands, light/dark. — done 2026-10-31, PR #65; verified: full suite
-      542 OK, `test/design_tokens_test.dart` (tokens, contrast, Study Center tokens unchanged, sheet
+      701 OK, flutter test 69 OK, `test/design_tokens_test.dart` (tokens, contrast, Study Center tokens unchanged, sheet
       renders), `SchoolBrandStylesheetTests.test_defines_design_rule_tokens`; screenshot
       `school-app-screens/pd1-components.png`
 - [x] **PD.2** Mockups: choice screen and login (both brands) — done 2026-10-23, PR #27; screens 1–3 in
@@ -1113,6 +1113,7 @@ Newest first. One line per session: date — tasks — PR — note for the next 
   Inter), School gold `SchoolColors.gold/goldInk/goldSoft` and `IceTokens.highlight*`, `IceType` and
   `IceSpace` in `lib/core/theme/ice_type.dart`, the same tokens in `brand-school.css`, debug-only
   component sheet at `/debug/components`. Build screens with these; don't hard-code sizes or gold.
+  Brought up to main 2026-11-16 (after P4.2, P4.3): the router's `appRedirect` wraps `roleRedirect`.
 
 - 2026-11-11 — PL.2 backend and web half (`feat/school-pl2-password-reset`, on top of #58): parents' SMS
   code reset API, reset audit log on the parent page, "Send login by SMS". Migration 0052. Next on this
