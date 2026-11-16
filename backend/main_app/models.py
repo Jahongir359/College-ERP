@@ -10,7 +10,8 @@ from django.db import OperationalError, ProgrammingError, models
 from django.db.models import Q
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-from django.utils.translation import gettext_lazy
+from django.utils.functional import lazy
+from django.utils.translation import gettext, gettext_lazy
 from datetime import datetime, timedelta
 
 
@@ -174,6 +175,9 @@ class CustomUser(AbstractUser):
     avatar = models.CharField(max_length=10, blank=True, default="")
     address = models.TextField(blank=True, default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
+    # Set when an admin gives the password (new parent, reset, login letter); the API then
+    # allows only me/, change-password and logout until the user picks their own (PL.1).
+    must_change_password = models.BooleanField(default=False)
     # Web language chosen with the header switch ("uz", "ru", "en"); blank = default (P3.0).
     language = models.CharField(max_length=5, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -241,17 +245,25 @@ class Book(models.Model):
         return str(self.name) + " [" + str(self.isbn) + "]"
 
 
+def _level_text(level):
+    return gettext("Level %(level)s") % {"level": level}
+
+
+# "Level 3" in the page language, worked out when it is shown (P3.0 / web audit M2).
+_level_label = lazy(_level_text, str)
+
+
 class Student(models.Model):
     STATUS_ACTIVE = "active"
     STATUS_INACTIVE = "inactive"
     STATUS_SUSPENDED = "suspended"
     STATUS_CHOICES = [
-        (STATUS_ACTIVE, "Active"),
-        (STATUS_INACTIVE, "Inactive"),
-        (STATUS_SUSPENDED, "Suspended"),
+        (STATUS_ACTIVE, gettext_lazy("Active")),
+        (STATUS_INACTIVE, gettext_lazy("Inactive")),
+        (STATUS_SUSPENDED, gettext_lazy("Suspended")),
     ]
 
-    LEVEL_CHOICES = [(i, f"Level {i}") for i in range(1, 7)]
+    LEVEL_CHOICES = [(i, _level_label(i)) for i in range(1, 7)]
 
     THEME_DARK = "dark"
     THEME_BRIGHT = "bright"
@@ -1687,10 +1699,10 @@ class Invoice(models.Model):
     STATUS_PAID = "paid"
     STATUS_CANCELLED = "cancelled"
     STATUS_CHOICES = [
-        (STATUS_DUE, "Due"),
-        (STATUS_PARTIAL, "Partially paid"),
-        (STATUS_PAID, "Paid"),
-        (STATUS_CANCELLED, "Cancelled"),
+        (STATUS_DUE, gettext_lazy("Due")),
+        (STATUS_PARTIAL, gettext_lazy("Partially paid")),
+        (STATUS_PAID, gettext_lazy("Paid")),
+        (STATUS_CANCELLED, gettext_lazy("Cancelled")),
     ]
 
     student = models.ForeignKey(Student, on_delete=models.PROTECT, related_name="invoices")
@@ -1960,3 +1972,64 @@ def push_new_chat_message(sender, instance, created, **kwargs):
             logging.getLogger("main_app.push").exception(
                 "Push for chat message %s failed.", instance.pk
             )
+
+
+class PasswordResetLog(models.Model):
+    """Audit log: one row for every password reset of a parent (plan PL.2, D13).
+
+    Written by ``parents.update_parent`` (office: web page, admin API, login letter)
+    and by the SMS code reset. Read-only: admins see it on the parent page, scoped
+    by ``branching.filter_password_resets_for_user``.
+    """
+
+    METHOD_OFFICE = "office"
+    METHOD_API = "api"
+    METHOD_LETTER = "letter"
+    METHOD_SMS = "sms"
+    METHOD_CHOICES = [
+        (METHOD_OFFICE, gettext_lazy("Office")),
+        (METHOD_API, gettext_lazy("Office (API)")),
+        (METHOD_LETTER, gettext_lazy("Login letter")),
+        (METHOD_SMS, gettext_lazy("SMS code (the parent)")),
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="password_resets")
+    method = models.CharField(max_length=10, choices=METHOD_CHOICES)
+    # The admin who reset it; empty for the parent's own SMS reset.
+    by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="password_resets_done",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at", "-pk"]
+
+    def __str__(self):
+        return f"{self.user} · {self.method} · {self.created_at:%Y-%m-%d %H:%M}"
+
+
+class SmsResetCode(models.Model):
+    """A one-time SMS code for a parent's own password reset (plan PL.2, D13).
+
+    Only a hash of the code is stored. A code lives 10 minutes, works once and
+    allows a few wrong tries (``parents_sms``). ``phone`` is the normalised number
+    the code was sent to, used for the per-phone rate limit.
+    """
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sms_reset_codes")
+    phone = models.CharField(max_length=20, db_index=True)
+    code_hash = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at", "-pk"]
+
+    def __str__(self):
+        return f"{self.user} · {self.created_at:%Y-%m-%d %H:%M}"

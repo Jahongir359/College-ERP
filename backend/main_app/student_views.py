@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 
 from .decorators import student_only
 from .forms import *
@@ -298,7 +299,7 @@ def _attendance_weekly_trend(student, weeks=8):
                 status__in=[AttendanceReport.PRESENT, AttendanceReport.LATE]
             ).count()
             value = round((present / total) * 100)
-        labels.append(week_start.strftime("%b %d"))
+        labels.append(date_format(week_start, "M d"))
         values.append(value)
     seen = [v for v in values if v is not None]
     return {
@@ -336,7 +337,7 @@ def _homework_weekly_trend(student, weeks=8):
                 assignment__in=due_assignments,
             ).count()
             value = round((submitted / total_due) * 100)
-        labels.append(week_start.strftime("%b %d"))
+        labels.append(date_format(week_start, "M d"))
         values.append(value)
     seen = [v for v in values if v is not None]
     return {
@@ -349,7 +350,7 @@ def _homework_weekly_trend(student, weeks=8):
 def _vocab_quiz_trend(student):
     """Chronological list of quiz scores."""
     quizzes = VocabularyQuizResult.objects.filter(student=student).order_by("taken_at")
-    labels = [q.taken_at.strftime("%b %d") for q in quizzes]
+    labels = [date_format(q.taken_at, "M d") for q in quizzes]
     values = [round(q.score) for q in quizzes]
     return {
         "labels": labels,
@@ -375,7 +376,7 @@ def _overall_performance_trend(student, weeks=8):
     for i in range(weeks - 1, -1, -1):
         week_end = today - timedelta(days=i * 7)
         week_start = week_end - timedelta(days=6)
-        labels.append(week_start.strftime("%b %d"))
+        labels.append(date_format(week_start, "M d"))
         qs = VocabularyQuizResult.objects.filter(
             student=student,
             taken_at__date__gte=week_start,
@@ -1561,7 +1562,7 @@ def student_progress(request):
     )
     today = tz.localdate()
     days_30 = [(today - timedelta(days=i)) for i in range(29, -1, -1)]
-    date_labels = [d.strftime("%b %d") for d in days_30]
+    date_labels = [date_format(d, "M d") for d in days_30]
 
     # ── Vocabulary days completed per day (last 30 days) ─────────────────────
     completions_qs = dict(

@@ -1,6 +1,13 @@
 {% extends 'main_app/base.html' %}
 {% load static i18n %}
 {% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% translate "The lesson periods of each school branch. The timetable uses them." %}</p>{% endblock %}
+{% block page_actions %}
+<div class="page-actions">
+  <a href="{% url 'school_timetable' %}" class="ice-manage-action">{% translate "Timetable" %} →</a>
+</div>
+{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/admin-manage-mobile.css' %}">
@@ -9,18 +16,6 @@
 
 {% block content %}
 <div class="ice-manage-page">
-  <section class="ice-manage-hero">
-    <div class="ice-manage-hero__main">
-      <span class="ice-manage-hero__icon" aria-hidden="true"><i class="fas fa-bell"></i></span>
-      <div class="ice-manage-hero__copy">
-        <h2 class="ice-manage-hero__title">{% translate "Bell times" %}</h2>
-        <p class="ice-manage-hero__subtitle">{% translate "The lesson periods of each school branch. The timetable uses them." %}</p>
-      </div>
-    </div>
-    <div class="ice-manage-hero__actions">
-      <a href="{% url 'school_timetable' %}" class="ice-manage-action">{% translate "Timetable" %} →</a>
-    </div>
-  </section>
 
   {% for item in branches %}
   <section class="school-section" aria-labelledby="branch-{{ item.branch.pk }}">

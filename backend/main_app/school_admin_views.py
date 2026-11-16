@@ -26,6 +26,7 @@ from .models import (
     Term,
     lesson_clashes,
 )
+from .school import register_summaries
 from .school_forms import ClassForm, ClassStudentForm, ClassSubjectForm, TermForm
 
 
@@ -60,6 +61,12 @@ def classes(request):
         .order_by("branch__name", "grade_level", "letter")
     )
     active = Enrollment.objects.filter(is_active=True, group__in=rows)
+    # Today's register per class (keldi / kech / yo'q), as on the register report.
+    today = timezone.localdate()
+    summary = register_summaries(rows, today)
+    rows = list(rows)
+    for row in rows:
+        row.today = summary.get(row.pk, {"taken": False, "present": 0, "late": 0, "absent": 0})
     context = {
         "page_title": _("Classes"),
         "classes": rows,
@@ -67,6 +74,7 @@ def classes(request):
         "year": year,
         "show_branch": len({row.branch_id for row in rows}) > 1,
         "total_students": active.values("student_id").distinct().count(),
+        "taken_today": sum(1 for row in rows if row.today["taken"]),
         "linked_students": ParentChild.objects.filter(student_id__in=active.values("student_id"))
         .values("student_id")
         .distinct()

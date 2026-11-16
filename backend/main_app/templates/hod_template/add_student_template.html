@@ -1,4 +1,5 @@
 {% extends 'main_app/base.html' %}
+{% load i18n %}
 {% load static %}
 {% block page_title %}{{ page_title }}{% endblock %}
 
@@ -34,7 +35,7 @@
       </div>
       {% endif %}
 
-      <div class="ice-section-title">Personal Information</div>
+      <div class="ice-section-title">{% translate "Personal Information" %}</div>
       <div class="ice-form-grid cols-2">
         <div class="ice-field">
           <label>{{ form.first_name.label }}<span class="ice-field-req">*</span></label>
@@ -54,11 +55,11 @@
           <label>{{ form.date_of_birth.label }}<span class="ice-field-req">*</span></label>
           {{ form.date_of_birth }}
           {% if form.date_of_birth.errors %}<div class="ice-field-error">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
-          <small class="ice-field-help">YYYY-MM-DD — used to generate the login ID (e.g. IC052401).</small>
+          <small class="ice-field-help">{% translate "YYYY-MM-DD — used to generate the login ID (e.g. IC052401)." %}</small>
         </div>
       </div>
 
-      <div class="ice-section-title" style="margin-top:22px;">Account &amp; Contact</div>
+      <div class="ice-section-title" style="margin-top:22px;">{% translate "Account & Contact" %}</div>
       <div class="ice-form-grid cols-2">
         <div class="ice-field">
           <label>{{ form.password.label }}</label>
@@ -66,12 +67,12 @@
           {% if form.password.errors %}<div class="ice-field-error">{{ form.password.errors.0 }}</div>{% endif %}
         </div>
         <div class="ice-field">
-          <label>Phone Number</label>
+          <label>{% translate "Phone Number" %}</label>
           {{ form.phone }}
           {% if form.phone.errors %}<div class="ice-field-error">{{ form.phone.errors.0 }}</div>{% endif %}
         </div>
         <div class="ice-field">
-          <label>Status</label>
+          <label>{% translate "Status" %}</label>
           {{ form.status }}
           {% if form.status.errors %}<div class="ice-field-error">{{ form.status.errors.0 }}</div>{% endif %}
         </div>
@@ -82,35 +83,40 @@
         <div class="ice-field span-2">
           <label>{{ form.profile_pic.label }}</label>
           {{ form.profile_pic }}
-          <small class="ice-field-help">Optional — PNG, JPG up to 5 MB.</small>
+          <small class="ice-field-help">{% translate "Optional — PNG, JPG up to 5 MB." %}</small>
         </div>
       </div>
 
-      <div class="ice-section-title" style="margin-top:22px;">Program &amp; Class Assignment</div>
+      <div class="ice-section-title" style="margin-top:22px;">{% translate "Program & Class Assignment" %}</div>
       <div class="ice-form-grid cols-2">
         <div class="ice-field">
-          <label>Program <span class="ice-field-req">*</span></label>
+          <label>{% translate "Program" %} <span class="ice-field-req">*</span></label>
           {{ form.course }}
           {% if form.course.errors %}<div class="ice-field-error">{{ form.course.errors.0 }}</div>{% endif %}
         </div>
         <div class="ice-field">
-          <label>Teacher <small style="font-weight:400;">(filter groups)</small></label>
+          <label>{% translate "Teacher" %} <small style="font-weight:400;">{% translate "(filter groups)" %}</small></label>
           <select id="teacher_filter" class="form-control">
-            <option value="">— All Teachers —</option>
+            <option value="">{% translate "— All Teachers —" %}</option>
           </select>
-          <small class="ice-field-help">Select program first.</small>
+          <small class="ice-field-help">{% translate "Select program first." %}</small>
         </div>
         <div class="ice-field">
-          <label>Class Group <small style="font-weight:400;">(optional)</small></label>
+          <label>{% translate "Class Group" %} <small style="font-weight:400;">{% translate "(optional)" %}</small></label>
           {{ form.group }}
           {% if form.group.errors %}<div class="ice-field-error">{{ form.group.errors.0 }}</div>{% endif %}
-          <small class="ice-field-help">Select program to load groups.</small>
+          <small class="ice-field-help">{% translate "Select program to load groups." %}</small>
         </div>
         <div class="ice-field">
           <label>{{ form.level.label }}</label>
           {{ form.level }}
           {% if form.level.errors %}<div class="ice-field-error">{{ form.level.errors.0 }}</div>{% endif %}
-          <small class="ice-field-help">English level 1–6. Leave blank for non-English programs.</small>
+          <small class="ice-field-help">{% translate "English level 1–6. Leave blank for non-English programs." %}</small>
+        </div>
+        <div class="ice-field">
+          <label for="{{ form.branch.id_for_label }}">{{ form.branch.label }}<span class="ice-field-req">*</span></label>
+          {{ form.branch }}
+          {% if form.branch.errors %}<div class="ice-field-error">{{ form.branch.errors.0 }}</div>{% endif %}
         </div>
       </div>
 
@@ -118,10 +124,10 @@
 
     <div class="ice-submit-bar">
       <button type="submit" class="ice-btn-primary">
-        <i class="fas fa-user-plus"></i> Add Student
+        <i class="fas fa-user-plus"></i> {% translate "Add Student" %}
       </button>
       <a href="{% url 'manage_student' %}" class="ice-btn-secondary">
-        <i class="fas fa-list"></i> View All Students
+        <i class="fas fa-list"></i> {% translate "View All Students" %}
       </a>
     </div>
   </form>

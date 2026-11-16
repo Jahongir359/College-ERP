@@ -1,8 +1,9 @@
 {% extends 'main_app/base.html' %}
+{% load i18n %}
 {% load static %}
 
-{% block page_title %}My Profile / Settings{% endblock %}
-{% block breadcrumb %}<li class="breadcrumb-item active">Profile</li>{% endblock %}
+{% block page_title %}{% translate "My Profile / Settings" %}{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">{% translate "Profile" %}</li>{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'dist/css/profile-hub.css' %}">
@@ -12,22 +13,22 @@
 <div class="avatar-modal-overlay" id="avatar-modal" aria-hidden="true">
   <div class="avatar-modal" role="dialog" aria-modal="true" aria-labelledby="avatar-modal-title">
     <div class="avatar-modal-header">
-      <h3 id="avatar-modal-title"><i class="fas fa-smile me-2" style="color:var(--accent,#06B6D4);"></i>Choose Your Avatar</h3>
-      <button type="button" class="avatar-modal-close" data-close-avatar aria-label="Close avatar picker">
+      <h3 id="avatar-modal-title"><i class="fas fa-smile me-2" style="color:var(--accent,#06B6D4);"></i>{% translate "Choose Your Avatar" %}</h3>
+      <button type="button" class="avatar-modal-close" data-close-avatar aria-label="{% translate 'Close avatar picker' %}">
         <i class="fas fa-times" aria-hidden="true"></i>
       </button>
     </div>
     <div class="avatar-grid" id="avatar-grid"></div>
     <div class="avatar-modal-footer">
-      <button type="button" class="avatar-cancel-btn" data-close-avatar>Cancel</button>
+      <button type="button" class="avatar-cancel-btn" data-close-avatar>{% translate "Cancel" %}</button>
       <button type="button" class="avatar-save-btn" data-save-avatar>
-        <i class="fas fa-check me-1" aria-hidden="true"></i>Save Avatar
+        <i class="fas fa-check me-1" aria-hidden="true"></i>{% translate "Save Avatar" %}
       </button>
     </div>
   </div>
 </div>
 <div class="avatar-toast" id="avatar-toast" role="status" aria-live="polite">
-  <i class="fas fa-check-circle me-1" aria-hidden="true"></i>Avatar saved
+  <i class="fas fa-check-circle me-1" aria-hidden="true"></i>{% translate "Avatar saved" %}
 </div>
 {% endblock body_modals %}
 
@@ -47,7 +48,7 @@
         <button type="button" class="profile-avatar{% if request.user.avatar %} profile-avatar-sticker{% endif %}"
                 id="profile-avatar-display"
                 data-open-avatar
-                aria-label="Change profile avatar">
+                aria-label="{% translate 'Change profile avatar' %}">
           <span id="profile-avatar-inner">
             {% if request.user.avatar %}
               {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
@@ -68,7 +69,7 @@
         </div>
 
         {% if profile_meta %}
-        <div class="profile-contact-list" aria-label="Profile details">
+        <div class="profile-contact-list" aria-label="{% translate 'Profile details' %}">
           {% for item in profile_meta %}
           <span class="profile-contact-item"><i class="fas {{ item.icon }}" aria-hidden="true"></i><span>{{ item.text }}</span></span>
           {% endfor %}
@@ -78,17 +79,17 @@
         <div class="settings-row settings-row--danger profile-logout-row">
           <span class="settings-row__icon"><i class="fas fa-sign-out-alt icon-hover-pulse" aria-hidden="true"></i></span>
           <span class="settings-row__content">
-            <span class="settings-row__title">Log Out</span>
-            <span class="settings-row__subtitle">End this signed-in session</span>
+            <span class="settings-row__title">{% translate "Log Out" %}</span>
+            <span class="settings-row__subtitle">{% translate "End this signed-in session" %}</span>
           </span>
-          {% include "main_app/includes/animated_logout_button.html" with variant="full" btn_class="profile-hub-logout" label="Log Out" aria="Log out of Iceberg" %}
+          {% include "main_app/includes/animated_logout_button.html" with variant="full" btn_class="profile-hub-logout" label=_("Log Out") aria=_("Log out of Iceberg") %}
         </div>
       </div>
     </aside>
 
     <main class="profile-workspace">
       {% if profile_stats %}
-      <div class="profile-snapshot" aria-label="Profile summary">
+      <div class="profile-snapshot" aria-label="{% translate 'Profile summary' %}">
         {% for stat in profile_stats %}
         <div class="profile-snapshot__item">
           <span class="profile-snapshot__icon"><i class="fas {{ stat.icon }}" aria-hidden="true"></i></span>
@@ -101,25 +102,25 @@
 
       <section class="profile-panel">
         <div class="profile-section-heading">
-          <span>Quick Actions</span>
-          <strong>Fast path</strong>
+          <span>{% translate "Quick Actions" %}</span>
+          <strong>{% translate "Fast path" %}</strong>
         </div>
         <div class="profile-quick-grid">
           <a href="#edit-profile" class="profile-quick-action" data-open-details="edit-profile" data-focus="#id_first_name">
             <i class="fas fa-user-edit" aria-hidden="true"></i>
-            <span><strong>Edit info</strong><small>Name, phone, birthday</small></span>
+            <span><strong>{% translate "Edit info" %}</strong><small>{% translate "Name, phone, birthday" %}</small></span>
           </a>
           <button type="button" class="profile-quick-action" data-open-avatar>
             <i class="fas fa-camera-retro" aria-hidden="true"></i>
-            <span><strong>Photo</strong><small>Avatar and profile visual</small></span>
+            <span><strong>{% translate "Photo" %}</strong><small>{% translate "Avatar and profile visual" %}</small></span>
           </button>
           <a href="#edit-profile" class="profile-quick-action" data-open-details="edit-profile" data-focus="#id_password">
             <i class="fas fa-key" aria-hidden="true"></i>
-            <span><strong>Password</strong><small>Update account security</small></span>
+            <span><strong>{% translate "Password" %}</strong><small>{% translate "Update account security" %}</small></span>
           </a>
           <a href="{% url 'messages' %}" class="profile-quick-action">
             <i class="fas fa-comments" aria-hidden="true"></i>
-            <span><strong>Messages</strong><small>Open conversations</small></span>
+            <span><strong>{% translate "Messages" %}</strong><small>{% translate "Open conversations" %}</small></span>
           </a>
         </div>
       </section>
@@ -128,7 +129,7 @@
         <section class="profile-panel">
           <div class="profile-section-heading">
             <span>{{ group.label }}</span>
-            <strong>{{ group.rows|length }} items</strong>
+            <strong>{% blocktranslate trimmed count n=group.rows|length %}{{ n }} item{% plural %}{{ n }} items{% endblocktranslate %}</strong>
           </div>
           <div class="settings-group">
             {% for row in group.rows %}
@@ -161,31 +162,31 @@
                   <span class="settings-row__subtitle">{{ row.subtitle }}</span>
                 </span>
               </div>
-              <div class="theme-grid" role="group" aria-label="Theme preference">
-                <button type="button" class="theme-btn" data-theme-choice="bright" aria-label="Use bright theme">
+              <div class="theme-grid" role="group" aria-label="{% translate 'Theme preference' %}">
+                <button type="button" class="theme-btn" data-theme-choice="bright" aria-label="{% translate 'Use bright theme' %}">
                   <span class="theme-preview theme-preview--bright">
                     <span></span><span></span><span></span>
                   </span>
-                  <strong>Bright</strong>
-                  <small>Light Ice surfaces</small>
+                  <strong>{% translate "Bright" %}</strong>
+                  <small>{% translate "Light Ice surfaces" %}</small>
                 </button>
-                <button type="button" class="theme-btn" data-theme-choice="dark" aria-label="Use dark theme">
+                <button type="button" class="theme-btn" data-theme-choice="dark" aria-label="{% translate 'Use dark theme' %}">
                   <span class="theme-preview theme-preview--dark">
                     <span></span><span></span><span></span>
                   </span>
-                  <strong>Dark</strong>
-                  <small>Deep Navy glass</small>
+                  <strong>{% translate "Dark" %}</strong>
+                  <small>{% translate "Deep Navy glass" %}</small>
                 </button>
-                <button type="button" class="theme-btn" data-theme-choice="system" aria-label="Use system theme">
+                <button type="button" class="theme-btn" data-theme-choice="system" aria-label="{% translate 'Use system theme' %}">
                   <span class="theme-preview theme-preview--system">
                     <span></span><span></span><span></span>
                   </span>
-                  <strong>System</strong>
-                  <small>Match device</small>
+                  <strong>{% translate "System" %}</strong>
+                  <small>{% translate "Match device" %}</small>
                 </button>
               </div>
               <div class="theme-saved-msg" id="theme-msg">
-                <i class="fas fa-check-circle me-1" aria-hidden="true"></i>Theme saved
+                <i class="fas fa-check-circle me-1" aria-hidden="true"></i>{% translate "Theme saved" %}
               </div>
               {% elif row.kind == "static" %}
               <div class="settings-row settings-row--static">
@@ -214,8 +215,8 @@
         <summary class="settings-row pressable">
           <span class="settings-row__icon"><i class="fas fa-edit icon-hover-wiggle" aria-hidden="true"></i></span>
           <span class="settings-row__content">
-            <span class="settings-row__title">Edit Profile</span>
-            <span class="settings-row__subtitle">Update details and password</span>
+            <span class="settings-row__title">{% translate "Edit Profile" %}</span>
+            <span class="settings-row__subtitle">{% translate "Update details and password" %}</span>
           </span>
           <i class="fas fa-chevron-right settings-row__chevron" aria-hidden="true"></i>
         </summary>
@@ -238,14 +239,14 @@
                   {% if field.name == "password" %}
                   <div class="pw-notice" id="pw-notice">
                     <i class="fas fa-exclamation-triangle me-1" aria-hidden="true"></i>
-                    Saving a new password may end your current session.
+                    {% translate "Saving a new password may end your current session." %}
                   </div>
                   {% endif %}
                 </div>
               {% endfor %}
             </div>
             <button type="submit" class="profile-save-btn">
-              <i class="fas fa-save me-1" aria-hidden="true"></i>Save Changes
+              <i class="fas fa-save me-1" aria-hidden="true"></i>{% translate "Save Changes" %}
             </button>
           </form>
         </div>

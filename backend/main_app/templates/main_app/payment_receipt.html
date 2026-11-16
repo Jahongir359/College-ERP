@@ -31,7 +31,7 @@
     <div class="receipt-row"><span class="receipt-label">Receipt No.</span><span class="receipt-value">{{ payment.receipt_no }}</span></div>
     <div class="receipt-row"><span class="receipt-label">Date</span><span class="receipt-value">{{ payment.paid_on }}</span></div>
     <div class="receipt-row"><span class="receipt-label">Student</span><span class="receipt-value">{{ invoice.student }}{% if invoice.student.admin.login_id %} ({{ invoice.student.admin.login_id }}){% endif %}</span></div>
-    <div class="receipt-row"><span class="receipt-label">For</span><span class="receipt-value">{{ invoice.period_label }}{% if invoice.group %} · {{ invoice.group.name }}{% endif %}</span></div>
+    <div class="receipt-row"><span class="receipt-label">For</span><span class="receipt-value">{{ invoice.period|date:"F Y" }}{% if invoice.group %} · {{ invoice.group.name }}{% endif %}</span></div>
     <div class="receipt-row"><span class="receipt-label">Method</span><span class="receipt-value">{{ payment.get_method_display }}</span></div>
     {% if payment.note %}<div class="receipt-row"><span class="receipt-label">Note</span><span class="receipt-value">{{ payment.note }}</span></div>{% endif %}
     {% if payment.received_by %}<div class="receipt-row"><span class="receipt-label">Received by</span><span class="receipt-value">{{ payment.received_by.get_full_name }}</span></div>{% endif %}

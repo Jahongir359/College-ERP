@@ -1,0 +1,147 @@
+{% extends 'main_app/base.html' %}
+{% load static i18n %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_eyebrow %}<p class="page-eyebrow">{% translate "School" %}</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ today|date:"l, j E Y" }}</p>{% endblock %}
+{% block page_actions %}
+{% if has_school %}
+{% url 'school_register_report' as register_url %}
+<div class="page-actions">
+  <a href="{% url 'school_classes' %}" class="ui-btn ui-btn--secondary">
+    <i class="fas fa-door-open" aria-hidden="true"></i> {% translate "Classes" %}
+  </a>
+  {% if register_url %}
+  <a href="{{ register_url }}" class="ui-btn ui-btn--primary">
+    <i class="fas fa-clipboard-check" aria-hidden="true"></i> {% translate "Register report" %}
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'dist/css/school-admin.css' %}">
+{% endblock custom_css %}
+
+{% block content %}
+{% url 'school_register_report' as register_url %}
+<div class="school-page school-board">
+
+{% if not has_school %}
+  <section class="ui-card ui-empty" data-board-empty="no-school">
+    <h2 class="ui-card-title">{% translate "No School branch yet" %}</h2>
+    <p>{% translate "This board shows Iceberg School numbers. None of the branches you manage is a School branch." %}</p>
+  </section>
+{% else %}
+
+  {% if show_branch %}
+  <p class="school-chips board-branches">{% for branch in branches %}<b class="ui-badge">{{ branch.name }}</b>{% endfor %}</p>
+  {% endif %}
+
+  <div class="ui-stats">
+    <a class="ui-stat board-stat" href="{% url 'school_classes' %}">
+      <div class="ui-stat-label">{% translate "Pupils" %}</div>
+      <b class="ui-stat-value" data-count="pupils">{{ counts.pupils }}</b>
+    </a>
+    <a class="ui-stat board-stat" href="{% url 'school_classes' %}">
+      <div class="ui-stat-label">{% translate "Classes" %}</div>
+      <b class="ui-stat-value" data-count="classes">{{ counts.classes }}</b>
+    </a>
+    <a class="ui-stat board-stat" href="{% url 'school_timetable' %}">
+      <div class="ui-stat-label">{% translate "Teachers" %}</div>
+      <b class="ui-stat-value" data-count="teachers">{{ counts.teachers }}</b>
+    </a>
+    <a class="ui-stat board-stat" href="{% url 'school_parents' %}">
+      <div class="ui-stat-label">{% translate "Parents" %}</div>
+      <b class="ui-stat-value" data-count="parents">{{ counts.parents }}</b>
+    </a>
+  </div>
+
+  <div class="ui-split">
+    <div class="school-stack">
+      <section class="ui-card">
+        <div class="ui-card-head">
+          <h2 class="ui-card-title">{% translate "Today's register" %}</h2>
+          {% if register_url and class_rows %}<a href="{{ register_url }}" class="ui-card-link">{% translate "Open the register report" %} →</a>{% endif %}
+        </div>
+        {% if not year %}
+          <p class="school-help" data-board-empty="no-year">{% translate "Set up the academic year first; the register follows its classes." %}</p>
+        {% elif not class_rows %}
+          <div class="ui-empty" data-board-empty="no-classes">
+            {% translate "No classes in this academic year yet." %}<br>
+            <a href="{% url 'school_class_add' %}" class="ui-open">{% translate "New class" %} →</a>
+          </div>
+        {% else %}
+          <div class="board-progress" role="img" aria-label="{% blocktranslate with taken=taken_count total=class_rows|length %}{{ taken }} of {{ total }} classes took the register{% endblocktranslate %}">
+            <p class="board-progress__text">
+              <b class="ui-stat-value">{{ taken_count }} / {{ class_rows|length }}</b>
+              {% translate "classes took the register" %}
+            </p>
+            <div class="board-progress__bar"><i style="width: {% widthratio taken_count class_rows|length 100 %}%"></i></div>
+          </div>
+          {% if not_taken %}
+          <p class="page-eyebrow board-subhead">{% translate "Not taken yet" %}</p>
+          <div class="ui-table-wrap board-table" data-no-table-enhance>
+            <table class="ui-table">
+              <tbody>
+                {% for row in not_taken %}
+                <tr>
+                  <td class="school-nowrap"><strong>{{ row.group.name }}</strong></td>
+                  <td>{% if row.group.teacher %}{{ row.group.teacher.admin.get_full_name }}{% else %}<span class="ui-badge ui-badge--muted">{% translate "No homeroom teacher" %}</span>{% endif %}</td>
+                  <td><span class="ui-badge ui-badge--late">{% translate "Not taken" %}</span></td>
+                  <td class="ui-end"><a href="{% url 'school_class_detail' row.group.pk %}" class="ui-open">{% translate "Open" %} →</a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="board-ok"><span class="ui-badge ui-badge--ok"><i class="fas fa-check" aria-hidden="true"></i> {% translate "Every class has taken today's register." %}</span></p>
+          {% endif %}
+        {% endif %}
+      </section>
+
+      <section class="ui-card">
+        <div class="ui-card-head"><h2 class="ui-card-title">{% translate "Quick links" %}</h2></div>
+        <nav class="board-links" aria-label="{% translate 'Quick links' %}">
+          <a class="ui-btn ui-btn--secondary" href="{% url 'school_classes' %}"><i class="fas fa-door-open" aria-hidden="true"></i> {% translate "Classes" %}</a>
+          <a class="ui-btn ui-btn--secondary" href="{% url 'school_timetable' %}"><i class="fas fa-table" aria-hidden="true"></i> {% translate "Timetable" %}</a>
+          <a class="ui-btn ui-btn--secondary" href="{% url 'school_bells' %}"><i class="fas fa-bell" aria-hidden="true"></i> {% translate "Bell times" %}</a>
+          {% if register_url %}<a class="ui-btn ui-btn--secondary" href="{{ register_url }}"><i class="fas fa-clipboard-check" aria-hidden="true"></i> {% translate "Register" %}</a>{% endif %}
+          <a class="ui-btn ui-btn--secondary" href="{% url 'school_parents' %}"><i class="fas fa-user-friends" aria-hidden="true"></i> {% translate "Parents" %}</a>
+          <a class="ui-btn ui-btn--secondary" href="{% url 'school_years' %}"><i class="fas fa-calendar-alt" aria-hidden="true"></i> {% translate "Academic year" %}</a>
+        </nav>
+      </section>
+    </div>
+
+    <div class="school-stack">
+      <section class="ui-card{% if not year %} school-card-gold{% endif %}">
+        <div class="ui-card-head"><h2 class="ui-card-title">{% translate "Academic year" %}</h2></div>
+        {% if year %}
+          <b class="ui-stat-value">{{ year }}</b>
+          {% if term %}
+          <p class="school-help">{% if term.name %}{{ term.name }}{% else %}{% blocktranslate with number=term.number %}Quarter {{ number }}{% endblocktranslate %}{% endif %} · {{ term.start_date|date:"j E" }} – {{ term.end_date|date:"j E Y" }}</p>
+          {% else %}
+          <p class="school-help">{% translate "No quarter has started yet." %}</p>
+          {% endif %}
+        {% else %}
+          <p class="school-help" data-board-empty="no-year">{% translate "No current academic year is set." %}</p>
+          <a href="{% url 'school_years' %}" class="ui-btn ui-btn--primary board-more">{% translate "Set one up" %} →</a>
+        {% endif %}
+      </section>
+
+      <section class="ui-card">
+        <div class="ui-card-head">
+          <h2 class="ui-card-title">{% translate "Parents" %}</h2>
+          <a href="{% url 'school_parents' %}" class="ui-card-link">{% translate "Open parents" %} →</a>
+        </div>
+        <ul class="board-facts">
+          <li><b class="ui-stat-value" data-count="never-signed-in">{{ parents_never_signed_in }}</b> {% translate "parents haven't signed in yet" %}</li>
+          <li><b class="ui-stat-value" data-count="no-parent">{{ pupils_without_parent }}</b> {% translate "pupils have no parent linked" %}</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+{% endif %}
+</div>
+{% endblock content %}

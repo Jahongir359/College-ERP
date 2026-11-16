@@ -8,6 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.views.decorators.http import require_POST
 
 from .decorators import staff_only
@@ -34,7 +35,7 @@ def _monthly_range(n=6):
             last = date(year + 1, 1, 1)
         else:
             last = date(year, month + 1, 1)
-        months.append((first, last, first.strftime("%b")))
+        months.append((first, last, date_format(first, "M")))
     return months
 
 

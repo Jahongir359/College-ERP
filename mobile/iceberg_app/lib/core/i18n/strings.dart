@@ -437,6 +437,25 @@ class S {
     'Your classes will appear here once assigned.': 'Sinflar biriktirilgach shu yerda koʻrinadi.',
     'due': 'qarz',
     'Next': 'Keyingi',
+
+    // ── Choice screen (P4.2) ────────────────────────────────────────────
+    'Which Iceberg are you signing in to?': 'Qaysi Icebergʼga kirasiz?',
+    'Choose one. Next time the app opens there.': 'Tanlang — keyingi safar ilova shu yerdan ochiladi.',
+    'Private school · Grades 1–11': 'Xususiy maktab · 1–11-sinflar',
+    'IELTS, CEFR, SAT and subject courses': 'IELTS, CEFR, SAT va fan kurslari',
+    'You can change this on the sign-in screen': 'Tanlovni kirish sahifasida oʻzgartirish mumkin',
+    'Choose another': 'Boshqa tanlash',
+
+    // ── Password change and brand notice (P4.3) ──────────────────────────
+    'Choose your password': 'Parolingizni tanlang',
+    'You signed in with a temporary password. Choose your own to continue.': 'Siz vaqtinchalik parol bilan kirdingiz. Davom etish uchun oʻz parolingizni tanlang.',
+    'Temporary password': 'Vaqtinchalik parol',
+    'At least 8 characters': 'Kamida 8 ta belgi',
+    'Use a different password from the temporary one.': 'Vaqtinchalik paroldan boshqa parol tanlang.',
+    'The temporary password is not correct.': 'Vaqtinchalik parol notoʻgʻri.',
+    'Could not save. Check your internet and try again.': 'Saqlab boʻlmadi. Internetni tekshirib, qayta urinib koʻring.',
+    'Save and continue': 'Saqlash va davom etish',
+    'Your account is in {brand}, so the app has switched to it.': 'Akkauntingiz {brand}ga tegishli, shuning uchun ilova unga oʻtdi.',
   };
 
   static const _ru = <String, String>{
@@ -872,6 +891,25 @@ class S {
     'Your classes will appear here once assigned.': 'Классы появятся здесь после назначения.',
     'due': 'к оплате',
     'Next': 'Следующий',
+
+    // ── Choice screen (P4.2) ────────────────────────────────────────────
+    'Which Iceberg are you signing in to?': 'В какой Iceberg вы входите?',
+    'Choose one. Next time the app opens there.': 'Выберите — в следующий раз приложение откроется сразу здесь.',
+    'Private school · Grades 1–11': 'Частная школа · 1–11 классы',
+    'IELTS, CEFR, SAT and subject courses': 'IELTS, CEFR, SAT и предметные курсы',
+    'You can change this on the sign-in screen': 'Выбор можно изменить на странице входа',
+    'Choose another': 'Выбрать другое',
+
+    // ── Password change and brand notice (P4.3) ──────────────────────────
+    'Choose your password': 'Придумайте пароль',
+    'You signed in with a temporary password. Choose your own to continue.': 'Вы вошли с временным паролем. Чтобы продолжить, придумайте свой.',
+    'Temporary password': 'Временный пароль',
+    'At least 8 characters': 'Не менее 8 символов',
+    'Use a different password from the temporary one.': 'Новый пароль должен отличаться от временного.',
+    'The temporary password is not correct.': 'Временный пароль неверный.',
+    'Could not save. Check your internet and try again.': 'Не удалось сохранить. Проверьте интернет и попробуйте ещё раз.',
+    'Save and continue': 'Сохранить и продолжить',
+    'Your account is in {brand}, so the app has switched to it.': 'Ваш аккаунт относится к {brand}, поэтому приложение переключилось.',
   };
 
   static const _ko = <String, String>{
@@ -1304,6 +1342,25 @@ class S {
     'Your classes will appear here once assigned.': '학급이 배정되면 여기에 표시됩니다.',
     'due': '미납',
     'Next': '다음',
+
+    // ── Choice screen (P4.2) ────────────────────────────────────────────
+    'Which Iceberg are you signing in to?': '어느 Iceberg에 로그인하시나요?',
+    'Choose one. Next time the app opens there.': '하나를 선택하세요. 다음에는 앱이 바로 그곳에서 열립니다.',
+    'Private school · Grades 1–11': '사립학교 · 1–11학년',
+    'IELTS, CEFR, SAT and subject courses': 'IELTS, CEFR, SAT 및 교과 과정',
+    'You can change this on the sign-in screen': '로그인 화면에서 변경할 수 있습니다',
+    'Choose another': '다른 곳 선택',
+
+    // ── Password change and brand notice (P4.3) ──────────────────────────
+    'Choose your password': '비밀번호를 정하세요',
+    'You signed in with a temporary password. Choose your own to continue.': '임시 비밀번호로 로그인했습니다. 계속하려면 새 비밀번호를 정하세요.',
+    'Temporary password': '임시 비밀번호',
+    'At least 8 characters': '8자 이상',
+    'Use a different password from the temporary one.': '임시 비밀번호와 다른 비밀번호를 사용하세요.',
+    'The temporary password is not correct.': '임시 비밀번호가 올바르지 않습니다.',
+    'Could not save. Check your internet and try again.': '저장하지 못했습니다. 인터넷을 확인하고 다시 시도하세요.',
+    'Save and continue': '저장하고 계속',
+    'Your account is in {brand}, so the app has switched to it.': '계정이 {brand}에 속해 있어 앱이 전환되었습니다.',
   };
 
   /// Translate [key] (the English string doubles as the key).

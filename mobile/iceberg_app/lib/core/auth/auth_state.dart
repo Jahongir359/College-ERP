@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../api/api_client.dart';
@@ -16,6 +17,9 @@ class IceUser {
   final String avatar; // emoji avatar ('' when unset)
   final Map<String, dynamic>? roleProfile;
   final String brand; // "center" or "school" — server-decided, see IceBrand
+  // Signed in with a temporary password (PL.1): the app shows only
+  // /change-password until the user picks their own.
+  final bool mustChangePassword;
 
   const IceUser({
     required this.id,
@@ -28,6 +32,7 @@ class IceUser {
     this.avatar = '',
     this.roleProfile,
     this.brand = 'center',
+    this.mustChangePassword = false,
   });
 
   String get fullName => '$firstName $lastName'.trim();
@@ -51,6 +56,7 @@ class IceUser {
     roleProfile: j['role_profile'],
     // Older servers and cached users have no brand → Learning Center.
     brand: j['brand'] ?? 'center',
+    mustChangePassword: j['must_change_password'] == true,
   );
 
   Map<String, dynamic> toJson() => {
@@ -64,6 +70,7 @@ class IceUser {
     'avatar': avatar,
     'role_profile': roleProfile,
     'brand': brand,
+    'must_change_password': mustChangePassword,
   };
 }
 
@@ -86,12 +93,21 @@ class AuthState {
 
 // ─── Provider ────────────────────────────────────────────────────────────────
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(AuthState.loading()) {
+  AuthNotifier() : _dio = ApiClient.instance.dio, super(AuthState.loading()) {
     // When a token refresh fails (expired/blacklisted), drop to login cleanly
     // instead of leaving the user stuck on an error screen.
     _api.onSessionExpired = _handleSessionExpired;
+    // Any call refused because the password is still temporary (PL.1).
+    _api.onPasswordChangeRequired = passwordChangeRequired;
     _init();
   }
+
+  /// Starts in the given state without reading the saved session; requests
+  /// go through [dio].
+  @visibleForTesting
+  AuthNotifier.withState(super.state, {required Dio dio}) : _dio = dio;
+
+  final Dio _dio;
 
   // encryptedSharedPreferences avoids the raw Android Keystore path, which is
   // known to hang or fail on some Xiaomi/MIUI and Huawei/EMUI devices and could
@@ -105,9 +121,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // Run a minimum display timer in parallel with auth loading so the splash
     // animation always completes (~1.8 s) regardless of how fast storage reads
     // resolve. Both paths await minDisplay before transitioning.
-    final minDisplay = Future<void>.delayed(
-      const Duration(milliseconds: 1800),
-    );
+    final minDisplay = Future<void>.delayed(const Duration(milliseconds: 1800));
 
     IceUser? user;
     try {
@@ -149,14 +163,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // mobile where the initial TCP/TLS handshake drops.
     for (var attempt = 0; attempt < 2; attempt++) {
       try {
-        final res = await _api.dio.post(
+        final res = await _dio.post(
           '/auth/login/',
           data: {'identifier': identifier, 'password': password},
         );
         final data = res.data as Map<String, dynamic>;
         await _api.saveTokens(data['access'], data['refresh']);
         final user = IceUser.fromJson(data['user']);
-        await _storage.write(key: 'user_json', value: jsonEncode(user.toJson()));
+        await _storage.write(
+          key: 'user_json',
+          value: jsonEncode(user.toJson()),
+        );
         state = AuthState.auth(user);
         return null; // success
       } on DioException catch (e) {
@@ -201,7 +218,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final refresh = await _storage.read(key: 'refresh_token');
       if (refresh != null) {
-        await _api.dio.post('/auth/logout/', data: {'refresh': refresh});
+        await _dio.post('/auth/logout/', data: {'refresh': refresh});
       }
     } catch (_) {}
     await _api.clearTokens();
@@ -212,6 +229,104 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void updateUser(IceUser user) {
     _storage.write(key: 'user_json', value: jsonEncode(user.toJson()));
     state = AuthState.auth(user);
+  }
+
+  /// Reload the signed-in user from `me/`. Returns false when it failed.
+  Future<bool> refreshMe() async {
+    try {
+      final res = await _dio.get('/me/');
+      if (state.status != AuthStatus.authenticated) return false;
+      updateUser(IceUser.fromJson(res.data as Map<String, dynamic>));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// The server refused a call with code "password_change_required": show
+  /// the password screen now, then confirm the flag with `me/`.
+  void passwordChangeRequired() {
+    final user = state.user;
+    if (user == null) return;
+    if (!user.mustChangePassword) {
+      updateUser(
+        IceUser.fromJson({...user.toJson(), 'must_change_password': true}),
+      );
+    }
+    refreshMe();
+  }
+
+  /// Replace a temporary password (PL.1). Returns null on success, else the
+  /// server's message; [ChangePasswordError] says which field it is about.
+  Future<ChangePasswordError?> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _dio.post(
+        '/me/change-password/',
+        data: {
+          'old_password': oldPassword,
+          'new_password': newPassword,
+          'confirm_password': newPassword,
+        },
+      );
+    } on DioException catch (e) {
+      return ChangePasswordError.from(e);
+    } on Exception {
+      return const ChangePasswordError(null, null);
+    }
+    // The same token keeps working. If me/ fails, the server has still
+    // cleared the flag, so let the user continue.
+    if (!await refreshMe()) {
+      final user = state.user;
+      if (user != null) {
+        updateUser(
+          IceUser.fromJson({...user.toJson(), 'must_change_password': false}),
+        );
+      }
+    }
+    return null;
+  }
+}
+
+/// Why `me/change-password/` refused: [field] is `old_password`,
+/// `new_password`, `confirm_password` or null (network or other), [message]
+/// is the server's text when it sent one.
+class ChangePasswordError {
+  const ChangePasswordError(this.field, this.message);
+
+  final String? field;
+  final String? message;
+
+  /// The server sends `{"old_password": "Incorrect password."}` (a string)
+  /// or serializer errors (`{"new_password": ["…", …]}`); accept both.
+  factory ChangePasswordError.from(DioException e) {
+    final data = e.response?.data;
+    if (data is Map) {
+      for (final key in const [
+        'old_password',
+        'new_password',
+        'confirm_password',
+        'non_field_errors',
+        'detail',
+      ]) {
+        final msg = _firstMessage(data[key]);
+        if (msg != null) {
+          return ChangePasswordError(
+            key.endsWith('password') ? key : null,
+            msg,
+          );
+        }
+      }
+    }
+    return const ChangePasswordError(null, null);
+  }
+
+  static String? _firstMessage(Object? v) {
+    if (v is String && v.isNotEmpty) return v;
+    if (v is List && v.isNotEmpty) return v.first.toString();
+    return null;
   }
 }
 

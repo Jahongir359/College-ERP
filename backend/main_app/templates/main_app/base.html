@@ -1,6 +1,6 @@
 {% load static i18n %}{% get_current_language as current_language %}
 <!DOCTYPE html>
-<html lang="{{ current_language|default:'en' }}" data-brand="{{ brand.key|default:'center' }}">
+<html lang="{{ current_language|default:'en' }}" data-brand="{{ brand.key|default:'center' }}"{% if user.user_type == '1' %} data-shell="admin"{% endif %}>
 <head>
     <!-- Adaptive platform look (Apple glass / Android+other solid) — must run before paint -->
     <script src="{% static 'dist/js/platform-detect.js' %}"></script>
@@ -165,7 +165,9 @@
 .erpnext-sidebar .sidebar-user-info h6 { color: #fff !important; }
 .erpnext-sidebar .sidebar-user-info small { color: rgba(255,255,255,.55) !important; }
     </style>{% if brand.key == "school" %}
-    <link rel="stylesheet" href="{% static 'dist/css/brand-school.css' %}">{% endif %}
+    <link rel="stylesheet" href="{% static 'dist/css/brand-school.css' %}">{% endif %}{% if user.user_type == '1' %}{% if brand.key == "school" %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500..700,50..100&display=swap">{% endif %}
+    <link rel="stylesheet" href="{% static 'dist/css/admin-shell.css' %}">{% endif %}
     {% block custom_css %}{% endblock custom_css %}
     <script>
     /* Apply theme before paint to prevent flash */
@@ -207,13 +209,59 @@
             <button type="button" class="navbar-toggle" onclick="toggleSidebar()" title="{% translate 'Toggle menu' %}" aria-label="{% translate 'Toggle navigation menu' %}" aria-controls="erpnext-sidebar" aria-expanded="false">
                 <i class="fas fa-bars"></i>
             </button>
-            <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}"
+            <a href="{% if user.user_type == '1' %}{{ admin_home_url|default:'/admin/home/' }}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}"
                class="navbar-brand" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;">
+                {% if brand.key == "school" %}
+                <img class="navbar-brand-logo navbar-brand-logo--light" src="{% static brand.logo_on_light %}" alt="{{ brand.display_name }}">
+                <img class="navbar-brand-logo navbar-brand-logo--dark" src="{% static brand.logo_on_dark %}" alt="" aria-hidden="true">
+                {% else %}
                 <span class="navbar-logo-text">ICEBERG</span>
+                {% endif %}
             </a>
         </div>
 
+        {% if user.user_type == '1' %}
+        <!-- Admin shell topbar (P3.9, mockups 16 and 16c): chip, bell, initials
+             avatar. Language, theme and sign-out live in the avatar menu. -->
+        <div class="navbar-user admin-topbar">
+            {% if brand.key == "school" and school_period %}
+            <span class="navbar-period-chip">{{ school_period }}</span>
+            {% elif admin_branch_label %}
+            <span class="admin-chip">{{ admin_branch_label }}</span>
+            {% endif %}
+            {% url 'messages' as messages_url %}
+            <a href="{{ messages_url }}" class="admin-topbar-icon" title="{% translate 'Messages' %}" aria-label="{% translate 'Open group messages' %}">
+                <i class="far fa-bell" aria-hidden="true"></i>
+                {% if unread_message_count > 0 %}<span class="notif-badge">{{ unread_message_count }}</span>{% endif %}
+            </a>
+            <div class="dropdown admin-account">
+                <button type="button" class="admin-avatar" id="admin-account-btn" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" aria-haspopup="true" aria-label="{% translate 'Account menu' %}" title="{{ user.get_full_name|default:user.email }}">{{ user.first_name|first|upper }}{{ user.last_name|first|upper|default:"" }}</button>
+                <div class="dropdown-menu dropdown-menu-end admin-account-menu" aria-labelledby="admin-account-btn">
+                    <div class="admin-account-head">
+                        <span class="admin-avatar admin-avatar--lg" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                        <span><b>{{ user.get_full_name|default:user.email }}</b><small>{{ user.email }}</small></span>
+                    </div>
+                    {% url 'profile_hub' as profile_url %}
+                    <a class="dropdown-item" href="{{ profile_url }}"><i class="fas fa-user-circle" aria-hidden="true"></i>{% translate "Profile & Settings" %}</a>
+                    <div class="admin-account-row">
+                        <span><i class="fas fa-globe" aria-hidden="true"></i>{% translate "Language" %}</span>
+                        {% include "main_app/includes/language_switch.html" with lang_class="navbar-lang-switch" %}
+                    </div>
+                    <button type="button" id="navbar-theme-toggle" class="dropdown-item admin-theme-toggle" onclick="iceToggleTheme()" aria-label="{% translate 'Toggle dark or bright theme' %}">
+                        <i class="fas fa-moon" id="navbar-theme-icon" aria-hidden="true"></i><span class="admin-theme-label admin-theme-label--dark">{% translate "Dark mode" %}</span><span class="admin-theme-label admin-theme-label--light">{% translate "Light mode" %}</span>
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    {% translate "Sign Out" as sign_out_label %}{% translate "Sign out of Iceberg" as sign_out_aria %}
+                    {% include "main_app/includes/animated_logout_button.html" with btn_class="dropdown-item admin-signout" label=sign_out_label aria=sign_out_aria %}
+                </div>
+            </div>
+        </div>
+        {% else %}
         <div class="navbar-user">
+            <!-- School year · quarter chip (P3.6, mockup 16): School admins only -->
+            {% if brand.key == "school" and school_period %}
+            <span class="navbar-period-chip">{{ school_period }}</span>
+            {% endif %}
             <!-- Language switch (admins, P3.0): uz / ru / en, saved per user -->
             {% if user.user_type == '1' %}
             {% include "main_app/includes/language_switch.html" with lang_class="navbar-lang-switch" %}
@@ -267,6 +315,7 @@
             <!-- Logout (animated, POST + CSRF, JS-optional) -->
             {% translate "Logout" as logout_label %}
             {% include "main_app/includes/animated_logout_button.html" with btn_class="logout-btn" label=logout_label label_class="logout-text" %}
+        {% endif %}
         </div>
     </nav>
 
@@ -280,13 +329,15 @@
     <main class="erpnext-main ice-page" id="main-content">
         <div class="page-header ice-page-header">
             <div class="page-header-content">
+                {% block page_eyebrow %}{% endblock page_eyebrow %}
                 <h1 class="page-title">{% block page_title %}{% translate "Dashboard" %}{% endblock page_title %}</h1>
                 {% block page_subtitle %}{% if page_subtitle %}<p class="page-subtitle">{{ page_subtitle }}</p>{% endif %}{% endblock page_subtitle %}
             </div>
+            {% block page_actions %}{% endblock page_actions %}
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}" aria-label="{% translate 'Open dashboard' %}">
+                        <a href="{% if user.user_type == '1' %}{{ admin_home_url|default:'/admin/home/' }}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}" aria-label="{% translate 'Open dashboard' %}">
                             <i class="fas fa-home"></i>
                         </a>
                     </li>

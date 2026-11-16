@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_state.dart';
 import '../../../core/i18n/strings.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/ice_tokens.dart';
 import '../../../core/theme/brand.dart';
+import '../../../core/theme/brand_provider.dart';
 
-/// ICEBERG login — dark navy/teal hero with the lime accent, shared by all
-/// roles (the API routes each role to its own shell after sign-in).
+/// ICEBERG login — dark hero in the brand picked on `/choose` (navy for the
+/// Study Center, maroon for the School), shared by all roles (the API routes
+/// each role to its own shell after sign-in).
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
   @override
@@ -25,8 +28,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _obscure = true;
   String? _error;
 
-  // Login renders before any role/theme is known — use the dark brand palette.
-  final IceTokens t = IceTokens.dark();
+  // Login renders before any role/theme is known — use the dark palette of
+  // the brand picked on /choose.
+  late IceTokens t;
 
   @override
   void dispose() {
@@ -56,6 +60,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
+    final brand = ref.watch(brandProvider);
+    // The School gets its own light page (mockup 02); the Study Center keeps
+    // its dark login exactly as before.
+    if (brand.isSchool) {
+      t = IceTokens.light(brand: brand);
+      return _schoolLogin(s, brand);
+    }
+    t = IceTokens.dark(brand: brand);
     return Scaffold(
       backgroundColor: t.bg,
       body: Container(
@@ -100,15 +112,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         .scale(duration: 500.ms, curve: Curves.easeOutBack)
                         .fadeIn(duration: 300.ms),
                     const SizedBox(height: 18),
-                    Text(
-                      'ICEBERG',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 6,
-                        color: t.mint,
-                      ),
-                    ),
+                    if (brand.isSchool)
+                      Image.asset(
+                        'assets/images/brand/school/logo-h-white.png',
+                        height: 44,
+                        semanticLabel: brand.appTitle,
+                        errorBuilder: (_, __, ___) => _wordmark(),
+                      )
+                    else
+                      _wordmark(),
                     const SizedBox(height: 30),
 
                     // ── Card ────────────────────────────────────────────────
@@ -158,6 +170,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           curve: Curves.easeOutCubic,
                         )
                         .fadeIn(duration: 350.ms),
+                    const SizedBox(height: 18),
+                    _changeBrand(s, brand),
                   ],
                 ),
               ),
@@ -165,6 +179,169 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Iceberg School sign-in (mockup 02): a maroon header with the crest and
+  /// wordmark, a white card over it, and a maroon button with white text.
+  Widget _schoolLogin(S s, IceBrand brand) {
+    return Scaffold(
+      backgroundColor: SchoolColors.bg,
+      body: Stack(
+        children: [
+          Container(
+            height: 330,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  SchoolColors.primaryHover,
+                  SchoolColors.primary,
+                  SchoolColors.primaryDeep,
+                ],
+              ),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
+            ),
+          ),
+          // Top-aligned, not centred: the maroon header has a fixed height,
+          // so on a tall screen a centred wordmark would fall below it.
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 96,
+                        height: 96,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.22),
+                          ),
+                        ),
+                        child: Image.asset(
+                          IceBrandLogo.schoolCrestAsset,
+                          errorBuilder: (_, __, ___) => const SizedBox(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Image.asset(
+                        'assets/images/brand/school/logo-h-white.png',
+                        height: 44,
+                        semanticLabel: brand.appTitle,
+                        errorBuilder: (_, __, ___) => Text(
+                          brand.appTitle,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      Container(
+                            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: SchoolColors.border),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: SchoolColors.primary.withValues(
+                                    alpha: 0.10,
+                                  ),
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 14),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  s('Welcome'),
+                                  style: const TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w800,
+                                    color: SchoolColors.text,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  s('Please sign in to your account'),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: SchoolColors.muted,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                _form(s),
+                              ],
+                            ),
+                          )
+                          .animate(delay: 150.ms)
+                          .slideY(
+                            begin: 0.08,
+                            duration: 450.ms,
+                            curve: Curves.easeOutCubic,
+                          )
+                          .fadeIn(duration: 350.ms),
+                      const SizedBox(height: 18),
+                      _changeBrand(s, brand),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _wordmark() => Text(
+    'ICEBERG',
+    style: TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 6,
+      color: t.mint,
+    ),
+  );
+
+  /// "Iceberg School · Choose another" — back to /choose.
+  Widget _changeBrand(S s, IceBrand brand) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          '${brand.appTitle} · ',
+          style: TextStyle(fontSize: 13.5, color: t.textMid),
+        ),
+        TextButton(
+          key: const ValueKey('login-change-brand'),
+          onPressed: _loading ? null : () => context.go('/choose'),
+          style: TextButton.styleFrom(
+            foregroundColor: t.isDark ? t.textHi : t.accentInk,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            minimumSize: const Size(0, 40),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            s('Choose another'),
+            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800),
+          ),
+        ),
+      ],
     );
   }
 

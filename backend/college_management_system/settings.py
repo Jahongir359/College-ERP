@@ -45,7 +45,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "False").strip().lower() not in ("0", "fa
 # Always require an explicit secret key in production.
 # Fallback is only kept so `manage.py` commands work in a fresh clone
 # before the developer has created their .env file.
-_secret_key_fallback = "f2zx8*lb*em*-*b+!&1lpp&$_9q9kmkar+l3x90do@s(+sr&x7"
+_secret_key_fallback = "django-insecure-dev-only-not-a-real-key"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", _secret_key_fallback)
 if not DEBUG and SECRET_KEY == _secret_key_fallback and not _ALLOW_INSECURE_CONFIG_DEFAULTS:
     raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is False.")
@@ -413,6 +413,9 @@ MIN_APP_VERSION_IOS = os.environ.get("MIN_APP_VERSION_IOS", "").strip()
 # Store pages the app's "update" screen opens; blank until the listings exist (P5).
 APP_STORE_URL_ANDROID = os.environ.get("APP_STORE_URL_ANDROID", "").strip()
 APP_STORE_URL_IOS = os.environ.get("APP_STORE_URL_IOS", "").strip()
+# Page the QR code on printed parent login letters opens (PL.1); one link for both
+# phones, e.g. a page with both store buttons. Blank: this site's /download/ page.
+APP_DOWNLOAD_URL = os.environ.get("APP_DOWNLOAD_URL", "").strip()
 
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     # Full SMTP — used in production when credentials are configured.
@@ -502,7 +505,8 @@ if not DEBUG:
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # JWT, plus the first-login password change (PL.1).
+        "main_app.api.authentication.PasswordChangeJWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",

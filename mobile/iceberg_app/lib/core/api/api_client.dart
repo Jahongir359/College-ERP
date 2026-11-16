@@ -9,6 +9,14 @@ const String kBaseUrl = String.fromEnvironment(
   defaultValue: 'https://app.iceberglc.com/api/v1',
 );
 
+/// A 403 the server sends while the user's password is still temporary.
+bool isPasswordChangeRequired(Response<dynamic>? res) {
+  final data = res?.data;
+  return res?.statusCode == 403 &&
+      data is Map &&
+      data['code'] == 'password_change_required';
+}
+
 class ApiClient {
   ApiClient._();
   static ApiClient? _instance;
@@ -36,6 +44,10 @@ class ApiClient {
   // Invoked when a 401 cannot be refreshed (refresh token expired/blacklisted)
   // so the app can drop to the login screen instead of looping on errors.
   void Function()? onSessionExpired;
+
+  // Invoked when the server refuses a call because the user still has a
+  // temporary password (PL.1), so the app can show the password screen.
+  void Function()? onPasswordChangeRequired;
 
   late final Dio dio = _buildDio();
 
@@ -74,7 +86,8 @@ class ApiClient {
         onError: (error, handler) async {
           final path = error.requestOptions.path;
           final isAuthCall =
-              path.contains('/auth/login') || path.contains('/auth/token/refresh');
+              path.contains('/auth/login') ||
+              path.contains('/auth/token/refresh');
 
           if (error.response?.statusCode == 401 && !isAuthCall) {
             final refreshed = await _tryRefresh();
@@ -94,6 +107,9 @@ class ApiClient {
               onSessionExpired?.call();
             }
           }
+          if (isPasswordChangeRequired(error.response)) {
+            onPasswordChangeRequired?.call();
+          }
           handler.next(error);
         },
       ),
@@ -112,10 +128,9 @@ class ApiClient {
     if (refresh == null || refresh.isEmpty) return false;
     try {
       // A bare Dio avoids the auth interceptor (no Authorization header here).
-      final res = await Dio(BaseOptions(baseUrl: kBaseUrl)).post(
-        '/auth/token/refresh/',
-        data: {'refresh': refresh},
-      );
+      final res = await Dio(
+        BaseOptions(baseUrl: kBaseUrl),
+      ).post('/auth/token/refresh/', data: {'refresh': refresh});
       final data = res.data as Map<String, dynamic>;
       final newAccess = data['access'] as String?;
       // ROTATE_REFRESH_TOKENS is on server-side: a new refresh token is issued
@@ -180,5 +195,6 @@ class ApiClient {
     } catch (_) {}
   }
 
-  Future<String?> get accessToken async => _access ??= await _storage.read(key: 'access_token');
+  Future<String?> get accessToken async =>
+      _access ??= await _storage.read(key: 'access_token');
 }

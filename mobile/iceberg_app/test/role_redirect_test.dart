@@ -3,14 +3,14 @@ import 'package:iceberg_app/core/auth/auth_state.dart';
 import 'package:iceberg_app/core/router/app_router.dart';
 
 IceUser _user(String userType, {String brand = 'center'}) => IceUser(
-      id: 1,
-      email: 'u@example.com',
-      loginId: 'U1',
-      firstName: 'Test',
-      lastName: 'User',
-      userType: userType,
-      brand: brand,
-    );
+  id: 1,
+  email: 'u@example.com',
+  loginId: 'U1',
+  firstName: 'Test',
+  lastName: 'User',
+  userType: userType,
+  brand: brand,
+);
 
 void main() {
   group('roleRedirect', () {
@@ -23,6 +23,49 @@ void main() {
       expect(roleRedirect(auth, '/student/home'), '/login');
       expect(roleRedirect(auth, '/staff/home'), '/login');
       expect(roleRedirect(auth, '/login'), isNull);
+    });
+
+    test('first launch goes to the choice screen before login', () {
+      final auth = AuthState.unauth();
+      expect(roleRedirect(auth, '/splash', brandChosen: false), '/choose');
+      expect(roleRedirect(auth, '/login', brandChosen: false), '/choose');
+      expect(
+        roleRedirect(auth, '/student/home', brandChosen: false),
+        '/choose',
+      );
+      expect(roleRedirect(auth, '/choose', brandChosen: false), isNull);
+    });
+
+    test('after the choice, login opens and links back to /choose', () {
+      final auth = AuthState.unauth();
+      expect(roleRedirect(auth, '/splash', brandChosen: true), '/login');
+      expect(roleRedirect(auth, '/login', brandChosen: true), isNull);
+      expect(roleRedirect(auth, '/choose', brandChosen: true), isNull);
+    });
+
+    test('the splash stays while the saved choice is still loading', () {
+      final auth = AuthState.unauth();
+      expect(roleRedirect(auth, '/login', brandChosen: null), '/splash');
+      expect(roleRedirect(auth, '/choose', brandChosen: null), '/splash');
+    });
+
+    test('signed-in users never see the choice screen', () {
+      expect(
+        roleRedirect(AuthState.auth(_user('3')), '/choose'),
+        '/student/home',
+      );
+      expect(
+        roleRedirect(AuthState.auth(_user('2')), '/choose'),
+        '/staff/home',
+      );
+      expect(
+        roleRedirect(AuthState.auth(_user('4')), '/choose'),
+        '/coming-soon',
+      );
+      expect(
+        roleRedirect(AuthState.auth(_user('3')), '/choose', brandChosen: false),
+        '/student/home',
+      );
     });
 
     test('admins only see the coming-soon wall', () {
@@ -60,7 +103,11 @@ void main() {
 
   group('IceUser.fromJson', () {
     test('reads the role and defaults the brand to the Study Center', () {
-      final u = IceUser.fromJson({'id': 7, 'user_type': 2, 'first_name': 'Ali'});
+      final u = IceUser.fromJson({
+        'id': 7,
+        'user_type': 2,
+        'first_name': 'Ali',
+      });
       expect(u.isStaff, isTrue);
       expect(u.isAdmin || u.isStudent, isFalse);
       expect(u.brand, 'center');
@@ -68,7 +115,11 @@ void main() {
     });
 
     test('keeps a School brand and survives a toJson round trip', () {
-      final u = IceUser.fromJson({'id': 8, 'user_type': '3', 'brand': 'school'});
+      final u = IceUser.fromJson({
+        'id': 8,
+        'user_type': '3',
+        'brand': 'school',
+      });
       final again = IceUser.fromJson(u.toJson());
       expect(again.isStudent, isTrue);
       expect(again.brand, 'school');
@@ -78,7 +129,10 @@ void main() {
       final u = IceUser.fromJson({
         'id': 9,
         'user_type': '1',
-        'role_profile': {'is_super_admin': true, 'branch_ids': [1, 2]},
+        'role_profile': {
+          'is_super_admin': true,
+          'branch_ids': [1, 2],
+        },
       });
       expect(u.isSuperAdmin, isTrue);
       expect(u.branchIds, [1, 2]);
